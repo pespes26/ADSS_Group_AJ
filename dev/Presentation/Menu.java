@@ -1,15 +1,28 @@
 package Presentation;
+
 import Service.*;
-
 import java.util.Scanner;
-
 import org.yaml.snakeyaml.Yaml;
-
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Presentation layer of the application.
+ * Handles user input/output and interacts with the Service layer (DataController).
+ * Provides a console-based menu for managing stock, viewing product details,
+ * updating prices, generating reports, and more.
+ */
 public class Menu {
+    /** Global scanner object used for user input */
     public static Scanner scan;
+
+    /**
+     * Entry point of the program.
+     * Loads data from the YAML-configured CSV file, and displays a menu to the user
+     * for managing the inventory system.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         DataController dataController = new DataController();
         String path = getPathFromConfig();
@@ -21,11 +34,11 @@ public class Menu {
         while (choice != 10) {
             String menu = """
                     Menu:
-                    1.Add a new product to the stock\
+                    1.Show product Details\
                     
-                    2.Remove a product from the stock\
+                    2.Add a new product to the stock\
                     
-                    3.Show product Details\
+                    3.Remove a product from the stock\
                     
                     4.Show the purchase price of a product\
                     
@@ -53,7 +66,21 @@ public class Menu {
             int product_ID;
 
             switch (choice) {
-                case 1: //Add a new product to the stock
+                case 1: //Show Product Details
+                    try {
+                        System.out.println("Enter product ID: ");
+                        product_ID = scan.nextInt();
+                        scan.nextLine();
+                        String details = dataController.productsDetails(product_ID);
+                        System.out.println(details);
+                        break;
+
+                    }
+                    catch (NullPointerException e) {
+                        System.out.println("This Product ID is not in tne stock.");
+                    }
+
+                case 2: //Add a new product to the stock
                     boolean validCatalogNum = false;
                     while(!validCatalogNum) {
                         String productDetails = getProductDetails(); //from user
@@ -63,28 +90,29 @@ public class Menu {
                         }
                     }
                     break;
-                case 2: //Remove a product from the stock
+                case 3: //Remove a product from the stock
                     try {
-                        System.out.println("Enter the ID of the product: ");
+                        System.out.println("Enter the ID of the product that you want to remove: ");
                         product_ID = scan.nextInt();
                         scan.nextLine();
-                        int remove_choice = 3;
-                        while (remove_choice != 1 && remove_choice != 2) {
+                        while (choice != 1 && choice != 2) {
+                            System.out.println("What is the reason for removing the product?");
                             System.out.println("(1)Purchase\n(2)Defect");
-                            remove_choice = scan.nextInt();
+                            choice = scan.nextInt();
                             scan.nextLine();
-                            if (remove_choice == 1) { //Purchase
+                            if (choice == 1) { //Purchase
                                 System.out.println("Enter the sale price for this product: ");
                                 double price = scan.nextDouble();
                                 scan.nextLine();
+
                                 boolean alert = dataController.checkForAlert(product_ID);
-                                //check if need alert
                                 if (alert) {
                                     System.out.println("ALERT! " + dataController.getProductName(product_ID)
                                             + " has reached critical amount. Please order new supply.");
                                 }
+
                                 dataController.handlePurchaseProduct(product_ID, price);
-                            } else if (remove_choice == 2) { //Defect
+                            } else if (choice == 2) { //Defect
                                 boolean alert = dataController.checkForAlert(product_ID);
                                 if (alert) {
                                     System.out.println("ALERT! " + dataController.getProductName(product_ID)
@@ -100,18 +128,6 @@ public class Menu {
                         System.out.println("This Product ID is not in the stock.");
                     }
                     break;
-                case 3: //Show Product Details
-                    try {
-                        System.out.println("Enter product ID: ");
-                        product_ID = scan.nextInt();
-                        scan.nextLine();
-                        String details = dataController.productsDetails(product_ID);
-                        System.out.println(details);
-                        break;
-                    }
-                    catch (NullPointerException e) {
-                        System.out.println("This Product ID is not in tne stock.");
-                    }
                 case 4: //Show the purchase price of a product
                     try{
                         System.out.println("Enter the ID of the product:");
@@ -155,6 +171,7 @@ public class Menu {
                     String[] categories = stringCategories.split(" ");
                     System.out.println("Inventory Report\n");
                     System.out.println(dataController.inventoryReportController(categories));
+                    break;
 
                 case 8: //Generate a defective products report
                     System.out.println("Here is the defective report:");
@@ -165,23 +182,23 @@ public class Menu {
                     System.out.println("Apply discount on:\n(1)Category\n(2)Sub-Category\n(3)Catalog Number");
                     choice = scan.nextInt();
                     scan.nextLine();
-                    System.out.println("Enter Discount in %: ");
+                    System.out.println("Enter the discount in %: ");
                     int discount = scan.nextInt();
                     scan.nextLine();
                     boolean continue_flag = true;
                     while (continue_flag) {
                         if (choice == 1) {
-                            System.out.println("Enter the name of the Category: ");
+                            System.out.println("Enter the name of the category: ");
                             String category = scan.nextLine();
                             dataController.setDiscountForCategory(category, discount);
                             continue_flag = false;
                         } else if (choice == 2) {
-                            System.out.println("Enter Sub-Category: ");
+                            System.out.println("Enter the name of the sub-category: ");
                             String sub_category = scan.nextLine();
                             dataController.setDiscountForSubCategory(sub_category, discount);
                             continue_flag = false;
                         } else if (choice == 3) {
-                            System.out.println("Enter Catalog Number: ");
+                            System.out.println("Enter the catalog number: ");
                             int cNum = scan.nextInt();
                             scan.nextLine();
                             dataController.setDiscountForCatalogNum(cNum, discount);
@@ -201,6 +218,11 @@ public class Menu {
         }
     }
 
+    /**
+     * Collects product details from user input, and returns them as a single comma-separated string.
+     *
+     * @return A CSV-style string containing all product fields, in the expected order
+     */
     public static String getProductDetails(){ //get all product details from user
         System.out.println("Enter the Product ID: ");
         int p_id = scan.nextInt();
@@ -256,6 +278,11 @@ public class Menu {
 
     }
 
+    /**
+     * Loads the product data file path from the YAML configuration file ("config.yaml").
+     *
+     * @return the path to the CSV data file, or empty string if loading fails
+     */
     public static String getPathFromConfig(){
         Yaml yaml = new Yaml();
         String path = "";

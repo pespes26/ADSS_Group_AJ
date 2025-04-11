@@ -9,7 +9,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
 
-
+/**
+ * The DataController class is part of the Service layer and manages all operations related to product data,
+ * including importing, updating inventory, handling purchases, managing defects, and generating reports.
+ */
 public class DataController {
     private HashMap<Integer,Product> products; //Saves all the current products in the store. Key: product ID, Value: an object of product
     private HashMap<Integer,Product> purchase_products; //Saves all purchase products
@@ -23,7 +26,11 @@ public class DataController {
         catalog_numbers_Set = new HashSet<>();
     }
 
-
+    /**
+     * Imports product data from a CSV file and populates the products and inventory maps.
+     *
+     * @param path the path to the CSV file
+     */
     public void ImportData(String path){
         try (CSVReader reader = new CSVReader(new FileReader(path))) {
             String[] nextRecord;
@@ -56,19 +63,16 @@ public class DataController {
             throw new RuntimeException(e);
         }
     }
+
     /**
-     * Updates the count of a product in the inventory map based on the specified parameters.
-     * The inventory map is structured as a nested HashMap:
-     * category -> subCategory -> size -> location -> count.
+     * Updates the count of a product in the inventory map.
      *
      * @param add        whether to increment (true) or decrement (false) the count
-     * @param category   the category of the product
-     * @param sub_category the subcategory of the product
-     * @param size       the size of the product
+     * @param category   the product's category
+     * @param sub_category the product's sub-category
+     * @param size       the product size (as string)
      * @param location   the location of the product ("wareHouse" or "interiorStore")
      */
-
-
     public void updateProductInventoryCount(boolean add, String category, String sub_category, String size, String location) {
         // Check if the category exists
         if (!productsAmountMapByCategory.containsKey(category)) {
@@ -101,9 +105,12 @@ public class DataController {
     }
 
 
-    // the details array contains those 15 items: p_id, p_name, p_expiring_date, p_location,
-    // p_section, p_catalog_number, p_category, p_sub_category, p_size, p_cost,
-    // p_demand, p_supply_time, p_manufacturer, p_supplier_discount, p_store_discount
+    /**
+     * Sets the details of a product object from a provided array of strings.
+     *
+     * @param product  the product object to populate
+     * @param details  array of 15 strings representing the product fields
+     */
     public void setProductDetails(Product product, String[] details){
         product.setProductId(Integer.parseInt(details[0]));
         product.setProductName(details[1]);
@@ -127,8 +134,12 @@ public class DataController {
         product.setClassification(classification);
     }
 
-    //return true - when product is valid and added to dataBase.
-    //return false - the product's catalog number is wrong
+    /**
+     * Adds a product to the system after validating its catalog number and classification.
+     *
+     * @param product_details  a CSV-style string with all product details
+     * @return true if the product was added successfully, false if the catalog number is invalid
+     */
     public boolean addProductController(String product_details) {
         Product product = new Product();
         String[] product_details_array = product_details.split(",");
@@ -159,28 +170,63 @@ public class DataController {
         }
     }
 
+    /**
+     * Marks a product as defective.
+     *
+     * @param product_ID the ID of the product to mark
+     */
     public void markDefect(int product_ID){
         products.get(product_ID).setDefect(true);
+        System.out.println("The product with the ID " + product_ID + " has been marked as defective.");
     }
 
+    /**
+     * Handles the purchase of a product: sets sale price, moves to purchase list, and removes from stock.
+     *
+     * @param product_ID  the ID of the purchased product
+     * @param sale_price  the sale price of the product
+     */
     public void handlePurchaseProduct(int product_ID, double sale_price){
         Product p = products.get(product_ID);
         purchase_products.put(product_ID, p);
         purchase_products.get(product_ID).getClassification().setSalePrice(sale_price);
         products.remove(product_ID);
-        updateProductInventoryCount(false,p.getClassification().getCategory(), p.getClassification().getSubcategory(), String.valueOf(p.getClassification().getProductSize()), p.getStored()); //decrement by 1 in categories map
+        updateProductInventoryCount(false,p.getClassification().getCategory(),
+                p.getClassification().getSubcategory(),
+                String.valueOf(p.getClassification().getProductSize()),
+                p.getStored()); //decrement by 1 in categories map
     }
 
+    /**
+     * Handles the removal of a product due to defect and updates inventory accordingly.
+     *
+     * @param product_ID the ID of the defective product
+     */
     public void handleDefectProduct(int product_ID){
         Product p = products.get(product_ID);
         products.remove(product_ID);
-        updateProductInventoryCount(false,p.getClassification().getCategory(), p.getClassification().getSubcategory(), String.valueOf(p.getClassification().getProductSize()), p.getStored()); //decrement by 1 in categories map
+        System.out.println("The product with the ID " + product_ID + " has been removed from the store.");
+        updateProductInventoryCount(false,p.getClassification().getCategory(),
+                p.getClassification().getSubcategory(),
+                String.valueOf(p.getClassification().getProductSize()), p.getStored()); //decrement by 1 in categories map
     }
 
+    /**
+     * Updates the cost price of a product.
+     *
+     * @param product_ID the ID of the product
+     * @param new_price  the new cost price to set
+     */
     public void updatePriceController(int product_ID, double new_price){
         products.get(product_ID).getClassification().setCostPrice(new_price);
+        System.out.println("The price of product ID " + product_ID + " has been updated to " + new_price);
     }
 
+    /**
+     * Generates a report of all defective products currently in stock.
+     *
+     * @return a formatted string with the defective products list
+     */
     public String defectReportController(){
         StringBuilder defectReport = new StringBuilder();
         int counter = 1;
@@ -200,38 +246,90 @@ public class DataController {
         return defectReport.toString();
     }
 
-    public String inventoryReportController(String[] categories){
-        String report = "";
-        // Iterate over the keys of the top-level map (categories)
-        for (String category : categories) {
-            System.out.println(category + ": " + productsAmountMapByCategory.get(category).size());
-            for (String subCategory : productsAmountMapByCategory.get(category).keySet()){ //Iterate over sub-categories
-                System.out.println("---" + subCategory + ": " + productsAmountMapByCategory.get(category).get(subCategory).size());
-                for(String size : productsAmountMapByCategory.get(category).get(subCategory).keySet()){ //Iterate over sizes
-                    System.out.println("------Size(" + size + "):" + " Store - " + productsAmountMapByCategory.get(category).get(subCategory).get(size).get("interiorStore")+
-                            ", WareHouse - " + productsAmountMapByCategory.get(category).get(subCategory).get(size).get("wareHouse"));
+    /**
+     * Generates an inventory report for specified categories.
+     *
+     * @param categories an array of category names to include in the report
+     * @return a formatted string with category/subcategory/product information
+     */
+    public String inventoryReportController(String[] categories) {
+        StringBuilder report = new StringBuilder("Here is the Category Report:\n");
+
+        for (String categoryName : categories) {
+            report.append("Category: ").append(categoryName).append("\n");
+
+            // Map to group products by sub-category
+            Map<String, List<Product>> subcategoryMap = new TreeMap<>();
+
+            for (Product p : products.values()) {
+                Classification c = p.getClassification();
+                if (c.getCategory().equalsIgnoreCase(categoryName)) {
+                    subcategoryMap
+                            .computeIfAbsent(c.getSubcategory(), k -> new ArrayList<>())
+                            .add(p);
                 }
-                System.out.println();
             }
-            System.out.println("----------------------------------------------------------------------------------------------");
+
+            if (subcategoryMap.isEmpty()) {
+                report.append("  No products found in this category.\n");
+            } else {
+                for (Map.Entry<String, List<Product>> entry : subcategoryMap.entrySet()) {
+                    report.append("  Sub-Category: ").append(entry.getKey()).append("\n");
+
+                    int count = 1;
+                    for (Product p : entry.getValue()) {
+                        Classification c = p.getClassification();
+                        report.append("    ").append(count++).append(". ")
+                                .append("ID: ").append(p.getProductId())
+                                .append(", Name: ").append(p.getProductName())
+                                .append(", Size: ").append(c.getProductSize())
+                                .append(", Stored: ").append(p.getStored())
+                                .append(", Expiring: ").append(p.getExpiringDate())
+                                .append("\n");
+                    }
+                }
+            }
+
+            report.append("------------------------------------------------------------\n");
         }
-        return report;
+
+        return report.toString();
     }
 
-    public String productsDetails(int product_ID){
-        String details;
+    /**
+     * Returns a formatted string with the details of a product.
+     *
+     * @param product_ID the ID of the product
+     * @return a string representing all product details
+     */
+    public String productsDetails(int product_ID) {
         Product p = products.get(product_ID);
-        details = "Product ID: " + p.getProductId() + ", Product name: " + p.getProductName() + "\n" + "Expiring Date: " + p.getExpiringDate() + "\nLocation: "
-                + p.getStored() + ", Section: " + p.getSection() + "\nCatalog Number: "
-                + p.getClassification().getCatalogNumber() + ", Category: " + p.getClassification().getCategory() + ", Sub-Category: " + p.getClassification().getSubcategory() +
-                ", Size: " + p.getClassification().getProductSize() + "\nProduct cost price: "
-                + p.getClassification().getCostPrice() + "\nProduct demand: " + p.getClassification().getProductDemand() + "\nSupply time: " + p.getClassification().getSupplyTime() +
-                "\nMinimum time For Alert: " + p.getClassification().getMinAmountForAlert() + "\nManufacturer: "
-                + p.getClassification().getManufacturer() + "\nSupplier Discount: " + p.getClassification().getSupplierDiscount() + "\nStore Discount: " + p.getClassification().getStoreDiscount() + "\n";
+
+        String details = "Product ID: " + p.getProductId() + "\n"
+                + "Product name: " + p.getProductName() + "\n"
+                + "Expiring Date: " + p.getExpiringDate() + "\n"
+                + "Location: " + p.getStored() + ", Section: " + p.getSection() + "\n"
+                + "Catalog Number: " + p.getClassification().getCatalogNumber() + ", Category: "
+                + p.getClassification().getCategory() + ", Sub-Category: " + p.getClassification().getSubcategory() + "\n"
+                + "Size: " + p.getClassification().getProductSize() + "\n"
+                + "Product cost price: " + p.getClassification().getCostPrice() + "\n"
+                + "Product demand: " + p.getClassification().getProductDemand() + "\n"
+                + "Supply time: " + p.getClassification().getSupplyTime() + " days\n"
+                + "Minimum amount for alert: " + p.getClassification().getMinAmountForAlert() + "\n"
+                + "Manufacturer: " + p.getClassification().getManufacturer() + "\n"
+                + "Supplier Discount: " + p.getClassification().getSupplierDiscount() + "\n"
+                + "Store Discount: " + p.getClassification().getStoreDiscount() + "\n"
+                + "Defective: " + (p.isDefect() ? "Yes" : "No") + "\n";
 
         return details;
     }
 
+    /**
+     * Checks if the current stock of a product is below its minimum alert threshold.
+     *
+     * @param product_ID the ID of the product
+     * @return true if current stock is below alert level, false otherwise
+     */
     public boolean checkForAlert(int product_ID){
         Product p = products.get(product_ID);
         int wareHouse_amount = productsAmountMapByCategory.get(p.getClassification().getCategory()).get(p.getClassification().getSubcategory()).get(String.valueOf(p.getClassification().getProductSize())).get("wareHouse");
@@ -240,34 +338,67 @@ public class DataController {
         return currentAmount <= p.getClassification().getMinAmountForAlert();
     }
 
+    /**
+     * Retrieves the name of a product by its ID.
+     *
+     * @param product_ID the ID of the product
+     * @return the name of the product
+     */
     public String getProductName(int product_ID){
         return products.get(product_ID).getProductName();
     }
 
+    /**
+     * Applies a store discount to all products of a specific category.
+     *
+     * @param category the category name
+     * @param discount the discount percentage to apply
+     */
     public void setDiscountForCategory(String category, int discount){
         for(Product p : products.values()){
             if(p.getClassification().getCategory().equals(category)){
                 p.getClassification().setStoreDiscount(discount);
             }
         }
+        System.out.println("Discount of " + discount + "% has been set for category " + category);
     }
 
+    /**
+     * Applies a store discount to all products of a specific sub-category.
+     *
+     * @param sub_category the sub-category name
+     * @param discount     the discount percentage to apply
+     */
     public void setDiscountForSubCategory(String sub_category, int discount){
         for(Product p : products.values()){
             if(p.getClassification().getSubcategory().equals(sub_category)){
                 p.getClassification().setStoreDiscount(discount);
             }
         }
+        System.out.println("Discount of " + discount + "% has been set for sub-category " + sub_category);
     }
 
+    /**
+     * Applies a store discount to all products with a specific catalog number.
+     *
+     * @param catalog_number the catalog number
+     * @param discount       the discount percentage to apply
+     */
     public void setDiscountForCatalogNum(int catalog_number, int discount){
         for(Product p : products.values()){
             if(p.getClassification().getCatalogNumber() == catalog_number){
                 p.getClassification().setStoreDiscount(discount);
             }
         }
+        System.out.println("Discount of " + discount + "% has been set for catalog number " + catalog_number);
     }
 
+    /**
+     * Returns the sale price of a purchased product.
+     *
+     * @param product_ID the ID of the product
+     * @return the sale price set at purchase time
+     */
     public double getProductPurchasePrice(int product_ID){
         return purchase_products.get(product_ID).getClassification().getSalePrice();
     }

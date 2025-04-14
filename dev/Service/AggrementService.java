@@ -3,7 +3,7 @@ package Service;
 import java.util.List;
 
 public class AggrementService {
-    List<IAggrement>;
+    List<Aggrement>;
     void createAgreementWithSupplier();
     void deleteAgreementWithSupplier();
     Agreement findAgreementWithSupplier();

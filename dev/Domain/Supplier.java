@@ -1,7 +1,7 @@
 package Domain;
 
 public class Supplier {
-    Aggrement;
+    Agreement;
     String suplierName;
     int supplierID;
     int companyID;

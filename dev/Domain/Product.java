@@ -11,8 +11,15 @@ public class Product {
 
     public record DiscountRule(int discount, int amount) {} //this is the content of the discount
     List<DiscountRule> discountRules = new ArrayList<>(); //array of discounts
-    //addDiscountRule(int discount, int amount);
+    void addDiscountRule(int discount, int amount){}
 
+    public int getProduct_id() {
+        return product_id;
+    }
+
+    public int getCatalog_Number() {
+        return Catalog_Number;
+    }
 
     //#להוסיף שיטה שמחזירה את ההנחה בהינתו כמות
     public int calcDiscount(int amount){

@@ -2,6 +2,7 @@ package Service;
 
 import Domain.Order;
 
+import java.util.Date;
 import java.util.HashMap;
 
 public class OrderService {
@@ -11,8 +12,8 @@ public class OrderService {
         orderHashMap = new HashMap<>(); //אתחול השדה
     }
 
-    public void createOrder(int orderID) {
-        Order order = new Order(orderID); // יצירת מופע חדש להזמנה בהינתן מספר מזהה שלה
+    public void createOrder(int orderID, int phoneNumber, Date orderDate) {
+        Order order = new Order(orderID, phoneNumber, orderDate,   ); // יצירת מופע חדש להזמנה בהינתן מספר מזהה שלה
         this.orderHashMap.put(orderID, order); //הכנסת ההזמנה לרשימת ההזמנות
     }
 

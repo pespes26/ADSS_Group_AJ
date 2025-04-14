@@ -20,6 +20,8 @@ public class AgreementService {
     // מחיקת הסכם עם ספק
     public void deleteAgreementWithSupplier(int supplierId) {
         agreementHashMap.remove(supplierId);
+        ///////למחוק את כל המוצרים של הספק בעת מחיקה הסכם
+        /// //// אולי כדאי להוסיך מזהה יחודי לכל הזמנה
     }
 
     // חיפוש הסכם לפי מזהה ספק

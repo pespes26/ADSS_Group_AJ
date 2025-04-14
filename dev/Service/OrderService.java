@@ -13,7 +13,7 @@ public class OrderService {
     }
 
     public void createOrder(int orderID, int phoneNumber, Date orderDate) {
-        Order order = new Order(orderID, phoneNumber, orderDate,   ); // יצירת מופע חדש להזמנה בהינתן מספר מזהה שלה
+        Order order = new Order(orderID, phoneNumber, orderDate, Map<Integer, Integer> productsInOrder ); // יצירת מופע חדש להזמנה בהינתן מספר מזהה שלה
         this.orderHashMap.put(orderID, order); //הכנסת ההזמנה לרשימת ההזמנות
     }
 

@@ -246,11 +246,19 @@ public class DataController {
         return defectReport.toString();
     }
 
+
     /**
-     * Generates an inventory report for specified categories.
+     * Generates a detailed inventory report for the given categories.
      *
-     * @param categories an array of category names to include in the report
-     * @return a formatted string with category/subcategory/product information
+     * The report organizes products hierarchically by:
+     *   - Category
+     *     - Sub-category
+     *       - Product size (Small, Medium, Big)
+     *
+     * For each group, it lists all products with their ID, name, location, and expiration date.
+     *
+     * @param categories An array of category names for which to generate the report.
+     * @return A formatted string containing the inventory report grouped by category, sub-category, and product size.
      */
     public String inventoryReportController(String[] categories) {
         StringBuilder report = new StringBuilder("Here is the Category Report:\n");
@@ -258,14 +266,18 @@ public class DataController {
         for (String categoryName : categories) {
             report.append("Category: ").append(categoryName).append("\n");
 
-            // Map to group products by sub-category
-            Map<String, List<Product>> subcategoryMap = new TreeMap<>();
+            // Map to group products by sub-category and size
+            Map<String, Map<Integer, List<Product>>> subcategoryMap = new TreeMap<>();
 
             for (Product p : products.values()) {
                 Classification c = p.getClassification();
                 if (c.getCategory().equalsIgnoreCase(categoryName)) {
+                    String subCategory = c.getSubcategory();
+                    int size = c.getProductSize();
+
                     subcategoryMap
-                            .computeIfAbsent(c.getSubcategory(), k -> new ArrayList<>())
+                            .computeIfAbsent(subCategory, k -> new TreeMap<>())
+                            .computeIfAbsent(size, k -> new ArrayList<>())
                             .add(p);
                 }
             }
@@ -273,19 +285,30 @@ public class DataController {
             if (subcategoryMap.isEmpty()) {
                 report.append("  No products found in this category.\n");
             } else {
-                for (Map.Entry<String, List<Product>> entry : subcategoryMap.entrySet()) {
-                    report.append("  Sub-Category: ").append(entry.getKey()).append("\n");
+                for (Map.Entry<String, Map<Integer, List<Product>>> subEntry : subcategoryMap.entrySet()) {
+                    report.append("  Sub-Category: ").append(subEntry.getKey()).append("\n");
 
-                    int count = 1;
-                    for (Product p : entry.getValue()) {
-                        Classification c = p.getClassification();
-                        report.append("    ").append(count++).append(". ")
-                                .append("ID: ").append(p.getProductId())
-                                .append(", Name: ").append(p.getProductName())
-                                .append(", Size: ").append(c.getProductSize())
-                                .append(", Stored: ").append(p.getStored())
-                                .append(", Expiring: ").append(p.getExpiringDate())
-                                .append("\n");
+                    for (Map.Entry<Integer, List<Product>> sizeEntry : subEntry.getValue().entrySet()) {
+                        int size = sizeEntry.getKey();
+                        String sizeLabel = switch (size) {
+                            case 1 -> "Small";
+                            case 2 -> "Medium";
+                            case 3 -> "Big";
+                            default -> "Unknown Size";
+                        };
+
+                        report.append("    Size: ").append(sizeLabel).append("\n");
+
+                        int count = 1;
+                        for (Product p : sizeEntry.getValue()) {
+                            Classification c = p.getClassification();
+                            report.append("      ").append(count++).append(". ")
+                                    .append("ID: ").append(p.getProductId())
+                                    .append(", Name: ").append(p.getProductName())
+                                    .append(", Stored: ").append(p.getStored())
+                                    .append(", Expiring: ").append(p.getExpiringDate())
+                                    .append("\n");
+                        }
                     }
                 }
             }
@@ -295,6 +318,7 @@ public class DataController {
 
         return report.toString();
     }
+
 
     /**
      * Returns a formatted string with the details of a product.
@@ -402,4 +426,37 @@ public class DataController {
     public double getProductPurchasePrice(int product_ID){
         return purchase_products.get(product_ID).getClassification().getSalePrice();
     }
+
+
+    public String showCurrentAmountPerLocationByCatalogNumber(int catalog_number) {
+        // Check if catalog number exists in the system
+        if (!catalog_numbers_Set.contains(catalog_number)) {
+            return "Invalid catalog number: " + catalog_number + ". This catalog number does not exist in the Inventory.";
+        }
+
+        int warehouse_quantity = 0;
+        int store_quantity = 0;
+
+        for (Product p : products.values()) {
+            if (p.getClassification().getCatalogNumber() == catalog_number) {
+                String location = p.getStored();
+                if (location.equalsIgnoreCase("wareHouse")) {
+                    warehouse_quantity++;
+                } else if (location.equalsIgnoreCase("interiorStore")) {
+                    store_quantity++;
+                }
+            }
+        }
+
+        if (warehouse_quantity == 0 && store_quantity == 0) {
+            return "No products found for catalog number: " + catalog_number;
+        }
+
+        return "Catalog Number: " + catalog_number + "\n"
+                + "Warehouse quantity: " + warehouse_quantity + "\n"
+                + "Store quantity: " + store_quantity;
+    }
+
+
+
 }

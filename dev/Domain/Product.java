@@ -7,7 +7,7 @@ package Domain;
  * This class belongs to the Domain layer and models the core product entity.
  */
 public class Product {
-    /** The unique ID of the product */
+    /** The unique ID of the product - represents an item of some product */
     private int product_id;
 
     /** The name of the product */

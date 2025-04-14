@@ -31,42 +31,45 @@ public class Menu {
         int choice = 0;
 
         scan = new Scanner(System.in);
-        while (choice != 10) {
+        while (choice != 11) {
             String menu = """
                     Menu:
-                    1.Show product Details\
+                    1.Show item Details\
                     
-                    2.Add a new product to the stock\
+                    2.Add a new product\
                     
-                    3.Remove a product from the stock\
+                    3.Remove a product\
                     
-                    4.Show the purchase price of a product\
+                    4.Show the purchase prices of a product\
                     
                     5.Update a price of a product\
                     
                     6.Mark product as a defect\
                     
-                    7.Generate an inventory report by category\
+                    7.Generate an inventory report\
                     
                     8.Generate a defective products report\
                     
-                    9.Update a discount\
+                    9.Set a discount\
                     
-                    10.Exit""";
+                    10.Show current quantity of product in warehouse and store\
+                    
+                    11.Exit""";
 
+            System.out.println();
             System.out.println(menu);
 
             choice = scan.nextInt();
 
 
-            if (choice != 10) {
+            if (choice != 11) {
                 scan.nextLine();
             }
 
             int product_ID;
 
             switch (choice) {
-                case 1: //Show Product Details
+                case 1: //Show item Details
                     try {
                         System.out.println("Enter product ID: ");
                         product_ID = scan.nextInt();
@@ -80,7 +83,7 @@ public class Menu {
                         System.out.println("This Product ID is not in tne stock.");
                     }
 
-                case 2: //Add a new product to the stock
+                case 2: //Add a new product
                     boolean validCatalogNum = false;
                     while(!validCatalogNum) {
                         String productDetails = getProductDetails(); //from user
@@ -90,7 +93,7 @@ public class Menu {
                         }
                     }
                     break;
-                case 3: //Remove a product from the stock
+                case 3: //Remove a product
                     try {
                         System.out.println("Enter the ID of the product that you want to remove: ");
                         product_ID = scan.nextInt();
@@ -128,7 +131,8 @@ public class Menu {
                         System.out.println("This Product ID is not in the stock.");
                     }
                     break;
-                case 4: //Show the purchase price of a product
+                //implement according to the catalog number
+                case 4: //Show the purchase prices of a product
                     try{
                         System.out.println("Enter the ID of the product:");
                         product_ID = scan.nextInt();
@@ -140,6 +144,7 @@ public class Menu {
                         System.out.println("This Product ID was not purchased before.");
                     }
                     break;
+                    //implement according to the catalog number
                 case 5: //Update a price of a product
                     try {
                         System.out.println("Enter product ID: ");
@@ -154,7 +159,7 @@ public class Menu {
                         System.out.println("This Product ID not in stock.");
                     }
                     break;
-                case 6:
+                case 6: //Mark product as a defect
                     try {
                         System.out.println("Enter product ID: ");
                         product_ID = scan.nextInt();
@@ -165,9 +170,9 @@ public class Menu {
                     catch (NullPointerException e){
                         System.out.println("This Product ID not in stock.");
                     }
-                case 7: //Generate an inventory report by category
+                case 7: //Generate an inventory report
                     System.out.println("Enter a category");
-                    String stringCategories = scan.nextLine(); //assume that the user writes the categories in this format: "Ca1 Ca2 Ca3..."
+                    String stringCategories = scan.nextLine();
                     String[] categories = stringCategories.split(" ");
                     System.out.println("Inventory Report\n");
                     System.out.println(dataController.inventoryReportController(categories));
@@ -178,7 +183,7 @@ public class Menu {
                     System.out.println(dataController.defectReportController());
                     break;
 
-                case 9: //Update Discount
+                case 9: //Set a Discount
                     System.out.println("Apply discount on:\n(1)Category\n(2)Sub-Category\n(3)Catalog Number");
                     choice = scan.nextInt();
                     scan.nextLine();
@@ -209,7 +214,15 @@ public class Menu {
                     }
                     break;
 
-                case 10: //Exit
+                case 10: // Show current quantity of product in warehouse and store by catalog number
+                    System.out.println("Enter catalog number:");
+                    int catalog_number = scan.nextInt();
+                    scan.nextLine();
+                    System.out.println(dataController.showCurrentAmountPerLocationByCatalogNumber(catalog_number));
+                    break;
+
+
+                case 11: //Exit
                     System.out.println("Thank you! Have a nice day :) ");
                     break;
                 default:

@@ -1,6 +1,8 @@
 package Presentation;
 
 import Service.*;
+
+import java.util.Arrays;
 import java.util.Scanner;
 import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
@@ -31,10 +33,10 @@ public class Menu {
         int choice = 0;
 
         scan = new Scanner(System.in);
-        while (choice != 11) {
+        while (choice != 12) {
             String menu = """
                     Menu:
-                    1.Show item Details\
+                    1.Show item details\
                     
                     2.Add a new product\
                     
@@ -42,19 +44,21 @@ public class Menu {
                     
                     4.Show the purchase prices of a product\
                     
-                    5.Update a price of a product\
+                    5.Update the cost price of a product\
                     
-                    6.Mark product as a defect\
+                    6.Mark item as a defect\
                     
-                    7.Generate an inventory report\
+                    7.Generate inventory report by categories\
                     
-                    8.Generate a defective products report\
+                    8.Generate a defective and expired products report\
                     
                     9.Set a discount\
                     
-                    10.Show current quantity of product in warehouse and store\
+                    10.Show the current quantity of a product in warehouse and store\
                     
-                    11.Exit""";
+                    11.Show low-stock products that need reordering\
+                    
+                    12.Exit""";
 
             System.out.println();
             System.out.println(menu);
@@ -62,14 +66,14 @@ public class Menu {
             choice = scan.nextInt();
 
 
-            if (choice != 11) {
+            if (choice != 12) {
                 scan.nextLine();
             }
 
             int product_ID;
 
             switch (choice) {
-                case 1: //Show item Details
+                case 1: //Show item details
                     try {
                         System.out.println("Enter product ID: ");
                         product_ID = scan.nextInt();
@@ -81,6 +85,7 @@ public class Menu {
                     }
                     catch (NullPointerException e) {
                         System.out.println("This Product ID is not in tne stock.");
+                        break;
                     }
 
                 case 2: //Add a new product
@@ -93,73 +98,75 @@ public class Menu {
                         }
                     }
                     break;
-                case 3: //Remove a product
-                    try {
-                        System.out.println("Enter the ID of the product that you want to remove: ");
-                        product_ID = scan.nextInt();
+                case 3: // Remove a product
+                    System.out.println("Enter the ID of the product that you want to remove: ");
+                    product_ID = scan.nextInt();
+                    scan.nextLine();
+
+                    if (!dataController.productExists(product_ID)) {
+                        System.out.println("This Product ID is not in the stock.");
+                        break;
+                    }
+
+                    int reason = 0;
+                    while (reason != 1 && reason != 2) {
+                        System.out.println("What is the reason for removing the product?");
+                        System.out.println("(1)Purchase\n(2)Defect");
+                        reason = scan.nextInt();
                         scan.nextLine();
-                        while (choice != 1 && choice != 2) {
-                            System.out.println("What is the reason for removing the product?");
-                            System.out.println("(1)Purchase\n(2)Defect");
-                            choice = scan.nextInt();
+
+                        if (reason == 1) {
+                            System.out.println("Enter the sale price for this product: ");
+                            double price = scan.nextDouble();
                             scan.nextLine();
-                            if (choice == 1) { //Purchase
-                                System.out.println("Enter the sale price for this product: ");
-                                double price = scan.nextDouble();
-                                scan.nextLine();
 
-                                boolean alert = dataController.checkForAlert(product_ID);
-                                if (alert) {
-                                    System.out.println("ALERT! " + dataController.getProductName(product_ID)
-                                            + " has reached critical amount. Please order new supply.");
-                                }
-
-                                dataController.handlePurchaseProduct(product_ID, price);
-                            } else if (choice == 2) { //Defect
-                                boolean alert = dataController.checkForAlert(product_ID);
-                                if (alert) {
-                                    System.out.println("ALERT! " + dataController.getProductName(product_ID)
-                                            + " has reached critical amount. Please order new supply to this product.");
-                                }
-                                dataController.handleDefectProduct(product_ID);
-                            } else {
-                                System.out.println("Invalid choice. You can only enter 1 or 2");
+                            boolean alert = dataController.checkForAlert(product_ID);
+                            if (alert) {
+                                System.out.println("ALERT! " + dataController.getProductName(product_ID)
+                                        + " has reached critical amount. Please order new supply.");
                             }
+
+                            dataController.handlePurchaseProduct(product_ID, price);
+                        } else if (reason == 2) {
+                            boolean alert = dataController.checkForAlert(product_ID);
+                            if (alert) {
+                                System.out.println("ALERT! " + dataController.getProductName(product_ID)
+                                        + " has reached critical amount. Please order new supply to this product.");
+                            }
+                            dataController.handleDefectProduct(product_ID);
+                        } else {
+                            System.out.println("Invalid choice. You can only enter 1 or 2");
                         }
                     }
-                    catch (NullPointerException e){
-                        System.out.println("This Product ID is not in the stock.");
-                    }
                     break;
-                //implement according to the catalog number
+
                 case 4: //Show the purchase prices of a product
-                    try{
-                        System.out.println("Enter the ID of the product:");
-                        product_ID = scan.nextInt();
+                    try {
+                        System.out.println("Enter the catalog number of the product:");
+                        int catalogNumber = scan.nextInt();
                         scan.nextLine();
-                        double salePrice = dataController.getProductPurchasePrice(product_ID);
-                        System.out.println("Product " + product_ID + " was sold for " + salePrice);
-                    }
-                    catch (NullPointerException e){
-                        System.out.println("This Product ID was not purchased before.");
+                        String result = dataController.getPurchasePricesByCatalogNumber(catalogNumber);
+                        System.out.println(result);
+                    } catch (Exception e) {
+                        System.out.println("An error occurred while retrieving purchase prices.");
                     }
                     break;
-                    //implement according to the catalog number
-                case 5: //Update a price of a product
+                case 5: // Update the cost price of a product
                     try {
-                        System.out.println("Enter product ID: ");
-                        product_ID = scan.nextInt();
+                        System.out.println("Enter product catalog number: ");
+                        int catalogNumber = scan.nextInt();
                         scan.nextLine();
-                        System.out.println("New price: ");
+
+                        System.out.println("Enter the new cost price: ");
                         double newPrice = scan.nextDouble();
                         scan.nextLine();
-                        dataController.updatePriceController(product_ID, newPrice);
-                    }
-                    catch (NullPointerException e){
-                        System.out.println("This Product ID not in stock.");
+
+                        dataController.updateCostPriceByCatalogNumber(catalogNumber, newPrice);
+                    } catch (Exception e) {
+                        System.out.println("Something went wrong while updating the price.");
                     }
                     break;
-                case 6: //Mark product as a defect
+                case 6: //Mark item as a defect
                     try {
                         System.out.println("Enter product ID: ");
                         product_ID = scan.nextInt();
@@ -170,17 +177,18 @@ public class Menu {
                     catch (NullPointerException e){
                         System.out.println("This Product ID not in stock.");
                     }
-                case 7: //Generate an inventory report
-                    System.out.println("Enter a category");
+                case 7: //Generate inventory report by categories
+                    System.out.println("Enter category names, separated by commas (e.g., Beverages,Meat & Fish):");
                     String stringCategories = scan.nextLine();
-                    String[] categories = stringCategories.split(" ");
-                    System.out.println("Inventory Report\n");
-                    System.out.println(dataController.inventoryReportController(categories));
+                    String[] categories = Arrays.stream(stringCategories.split(","))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+                    System.out.println(dataController.inventoryReportByCategories(categories));
                     break;
 
-                case 8: //Generate a defective products report
-                    System.out.println("Here is the defective report:");
-                    System.out.println(dataController.defectReportController());
+                case 8: // Generate a defective and expired products report
+                    System.out.println("Here is the defective and expired products report:");
+                    System.out.println(dataController.defectAndExpiredReport());
                     break;
 
                 case 9: //Set a Discount
@@ -206,7 +214,7 @@ public class Menu {
                             System.out.println("Enter the catalog number: ");
                             int cNum = scan.nextInt();
                             scan.nextLine();
-                            dataController.setDiscountForCatalogNum(cNum, discount);
+                            dataController.setDiscountForCatalogNumber(cNum, discount);
                             continue_flag = false;
                         } else {
                             System.out.println("Invalid choice. Please enter 1, 2 or 3");
@@ -214,15 +222,20 @@ public class Menu {
                     }
                     break;
 
-                case 10: // Show current quantity of product in warehouse and store by catalog number
+
+                case 10: // Show the current quantity of a product in warehouse and store
                     System.out.println("Enter catalog number:");
                     int catalog_number = scan.nextInt();
                     scan.nextLine();
                     System.out.println(dataController.showCurrentAmountPerLocationByCatalogNumber(catalog_number));
                     break;
 
+                case 11: // Show low-stock products that need reordering
+                    System.out.println("Low-stock products (below their minimum amount):");
+                    System.out.println(dataController.generateReorderAlertReport());
+                    break;
 
-                case 11: //Exit
+                case 12: //Exit
                     System.out.println("Thank you! Have a nice day :) ");
                     break;
                 default:

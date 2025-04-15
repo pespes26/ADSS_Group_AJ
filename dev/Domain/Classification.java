@@ -22,7 +22,7 @@ public class Classification {
     /** The cost price of the product */
     private double cost_price;
 
-    /** The product's demand level (1 to 10) */
+    /** The product's demand level (1 to 5) */
     private int product_demand;
 
     /** The supply time in days */

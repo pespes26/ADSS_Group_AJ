@@ -7,7 +7,10 @@ import java.util.*;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.time.format.DateTimeParseException;
 
 /**
  * The DataController class is part of the Service layer and manages all operations related to product data,
@@ -16,14 +19,14 @@ import com.opencsv.exceptions.CsvValidationException;
 public class DataController {
     private HashMap<Integer,Product> products; //Saves all the current products in the store. Key: product ID, Value: an object of product
     private HashMap<Integer,Product> purchase_products; //Saves all purchase products
-    private HashMap<String, HashMap<String, HashMap<String, HashMap<String, Integer>>>> productsAmountMapByCategory; //Saves all product quantities in the following format:: Map<category, Map<sub-category,Map<size, Map<location, amount>>>> (location- wareHouse, interiorStore)
-    private Set<Integer> catalog_numbers_Set; //Saves all the catalogs numbers we have in store
+    private HashMap<String, HashMap<String, HashMap<String, HashMap<String, Integer>>>> products_amount_map_by_category; //Saves all product quantities in the following format:: Map<category, Map<sub-category,Map<size, Map<location, amount>>>> (location- wareHouse, interiorStore)
+    private Set<Integer> catalog_numbers_set; //Saves all the catalogs numbers we have in store
 
     public DataController(){
         products = new HashMap<>();
         purchase_products = new HashMap<>();
-        productsAmountMapByCategory = new HashMap<>();
-        catalog_numbers_Set = new HashSet<>();
+        products_amount_map_by_category = new HashMap<>();
+        catalog_numbers_set = new HashSet<>();
     }
 
     /**
@@ -43,7 +46,7 @@ public class DataController {
                 input_id = input_id.trim();
                 nextRecord[0] = input_id;
                 setProductDetails(product, nextRecord); //build product
-                catalog_numbers_Set.add(product.getClassification().getCatalogNumber()); //add catalog number to catalog set
+                catalog_numbers_set.add(product.getClassification().getCatalogNumber()); //add catalog number to catalog set
                 products.put(product.getProductId(), product);
 
                 //add to productsAmountMap
@@ -75,12 +78,12 @@ public class DataController {
      */
     public void updateProductInventoryCount(boolean add, String category, String sub_category, String size, String location) {
         // Check if the category exists
-        if (!productsAmountMapByCategory.containsKey(category)) {
-            productsAmountMapByCategory.put(category, new HashMap<>());
+        if (!products_amount_map_by_category.containsKey(category)) {
+            products_amount_map_by_category.put(category, new HashMap<>());
         }
 
         // Check if the sub category exists
-        HashMap<String, HashMap<String, HashMap<String, Integer>>> subCategoryMap = productsAmountMapByCategory.get(category);
+        HashMap<String, HashMap<String, HashMap<String, Integer>>> subCategoryMap = products_amount_map_by_category.get(category);
         if (!subCategoryMap.containsKey(sub_category)) {
             subCategoryMap.put(sub_category, new HashMap<>());
         }
@@ -145,11 +148,11 @@ public class DataController {
         String[] product_details_array = product_details.split(",");
         setProductDetails(product, product_details_array);
         //checks that catalog number is valid
-        if (productsAmountMapByCategory.containsKey(product.getClassification().getCategory()) &&
-                productsAmountMapByCategory.get(product.getClassification().getCategory()).containsKey(product.getClassification().getSubcategory()) &&
-                productsAmountMapByCategory.get(product.getClassification().getCategory()).get(product.getClassification().getSubcategory()).containsKey(String.valueOf(product.getClassification().getProductSize()))) {
+        if (products_amount_map_by_category.containsKey(product.getClassification().getCategory()) &&
+                products_amount_map_by_category.get(product.getClassification().getCategory()).containsKey(product.getClassification().getSubcategory()) &&
+                products_amount_map_by_category.get(product.getClassification().getCategory()).get(product.getClassification().getSubcategory()).containsKey(String.valueOf(product.getClassification().getProductSize()))) {
 
-            if (catalog_numbers_Set.contains(product.getClassification().getCatalogNumber())) { //checks if catalog number is exist
+            if (catalog_numbers_set.contains(product.getClassification().getCatalogNumber())) { //checks if catalog number is exist
                 products.put(product.getProductId(), product);
                 updateProductInventoryCount(true, product.getClassification().getCategory(), product.getClassification().getSubcategory(), String.valueOf(product.getClassification().getProductSize()), product.getStored());
                 return true;
@@ -159,7 +162,7 @@ public class DataController {
             }
         }
         else{ //new kind of product
-            if(!catalog_numbers_Set.contains(product.getClassification().getCatalogNumber())){ //if catalog number is not exist in set, add product
+            if(!catalog_numbers_set.contains(product.getClassification().getCatalogNumber())){ //if catalog number is not exist in set, add product
                 products.put(product.getProductId(), product);
                 updateProductInventoryCount(true, product.getClassification().getCategory(), product.getClassification().getSubcategory(), String.valueOf(product.getClassification().getProductSize()), product.getStored());
                 return true;
@@ -211,62 +214,127 @@ public class DataController {
                 String.valueOf(p.getClassification().getProductSize()), p.getStored()); //decrement by 1 in categories map
     }
 
-    /**
-     * Updates the cost price of a product.
-     *
-     * @param product_ID the ID of the product
-     * @param new_price  the new cost price to set
-     */
-    public void updatePriceController(int product_ID, double new_price){
-        products.get(product_ID).getClassification().setCostPrice(new_price);
-        System.out.println("The price of product ID " + product_ID + " has been updated to " + new_price);
-    }
 
     /**
-     * Generates a report of all defective products currently in stock.
+     * Updates the cost price of all products with the given catalog number.
      *
-     * @return a formatted string with the defective products list
+     * @param catalogNumber the catalog number of the product(s)
+     * @param newPrice the new price to set
      */
-    public String defectReportController(){
-        StringBuilder defectReport = new StringBuilder();
-        int counter = 1;
-        for (Product p : products.values()){
-            if(p.isDefect()) {
-                defectReport.append(counter).append(". ").append("Product ID: ").append(p.getProductId())
-                        .append(", Product Name: ").append(p.getProductName()).append(", Stored: ")
-                        .append(p.getStored()).append(", Section:").append(p.getSection())
-                        .append(" , Category: ").append(p.getClassification().getCategory())
-                        .append(", Sub-Category: ").append(p.getClassification().getSubcategory())
-                        .append(", Size: ").append(p.getClassification().getProductSize()).append("\n");
-                counter++;
+    public void updateCostPriceByCatalogNumber(int catalogNumber, double newPrice) {
+        boolean found = false;
+        for (Product p : products.values()) {
+            if (p.getClassification().getCatalogNumber() == catalogNumber) {
+                p.getClassification().setCostPrice(newPrice);
+                found = true;
             }
         }
-        if(counter == 1){
-            defectReport = new StringBuilder("There are no defective products.");}
-        return defectReport.toString();
+
+        if (found) {
+            System.out.println("The price of all products with catalog number " + catalogNumber + " has been updated to " + newPrice);
+        } else {
+            System.out.println("No products with catalog number " + catalogNumber + " found in stock.");
+        }
     }
 
 
     /**
-     * Generates a detailed inventory report for the given categories.
+     * Generates a report of all defective and expired products currently in stock.
+     * The report includes two sections:
+     *   1. Products that were manually marked as defective.
+     *   2. Products whose expiration date has passed, sorted from oldest to newest.
      *
-     * The report organizes products hierarchically by:
-     *   - Category
-     *     - Sub-category
-     *       - Product size (Small, Medium, Big)
-     *
-     * For each group, it lists all products with their ID, name, location, and expiration date.
-     *
-     * @param categories An array of category names for which to generate the report.
-     * @return A formatted string containing the inventory report grouped by category, sub-category, and product size.
+     * @return A formatted string containing both defective and expired product listings.
      */
-    public String inventoryReportController(String[] categories) {
-        StringBuilder report = new StringBuilder("Here is the Category Report:\n");
+    public String defectAndExpiredReport() {
+        StringBuilder report = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate today = LocalDate.now();
+        // Section 1: Defective products
+        report.append("Defective Products (Marked):\n");
+        int counter = 1;
+        boolean hasDefects = false;
+        for (Product p : products.values()) {
+            if (p.isDefect()) {
+                hasDefects = true;
+                report.append(counter++).append(". Product ID: ").append(p.getProductId())
+                        .append(", Name: ").append(p.getProductName())
+                        .append(", Category: ").append(p.getClassification().getCategory())
+                        .append(", Sub-Category: ").append(p.getClassification().getSubcategory())
+                        .append(", Size: ").append(p.getClassification().getProductSize())
+                        .append(", Stored: ").append(p.getStored())
+                        .append(", Section: ").append(p.getSection())
+                        .append("\n");
+            }
+        }
+        if (!hasDefects) {
+            report.append("No products marked as defective.\n");
+        }
+        // Section 2: Expired products (sorted by date)
+        report.append("\nExpired Products (Date has passed):\n");
+        List<Product> expiredProducts = new ArrayList<>();
+        for (Product p : products.values()) {
+            try {
+                LocalDate expDate = LocalDate.parse(p.getExpiringDate(), formatter);
+                if (expDate.isBefore(today)) {
+                    expiredProducts.add(p);
+                }
+            } catch (DateTimeParseException e) {
+                // Ignore invalid date
+            }
+        }
+        expiredProducts.sort(Comparator.comparing(p -> {
+            try {
+                return LocalDate.parse(p.getExpiringDate(), formatter);
+            } catch (DateTimeParseException e) {
+                return LocalDate.MAX;
+            }
+        }));
+        if (expiredProducts.isEmpty()) {
+            report.append("No products have expired.\n");
+        } else {
+            counter = 1;
+            for (Product p : expiredProducts) {
+                report.append(counter++).append(". Product ID: ").append(p.getProductId())
+                        .append(", Name: ").append(p.getProductName())
+                        .append(", Expired on: ").append(p.getExpiringDate())
+                        .append(", Category: ").append(p.getClassification().getCategory())
+                        .append(", Sub-Category: ").append(p.getClassification().getSubcategory())
+                        .append(", Size: ").append(p.getClassification().getProductSize())
+                        .append(", Stored: ").append(p.getStored())
+                        .append("\n");
+            }
+        }
+        return report.toString();
+    }
+
+
+    /**
+     * Generates an inventory report for the specified product categories.
+     *
+     * <p>The report includes products grouped by sub-category and size (Small, Medium, Big),
+     * and within each group, products are sorted by their expiration date in ascending order.</p>
+     *
+     * <p>For each category provided:
+     * <ul>
+     *   <li>If products exist in the category, the report includes a detailed breakdown by sub-category and size.</li>
+     *   <li>If no products are found for the category, the report notes that the category does not exist.</li>
+     * </ul>
+     *
+     * If none of the specified categories contain any products, a message is returned indicating that all categories are invalid.
+     *
+     * @param categories an array of category names to include in the report
+     * @return a formatted string representing the inventory report for the provided categories
+     */
+    public String inventoryReportByCategories(String[] categories) {
+        StringBuilder report = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        boolean anyCategoryFound = false; // Tracks whether at least one valid category is found
 
         for (String categoryName : categories) {
             report.append("Category: ").append(categoryName).append("\n");
 
-            // Map to group products by sub-category and size
+            // Group products by sub-category and size
             Map<String, Map<Integer, List<Product>>> subcategoryMap = new TreeMap<>();
 
             for (Product p : products.values()) {
@@ -274,17 +342,17 @@ public class DataController {
                 if (c.getCategory().equalsIgnoreCase(categoryName)) {
                     String subCategory = c.getSubcategory();
                     int size = c.getProductSize();
-
                     subcategoryMap
                             .computeIfAbsent(subCategory, k -> new TreeMap<>())
                             .computeIfAbsent(size, k -> new ArrayList<>())
                             .add(p);
                 }
             }
-
+            // If no products matched this category
             if (subcategoryMap.isEmpty()) {
-                report.append("  No products found in this category.\n");
+                report.append("  Category does not exist.\n");
             } else {
+                anyCategoryFound = true;
                 for (Map.Entry<String, Map<Integer, List<Product>>> subEntry : subcategoryMap.entrySet()) {
                     report.append("  Sub-Category: ").append(subEntry.getKey()).append("\n");
 
@@ -296,12 +364,19 @@ public class DataController {
                             case 3 -> "Big";
                             default -> "Unknown Size";
                         };
-
                         report.append("    Size: ").append(sizeLabel).append("\n");
 
+                        List<Product> sortedProducts = sizeEntry.getValue();
+                        sortedProducts.sort(Comparator.comparing(p -> {
+                            try {
+                                return LocalDate.parse(p.getExpiringDate(), formatter);
+                            } catch (Exception e) {
+                                return LocalDate.MAX;
+                            }
+                        }));
+
                         int count = 1;
-                        for (Product p : sizeEntry.getValue()) {
-                            Classification c = p.getClassification();
+                        for (Product p : sortedProducts) {
                             report.append("      ").append(count++).append(". ")
                                     .append("ID: ").append(p.getProductId())
                                     .append(", Name: ").append(p.getProductName())
@@ -315,10 +390,13 @@ public class DataController {
 
             report.append("------------------------------------------------------------\n");
         }
+        // If none of the entered categories matched any products
+        if (!anyCategoryFound) {
+            return "No valid categories found. All entered categories do not exist.";
+        }
 
         return report.toString();
     }
-
 
     /**
      * Returns a formatted string with the details of a product.
@@ -329,7 +407,7 @@ public class DataController {
     public String productsDetails(int product_ID) {
         Product p = products.get(product_ID);
 
-        String details = "Product ID: " + p.getProductId() + "\n"
+        return "Product ID: " + p.getProductId() + "\n"
                 + "Product name: " + p.getProductName() + "\n"
                 + "Expiring Date: " + p.getExpiringDate() + "\n"
                 + "Location: " + p.getStored() + ", Section: " + p.getSection() + "\n"
@@ -344,23 +422,33 @@ public class DataController {
                 + "Supplier Discount: " + p.getClassification().getSupplierDiscount() + "\n"
                 + "Store Discount: " + p.getClassification().getStoreDiscount() + "\n"
                 + "Defective: " + (p.isDefect() ? "Yes" : "No") + "\n";
-
-        return details;
     }
 
     /**
-     * Checks if the current stock of a product is below its minimum alert threshold.
+     * Checks whether the specified product should trigger a stock alert.
      *
-     * @param product_ID the ID of the product
-     * @return true if current stock is below alert level, false otherwise
+     * <p>The function verifies if the product exists, calculates the total quantity
+     * of similar products (by category, sub-category, and size), and determines
+     * whether the quantity after one unit is removed falls below or equals
+     * the minimum threshold defined for alerts.</p>
+     *
+     * @param product_ID the unique identifier of the product to check
+     * @return true if an alert should be triggered, false otherwise
      */
-    public boolean checkForAlert(int product_ID){
+    public boolean checkForAlert(int product_ID) {
         Product p = products.get(product_ID);
-        int wareHouse_amount = productsAmountMapByCategory.get(p.getClassification().getCategory()).get(p.getClassification().getSubcategory()).get(String.valueOf(p.getClassification().getProductSize())).get("wareHouse");
-        int interior_store_amount = productsAmountMapByCategory.get(p.getClassification().getCategory()).get(p.getClassification().getSubcategory()).get(String.valueOf(p.getClassification().getProductSize())).get("interiorStore");
-        int currentAmount = wareHouse_amount + interior_store_amount - 1; //remove current product from amount
-        return currentAmount <= p.getClassification().getMinAmountForAlert();
+        if (p == null) return false;
+
+        String category = p.getClassification().getCategory();
+        String subCategory = p.getClassification().getSubcategory();
+        String size = String.valueOf(p.getClassification().getProductSize());
+
+        int currentAmount = getTotalQuantity(category, subCategory, size);
+        if (currentAmount == -1) return false;
+
+        return currentAmount - 1 <= p.getClassification().getMinAmountForAlert();
     }
+
 
     /**
      * Retrieves the name of a product by its ID.
@@ -373,70 +461,129 @@ public class DataController {
     }
 
     /**
-     * Applies a store discount to all products of a specific category.
+     * Applies a store discount to all products within a specified category.
      *
-     * @param category the category name
+     * <p>If the category exists in the system, the discount is applied to all
+     * relevant products. Otherwise, a message is displayed indicating that
+     * the category does not exist.</p>
+     *
+     * @param category the name of the category to apply the discount to
      * @param discount the discount percentage to apply
      */
     public void setDiscountForCategory(String category, int discount){
+        boolean found = false;
         for(Product p : products.values()){
             if(p.getClassification().getCategory().equals(category)){
                 p.getClassification().setStoreDiscount(discount);
+                found = true;
             }
         }
-        System.out.println("Discount of " + discount + "% has been set for category " + category);
+        if (found) {
+            System.out.println("Discount of " + discount + "% has been set for category " + category);
+        } else {
+            System.out.println("The category \"" + category + "\" does not exist in the system.");
+        }
     }
 
     /**
-     * Applies a store discount to all products of a specific sub-category.
+     * Applies a store discount to all products within a specified sub-category.
      *
-     * @param sub_category the sub-category name
-     * @param discount     the discount percentage to apply
+     * <p>If the sub-category exists in the system, the discount is applied to all
+     * relevant products. Otherwise, a message is displayed indicating that
+     * the sub-category does not exist.</p>
+     *
+     * @param sub_category the name of the sub-category to apply the discount to
+     * @param discount the discount percentage to apply
      */
     public void setDiscountForSubCategory(String sub_category, int discount){
+        boolean found = false;
         for(Product p : products.values()){
             if(p.getClassification().getSubcategory().equals(sub_category)){
                 p.getClassification().setStoreDiscount(discount);
+                found = true;
             }
         }
-        System.out.println("Discount of " + discount + "% has been set for sub-category " + sub_category);
+        if (found) {
+            System.out.println("Discount of " + discount + "% has been set for sub-category " + sub_category);
+        } else {
+            System.out.println("The sub-category \"" + sub_category + "\" does not exist in the system.");
+        }
     }
 
     /**
-     * Applies a store discount to all products with a specific catalog number.
+     * Applies a store discount to the product with the specified catalog number.
      *
-     * @param catalog_number the catalog number
-     * @param discount       the discount percentage to apply
+     * <p>If a product with the given catalog number exists in the system,
+     * the discount is applied. Otherwise, a message is displayed indicating
+     * that the catalog number does not exist.</p>
+     *
+     * @param catalog_number the catalog number of the product
+     * @param discount the discount percentage to apply
      */
-    public void setDiscountForCatalogNum(int catalog_number, int discount){
+    public void setDiscountForCatalogNumber(int catalog_number, int discount){
+        boolean found = false;
         for(Product p : products.values()){
             if(p.getClassification().getCatalogNumber() == catalog_number){
                 p.getClassification().setStoreDiscount(discount);
+                found = true;
             }
         }
-        System.out.println("Discount of " + discount + "% has been set for catalog number " + catalog_number);
+        if (found) {
+            System.out.println("Discount of " + discount + "% has been set for catalog number " + catalog_number);
+        } else {
+            System.out.println("The catalog number \"" + catalog_number + "\" does not exist in the system.");
+        }
+    }
+
+
+    /**
+     * Returns a list of sale prices for all purchased products with the given catalog number.
+     *
+     * @param catalogNumber the catalog number to search for
+     * @return a formatted string of purchase prices, or a message if none found
+     */
+    public String getPurchasePricesByCatalogNumber(int catalogNumber) {
+        List<Double> prices = new ArrayList<>();
+
+        for (Product p : purchase_products.values()) {
+            if (p.getClassification().getCatalogNumber() == catalogNumber) {
+                double price = p.getClassification().getSalePrice();
+                if (price >= 0) {
+                    prices.add(price);
+                }
+            }
+        }
+
+        if (prices.isEmpty()) {
+            return "No purchased products found with catalog number: " + catalogNumber;
+        }
+
+        StringBuilder result = new StringBuilder("Sale prices for catalog number " + catalogNumber + ":\n");
+        for (int i = 0; i < prices.size(); i++) {
+            result.append((i + 1)).append(". ").append(prices.get(i)).append("\n");
+        }
+        return result.toString();
     }
 
     /**
-     * Returns the sale price of a purchased product.
+     * Returns the current stock count of a specific product, identified by its catalog number,
+     * separated by storage location ("wareHouse" and "interiorStore").
+     * This function iterates through all products in the inventory, and for each product that matches
+     * the given catalog number, it increments a counter according to its storage location.
+     * If the catalog number does not exist in the system, an error message is returned.
+     * If no matching products are found, a message indicating this is returned as well.
      *
-     * @param product_ID the ID of the product
-     * @return the sale price set at purchase time
+     * @param catalog_number the catalog number of the product to look for
+     * @return a formatted string showing the quantity of the product in the warehouse and in the store,
+     *         or an appropriate message if the catalog number is invalid or has no stock
      */
-    public double getProductPurchasePrice(int product_ID){
-        return purchase_products.get(product_ID).getClassification().getSalePrice();
-    }
-
-
     public String showCurrentAmountPerLocationByCatalogNumber(int catalog_number) {
-        // Check if catalog number exists in the system
-        if (!catalog_numbers_Set.contains(catalog_number)) {
+        // Check if the catalog number exists in the system
+        if (!catalog_numbers_set.contains(catalog_number)) {
             return "Invalid catalog number: " + catalog_number + ". This catalog number does not exist in the Inventory.";
         }
-
         int warehouse_quantity = 0;
         int store_quantity = 0;
-
         for (Product p : products.values()) {
             if (p.getClassification().getCatalogNumber() == catalog_number) {
                 String location = p.getStored();
@@ -447,16 +594,94 @@ public class DataController {
                 }
             }
         }
-
         if (warehouse_quantity == 0 && store_quantity == 0) {
             return "No products found for catalog number: " + catalog_number;
         }
-
         return "Catalog Number: " + catalog_number + "\n"
                 + "Warehouse quantity: " + warehouse_quantity + "\n"
                 + "Store quantity: " + store_quantity;
     }
 
+    /**
+     * Retrieves the total current quantity of a product in both warehouse and interior store,
+     * based on its category, sub-category, and size.
+     *
+     * @param category the category of the product
+     * @param subCategory the sub-category of the product
+     * @param size the size of the product (as string)
+     * @return total quantity (warehouse + store), or -1 if data not found
+     */
+    private int getTotalQuantity(String category, String subCategory, String size) {
+        Map<String, HashMap<String, HashMap<String, Integer>>> subMap = products_amount_map_by_category.get(category);
+        if (subMap == null) return -1;
+
+        Map<String, HashMap<String, Integer>> sizeMap = subMap.get(subCategory);
+        if (sizeMap == null) return -1;
+
+        Map<String, Integer> locationMap = sizeMap.get(size);
+        if (locationMap == null) return -1;
+
+        int warehouseQty = locationMap.getOrDefault("wareHouse", 0);
+        int storeQty = locationMap.getOrDefault("interiorStore", 0);
+
+        return warehouseQty + storeQty;
+    }
+
+    /**
+     * Generates a report of products that are currently understocked based on their minimum required quantity.
+     * The report is grouped by catalog number, summing all instances of the same product across different entries.
+     * For each understocked product, the report shows:
+     * - Catalog number
+     * - Product name
+     * - Total quantity currently in stock
+     * - Minimum required quantity
+     * - Number of units missing to meet the minimum
+     *
+     * @return A formatted string listing all understocked products and their shortage,
+     *         or a message indicating that no products are below their minimum level.
+     */
+    public String generateReorderAlertReport() {
+        StringBuilder report = new StringBuilder();
+        boolean found = false;
+        // Map: catalog number → list of products
+        Map<Integer, List<Product>> catalogMap = new HashMap<>();
+        for (Product p : products.values()) {
+            int catalogNum = p.getClassification().getCatalogNumber();
+            catalogMap.computeIfAbsent(catalogNum, k -> new ArrayList<>()).add(p);
+        }
+        for (Map.Entry<Integer, List<Product>> entry : catalogMap.entrySet()) {
+            int catalogNumber = entry.getKey();
+            List<Product> productList = entry.getValue();
+            if (productList.isEmpty()) continue;
+            Product sample = productList.get(0); // use first product for name/min amount
+            String name = sample.getProductName();
+            int minRequired = sample.getClassification().getMinAmountForAlert();
+            int totalInStock = productList.size();
+            if (totalInStock < minRequired) {
+                found = true;
+                int missing = minRequired - totalInStock;
+                report.append("Catalog Number: ").append(catalogNumber)
+                        .append(", Name: ").append(name)
+                        .append(", Total in stock: ").append(totalInStock)
+                        .append(", Minimum required: ").append(minRequired)
+                        .append(", Missing: ").append(missing).append("\n");
+            }
+        }
+        if (!found) {
+            return "All the products are above their minimum required amount.";
+        }
+        return report.toString();
+    }
+
+    /**
+     * Checks whether a product with the specified product ID exists in the inventory.
+     *
+     * @param productId the unique identifier of the product to check
+     * @return true if the product exists in the inventory, false otherwise
+     */
+    public boolean productExists(int productId) {
+        return products.containsKey(productId);
+    }
 
 
 }

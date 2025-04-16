@@ -1,8 +1,7 @@
 package Domain;
 
-import java.security.KeyPair;
+
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Order {
@@ -17,5 +16,5 @@ public class Order {
         this.orderDate = orderDate;
         this.productsInOrder = productsInOrder;
     }
-//    List<שם מוצר, מספר ספק, מחיר> chackPrice(List<כמות, ID מוצר>);/////////// אני חושב שצריך להיות במוצר!
+
 }

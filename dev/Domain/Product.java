@@ -1,6 +1,8 @@
 package Domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Product {
@@ -8,10 +10,35 @@ public class Product {
     int product_id;
     double Price;
     String unitsOfMeasure;
-
-    public record DiscountRule(int discount, int amount) {} //this is the content of the discount
+    public record DiscountRule(int discount, int amount) {} //this is the content of the discount   // בגדול זה במקום ליצור עוד מחלקה
     List<DiscountRule> discountRules = new ArrayList<>(); //array of discounts
-    void addDiscountRule(int discount, int amount){}
+
+
+    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure){
+        this.Catalog_Number = catalog_Number;
+        this.product_id = product_id;
+        this.Price = price;
+        this.unitsOfMeasure = unitsOfMeasure;
+    }
+
+    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules) {
+        this.Catalog_Number = catalog_Number;
+        this.product_id = product_id;
+        this.Price = price;
+        this.unitsOfMeasure = unitsOfMeasure;
+        if (discountRules != null) {
+            this.discountRules.addAll(discountRules);
+
+        }
+    }
+
+    public void add_discountRule(int discount, int amount){
+        discountRules.add(new DiscountRule(discount, amount));
+    }
+
+    public List<DiscountRule> getDiscountRules() {
+        return Collections.unmodifiableList(discountRules); //return in a safe way the discountRules "read only"
+    }
 
     public int getProduct_id() {
         return product_id;
@@ -19,6 +46,24 @@ public class Product {
 
     public int getCatalog_Number() {
         return Catalog_Number;
+    }
+
+    public void setPrice(double new_price){ //new !!!!!! set_price
+        this.Price = new_price;
+    }
+
+
+    ///new !!!!!!!!!  setDiscount
+    public void setDiscount(int discount, int amount){
+        for (DiscountRule rule : discountRules){
+            if(rule.amount == amount){
+                discountRules.remove(rule);
+                add_discountRule(discount, amount);
+            }
+            else {
+                add_discountRule(discount, amount);
+            }
+        }
     }
 
     //#להוסיף שיטה שמחזירה את ההנחה בהינתו כמות

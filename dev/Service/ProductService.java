@@ -10,8 +10,10 @@ public class ProductService {
     public ProductService(){
         this.productList = new ArrayList<>();
     }
-    public void add(Product product) {
-        productList.add(product);
+    public void createProduct() { ////dooooooooooo
+
+        }
+
     }
     public boolean delete_by_id(int id) {
         return productList.remove(searchProduct_by_id(id));

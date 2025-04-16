@@ -6,8 +6,9 @@ import java.util.List;
 
 public class SupplierService {
     private List<Supplier> supplierList;
+
     public void createSupplier() {
-        Supplier supplier = new Supplier();
+        Supplier supplier = new Supplier(); /////////////////
         this.supplierList.add(supplier);
 
     }

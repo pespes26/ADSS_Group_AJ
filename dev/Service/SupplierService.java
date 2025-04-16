@@ -1,11 +1,13 @@
 package Service;
 
+import Domain.Agreement;
 import Domain.Supplier;
 
 import java.util.List;
 
 public class SupplierService {
     private List<Supplier> supplierList;
+    public AgreementService agreementService;
 
     public void createSupplier() {
         Supplier supplier = new Supplier(); /////////////////
@@ -22,5 +24,13 @@ public class SupplierService {
             }
         }
         return null;
+    }
+
+    public void deleteAgreementFromSupplier(int supplier_ID, int agreement_ID) {
+        Supplier supplier = supplierList.get(supplier_ID);
+        if (supplier!= null) {
+            supplier.removeAgreement(agreement_ID);
+            this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+        }
     }
 }

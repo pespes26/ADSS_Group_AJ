@@ -1,7 +1,9 @@
 package Domain;
 
+import java.util.HashMap;
+
 public class Supplier {
-    Agreement agreement;
+    HashMap<Integer, Agreement>  agreements;
     String supplierName;
     int supplier_id;
     int company_id;
@@ -38,7 +40,8 @@ public class Supplier {
         return email;
     }
 
-    public Agreement getAgreement() {
+    public Agreement getAgreement(int agreement_ID) {
+        Agreement agreement = agreements.get(agreement_ID);
         return agreement;
     }
 
@@ -49,4 +52,12 @@ public class Supplier {
     public String getSupplierName() {
         return supplierName;
     }
+
+    public void removeAgreement(int agreement_ID){ //
+        Agreement agreement = agreements.remove(agreement_ID);
+    }
+
+
+
+
 }

@@ -50,7 +50,6 @@ public class Agreement {
         return CatalogNumber;
     }
 
-
     //========================new Functions=================
     public int[] removeAllProducts(){
         int size = this.SupplierProducts.size();

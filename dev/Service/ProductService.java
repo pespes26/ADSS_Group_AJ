@@ -15,9 +15,10 @@ public class ProductService {
         this.productList = (initialProducts != null) ? new ArrayList<>(initialProducts) : new ArrayList<>();
     }*/
 
-    public void createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
+    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
         Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);
         this.productList.add(product);
+        return product;
         }
 
     public boolean delete_by_id(int id) {
@@ -48,7 +49,7 @@ public class ProductService {
     }
 
     /////////////
-    public Product best_price(int product_id){
+    public int best_price(int product_id, int amount){
         Product best_product = null; //init the best product to null
         for (Product product : productList) {
             if (product.getProduct_id() == product_id) { //check by id product
@@ -59,6 +60,6 @@ public class ProductService {
                }
             }
         }
-        return best_product;
+        return best_product.getPrice();
     }
 }

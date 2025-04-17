@@ -108,12 +108,24 @@ public class Agreement {
      * @param productID the ID of the product to remove
      * @return the catalog number of the removed product
      */
+//    public int removeProduct(int productID) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
+//        supplierProducts.remove(productID); // Remove from the map
+//        return catalogNumber; // Return the catalog number
+//    }
+
     public int removeProduct(int productID) {
         Product product = supplierProducts.get(productID); // Retrieve the product
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found in agreement.");
+        }
+
         int catalogNumber = product.getCatalog_Number(); // Get its catalog number
         supplierProducts.remove(productID); // Remove from the map
         return catalogNumber; // Return the catalog number
     }
+
 
     /**
      * Removes all products from the agreement.

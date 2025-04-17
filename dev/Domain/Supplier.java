@@ -13,7 +13,19 @@ public class Supplier {
     int phoneNumber;
     String email;
 
-    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentDay, HashMap<Integer, Agreement> agreements){
+//    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentDay, HashMap<Integer, Agreement> agreements){
+//        this.supplierName = supplierName;
+//        this.supplier_id = supplier_id;
+//        this.company_id = company_id;
+//        this.bankAccount = bankAccount;
+//        this.paymentMethod = paymentMethod;
+//        this.phoneNumber = phoneNumber;
+//        this.email = email;
+//        this.paymentDay = paymentDay;
+//        this.agreements = (agreements != null) ? agreements : new HashMap<>(); //if (agreements != null)  -> do agreements
+//    }
+
+    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentDay){
         this.supplierName = supplierName;
         this.supplier_id = supplier_id;
         this.company_id = company_id;
@@ -22,7 +34,7 @@ public class Supplier {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.paymentDay = paymentDay;
-        this.agreements = (agreements != null) ? agreements : new HashMap<>(); //if (agreements != null)  -> do agreements
+        this.agreements = new HashMap<>();
     }
 
 
@@ -84,7 +96,18 @@ public class Supplier {
         Agreement agreement = agreements.remove(agreement_ID);
     }
 
+    //==========================new=====================================
+    public int[] removeAllAgreementFromSupplier() {
+        int size = agreements.size();
+        int[] agreementIDs = new int[size];
+        int i = 0;
 
-
+        for (Agreement agreement : new HashMap<>(agreements).values()) {
+            int agreement_ID = agreement.getAgreementID();
+            agreements.remove(agreement_ID);
+            agreementIDs[i++] = agreement_ID;
+        }
+        return agreementIDs;
+    }
 
 }

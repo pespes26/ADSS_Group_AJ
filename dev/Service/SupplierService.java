@@ -10,14 +10,15 @@ public class SupplierService {
     private List<Supplier> supplierList;
     public AgreementService agreementService;
 
-    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, HashMap<Integer, Agreement> agreements) {
-        Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, agreements);
+    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay, HashMap<Integer, Agreement> agreements) {
+        Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentDay, agreements);
         this.supplierList.add(supplier);
+    }
+    public boolean deleteSupplier(int supplier_ID, int agreement_ID) {
+        deleteAgreementFromSupplier(supplier_ID, agreement_ID); ///delete all the agreement
+        return supplierList.remove(searchSupplier_by_id(supplier_ID)); ///delete the supplier
+    }
 
-    }
-    public boolean deleteSupplier(int id) {
-        return supplierList.remove(searchSupplier_by_id(id));
-    }
     public Supplier searchSupplier_by_id(int id) {
         for(Supplier supplier : supplierList){
             if(supplier.getSupplier_id()==id){

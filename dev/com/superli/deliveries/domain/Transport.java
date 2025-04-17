@@ -1,4 +1,4 @@
-package com.superli.deliveries.domain; // שם חבילה לדוגמה
+package com.superli.deliveries.domain; 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

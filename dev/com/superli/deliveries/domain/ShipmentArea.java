@@ -1,4 +1,4 @@
-package com.superli.deliveries.domain; // Example package
+package com.superli.deliveries.domain;
 
 /**
  * Represents a geographic shipment area used for delivery planning.

@@ -1,6 +1,7 @@
 package Service;
 
 import Domain.Product;
+import Domain.Supplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,17 +50,24 @@ public class ProductService {
     }
 
     /////////////
-    public int best_price(int product_id, int amount){
-        Product best_product = null; //init the best product to null
+    public double best_price(int product_id, int amount){
+        //Product best_product = null; //init the best product to null
+        double final_price = Double.MAX_VALUE; //init the final_price to MAX_VALUE
         for (Product product : productList) {
             if (product.getProduct_id() == product_id) { //check by id product
-                //if is the firs time -> best_product = product
-                //if not the first time -> check if chipper
-               if(best_product == null || product.getPrice() < best_product.getPrice()){
-                   best_product = product;
+                double current_price = product.get_price_after_discount(amount);
+                // check if chipper : (use "get_price_after_discount" to calculate the price after optional discount)
+               if(current_price < final_price){
+                   final_price = current_price;
                }
             }
         }
-        return best_product.getPrice();
+        if (final_price == Double.MAX_VALUE){
+            return -1;
+        }
+        return final_price;
     }
+
+
+
 }

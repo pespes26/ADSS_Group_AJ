@@ -10,7 +10,7 @@ public class Product {
     int product_id;
     double Price;
     String unitsOfMeasure;
-    public record DiscountRule(int discount, int amount) {} //this is the content of the discount   // בגדול זה במקום ליצור עוד מחלקה
+    public record DiscountRule(double discount, int amount) {} //this is the content of the discount   // בגדול זה במקום ליצור עוד מחלקה
     List<DiscountRule> discountRules = new ArrayList<>(); //array of discounts
 
 
@@ -32,7 +32,7 @@ public class Product {
         }
     }
 
-    public void add_discountRule(int discount, int amount){
+    public void add_discountRule(double discount, int amount){
         discountRules.add(new DiscountRule(discount, amount));
     }
 
@@ -58,7 +58,7 @@ public class Product {
 
 
     ///new !!!!!!!!!  setDiscount
-    public boolean setDiscount(int discount, int amount){
+    public boolean setDiscount(double discount, int amount){
         for (int i = 0; i < discountRules.size(); i++){
             if(discountRules.get(i).amount() == amount){
                 discountRules.set(i, new DiscountRule(discount, amount));
@@ -70,8 +70,8 @@ public class Product {
     }
 
     //#להוסיף שיטה שמחזירה את ההנחה בהינתו כמות
-    public int calcDiscount(int amount){
-        int current_discount = 0;
+    public double calcDiscount(int amount){
+        double current_discount = 0;
         for (int i=0;i<discountRules.size();i++){ //check all the discounts
             DiscountRule rule = discountRules.get(i);  // get the current discount rule from the list
             if(amount>=rule.amount){ //check if the amount is bigger then the discountRules in the list-> great for the discount
@@ -81,5 +81,12 @@ public class Product {
             }
         }
         return current_discount; //return the discount
+    }
+
+
+    public double get_price_after_discount(int amount){
+        double discount = calcDiscount(amount);//calculate the size of discount(אולי לשנות ל double)
+        discount = 1-(discount / 100.0); //percentage to be pay from the original price
+        return this.Price * discount;
     }
 }

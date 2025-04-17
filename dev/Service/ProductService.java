@@ -10,11 +10,16 @@ public class ProductService {
     public ProductService(){
         this.productList = new ArrayList<>();
     }
-    public void createProduct() { ////dooooooooooo
 
+/*    public ProductService(List<Product> initialProducts) {
+        this.productList = (initialProducts != null) ? new ArrayList<>(initialProducts) : new ArrayList<>();
+    }*/
+
+    public void createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
+        Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);
+        this.productList.add(product);
         }
 
-    }
     public boolean delete_by_id(int id) {
         return productList.remove(searchProduct_by_id(id));
     }
@@ -40,5 +45,20 @@ public class ProductService {
             }
         }
         return null;
+    }
+
+    /////////////
+    public Product best_price(int product_id){
+        Product best_product = null; //init the best product to null
+        for (Product product : productList) {
+            if (product.getProduct_id() == product_id) { //check by id product
+                //if is the firs time -> best_product = product
+                //if not the first time -> check if chipper
+               if(best_product == null || product.getPrice() < best_product.getPrice()){
+                   best_product = product;
+               }
+            }
+        }
+        return best_product;
     }
 }

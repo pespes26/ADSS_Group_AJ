@@ -3,14 +3,15 @@ package Service;
 import Domain.Agreement;
 import Domain.Supplier;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class SupplierService {
     private List<Supplier> supplierList;
     public AgreementService agreementService;
 
-    public void createSupplier() {
-        Supplier supplier = new Supplier(); /////////////////
+    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, HashMap<Integer, Agreement> agreements) {
+        Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, agreements);
         this.supplierList.add(supplier);
 
     }

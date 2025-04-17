@@ -48,22 +48,25 @@ public class Product {
         return Catalog_Number;
     }
 
+    public double getPrice() {
+        return Price;
+    }
+
     public void setPrice(double new_price){ //new !!!!!! set_price
         this.Price = new_price;
     }
 
 
     ///new !!!!!!!!!  setDiscount
-    public void setDiscount(int discount, int amount){
-        for (DiscountRule rule : discountRules){
-            if(rule.amount == amount){
-                discountRules.remove(rule);
-                add_discountRule(discount, amount);
-            }
-            else {
-                add_discountRule(discount, amount);
+    public boolean setDiscount(int discount, int amount){
+        for (int i = 0; i < discountRules.size(); i++){
+            if(discountRules.get(i).amount() == amount){
+                discountRules.set(i, new DiscountRule(discount, amount));
+                return true;
             }
         }
+        discountRules.add(new DiscountRule(discount, amount));
+        return false;
     }
 
     //#להוסיף שיטה שמחזירה את ההנחה בהינתו כמות

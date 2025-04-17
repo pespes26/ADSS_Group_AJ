@@ -55,7 +55,7 @@ public class Agreement {
      *
      * @return the agreement ID
      */
-    public int getAgreement_ID() {
+    public int getAgreementID() {
         return agreement_ID;
     }
 

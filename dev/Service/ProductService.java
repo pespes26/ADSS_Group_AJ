@@ -62,7 +62,7 @@ public class ProductService {
                }
             }
         }
-        if (final_price == Double.MAX_VALUE){
+        if (final_price == Double.MAX_VALUE){//can't create
             return -1;
         }
         return final_price;

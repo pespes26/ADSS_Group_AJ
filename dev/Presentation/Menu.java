@@ -33,7 +33,7 @@ public class Menu {
         int choice = 0;
 
         scan = new Scanner(System.in);
-        while (choice != 12) {
+        while (choice != 14) {
             String menu = """
                     Menu:
                     1.Show item details\
@@ -58,7 +58,11 @@ public class Menu {
                     
                     11.Show low-stock products that need reordering\
                     
-                    12.Exit""";
+                    12.Change product supply details.\
+                    
+                    13.Change product location.\
+                    
+                    14.Exit""";
 
             System.out.println();
             System.out.println(menu);
@@ -235,7 +239,47 @@ public class Menu {
                     System.out.println(dataController.generateReorderAlertReport());
                     break;
 
-                case 12: //Exit
+                case 12://change product supply details
+                    try {
+                    System.out.println("Enter product catalog number: ");
+                    int catalogNumber = scan.nextInt();
+                    scan.nextLine();
+
+                    System.out.println("Enter the product supply time: ");
+                    int supply_time = scan.nextInt();
+                    scan.nextLine();
+
+                    System.out.println("Enter the product demand:");
+                    int demand = scan.nextInt();
+                    scan.nextLine();
+
+                    dataController.updateProductSupplyDetails(catalogNumber,supply_time,demand);
+                    } catch (Exception e) {
+                        System.out.println("Something went wrong while updating the details.");
+                    }
+                    break;
+                case 13://change Product location
+                    try {
+                    System.out.println("Enter product ID: ");
+                    int id_num = scan.nextInt();
+                    scan.nextLine();
+
+                    System.out.println("Enter the product location: ");
+                    String loc = scan.nextLine();
+                    scan.nextLine();
+
+                    System.out.println("Enter the product section: ");
+                    String sec = scan.nextLine();
+                    scan.nextLine();
+                    dataController.updateProductLocation(id_num,loc,sec);
+                } catch (Exception e) {
+                System.out.println("Something went wrong while updating the location.");
+                }
+                break;
+
+
+
+                case 14: //Exit
                     System.out.println("Thank you! Have a nice day :) ");
                     break;
                 default:

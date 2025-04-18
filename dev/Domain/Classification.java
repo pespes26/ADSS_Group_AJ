@@ -1,5 +1,4 @@
 package Domain;
-
 /**
  * Represents the classification details of a product, including size, category,
  * demand, supply time, pricing, and discounts.

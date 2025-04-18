@@ -179,9 +179,14 @@ public class DataController {
      * @param product_ID the ID of the product to mark
      */
     public void markDefect(int product_ID){
+        if (!products.containsKey(product_ID)) {
+            System.out.println("ERROR: Product ID " + product_ID + " not found. Cannot mark as defect.");
+            return;
+        }
         products.get(product_ID).setDefect(true);
         System.out.println("The product with the ID " + product_ID + " has been marked as defective.");
     }
+
 
     /**
      * Handles the purchase of a product: sets sale price, moves to purchase list, and removes from stock.
@@ -190,15 +195,20 @@ public class DataController {
      * @param sale_price  the sale price of the product
      */
     public void handlePurchaseProduct(int product_ID, double sale_price){
+        if (!products.containsKey(product_ID)) {
+            System.out.println("ERROR: Product ID " + product_ID + " not found. Cannot proceed with purchase.");
+            return;
+        }
         Product p = products.get(product_ID);
         purchase_products.put(product_ID, p);
         purchase_products.get(product_ID).getClassification().setSalePrice(sale_price);
         products.remove(product_ID);
-        updateProductInventoryCount(false,p.getClassification().getCategory(),
+        updateProductInventoryCount(false, p.getClassification().getCategory(),
                 p.getClassification().getSubcategory(),
                 String.valueOf(p.getClassification().getProductSize()),
-                p.getStored()); //decrement by 1 in categories map
+                p.getStored());
     }
+
 
     /**
      * Handles the removal of a product due to defect and updates inventory accordingly.
@@ -206,13 +216,18 @@ public class DataController {
      * @param product_ID the ID of the defective product
      */
     public void handleDefectProduct(int product_ID){
+        if (!products.containsKey(product_ID)) {
+            System.out.println("ERROR: Product ID " + product_ID + " not found. Cannot mark as defect.");
+            return;
+        }
         Product p = products.get(product_ID);
         products.remove(product_ID);
         System.out.println("The product with the ID " + product_ID + " has been removed from the store.");
-        updateProductInventoryCount(false,p.getClassification().getCategory(),
+        updateProductInventoryCount(false, p.getClassification().getCategory(),
                 p.getClassification().getSubcategory(),
-                String.valueOf(p.getClassification().getProductSize()), p.getStored()); //decrement by 1 in categories map
+                String.valueOf(p.getClassification().getProductSize()), p.getStored());
     }
+
 
 
     /**
@@ -643,20 +658,25 @@ public class DataController {
     public String generateReorderAlertReport() {
         StringBuilder report = new StringBuilder();
         boolean found = false;
+
         // Map: catalog number → list of products
         Map<Integer, List<Product>> catalogMap = new HashMap<>();
         for (Product p : products.values()) {
             int catalogNum = p.getClassification().getCatalogNumber();
             catalogMap.computeIfAbsent(catalogNum, k -> new ArrayList<>()).add(p);
         }
+
+        // מוצרים שעדיין קיימים במלאי
         for (Map.Entry<Integer, List<Product>> entry : catalogMap.entrySet()) {
             int catalogNumber = entry.getKey();
             List<Product> productList = entry.getValue();
             if (productList.isEmpty()) continue;
-            Product sample = productList.get(0); // use first product for name/min amount
+
+            Product sample = productList.get(0); // נציג
             String name = sample.getProductName();
             int minRequired = sample.getClassification().getMinAmountForAlert();
             int totalInStock = productList.size();
+
             if (totalInStock < minRequired) {
                 found = true;
                 int missing = minRequired - totalInStock;
@@ -667,11 +687,38 @@ public class DataController {
                         .append(", Missing: ").append(missing).append("\n");
             }
         }
+
+        // מוצרים שנמחקו לגמרי מהמלאי
+        for (int catalogNumber : catalog_numbers_set) {
+            if (!catalogMap.containsKey(catalogNumber)) {
+                int minRequired = 0;
+                String productName = "Unknown";
+
+                for (Product p : purchase_products.values()) {
+                    if (p.getClassification().getCatalogNumber() == catalogNumber) {
+                        minRequired = p.getClassification().getMinAmountForAlert();
+                        productName = p.getProductName();
+                        break;
+                    }
+                }
+
+                if (minRequired > 0) {
+                    found = true;
+                    report.append("Catalog Number: ").append(catalogNumber)
+                            .append(", Name: ").append(productName)
+                            .append(", Total in stock: 0")
+                            .append(", Minimum required: ").append(minRequired)
+                            .append(", Missing: ").append(minRequired).append("\n");
+                }
+            }
+        }
+
         if (!found) {
             return "All the products are above their minimum required amount.";
         }
         return report.toString();
     }
+
 
     /**
      * Checks whether a product with the specified product ID exists in the inventory.

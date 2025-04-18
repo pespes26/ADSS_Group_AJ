@@ -252,42 +252,45 @@ public class DataController {
         }
     }
 
-    public void updateProductSupplyDetails(int catalogNumber, int supply_time,int demand) {
+    public void updateProductSupplyDetails(int catalogNumber, Integer supplyTime, Integer demand) {
         boolean found = false;
         for (Product p : products.values()) {
             if (p.getClassification().getCatalogNumber() == catalogNumber) {
-                p.getClassification().setSupplyTime(supply_time);
-                p.getClassification().setProductDemand(demand);
+                if (supplyTime != null) {
+                    p.getClassification().setSupplyTime(supplyTime);
+                    System.out.println("Updated supply time for product ID " + p.getProductId());
+                }
+                if (demand != null) {
+                    p.getClassification().setProductDemand(demand);
+                    System.out.println("Updated demand for product ID " + p.getProductId());
+                }
                 found = true;
             }
         }
 
-        if (found) {
-            System.out.println("The supply_time of all products with catalog number " + catalogNumber + " has been updated to " + supply_time);
-            System.out.println("The demand of all products with catalog number " + catalogNumber + " has been updated to " + demand);
-
-        } else {
+        if (!found) {
             System.out.println("No products with catalog number " + catalogNumber + " found in stock.");
         }
     }
 
-    public void updateProductLocation(int id, String loc,String section) {
+    public void updateProductLocation(int id, String loc, String section) {
         boolean found = false;
         for (Product p : products.values()) {
             if (p.getProductId() == id) {
-                p.setStored(loc);
-                p.setSection(section);
-
+                if (loc != null) {
+                    p.setStored(loc);
+                    System.out.println("The location of product with ID " + id + " has been updated to " + loc);
+                }
+                if (section != null) {
+                    p.setSection(section);
+                    System.out.println("The section of product with ID " + id + " has been updated to " + section);
+                }
                 found = true;
             }
         }
 
-        if (found) {
-            System.out.println("The location of the products with ID " + id + " has been updated to " + loc);
-            System.out.println("The section of the products with ID " + id + " has been updated to " + section);
-
-        } else {
-            System.out.println("No products with id " + id + " found in stock.");
+        if (!found) {
+            System.out.println("No products with ID " + id + " found in stock.");
         }
     }
 

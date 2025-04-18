@@ -60,7 +60,7 @@ public class Menu {
                     
                     12.Change product supply details.\
                     
-                    13.Change product location.\
+                    13.Change item location.\
                     
                     14.Exit""";
 
@@ -70,7 +70,7 @@ public class Menu {
             choice = scan.nextInt();
 
 
-            if (choice != 12) {
+            if (choice != 14) {
                 scan.nextLine();
             }
 
@@ -239,44 +239,64 @@ public class Menu {
                     System.out.println(dataController.generateReorderAlertReport());
                     break;
 
-                case 12://change product supply details
+                case 12: //Change product supply details
                     try {
-                    System.out.println("Enter product catalog number: ");
-                    int catalogNumber = scan.nextInt();
-                    scan.nextLine();
+                        System.out.println("Enter product catalog number: ");
+                        int catalogNumber = scan.nextInt();
+                        scan.nextLine();
 
-                    System.out.println("Enter the product supply time: ");
-                    int supply_time = scan.nextInt();
-                    scan.nextLine();
+                        System.out.println("What would you like to update?\n(1) Supply time\n(2) Demand\n(3) Both");
+                        int case_12_choice = scan.nextInt();
+                        scan.nextLine();
 
-                    System.out.println("Enter the product demand:");
-                    int demand = scan.nextInt();
-                    scan.nextLine();
+                        Integer supplyTime = null;
+                        Integer demand = null;
 
-                    dataController.updateProductSupplyDetails(catalogNumber,supply_time,demand);
+                        if (case_12_choice == 1 || case_12_choice == 3) {
+                            System.out.println("Enter the new supply time: ");
+                            supplyTime = scan.nextInt();
+                            scan.nextLine();
+                        }
+
+                        if (case_12_choice == 2 || case_12_choice == 3) {
+                            System.out.println("Enter the new demand value: ");
+                            demand = scan.nextInt();
+                            scan.nextLine();
+                        }
+
+                        dataController.updateProductSupplyDetails(catalogNumber, supplyTime, demand);
                     } catch (Exception e) {
                         System.out.println("Something went wrong while updating the details.");
                     }
                     break;
-                case 13://change Product location
+                case 13: // Change Product location
                     try {
-                    System.out.println("Enter product ID: ");
-                    int id_num = scan.nextInt();
-                    scan.nextLine();
+                        System.out.println("Enter product ID: ");
+                        int idNum = scan.nextInt();
+                        scan.nextLine();
 
-                    System.out.println("Enter the product location: ");
-                    String loc = scan.nextLine();
-                    scan.nextLine();
+                        System.out.println("What would you like to update?\n(1) Location\n(2) Section\n(3) Both");
+                        int case_13_choice = scan.nextInt();
+                        scan.nextLine();
 
-                    System.out.println("Enter the product section: ");
-                    String sec = scan.nextLine();
-                    scan.nextLine();
-                    dataController.updateProductLocation(id_num,loc,sec);
-                } catch (Exception e) {
-                System.out.println("Something went wrong while updating the location.");
-                }
-                break;
+                        String loc = null;
+                        String sec = null;
 
+                        if (case_13_choice == 1 || case_13_choice == 3) {
+                            System.out.println("Enter the new product location: ");
+                            loc = scan.nextLine();
+                        }
+
+                        if (case_13_choice == 2 || case_13_choice == 3) {
+                            System.out.println("Enter the new product section: ");
+                            sec = scan.nextLine();
+                        }
+
+                        dataController.updateProductLocation(idNum, loc, sec);
+                    } catch (Exception e) {
+                        System.out.println("Something went wrong while updating the location.");
+                    }
+                    break;
 
 
                 case 14: //Exit

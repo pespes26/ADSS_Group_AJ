@@ -20,14 +20,23 @@ public class SupplierService {
     }
 
     public void deleteSupplier(int supplier_ID) {
-        Supplier supplier = searchSupplier_by_id(supplier_ID);
+        Supplier supplier = getSupplierById(supplier_ID);
         if (supplier != null) {
             deleteAllAgreementFromSupplier(supplier_ID);
-            supplierList.remove(searchSupplier_by_id(supplier_ID));
+            supplierList.remove(getSupplierById(supplier_ID));
         }
     }
 
-    public Supplier searchSupplier_by_id(int id) {
+    public boolean searchSupplierByID(int id){
+        for (Supplier supplier : supplierList) {
+            if (supplier.getSupplier_id() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Supplier getSupplierById(int id) {
         for(Supplier supplier : supplierList){
             if(supplier.getSupplier_id()==id){
                 return supplier;

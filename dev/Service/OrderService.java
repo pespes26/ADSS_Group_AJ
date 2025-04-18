@@ -34,7 +34,7 @@ public class OrderService {
      * @param orderDate        the date the order was placed
      * @param productsInOrder  a map of product IDs to their requested quantities
      */
-    public Order createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder) {
+    public void createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder) {
         Map<Integer, Map.Entry<Integer, Double>> orderedProducts = new HashMap<>(); // Map to store productID -> (quantity, bestPrice)
 
         for (Integer productID : productsInOrder.keySet()) { // Loop through each product in the input map
@@ -45,7 +45,6 @@ public class OrderService {
 
         Order order = new Order(orderID, phoneNumber, orderDate, orderedProducts); // Create a new Order object using all collected data
         this.orderHashMap.put(orderID, order); // Add the order to the internal order list, using its ID as the key
-        return order;
     }
 
     /**
@@ -56,5 +55,13 @@ public class OrderService {
      */
     public Order searchOrderById(int orderID) {
         return orderHashMap.get(orderID); // Returns the order from the map using the given ID, or null if not found
+    }
+
+    public Map<Integer, Map.Entry<Integer, Double>> getProductsInOrder(int orderID) {
+        Order order = orderHashMap.get(orderID);
+        if (order != null) {
+            return order.getProductsInOrder();
+        }
+        return null;
     }
 }

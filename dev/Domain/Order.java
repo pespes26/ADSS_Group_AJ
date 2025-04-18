@@ -76,4 +76,5 @@ public class Order {
     public Map<Integer, Map.Entry<Integer, Double>> getProductsInOrder() {
         return productsInOrder; // Return the products and their quantities and prices
     }
+
 }

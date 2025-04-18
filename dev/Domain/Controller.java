@@ -25,7 +25,7 @@ public class Controller {
     }
     //--------------------------
     public Supplier getSupplierById(int id){
-        Supplier supplier = supplierService.searchSupplier_by_id(id);
+        Supplier supplier = supplierService.getSupplierById(id);
         if (supplier != null){
             return supplier;
 
@@ -40,6 +40,11 @@ public class Controller {
     //--------------------------
     public void deleteAllAgreementFromSupplier(int supplier_ID){
         supplierService.deleteAllAgreementFromSupplier(supplier_ID);
+    }
+
+    //--------------------------
+    public boolean searchSupplierByID(int id){
+        return supplierService.searchSupplierByID(id);
     }
 
 //===================================AgreementService================================================================\
@@ -95,8 +100,12 @@ public class Controller {
     }
 
 //===================================OrderService================================================================\
-    public Order createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder){
-        return orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
+    public void createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder){
+        orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
+    }
+    //--------------------------
+    public Map<Integer, Map.Entry<Integer, Double>> getProductsInOrder(int orderID){
+        return orderService.getProductsInOrder(orderID);
     }
 
 }

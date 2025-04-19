@@ -27,7 +27,7 @@ public class SupplierService {
         }
     }
 
-    public boolean searchSupplierByID(int id){
+    public boolean thereIsSupplier(int id){
         for (Supplier supplier : supplierList) {
             if (supplier.getSupplier_id() == id) {
                 return true;

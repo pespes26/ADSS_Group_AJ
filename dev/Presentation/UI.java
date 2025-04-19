@@ -1,6 +1,5 @@
 
 import Domain.Controller;
-import Domain.Product;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class UI {
             System.out.println("1. Create a new order");
             System.out.println("2. Search supplier");
             System.out.println("3. Create new supplier");
-//            TODO: System.out.println("4. Search for a past order");
+            System.out.println("4. Search for a past order");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -43,6 +42,8 @@ public class UI {
                      int supplier_ID = createSupplier(scanner, controller);
                     afterSupplierCreatedMenu(scanner, controller, supplier_ID);
                     break;
+                case 4:
+                    SearchPastOrder(scanner, controller);
                 case 0:
                     System.out.println("Exiting the system. Goodbye!");
                     break;
@@ -98,9 +99,8 @@ public class UI {
 
                 case 2:
                     controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder);//יוצר מופע של הזמנה
-                    Map<Integer, Map.Entry<Integer, Double>> productsInOrder1 = controller.getProductsInOrder(orderID);// מבנה נתונים עם כל המוצרים.
                     System.out.println(" Order submitted successfully.");
-                    printProductsInOrder1(productsInOrder1); //מדפיס את המוצרים
+                    printProductsInOrder1(controller,orderID); //מדפיס את המוצרים
                     return;
 
                 default:
@@ -109,7 +109,8 @@ public class UI {
         }
     }
 
-    public static void printProductsInOrder1(Map<Integer, Map.Entry<Integer, Double>> productsInOrder1) {
+    public static void printProductsInOrder1( Controller controller, int orderID) {
+        Map<Integer, Map.Entry<Integer, Double>> productsInOrder1 = controller.getProductsInOrder(orderID);
         System.out.println("\nProducts in order:");
         for (Map.Entry<Integer, Map.Entry<Integer, Double>> entry : productsInOrder1.entrySet()) {
             int productID = entry.getKey();                         // המפתח
@@ -122,16 +123,24 @@ public class UI {
         }
     }
 
+    public static void SearchPastOrder(Scanner scanner,Controller controller){
+        System.out.print("Enter Order ID: ");
+        int orderID = scanner.nextInt();
+
+        if(!controller.thereIsOrder(orderID)){
+            System.out.println("There is no such order.");
+        }
+        else {
+            System.out.println("There is such order.");
+        }
+        printProductsInOrder1(controller,orderID);//מדפיסה את המוצרים שהיו בהזמנה עם הכמות והמחיר
+    }
+
     //==============================searchSupplierMenu==============================
     public static void searchSupplierMenu(Scanner scanner,Controller controller) {
         System.out.println("Let's search supplier!");
-        System.out.print("Enter Supplier ID: ");
-        int supplierID = scanner.nextInt();
-        if (!controller.searchSupplierByID(supplierID)) {
-            System.out.println("Supplier does not exist.");
-        } else {
-            System.out.println("supplier is found!");
-
+        Integer supplierID = getValidSupplierID(scanner, controller);
+        if(supplierID != null) {
             int choice = -1;
             while (choice != 0) {
                 System.out.println("\nWhat would you like to do next?");
@@ -151,14 +160,11 @@ public class UI {
                     case 2:
                         editSpecificAgreementMenu(scanner, controller, supplierID);
                         break;
-//                    case 3:
-//                        // // TODO: createAgreementMenu(scanner, controller, supplierID);//קורא לפונקתיה הזאת בעוד מקום
-//                        break;
                     case 3:
-                        // TODO: DeleteAgreement(scanner, controller);
+                         DeleteAgreement(scanner, controller);
                         break;
                     case 4:
-                        // TODO:DeleteSupplier(scanner, controller);
+                        DeleteSupplier(scanner, controller);
                         break;
                     case 0:
                         System.out.println("Return to Main Menu. ");
@@ -170,16 +176,34 @@ public class UI {
         }
     }
 
-    //==============================editSpecificAgreementMenu==============================
-    public static void editSpecificAgreementMenu(Scanner scanner, Controller controller, int supplierID) {
-        System.out.println("Let's edit agreement...");
+
+    public static Integer getValidAgreementID(Scanner scanner, Controller controller) {
         System.out.print("Enter Agreement ID: ");
         int agreementID = scanner.nextInt();
 
         if (!controller.thereIsAgreement(agreementID)) {
-            System.out.println("Agreement not exists.");
-        } else {
-            System.out.println("Agreement found.");
+            System.out.println("Agreement does not exist.");
+            return null; // מייצג כישלון
+        }
+
+        System.out.println("Agreement found.");
+        return agreementID; // מייצג הצלחה
+    }
+
+
+    public static void DeleteAgreement(Scanner scanner, Controller controller) {
+        Integer agreementID = getValidAgreementID(scanner, controller);
+        if(agreementID!=null) {
+            controller.deleteAgreement(agreementID);
+            System.out.println("Agreement deleted.");
+        }
+    }
+
+    //==============================editSpecificAgreementMenu==============================
+    public static void editSpecificAgreementMenu(Scanner scanner, Controller controller, int supplierID) {
+        System.out.println("Let's edit agreement...");
+        Integer agreementID = getValidAgreementID(scanner, controller);
+        if(agreementID!= null) {
             int choice = -1;
             while (choice != 0) {
                 System.out.println("\nWhat would you like to do next?");
@@ -256,27 +280,27 @@ public class UI {
         System.out.println("Agreement created successfully.");
     }
     //==============================createNewAgreementMenu
-    public static void addNewProductToAgreement(Scanner scanner, Controller controller,int agreementID){
-        System.out.println("Let's Adding new product to agreement...");
-
-        System.out.print("Enter Product Catalog Number: ");
-        String catalogNumber = scanner.nextLine();
-
-        System.out.print("Enter Product ID: ");
-        int productID = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Enter price: ");
-        double price = scanner.nextDouble();
-
-        System.out.print("Enter Units of Measure: ");
-        String unitsOfMeasure = scanner.nextLine();
-
-        // TODO: System.out.print("Enter Discounts: ");//רן צריך לעשות
-
-        controller.addProductToAgreement(agreementID,catalogNumber, productID, price, //TODO discounts );
-
-    }
+//    public static void addNewProductToAgreement(Scanner scanner, Controller controller,int agreementID){
+//        System.out.println("Let's Adding new product to agreement...");
+//
+//        System.out.print("Enter Product Catalog Number: ");
+//        String catalogNumber = scanner.nextLine();
+//
+//        System.out.print("Enter Product ID: ");
+//        int productID = scanner.nextInt();
+//        scanner.nextLine();
+//
+//        System.out.print("Enter price: ");
+//        double price = scanner.nextDouble();
+//
+//        System.out.print("Enter Units of Measure: ");
+//        String unitsOfMeasure = scanner.nextLine();
+//
+//        // TODO: System.out.print("Enter Discounts: ");//רן צריך לעשות
+//
+//        controller.addProductToAgreement(agreementID,catalogNumber, productID, price, //TODO discounts );
+//
+//    }
 
 
 
@@ -313,6 +337,28 @@ public class UI {
         System.out.println("Supplier created successfully!");
         return supplierID;
     }
+
+    public static Integer getValidSupplierID(Scanner scanner, Controller controller) {
+        System.out.print("Enter Supplier ID: ");
+        int supplierID = scanner.nextInt();
+
+        if (!controller.thereIsSupplier(supplierID)) {
+            System.out.println("Supplier does not exist.");
+            return null; // מייצג כישלון
+        }
+
+        System.out.println("Supplier found.");
+        return supplierID; // מייצג הצלחה
+    }
+
+    public static void DeleteSupplier(Scanner scanner, Controller controller){
+        System.out.println("OK Let's Delete a supplier!");
+        Integer supplierID = getValidSupplierID(scanner, controller);
+        if (supplierID != null) {
+            controller.deleteSupplier(supplierID);
+        }
+    }
+
     //==============================afterSupplierCreatedMenu
     public static void afterSupplierCreatedMenu(Scanner scanner, Controller controller, int supplier_ID) {/// ////////////////to do
         int choice = -1;

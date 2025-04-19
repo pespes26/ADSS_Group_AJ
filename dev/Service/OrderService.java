@@ -64,4 +64,9 @@ public class OrderService {
         }
         return null;
     }
+
+    public boolean thereIsOrder(int order_ID) {
+        return orderHashMap.containsKey(order_ID);
+    }
+
 }

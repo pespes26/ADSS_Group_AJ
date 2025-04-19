@@ -9,10 +9,17 @@ import java.util.Date;
 import java.util.Map;
 
 public class Controller {
-    private AgreementService agreementService;
-    private OrderService orderService;
-    private ProductService productService  ;
-    private SupplierService supplierService;
+    private final AgreementService agreementService;
+    private final OrderService orderService;
+    private final ProductService productService  ;
+    private final SupplierService supplierService;
+
+    public Controller(){
+        agreementService = new AgreementService();
+        orderService = new OrderService();
+        productService = new ProductService();
+        supplierService = new SupplierService();
+    }
 
 //===================================SupplierService================================================================\
 
@@ -43,8 +50,8 @@ public class Controller {
     }
 
     //--------------------------
-    public boolean searchSupplierByID(int id){
-        return supplierService.searchSupplierByID(id);
+    public boolean thereIsSupplier(int id){
+        return supplierService.thereIsSupplier(id);
     }
 
 //===================================AgreementService================================================================\
@@ -110,6 +117,9 @@ public class Controller {
     //--------------------------
     public Map<Integer, Map.Entry<Integer, Double>> getProductsInOrder(int orderID){
         return orderService.getProductsInOrder(orderID);
+    }
+    public boolean thereIsOrder(int order_ID) {
+        return orderService.thereIsOrder(order_ID);
     }
 
 }

@@ -575,25 +575,6 @@ public class DataController {
         }
     }
 
-    /**
-     * Applies a store discount to the product with the specified catalog number.
-     *
-     * <p>If a product with the given catalog number exists in the system,
-     * the discount is applied. Otherwise, a message is displayed indicating
-     * that the catalog number does not exist.</p>
-     *
-     * @param catalog_number the catalog number of the product
-     * @param discount the discount percentage to apply
-     */
-    public void setSupplierDiscount(int catalog_number, int discount){
-        boolean found = false;
-        for(Product p : products.values()){
-            if(p.getClassification().getCatalogNumber() == catalog_number){
-                p.getClassification().setSupplierDiscount(discount);
-                found = true;
-            }
-        }
-    }
 
     public void setDiscountForCatalogNumber(int catalog_number, int discount){
         boolean found = false;

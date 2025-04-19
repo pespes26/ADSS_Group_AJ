@@ -1,1 +1,2 @@
-The JAR file must be executed while it is located in the main project folder, as specified in the system's operating instructions file (instructions.pdf).
+The JAR file must be executed while it is located in the main project folder,
+as specified in the system's operating instructions file (instructions.pdf).

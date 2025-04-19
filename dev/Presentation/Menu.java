@@ -58,8 +58,8 @@ public class Menu {
                     
                     11.Show low-stock products that need reordering\
                     
-                    12.Change product supply details.\
-                    
+                    12.Change product supply details\                  
+
                     13.Change item location.\
                     
                     14.Exit""";
@@ -196,7 +196,7 @@ public class Menu {
                     break;
 
                 case 9: //Set a Discount
-                    System.out.println("Apply discount on:\n(1)Category\n(2)Sub-Category\n(3)Catalog Number");
+                    System.out.println("Apply discount on:\n(1)Category\n(2)Sub-Category\n(3)Catalog Number(4)Supplier Discount");
                     choice = scan.nextInt();
                     scan.nextLine();
                     System.out.println("Enter the discount in %: ");
@@ -220,7 +220,16 @@ public class Menu {
                             scan.nextLine();
                             dataController.setDiscountForCatalogNumber(cNum, discount);
                             continue_flag = false;
-                        } else {
+                        } else if (choice == 4) {
+                            System.out.println("Enter the catalog number: ");
+                            int cNum = scan.nextInt();
+                            scan.nextLine();
+                            dataController.setSupplierDiscount(cNum, discount);
+                            continue_flag = false;
+                        }
+
+
+                        else {
                             System.out.println("Invalid choice. Please enter 1, 2 or 3");
                         }
                     }

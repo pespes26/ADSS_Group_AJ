@@ -126,13 +126,16 @@ public class DataController {
         classification.setCategory(details[6]);
         classification.setSubcategory(details[7]);
         classification.setProductSize(Integer.parseInt(details[8]));
+        classification.setSupplierDiscount(Integer.parseInt(details[13]));
         classification.setCostPrice(Double.parseDouble(details[9]));
         classification.setProductDemand(Integer.parseInt(details[10]));
         classification.setSupplyTime(Integer.parseInt(details[11]));
         classification.setMinAmountForAlert((int)(0.5*classification.getProductDemand() + 0.5*classification.getSupplyTime()));
         classification.setManufacturer(details[12]);
-        classification.setSupplierDiscount(Integer.parseInt(details[13]));
+
         classification.setStoreDiscount(Integer.parseInt(details[14]));
+        classification.setDisplayPrice(classification.getCostPrice());
+        classification.setDisplayPriceWithoutDiscount(classification.getCostPrice());
 
         product.setClassification(classification);
     }
@@ -471,6 +474,8 @@ public class DataController {
                 + p.getClassification().getCategory() + ", Sub-Category: " + p.getClassification().getSubcategory() + "\n"
                 + "Size: " + p.getClassification().getProductSize() + "\n"
                 + "Product cost price: " + p.getClassification().getCostPrice() + "\n"
+                + "display price: " + p.getClassification().getDisplayPrice() + "\n"
+                + "display price without discount: " + p.getClassification().getDisplayPriceWithoutDiscount()+"\n"
                 + "Product demand: " + p.getClassification().getProductDemand() + "\n"
                 + "Supply time: " + p.getClassification().getSupplyTime() + " days\n"
                 + "Minimum amount for alert: " + p.getClassification().getMinAmountForAlert() + "\n"
@@ -531,6 +536,8 @@ public class DataController {
         for(Product p : products.values()){
             if(p.getClassification().getCategory().equals(category)){
                 p.getClassification().setStoreDiscount(discount);
+                p.getClassification().setDisplayPrice(p.getClassification().getCostPrice());
+                p.getClassification().setDisplayPriceWithoutDiscount(p.getClassification().getCostPrice());
                 found = true;
             }
         }
@@ -556,6 +563,8 @@ public class DataController {
         for(Product p : products.values()){
             if(p.getClassification().getSubcategory().equals(sub_category)){
                 p.getClassification().setStoreDiscount(discount);
+                p.getClassification().setDisplayPrice(p.getClassification().getCostPrice());
+                p.getClassification().setDisplayPriceWithoutDiscount(p.getClassification().getCostPrice());
                 found = true;
             }
         }
@@ -576,11 +585,23 @@ public class DataController {
      * @param catalog_number the catalog number of the product
      * @param discount the discount percentage to apply
      */
+    public void setSupplierDiscount(int catalog_number, int discount){
+        boolean found = false;
+        for(Product p : products.values()){
+            if(p.getClassification().getCatalogNumber() == catalog_number){
+                p.getClassification().setSupplierDiscount(discount);
+                found = true;
+            }
+        }
+    }
+
     public void setDiscountForCatalogNumber(int catalog_number, int discount){
         boolean found = false;
         for(Product p : products.values()){
             if(p.getClassification().getCatalogNumber() == catalog_number){
                 p.getClassification().setStoreDiscount(discount);
+                p.getClassification().setDisplayPrice(p.getClassification().getCostPrice());
+                p.getClassification().setDisplayPriceWithoutDiscount(p.getClassification().getCostPrice());
                 found = true;
             }
         }

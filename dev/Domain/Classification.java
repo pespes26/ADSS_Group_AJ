@@ -45,6 +45,10 @@ public class Classification {
     /** The sale price of the product (default is -1 if not sold) */
     private double sale_price;
 
+    private double display_price;
+
+    private double price_without_discount;
+
     /**
      * Constructs a new Classification with default values:
      * current amount = 0, store & supplier discounts = 0, sale price = -1.
@@ -143,7 +147,35 @@ public class Classification {
      * @param cost_price the price to set
      */
     public void setCostPrice(double cost_price){
-        this.cost_price = cost_price;
+
+        if(this.supplier_discount!=0){
+            this.cost_price = cost_price * (1 - this.supplier_discount / 100.0);
+        }
+        else{
+            this.cost_price=cost_price;
+    }}
+
+    public void setDisplayPriceWithoutDiscount(double cost_price){
+
+        this.price_without_discount = cost_price *1.25;
+    }
+
+    public void setDisplayPrice(double cost_price){
+
+        this.display_price = cost_price *1.25* (1 - this.store_discount / 100.0);
+    }
+
+
+
+
+    public double getDisplayPriceWithoutDiscount(){
+        return this.price_without_discount;
+
+    }
+
+    public double getDisplayPrice(){
+        return this.display_price;
+
     }
 
     /**
@@ -252,6 +284,7 @@ public class Classification {
      */
     public void setSupplierDiscount(int supplier_discount) {
         this.supplier_discount = supplier_discount;
+        setCostPrice(this.cost_price);
     }
 
     /**

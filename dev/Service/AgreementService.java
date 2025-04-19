@@ -56,6 +56,11 @@ public class AgreementService {
         return agreementHashMap.get(agreement_ID); // Retrieve the agreement from the map
     }
 
+    public boolean thereIsAgreement(int agreement_ID) {
+        return agreementHashMap.containsKey(agreement_ID);
+    }
+
+
     /**
      * Adds a new product to an existing agreement.
      * It also creates the product via the ProductService.

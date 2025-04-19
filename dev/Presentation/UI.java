@@ -54,6 +54,7 @@ public class UI {
         scanner.close();
     }
 
+    //==============================createOrderMenu==============================
     public static void createOrder(Scanner scanner, Controller controller) {
         System.out.println(" Starting new order...");
 
@@ -119,7 +120,7 @@ public class UI {
         }
     }
 
-
+    //==============================searchSupplierMenu==============================
     public static void searchSupplierMenu(Scanner scanner,Controller controller) {
         System.out.println("Let's search supplier!");
         System.out.print("Enter Supplier ID: ");
@@ -134,8 +135,9 @@ public class UI {
                 System.out.println("\nWhat would you like to do next?");
                 System.out.println("1. Create a new agreement with this supplier ");
                 System.out.println("2. Edit specific agreement with this supplier ");
-                System.out.println("3. Delete agreement with this supplier ");
-                System.out.println("4. Delete this supplier");
+                System.out.println("3. Create a new agreement with this supplier");
+                System.out.println("4. Delete agreement with this supplier ");
+                System.out.println("5. Delete this supplier");
                 System.out.print("Enter your choice: ");
                 choice = scanner.nextInt();
 
@@ -145,13 +147,16 @@ public class UI {
                         createNewAgreement(scanner, controller, supplierID);
                         break;
                     case 2:
-                        editSpecificAgreement(scanner, controller, supplierID);
+                        editSpecificAgreementMenu(scanner, controller, supplierID);
                         break;
                     case 3:
-                        DeleteAgreement(scanner, controller);
+                        // // TODO: createAgreementMenu(scanner, controller, supplierID);//קורא לפונקתיה הזאת בעוד מקום
                         break;
                     case 4:
-                        DeleteSupplier(scanner, controller);
+                        // TODO: DeleteAgreement(scanner, controller);
+                        break;
+                    case 5:
+                        // TODO:DeleteSupplier(scanner, controller);
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
@@ -160,6 +165,74 @@ public class UI {
         }
     }
 
+    //==============================editSpecificAgreementMenu==============================
+    public static void editSpecificAgreementMenu(Scanner scanner, Controller controller, int supplierID) {
+        System.out.println("Let's edit agreement...");
+        System.out.print("Enter Agreement ID: ");
+        int agreementID = scanner.nextInt();
+
+        if (!controller.thereIsAgreement(agreementID)) {
+            System.out.println("Agreement not exists.");
+        } else {
+            System.out.println("Agreement found.");
+            int choice = -1;
+            while (choice != 0) {
+                System.out.println("\nWhat would you like to do next?");
+                System.out.println("1. Add new product to this agreement ");
+                System.out.println("2. remove product from this agreement ");
+                System.out.println("3. Edit product supply terms ");
+                System.out.println("3. Edit the delivery days ");
+                System.out.println("4. Change selfPickup status ");
+                System.out.print("0.Return to main menu: ");
+                System.out.print("Enter your choice: ");
+                choice = scanner.nextInt();
+            }
+            switch (choice) {
+                case 1:
+                    System.out.println("Adding new product to agreement...");
+                    // TODO: addNewProductToAgreement(scanner, controller);
+                    System.out.println("Product added successfully.\n");
+                    break;
+
+                case 2:
+                    System.out.println("Removing product from agreement...");
+                    // TODO: removeProductFromAgreement(scanner, controller);
+                    System.out.println("Product removed successfully.\n");
+                    break;
+
+                case 3:
+                    System.out.println("Editing product supply terms...");
+                    // TODO: editProductSupplyTerms(scanner, controller);
+                    System.out.println("Supply terms updated successfully.\n");
+                    break;
+
+                case 4:
+                    System.out.println("Editing delivery days...");
+                    // TODO: editDeliveryDays(scanner, controller, agreementID);
+                    System.out.println("Delivery days updated.\n");
+                    break;
+
+                case 5:
+                    System.out.println("Toggling self-pickup status...");
+                    // TODO: controller.toggleSelfPickup(agreementID);
+                    System.out.println("Self-pickup status changed.\n");
+                    break;
+
+                case 0:
+                    System.out.println("Returning to main menu...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.\n");
+                    break;
+
+            }
+        }
+    }
+
+
+    //==============================createNewAgreementMenu==============================
+    //==============================createNewAgreement
     public static void createNewAgreement(Scanner scanner, Controller controller, int supplierID) {
         System.out.println("Creating new agreement...");
 
@@ -177,10 +250,11 @@ public class UI {
         controller.createAgreement(agreementID, supplierID, deliveryDays, selfPickup);
         System.out.println("Agreement created successfully.");
     }
+    //==============================createNewAgreementMenu
 
 
 
-    //==============================SupplierMenu
+    //==============================createSupplierMenu==============================
     public static void createSupplier(Scanner scanner, Controller controller) {
         System.out.println("Let's create a new supplier!");
 
@@ -213,7 +287,7 @@ public class UI {
         System.out.println("Supplier created successfully!");
 
     }
-
+    //==============================afterSupplierCreatedMenu
     public static void afterSupplierCreatedMenu(Scanner scanner, Controller controller) {/// ////////////////to do
         int choice = -1;
         while (choice != 2) {
@@ -226,7 +300,7 @@ public class UI {
             switch (choice) {
                 case 1:
                     System.out.println("Creating a new agreement...");
-                    // אפשר להוסיף קריאה לפונקציה createAgreementMenu(scanner, controller, supplierID);
+                    // TODO: // אפשר להוסיף קריאה לפונקציה createAgreementMenu(scanner, controller, supplierID);
                     break;
                 case 2:
                     System.out.println("Returning to main menu.");

@@ -78,6 +78,10 @@ public class Controller {
     public void removeProductFromAgreement(int agreementID, int product_id){
         this.agreementService.removeProductFromAgreement(agreementID, product_id);
     }
+    public boolean thereIsAgreement(int agreement_ID){
+        return this.agreementService.thereIsAgreement(agreement_ID);
+    }
+
 
 //===================================ProductService================================================================\
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){

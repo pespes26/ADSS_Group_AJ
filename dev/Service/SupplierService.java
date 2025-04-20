@@ -6,12 +6,6 @@ import java.util.List;
 
 public class SupplierService {
     private List<Supplier> supplierList;
-    public AgreementService agreementService;
-
-//    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay, HashMap<Integer, Agreement> agreements) {
-//        Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentDay, agreements);
-//        this.supplierList.add(supplier);
-//    }
 
     public Supplier createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay) {
         Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentDay);
@@ -45,21 +39,22 @@ public class SupplierService {
         return null;
     }
 
-    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID) {
+
+    public boolean deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID) {
         Supplier supplier = supplierList.get(supplier_ID);
         if (supplier!= null) {
             supplier.removeAgreement(agreement_ID);
-            this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+            return true;
         }
+        return false;
     }
 
-    public void deleteAllAgreementFromSupplier(int supplier_ID) {
+    public int[] deleteAllAgreementFromSupplier(int supplier_ID) {
         Supplier supplier = supplierList.get(supplier_ID);
         if (supplier != null) {
             int[] agreementIDS = supplier.removeAllAgreementFromSupplier();
-            for (int agreementID : agreementIDS) {
-                this.agreementService.deleteAgreementWithSupplier(agreementID);
-            }
+            return agreementIDS;
         }
+        return new int[0];
     }
 }

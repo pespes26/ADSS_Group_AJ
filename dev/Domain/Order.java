@@ -14,7 +14,7 @@ public class Order {
     private int orderID; // Unique identifier of the order
     public int phoneNumber; // Customer's phone number
     private Date orderDate; // The date when the order was placed
-    private Map<Integer, Map.Entry<Integer, Double>> productsInOrder; // Maps productID -> (quantity, price)
+    private Map<Integer, Integer> productsInOrder; // Maps productID -> (quantity, price)
 
     /**
      * Constructs a new Order object with the provided details.
@@ -24,7 +24,7 @@ public class Order {
      * @param orderDate        the date the order was placed
      * @param productsInOrder  a map of product IDs to pairs of (quantity, price)
      */
-    public Order(int orderID, int phoneNumber, Date orderDate, Map<Integer, Map.Entry<Integer, Double>> productsInOrder) {
+    public Order(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder) {
         this.orderID = orderID; // Set the order ID
         this.phoneNumber = phoneNumber; // Set the customer's phone number
         this.orderDate = orderDate; // Set the order date
@@ -73,7 +73,7 @@ public class Order {
      *
      * @return the products in the order
      */
-    public Map<Integer, Map.Entry<Integer, Double>> getProductsInOrder() {
+    public Map<Integer,Integer> getProductsInOrder() {
         return productsInOrder; // Return the products and their quantities and prices
     }
 

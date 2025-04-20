@@ -98,9 +98,10 @@ public class UI {
                     break;
 
                 case 2:
+                    Map<Integer, Map.Entry<Integer, Double>> bestPrice = controller.orderWithBestPrice(productsInOrder);
+                    printProductsWithBestPrice(bestPrice);
                     controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder);//יוצר מופע של הזמנה
                     System.out.println(" Order submitted successfully.");
-                    printProductsInOrder1(controller,orderID); //מדפיס את המוצרים
                     return;
 
                 default:
@@ -109,19 +110,35 @@ public class UI {
         }
     }
 
-    public static void printProductsInOrder1( Controller controller, int orderID) {
-        Map<Integer, Map.Entry<Integer, Double>> productsInOrder1 = controller.getProductsInOrder(orderID);
-        System.out.println("\nProducts in order:");
-        for (Map.Entry<Integer, Map.Entry<Integer, Double>> entry : productsInOrder1.entrySet()) {
-            int productID = entry.getKey();                         // המפתח
-            int productAmount = entry.getValue().getKey();          // הכמות
-            double productPrice = entry.getValue().getValue();      // המחיר
+    public static void printProductsWithBestPrice(Map<Integer, Map.Entry<Integer, Double>> bestPriceMap) {
+        System.out.println("\n📦 Products with best supplier price:");
+        System.out.printf("%-12s %-10s %-10s%n", "Product ID", "Amount", "Best Price");
+        System.out.println("---------------------------------------------");
 
-            System.out.println("Product ID: " + productID +
-                    ", Amount: " + productAmount +
-                    ", Price: " + productPrice);
+        for (Map.Entry<Integer, Map.Entry<Integer, Double>> entry : bestPriceMap.entrySet()) {
+            int productID = entry.getKey();
+            int amount = entry.getValue().getKey();
+            double price = entry.getValue().getValue();
+
+            System.out.printf("%-12d %-10d %-10.2f%n", productID, amount, price);
         }
     }
+
+    public static void printProductsInOrder1(Controller controller, int orderID) {
+        Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
+
+        System.out.println("\n🧾 Products in order:");
+        System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
+        System.out.println("---------------------------");
+
+        for (Map.Entry<Integer, Integer> entry : productsInOrder.entrySet()) {
+            int productID = entry.getKey();        // מזהה המוצר
+            int amount = entry.getValue();         // כמות שהוזמנה
+
+            System.out.printf("%-12d %-10d%n", productID, amount);
+        }
+    }
+
 
     public static void SearchPastOrder(Scanner scanner,Controller controller){
         System.out.print("Enter Order ID: ");

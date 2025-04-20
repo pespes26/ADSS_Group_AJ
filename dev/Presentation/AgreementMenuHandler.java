@@ -63,31 +63,31 @@ public class AgreementMenuHandler {
             switch (choice) {
                 case 1:
                     System.out.println("Adding new product to agreement...");
-                    // TODO: addNewProductToAgreement(scanner, controller, agreementID);
+                    ProductMenuHandler.addNewProduct(scanner, controller);
                     System.out.println("Product added successfully.\n");
                     break;
 
                 case 2:
                     System.out.println("Removing product from agreement...");
-                    // TODO: removeProductFromAgreement(scanner, controller);
+                    ProductMenuHandler.removeProduct(scanner, controller);
                     System.out.println("Product removed successfully.\n");
                     break;
 
                 case 3:
                     System.out.println("Editing product supply terms...");
-                    // TODO: editProductSupplyTerms(scanner, controller);
+                    ProductMenuHandler.editProductTerms(scanner, controller);
                     System.out.println("Supply terms updated successfully.\n");
                     break;
 
                 case 4:
                     System.out.println("Editing delivery days...");
-                    // TODO: editDeliveryDays(scanner, controller, agreementID);
+                     editDeliveryDays(scanner, controller);
                     System.out.println("Delivery days updated.\n");
                     break;
 
                 case 5:
                     System.out.println("Toggling self-pickup status...");
-                    // TODO: controller.toggleSelfPickup(agreementID);
+                    controller.toggleSelfPickup(agreementID);
                     System.out.println("Self-pickup status changed.\n");
                     break;
 
@@ -102,6 +102,24 @@ public class AgreementMenuHandler {
             }
         }
     }
+
+    public static void editDeliveryDays(Scanner scanner, Controller controller) {
+        Integer agreementID =  getValidAgreementID(scanner, controller);
+        if (agreementID != null) {
+            System.out.print("Enter new delivery days (comma separated, e.g., Mon,Wed,Fri): ");
+            String[] newDays = scanner.nextLine().split(",");
+            controller.updateDeliveryDays(agreementID, newDays);
+            System.out.println("Delivery days updated.");
+        }
+    }
+
+    public static void toggleSelfPickup(Scanner scanner, Controller controller) {
+        Integer agreementID =  getValidAgreementID(scanner, controller);
+        controller.toggleSelfPickup(agreementID);
+        System.out.println("Self-pickup status toggled.");
+    }
+
+
 
     public static void agreementMenu(Scanner scanner, Controller controller, Integer supplierID) {
         if (supplierID == null) return;

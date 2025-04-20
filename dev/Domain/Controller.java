@@ -108,6 +108,20 @@ public class Controller {
         return this.agreementService.thereIsAgreement(agreement_ID);
     }
 
+    public void updateDeliveryDays(int agreementID, String[] newDays){
+        Agreement agreement  = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            agreement.updateDeliveryDays(newDays);
+        }
+    }
+
+    public void toggleSelfPickup(int agreementID){
+        Agreement agreement  = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            agreement.updateSelfDeliveryOption();
+        }
+    }
+
 
 //===================================ProductService================================================================\
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
@@ -116,6 +130,30 @@ public class Controller {
 
     public boolean deleteProductByID(int id){
         return productService.delete_by_id(id);//// לשאול את רן למה הוא שם את זה עם השדה boolean
+    }
+
+    public Product getProductByID(int id){
+        return this.productService.searchProduct_by_id(id);
+    }
+
+    public void add_discountRule(int productID, double discount, int amount){
+        Product product = getProductByID(productID);
+        if (product != null){
+            product.add_discountRule(discount, amount);
+        }
+    }
+    public boolean thereIsProduct(int id){
+        return productService.thereIsProduct(id);
+    }
+
+    public void updateProductPrice(int productID, double newPrice){
+        Product product = getProductByID(productID);
+        product.setPrice(newPrice);
+    }
+    public void updateProductUnit(int productID, String newUnit){
+        Product product = getProductByID(productID);
+
+
     }
     //--------------------------
 //    public Product getProductByID(int id){

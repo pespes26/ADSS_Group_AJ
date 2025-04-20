@@ -12,9 +12,15 @@ public class ProductService {
         this.productList = new ArrayList<>();
     }
 
-/*    public ProductService(List<Product> initialProducts) {
-        this.productList = (initialProducts != null) ? new ArrayList<>(initialProducts) : new ArrayList<>();
-    }*/
+
+    public boolean thereIsProduct(int ProductID){
+        for (Product product : productList) {
+            if (product.getProduct_id() == ProductID) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
         Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);

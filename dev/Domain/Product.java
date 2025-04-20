@@ -36,6 +36,10 @@ public class Product {
         discountRules.add(new DiscountRule(discount, amount));
     }
 
+    public void setUnitsOfMeasure(String unitsOfMeasure) {
+        this.unitsOfMeasure = unitsOfMeasure;
+    }
+
     public List<DiscountRule> getDiscountRules() {
         return Collections.unmodifiableList(discountRules); //return in a safe way the discountRules "read only"
     }

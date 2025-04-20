@@ -62,7 +62,7 @@ public class OrderMenuHandler {
 
 
     public static void printProductsWithBestPrice(Map<Integer, Map.Entry<Integer, Double>> bestPriceMap) {
-        System.out.println("\n📦 Products with best supplier price:");
+        System.out.println("\n Products with best supplier price:");
         System.out.printf("%-12s %-10s %-10s%n", "Product ID", "Amount", "Best Price");
         System.out.println("---------------------------------------------");
 

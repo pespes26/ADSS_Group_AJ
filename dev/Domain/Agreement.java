@@ -59,6 +59,7 @@ public class Agreement {
         return agreement_ID;
     }
 
+
     /**
      * Updates the price of a product in the agreement.
      *

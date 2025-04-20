@@ -1,10 +1,7 @@
 package Presentation;
 
 import Domain.Controller;
-import Domain.Product;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class ProductMenuHandler {
@@ -37,10 +34,12 @@ public class ProductMenuHandler {
             switch (choice) {
                 case 1:
                     System.out.println("Use case: Add discount rule to product");
-                    readAndAddDiscountRules(controller, product_id, scanner);
-                    break;
+                    readAndAddDiscountRules(scanner, controller, product_id);
+                    System.out.println("\nProduct added successfully.");
+                    return;
                 case 2:
                     System.out.println("No discount rules will be added.");
+                    System.out.println("\nProduct added successfully.");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -48,8 +47,8 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void readAndAddDiscountRules(Controller controller, int productID, Scanner scanner) {
-        if (controller.thereIsProduct(productID)) {
+    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber) {
+        if (controller.productExistsByCatalog(CatalogNumber)) {
             System.out.print("Enter number of discount rules: ");
             int numOfRules = scanner.nextInt();
 
@@ -61,18 +60,18 @@ public class ProductMenuHandler {
                 System.out.print("Enter discount percentage (e.g., 10 for 10%): ");
                 double discount = scanner.nextDouble();
 
-                controller.add_discountRule(productID, discount, amount);
+                controller.add_discountRule(CatalogNumber, discount, amount);
             }
         } else {
             System.out.println("Product not found. Cannot add discount rules.");
         }
     }
 
-    public static Integer getProductIdFromUser(Controller controller, Scanner scanner) {
-        System.out.println("\nEnter Product ID: ");
-        int productID = scanner.nextInt();
-        if (controller.thereIsProduct(productID)) {
-            return productID;
+    public static Integer getProductCatalogNumberFromUser(Controller controller, Scanner scanner) {
+        System.out.println("\nEnter catalogNumber: ");
+        int catalogNumber = scanner.nextInt();
+        if (controller.productExistsByCatalog(catalogNumber)) {
+            return catalogNumber;
         } else {
             System.out.println("Product not found.");
             return null;
@@ -80,19 +79,19 @@ public class ProductMenuHandler {
     }
 
     public static void removeProduct(Scanner scanner, Controller controller) {
-        Integer productID = getProductIdFromUser(controller, scanner);
-        if (productID != null) {
+        Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
+        if (catalogNumber != null) {
             System.out.println("\nRemoving product...");
-            controller.deleteProductByID(productID);
-            System.out.println("Product removed.");
+            controller.deleteProductByCatalog(catalogNumber);
+            System.out.println("Product removed!.");
         }
     }
 
     public static void editProductTerms(Scanner scanner, Controller controller) {
         System.out.println("\nEdit Product Supply Terms:");
 
-        Integer productID = getProductIdFromUser(controller, scanner);
-        if (productID == null) return;
+        Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
+        if (catalogNumber == null) return;
 
         int choice = -1;
         while (choice != 0) {
@@ -106,13 +105,13 @@ public class ProductMenuHandler {
 
             switch (choice) {
                 case 1:
-                    updateProductPrice(scanner, controller, productID);
+                    updateProductPrice(scanner, controller, catalogNumber);
                     break;
                 case 2:
-                    updateProductUnit(scanner, controller, productID);
+                    updateProductUnit(scanner, controller, catalogNumber);
                     break;
                 case 3:
-                    readAndAddDiscountRules(controller, productID, scanner);
+                    readAndAddDiscountRules(scanner, controller, catalogNumber);
                     break;
                 case 0:
                     System.out.println("Returning to previous menu...");
@@ -123,20 +122,18 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void updateProductPrice(Scanner scanner, Controller controller, int productID) {
+    public static void updateProductPrice(Scanner scanner, Controller controller, int catalogNumber) {
         System.out.print("Enter new price: ");
         double newPrice = scanner.nextDouble();
-        controller.updateProductPrice(productID, newPrice);
+        controller.updateProductPrice(catalogNumber, newPrice);
         System.out.println("Product price updated.");
     }
 
-    public static void updateProductUnit(Scanner scanner, Controller controller, int productID) {
+    public static void updateProductUnit(Scanner scanner, Controller controller, int catalogNumber) {
         System.out.print("Enter new unit of measure: ");
         String newUnit = scanner.next();
-        controller.updateProductUnit(productID, newUnit);
+        controller.updateProductUnit(catalogNumber, newUnit);
         System.out.println("Product unit updated.");
     }
-
-
 
 }

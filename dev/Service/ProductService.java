@@ -1,7 +1,6 @@
 package Service;
 
 import Domain.Product;
-import Domain.Supplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ public class ProductService {
     }
 
 
-    public boolean thereIsProduct(int ProductID){
+    public boolean existsProductWithID(int ProductID){
         for (Product product : productList) {
             if (product.getProduct_id() == ProductID) {
                 return true;
@@ -21,6 +20,16 @@ public class ProductService {
         }
         return false;
     }
+
+    public boolean productExistsByCatalog(int catalog) {
+        for (Product product : productList) {
+            if (product.getCatalog_Number() == catalog) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
         Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);
@@ -73,7 +82,5 @@ public class ProductService {
         }
         return final_price;
     }
-
-
 
 }

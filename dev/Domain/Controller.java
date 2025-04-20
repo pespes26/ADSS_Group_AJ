@@ -28,22 +28,24 @@ public class Controller {
     public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay){
         supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentDay);
     }
-    //--------------------------הנחות לשמור בתור קלאס כי אולי זה ימחק, האם יצירה ומיקה צריכה להיות בסרביס.
+    //-------------------------
     public void deleteSupplier(int supplier_ID){
-        supplierService.deleteSupplier(supplier_ID);
+        if (supplierService.thereIsSupplier(supplier_ID)){
+            deleteAllAgreementFromSupplier(supplier_ID);
+            supplierService.deleteSupplier(supplier_ID);
+        }
     }
     //--------------------------
     public Supplier getSupplierById(int id){
         Supplier supplier = supplierService.getSupplierById(id);
         if (supplier != null){
             return supplier;
-
         }
-        System.out.println("Supplier not found");
         return null;
     }
     //--------------------------
-    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){
+
+    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
           if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
               this.agreementService.deleteAgreementWithSupplier(agreement_ID);
           }
@@ -93,7 +95,7 @@ public class Controller {
         }
     }
     //--------------------------
-    public void deleteAgreementWithSupplier(int agreement_ID){
+    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
         this.agreementService.deleteAgreementWithSupplier(agreement_ID);
     }
     //--------------------------
@@ -132,28 +134,40 @@ public class Controller {
         return productService.delete_by_id(id);//// לשאול את רן למה הוא שם את זה עם השדה boolean
     }
 
+    public boolean deleteProductByCatalog(int catalog_Number){
+        return productService.delete_by_catalog(catalog_Number);//// לשאול את רן למה הוא שם את זה עם השדה boolean
+    }
+
     public Product getProductByID(int id){
         return this.productService.searchProduct_by_id(id);
     }
 
-    public void add_discountRule(int productID, double discount, int amount){
-        Product product = getProductByID(productID);
+    public Product getProductByCatalog(int catalog){
+        return this.productService.searchProduct_by_catalog(catalog);
+    }
+
+    public void add_discountRule(int catalog, double discount, int amount){
+        Product product = getProductByCatalog(catalog);
         if (product != null){
             product.add_discountRule(discount, amount);
         }
     }
-    public boolean thereIsProduct(int id){
-        return productService.thereIsProduct(id);
+
+    public boolean existsProductWithID(int id){
+        return productService.existsProductWithID(id);
     }
 
-    public void updateProductPrice(int productID, double newPrice){
-        Product product = getProductByID(productID);
+    public boolean productExistsByCatalog(int catalog){
+        return productService.productExistsByCatalog(catalog);
+    }
+
+    public void updateProductPrice(int catalog, double newPrice){
+        Product product = getProductByCatalog(catalog);
         product.setPrice(newPrice);
     }
-    public void updateProductUnit(int productID, String newUnit){
-        Product product = getProductByID(productID);
-
-
+    public void updateProductUnit(int catalogNumber, String newUnit){
+        Product product = getProductByCatalog(catalogNumber);
+        product.setUnitsOfMeasure(newUnit);
     }
     //--------------------------
 //    public Product getProductByID(int id){

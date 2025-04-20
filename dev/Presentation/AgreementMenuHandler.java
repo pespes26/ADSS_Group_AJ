@@ -1,7 +1,5 @@
 package Presentation;
-
 import Domain.Controller;
-
 import java.util.Scanner;
 
 public class AgreementMenuHandler {
@@ -41,7 +39,7 @@ public class AgreementMenuHandler {
         boolean selfPickup = selfPickupInput.equalsIgnoreCase("Y");
 
         controller.createAgreement(agreementID, supplierID, deliveryDays, selfPickup);
-        System.out.println("Agreement created successfully.");
+        System.out.println("Agreement created successfully!.");
     }
 
     public static void editSpecificAgreementMenu(Scanner scanner, Controller controller, int supplierID) {
@@ -130,7 +128,7 @@ public class AgreementMenuHandler {
             System.out.println("1. Delete agreement");
             System.out.println("2. Add new agreement");
             System.out.println("3. Edit existing agreement");
-            System.out.println("0. Return to main menu");
+            System.out.println("0. return to previous menu");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
@@ -140,7 +138,6 @@ public class AgreementMenuHandler {
                     deleteAgreement(scanner, controller);
                 }
                 case 2 -> {
-                    System.out.println("Adding new agreement...");
                     createNewAgreement(scanner, controller, supplierID);
                 }
                 case 3 -> {

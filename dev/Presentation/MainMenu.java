@@ -1,10 +1,11 @@
+package Presentation;
 
 import Domain.Controller;
 import Presentation.OrderMenuHandler;
 import Presentation.SupplierMenuHandler;
 import java.util.Scanner;
 
-public class UI {
+public class MainMenu {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);

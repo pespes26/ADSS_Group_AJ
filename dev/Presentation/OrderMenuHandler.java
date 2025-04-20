@@ -9,7 +9,9 @@ import java.util.Scanner;
 
 public class OrderMenuHandler {
     public static void createOrder(Scanner scanner, Controller controller) {
-        System.out.println(" Starting new order...");
+        System.out.println("\nStarting a new order...");
+        System.out.println("Before we begin, please enter a few details:\n");
+
 
         System.out.print("Enter Order ID: ");
         int orderID = scanner.nextInt();
@@ -27,13 +29,19 @@ public class OrderMenuHandler {
         Date orderDate = new Date(year - 1900, month - 1, day); // יצירת תאריך (הערה: deprecated, לשימוש בסיסי)
 
         Map<Integer, Integer> productsInOrder = new HashMap<>();
-
-        while (true) {
+        System.out.println("Let's create an order!\n");
+        int option = -1;
+        while (option != 0) {
             System.out.println("\n========== Order Menu ==========");
+            System.out.println("Let's create an order!\n");
+            System.out.print("Choose how to proceed:\n");
+
             System.out.println("1. Add new product to order");
             System.out.println("2. Submit order and return to main menu");
+            System.out.println("0. Cancel order and return to previous menu");
+
             System.out.print("Enter your choice: ");
-            int option = scanner.nextInt();
+            option = scanner.nextInt();
 
             switch (option) {
                 case 1:
@@ -53,7 +61,9 @@ public class OrderMenuHandler {
                     controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder);//יוצר מופע של הזמנה
                     System.out.println(" Order submitted successfully.");
                     return;
-
+                case 0:
+                    System.out.println("\nReturn to privies menu");
+                    break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }

@@ -1,16 +1,19 @@
 package Service;
-
 import Domain.Supplier;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierService {
     private List<Supplier> supplierList;
 
-    public Supplier createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay) {
+    public SupplierService() {
+        supplierList = new ArrayList<>();
+    }
+
+
+    public void  createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay) {
         Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentDay);
         this.supplierList.add(supplier);
-        return supplier;
     }
 
     public void deleteSupplier(int supplier_ID) {

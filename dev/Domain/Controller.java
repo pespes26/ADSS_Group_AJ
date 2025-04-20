@@ -25,8 +25,8 @@ public class Controller {
 
 //===================================SupplierService================================================================\
 
-    public Supplier createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay){
-        return supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentDay);
+    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay){
+        supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentDay);
     }
     //--------------------------הנחות לשמור בתור קלאס כי אולי זה ימחק, האם יצירה ומיקה צריכה להיות בסרביס.
     public void deleteSupplier(int supplier_ID){
@@ -64,8 +64,8 @@ public class Controller {
 
 //===================================AgreementService================================================================\
 
-    public Agreement createAgreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup){
-        return this.agreementService.createAgreementWithSupplier(agreement_ID, supplier_ID, deliveryDays, selfPickup);
+    public void createAgreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup){
+        this.agreementService.createAgreementWithSupplier(agreement_ID, supplier_ID, deliveryDays, selfPickup);
     }
     //--------------------------
     public void deleteAgreement(int agreement_ID) {

@@ -1,7 +1,5 @@
 package Presentation;
-
 import Domain.Controller;
-
 import java.util.Scanner;
 
 public class SupplierMenuHandler {

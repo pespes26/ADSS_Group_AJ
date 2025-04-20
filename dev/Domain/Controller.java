@@ -121,8 +121,8 @@ public class Controller {
         productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
     }
 
-    public boolean deleteProductByID(int id){
-        return productService.delete_by_id(id);
+    public void deleteProductByID(int id){
+        productService.delete_by_id(id);
     }
 
     public void deleteProductByCatalog(int catalog_Number){

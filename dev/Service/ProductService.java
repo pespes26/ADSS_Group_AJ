@@ -37,12 +37,16 @@ public class ProductService {
         return product;
         }
 
-    public boolean delete_by_id(int id) {
-        return productList.remove(searchProduct_by_id(id));
+    public void delete_by_id(int id) {
+        if (existsProductWithID(id)) {
+            productList.remove(searchProduct_by_id(id));
+        }
     }
 
-    public boolean delete_by_catalog(int catalog) {
-        return productList.remove(searchProduct_by_catalog(catalog));
+    public void delete_by_catalog(int catalog) {
+        if(productExistsByCatalog(catalog)) {
+            productList.remove(searchProduct_by_catalog(catalog));
+        }
     }
 
     public Product searchProduct_by_catalog(int catalog){

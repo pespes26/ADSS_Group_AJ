@@ -77,16 +77,7 @@ public class Controller {
         }
     }
     //--------------------------
-//    public Agreement getAgreementWithSupplier(int agreement_ID){
-//        Agreement agreement = agreementService.getAgreementByID(agreement_ID);
-//        if (agreement != null){
-//            System.out.println("Agreement found!");
-//            return agreement;
-//        }
-//        System.out.println("Agreement not found");
-//        return null;
-//    }
-    //--------------------------
+
     public void addProductToAgreement(int agreementID, int catalog_Number, int product_id, double price, String unitsOfMeasure){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
         if (agreement != null) {
@@ -126,16 +117,16 @@ public class Controller {
 
 
 //===================================ProductService================================================================\
-    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
-        return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+    public void createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
+        productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
     }
 
     public boolean deleteProductByID(int id){
-        return productService.delete_by_id(id);//// לשאול את רן למה הוא שם את זה עם השדה boolean
+        return productService.delete_by_id(id);
     }
 
-    public boolean deleteProductByCatalog(int catalog_Number){
-        return productService.delete_by_catalog(catalog_Number);//// לשאול את רן למה הוא שם את זה עם השדה boolean
+    public void deleteProductByCatalog(int catalog_Number){
+        productService.delete_by_catalog(catalog_Number);
     }
 
     public Product getProductByID(int id){
@@ -169,17 +160,6 @@ public class Controller {
         Product product = getProductByCatalog(catalogNumber);
         product.setUnitsOfMeasure(newUnit);
     }
-    //--------------------------
-//    public Product getProductByID(int id){
-//        Product product = productService.searchProduct_by_id(id);
-//        if (product != null){
-//            return product;
-//        }
-//        else {
-//            System.out.println("Product not found");
-//        }
-//        return null;
-//    }
 
 //===================================OrderService================================================================\
     public void createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder){

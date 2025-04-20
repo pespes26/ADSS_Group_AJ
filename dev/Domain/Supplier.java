@@ -39,7 +39,7 @@ public class Supplier {
 
 
     //set agreement//
-    public void setAgreement(Agreement agreement) {
+    public void setAgreement(Agreement agreement) {//לא נראה לי קריטי
         if(agreement != null){
             agreements.put(agreement.getAgreementID(), agreement);
         }
@@ -48,15 +48,15 @@ public class Supplier {
     public String getPaymentDay(){return paymentDay;}
 
 
-    public void setPaymentDay(String paymentDay) {
+    public void setPaymentDay(String paymentDay) {//אולי יש שכפול עם הסכם בנושא הזה
         this.paymentDay = paymentDay;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(String email) {//קריטי?
         this.email = email;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(String paymentMethod) {//לבדוק אם יש כפילות בהסכם על הנושא הזה
         this.paymentMethod = paymentMethod;
     }
 
@@ -80,7 +80,7 @@ public class Supplier {
         return email;
     }
 
-    public Agreement getAgreement(int agreement_ID) {
+    public Agreement getAgreement(int agreement_ID) {//היות ויש מזהה יחודי ל"הסכם" אין צורך במתודה הזאת
         return agreements.get(agreement_ID);
     }
 

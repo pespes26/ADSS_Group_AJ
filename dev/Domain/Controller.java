@@ -152,6 +152,11 @@ public class Controller {
         return productService.productExistsByCatalog(catalog);
     }
 
+    /////new function
+    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
+        return productService.productExistsByCatalogAndProductId(catalog, productId);
+    }
+
     public void updateProductPrice(int catalog, double newPrice){
         Product product = getProductByCatalog(catalog);
         product.setPrice(newPrice);

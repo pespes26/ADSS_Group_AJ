@@ -9,14 +9,20 @@ public class ProductMenuHandler {
     public static void addNewProduct(Scanner scanner, Controller controller) {
         System.out.println("\nAdding new product...");
 
-        System.out.println("Enter Catalog Number: ");
-        int catalog_Number = scanner.nextInt();
 
-        System.out.println("Enter Product ID: ");
-        int product_id = scanner.nextInt();
+        int catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");//input checking
 
-        System.out.println("Enter Product Price: ");
-        double price = scanner.nextDouble();
+
+        int product_id;
+        while (true){
+            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
+            if(!controller.productExistsByCatalogAndProductId(catalog_Number, product_id)){
+                break;
+            }
+            System.out.println("This Product ID already exists for the given catalog number. Please try a different one.");
+        }
+
+        double price = Inputs.read_double(scanner, "Enter Product Price: ");
 
         System.out.println("Enter Unit of Measure: ");
         String unitsOfMeasure = scanner.next();
@@ -29,7 +35,8 @@ public class ProductMenuHandler {
             System.out.println("1. Yes");
             System.out.println("2. No");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+
+            choice = Inputs.read_input_for_choice(scanner);
 
             switch (choice) {
                 case 1:
@@ -49,17 +56,12 @@ public class ProductMenuHandler {
 
     public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber) {
         if (controller.productExistsByCatalog(CatalogNumber)) {
-            System.out.print("Enter number of discount rules: ");
-            int numOfRules = scanner.nextInt();
+            int numOfRules = Inputs.read_int(scanner, "Enter number of discount rules: ");
 
             for (int i = 0; i < numOfRules; i++) {
                 System.out.println("Discount Rule #" + (i + 1));
-                System.out.print("Enter minimum amount for discount: ");
-                int amount = scanner.nextInt();
-
-                System.out.print("Enter discount percentage (e.g., 10 for 10%): ");
-                double discount = scanner.nextDouble();
-
+                int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
+                double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
                 controller.add_discountRule(CatalogNumber, discount, amount);
             }
         } else {
@@ -68,8 +70,7 @@ public class ProductMenuHandler {
     }
 
     public static Integer getProductCatalogNumberFromUser(Controller controller, Scanner scanner) {
-        System.out.println("\nEnter catalogNumber: ");
-        int catalogNumber = scanner.nextInt();
+        int catalogNumber = Inputs.read_int(scanner, "Enter catalogNumber: ");
         if (controller.productExistsByCatalog(catalogNumber)) {
             return catalogNumber;
         } else {
@@ -101,7 +102,8 @@ public class ProductMenuHandler {
             System.out.println("3. Add or Update Discount Rule");
             System.out.println("0. Return to previous menu");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+
+            choice = Inputs.read_input_for_choice(scanner);
 
             switch (choice) {
                 case 1:
@@ -123,8 +125,7 @@ public class ProductMenuHandler {
     }
 
     public static void updateProductPrice(Scanner scanner, Controller controller, int catalogNumber) {
-        System.out.print("Enter new price: ");
-        double newPrice = scanner.nextDouble();
+        double newPrice = Inputs.read_double(scanner, "Enter new price: ");
         controller.updateProductPrice(catalogNumber, newPrice);
         System.out.println("Product price updated.");
     }

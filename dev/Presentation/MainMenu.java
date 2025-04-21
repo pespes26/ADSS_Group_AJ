@@ -25,6 +25,15 @@ public class MainMenu {
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
+
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid choice. Please try again.");
+                System.out.println(); // רווח בין הפעולות
+                scanner.next(); //מדלג על הקלט הלא תקין כמו string
+                continue; //back to the menu
+            }
+
             choice = scanner.nextInt();
 
             switch (choice) {
@@ -39,7 +48,9 @@ public class MainMenu {
                     SupplierMenuHandler.afterSupplierCreatedMenu(scanner, controller, supplier_ID);
                     break;
                 case 4:
+                    System.out.println(); // רווח בין הפעולות
                     OrderMenuHandler.SearchPastOrder(scanner, controller);
+                    break;
                 case 0:
                     System.out.println("Exiting the system. Goodbye!");
                     break;
@@ -47,10 +58,9 @@ public class MainMenu {
                     System.out.println("Invalid choice. Please try again.");
             }
 
+
             System.out.println(); // רווח בין הפעולות
         }
-
         scanner.close();
     }
-
 }

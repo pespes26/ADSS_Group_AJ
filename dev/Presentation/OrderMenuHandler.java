@@ -10,13 +10,32 @@ public class OrderMenuHandler {
         System.out.println("\nStarting a new order...");
         System.out.println("Before we begin, please enter a few details:\n");
 
+        //order id to a new order
+        int orderID;
+        while (true) { // לולאה שתרוץ עד שהמשתמש יזין מזהה הזמנה חוקי
+            orderID = Inputs.read_int(scanner, "Enter Order ID: ");
+            if (!controller.thereIsOrder(orderID)) { // בדיקה האם כבר קיימת הזמנה עם אותו מזהה
+                break;
+            }
+            System.out.println("This Order ID already exists. Try another one.");
+        }
 
-        System.out.print("Enter Order ID: ");
-        int orderID = scanner.nextInt();
-
-        System.out.print("Enter phone number: ");
-        int phoneNumber = scanner.nextInt();
-
+        //phone number
+        int phoneNumber = Inputs.read_int(scanner, "Enter phone number: ");//input checking
+   /*     while (true) {// לולאה שתרוץ עד שיתקבל מספר חוקי
+            System.out.print("Enter phone number: ");
+            if (scanner.hasNextInt()) {
+                phoneNumber = scanner.nextInt();// שומר את המספר ומפסיק את הלולאה
+                break;
+            } else {
+                System.out.println("Invalid choice. Please Enter phone number again: ");
+                scanner.next();// מדלג על הקלט הבעייתי (כדי שלא ניתקע בלולאה)
+            }
+        }*/
+        //////////////////////////////
+        //maybe change it to local time// ask Maor
+        ///////////////////////////////
+        System.out.println("Order date: day, month, year\n");
         System.out.print("Enter order day (as number): ");
         int day = scanner.nextInt();
         System.out.print("Enter month: ");
@@ -26,28 +45,27 @@ public class OrderMenuHandler {
 
         Date orderDate = new Date(year - 1900, month - 1, day); // יצירת תאריך (הערה: deprecated, לשימוש בסיסי)
 
+
         Map<Integer, Integer> productsInOrder = new HashMap<>();
         System.out.println("Let's create an order!\n");
         int option = -1;
+
         while (option != 0) {
             System.out.println("\n========== Order Menu ==========");
             System.out.println("Let's create an order!\n");
             System.out.print("Choose how to proceed:\n");
-
             System.out.println("1. Add new product to order");
             System.out.println("2. Submit order and return to main menu");
             System.out.println("0. Cancel order and return to previous menu");
-
             System.out.print("Enter your choice: ");
-            option = scanner.nextInt();
+
+            option = Inputs.read_input_for_choice(scanner);
 
             switch (option) {
                 case 1:
-                    System.out.print("Enter Product ID: ");
-                    int productID = scanner.nextInt();
+                    int productID = Inputs.read_int(scanner, "Enter Product ID: ");
 
-                    System.out.print("Enter quantity: ");
-                    int quantity = scanner.nextInt();
+                    int quantity = Inputs.read_int(scanner, "Enter quantity: ");
 
                     productsInOrder.put(productID, quantity);
                     System.out.println(" Product added to order.");
@@ -86,7 +104,7 @@ public class OrderMenuHandler {
     public static void printProductsInOrder1(Controller controller, int orderID) {
         Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
 
-        System.out.println("\n🧾 Products in order:");
+        System.out.println("\n Products in order:");
         System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
         System.out.println("---------------------------");
 
@@ -99,8 +117,7 @@ public class OrderMenuHandler {
     }
 
     public static void SearchPastOrder(Scanner scanner,Controller controller){
-        System.out.print("Enter Order ID: ");
-        int orderID = scanner.nextInt();
+        int orderID = Inputs.read_int(scanner, "Enter Order ID: ");
 
         if(!controller.thereIsOrder(orderID)){
             System.out.println("There is no such order.");

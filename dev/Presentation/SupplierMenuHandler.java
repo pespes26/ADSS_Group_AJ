@@ -6,23 +6,19 @@ public class SupplierMenuHandler {
     public static int createSupplier(Scanner scanner, Controller controller) {
         System.out.println("Let's create a new supplier!");
 
-        System.out.print("Enter Supplier ID: ");
-        int supplierID = scanner.nextInt();
+        int supplierID = Inputs.read_int(scanner, "Enter Supplier ID: ");
 
         System.out.print("Enter Supplier Name: ");
         String supplierName = scanner.next();
 
-        System.out.print("Enter Company ID: ");
-        int companyID = scanner.nextInt();
+        int companyID = Inputs.read_int(scanner, "Enter Company ID: ");
 
-        System.out.print("Enter Bank Account: ");
-        int bankAccount = scanner.nextInt();
+        int bankAccount = Inputs.read_int(scanner, "Enter Bank Account: ");
 
         System.out.print("Enter Payment Method: ");
         String paymentMethod = scanner.next();
 
-        System.out.print("Enter Phone Number: ");
-        int phoneNumber = scanner.nextInt();
+        int phoneNumber = Inputs.read_int(scanner, "Enter Phone Number: ");
 
         System.out.print("Enter Email: ");
         String email = scanner.next();
@@ -37,8 +33,8 @@ public class SupplierMenuHandler {
     }
 
     public static Integer getValidSupplierID(Scanner scanner, Controller controller) {
-        System.out.print("Enter Supplier ID: ");
-        int supplierID = scanner.nextInt();
+
+        int supplierID = Inputs.read_int(scanner, "Enter Supplier ID: ");
 
         if (!controller.thereIsSupplier(supplierID)) {
             System.out.println("Supplier does not exist.");
@@ -64,11 +60,12 @@ public class SupplierMenuHandler {
             System.out.println("1. Create a new agreement with this supplier");
             System.out.println("2. Return to main menu");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+
+            choice = Inputs.read_input_for_choice(scanner);//input checking
 
             switch (choice) {
                 case 1:
-                    System.out.println("Creating a new agreement...");
+                    //System.out.println("Creating a new agreement...");
                     AgreementMenuHandler.createNewAgreement(scanner,controller,supplier_ID);
                     break;
                 case 2:
@@ -91,7 +88,8 @@ public class SupplierMenuHandler {
                 System.out.println("2. Delete this supplier");
                 System.out.println("0. Return to main menu");
                 System.out.print("Enter your choice: ");
-                choice = scanner.nextInt();
+
+                choice = Inputs.read_input_for_choice(scanner);
 
                 switch (choice) {
                     case 1:

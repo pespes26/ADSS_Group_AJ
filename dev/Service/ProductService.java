@@ -30,6 +30,17 @@ public class ProductService {
         return false;
     }
 
+    //new - get catalog_number and product_id
+    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
+        for (Product product : productList) {
+            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
         Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);

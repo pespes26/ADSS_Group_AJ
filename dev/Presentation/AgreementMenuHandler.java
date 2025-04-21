@@ -4,8 +4,7 @@ import java.util.Scanner;
 
 public class AgreementMenuHandler {
     public static Integer getValidAgreementID(Scanner scanner, Controller controller) {
-        System.out.print("Enter Agreement ID: ");
-        int agreementID = scanner.nextInt();
+        int agreementID = Inputs.read_int(scanner, "Enter Agreement ID: ");
 
         if (!controller.thereIsAgreement(agreementID)) {
             System.out.println("Agreement does not exist.");
@@ -28,7 +27,14 @@ public class AgreementMenuHandler {
         System.out.println("Creating new agreement...");
 
         System.out.print("Enter Agreement ID: ");
-        int agreementID = scanner.nextInt();
+        int agreementID;
+        while (true) {
+            agreementID = Inputs.read_int(scanner, "Enter Agreement ID: ");
+            if (!controller.thereIsAgreement(agreementID)) {
+                break;
+            }
+            System.out.println("This Agreement ID already exists. Try another one.");
+        }
         scanner.nextLine(); // קולט את ה־\n שנשאר אחרי nextInt()
 
         System.out.print("Enter Delivery Days (comma separated, e.g. Mon,Wed,Fri): ");
@@ -52,55 +58,56 @@ public class AgreementMenuHandler {
                 System.out.println("1. Add new product to this agreement ");
                 System.out.println("2. remove product from this agreement ");
                 System.out.println("3. Edit product supply terms ");
-                System.out.println("3. Edit the delivery days ");
-                System.out.println("4. Change selfPickup status ");
+                System.out.println("4. Edit the delivery days ");
+                System.out.println("5. Change selfPickup status ");
                 System.out.print("0.Return to main menu: ");
                 System.out.print("Enter your choice: ");
-                choice = scanner.nextInt();
-            }
-            switch (choice) {
-                case 1:
-                    System.out.println("Adding new product to agreement...");
-                    ProductMenuHandler.addNewProduct(scanner, controller);
-                    System.out.println("Product added successfully.\n");
-                    break;
 
-                case 2:
-                    System.out.println("Removing product from agreement...");
-                    ProductMenuHandler.removeProduct(scanner, controller);
-                    System.out.println("Product removed successfully.\n");
-                    break;
+                choice = Inputs.read_input_for_choice(scanner);
 
-                case 3:
-                    System.out.println("Editing product supply terms...");
-                    ProductMenuHandler.editProductTerms(scanner, controller);
-                    System.out.println("Supply terms updated successfully.\n");
-                    break;
+                switch (choice) {
+                    case 1:
+                        System.out.println("Adding new product to agreement...");
+                        ProductMenuHandler.addNewProduct(scanner, controller);
+                        System.out.println("Product added successfully.\n");
+                        break;
 
-                case 4:
-                    System.out.println("Editing delivery days...");
-                     editDeliveryDays(scanner, controller);
-                    System.out.println("Delivery days updated.\n");
-                    break;
+                    case 2:
+                        System.out.println("Removing product from agreement...");
+                        ProductMenuHandler.removeProduct(scanner, controller);
+                        System.out.println("Product removed successfully.\n");
+                        break;
 
-                case 5:
-                    System.out.println("Toggling self-pickup status...");
-                    controller.toggleSelfPickup(agreementID);
-                    System.out.println("Self-pickup status changed.\n");
-                    break;
+                    case 3:
+                        System.out.println("Editing product supply terms...");
+                        ProductMenuHandler.editProductTerms(scanner, controller);
+                        System.out.println("Supply terms updated successfully.\n");
+                        break;
 
-                case 0:
-                    System.out.println("Returning to main menu...");
-                    break;
+                    case 4:
+                        System.out.println("Editing delivery days...");
+                        editDeliveryDays(scanner, controller);
+                        System.out.println("Delivery days updated.\n");
+                        break;
 
-                default:
-                    System.out.println("Invalid choice. Please try again.\n");
-                    break;
+                    case 5:
+                        System.out.println("Toggling self-pickup status...");
+                        controller.toggleSelfPickup(agreementID);
+                        System.out.println("Self-pickup status changed.\n");
+                        break;
 
+                    case 0:
+                        System.out.println("Returning to main menu...");
+                        break;
+
+                    default:
+                        System.out.println("Invalid choice. Please try again.\n");
+
+
+                }
             }
         }
     }
-
     public static void editDeliveryDays(Scanner scanner, Controller controller) {
         Integer agreementID =  getValidAgreementID(scanner, controller);
         if (agreementID != null) {
@@ -130,7 +137,8 @@ public class AgreementMenuHandler {
             System.out.println("3. Edit existing agreement");
             System.out.println("0. return to previous menu");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+
+            choice = Inputs.read_input_for_choice(scanner);//input checking
 
             switch (choice) {
                 case 1 -> {

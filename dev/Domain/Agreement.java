@@ -147,4 +147,9 @@ public class Agreement {
 
         return productCatalogNumbers; // Return all catalog numbers
     }
+
+    public boolean hasProducts() {
+        return supplierProducts != null && !supplierProducts.isEmpty();  // אם ה-HashMap לא ריק, יש לפחות מוצר אחד
+    }
+
 }

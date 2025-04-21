@@ -11,7 +11,7 @@ public class MainMenu {
         // Welcome message
         System.out.println("=====================================");
         System.out.println("|                                   |");
-        System.out.println("|     Welcome to the Supplier Module!     |");
+        System.out.println("|  Welcome to the Supplier Module!  |");
         System.out.println("|                                   |");
         System.out.println("=====================================\n");
 

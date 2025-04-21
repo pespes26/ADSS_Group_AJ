@@ -110,4 +110,13 @@ public class Supplier {
         return agreementIDs;
     }
 
+    // מתודה שבודקת אם יש לספק לפחות הסכם אחד
+    public boolean hasAgreements() {
+        return agreements != null && !agreements.isEmpty();  // אם יש לפחות הסכם אחד
+    }
+
+    // מתודה שמחזירה את ההסכמים של הספק
+    public HashMap<Integer, Agreement> getAgreements() {
+        return agreements;
+    }
 }

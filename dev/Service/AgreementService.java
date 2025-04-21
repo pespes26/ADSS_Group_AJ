@@ -63,4 +63,9 @@ public class AgreementService {
         return new int[0]; // במקום null
     }
 
+    // מתודה בודקת אם בהסכם יש מוצרים
+    public boolean hasProducts(Agreement agreement) {
+        return agreement.hasProducts();  // בודק אם ההסכם מכיל מוצרים
+    }
+
 }

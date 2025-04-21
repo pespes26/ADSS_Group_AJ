@@ -24,6 +24,12 @@ public class SupplierService {
         }
     }
 
+
+    public boolean hasSuppliers() { //use to check if in the first order we have supplier
+        return !supplierList.isEmpty();
+    }
+
+
     public boolean thereIsSupplier(int id){
         for (Supplier supplier : supplierList) {
             if (supplier.getSupplier_id() == id) {
@@ -51,6 +57,12 @@ public class SupplierService {
         }
         return false;
     }
+
+     ///new - use for check supplier
+    public List<Supplier> getAllSuppliers() {
+        return new ArrayList<>(supplierList);
+    }
+
 
     public int[] deleteAllAgreementFromSupplier(int supplier_ID) {
         Supplier supplier = supplierList.get(supplier_ID);

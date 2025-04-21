@@ -7,6 +7,13 @@ import java.util.Scanner;
 
 public class OrderMenuHandler {
     public static void createOrder(Scanner scanner, Controller controller) {
+
+        // בדיקה אם אפשר ליצור הזמנה
+        /*if (!controller.canCreateOrder()) {
+            System.out.println("Cannot create order - missing suppliers, agreements, or products.");
+            return; // לא ממשיכים אם לא ניתן ליצור הזמנה
+        }*/
+
         System.out.println("\nStarting a new order...");
         System.out.println("Before we begin, please enter a few details:\n");
 
@@ -104,9 +111,15 @@ public class OrderMenuHandler {
     public static void printProductsInOrder1(Controller controller, int orderID) {
         Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
 
+        if (productsInOrder == null || productsInOrder.isEmpty()) { //if not have orders
+            System.out.println("No products in this order.");
+            return;
+        }
+
         System.out.println("\n Products in order:");
         System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
         System.out.println("---------------------------");
+
 
         for (Map.Entry<Integer, Integer> entry : productsInOrder.entrySet()) {
             int productID = entry.getKey();        // מזהה המוצר

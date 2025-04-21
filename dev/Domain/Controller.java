@@ -64,6 +64,13 @@ public class Controller {
         return supplierService.thereIsSupplier(id);
     }
 
+
+    //--------------------------
+    public boolean hasSuppliers() {//use for order (check if possible to make order)
+        return supplierService.hasSuppliers();
+    }
+
+
 //===================================AgreementService================================================================\
 
     public void createAgreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup){
@@ -189,5 +196,29 @@ public class Controller {
 
         return orderedProducts;
     }
+
+    //-------------------------
+   /* public boolean canCreateOrder() {
+        // בדיקה אם יש ספקים במערכת
+        if (!hasSuppliers()) {
+            System.out.println("No suppliers in the system.");
+            return false;
+        }
+
+        // בדיקה אם יש לפחות ספק עם הסכמים ועם מוצרים בתוכם
+        for (Supplier supplier : supplierService.getAllSuppliers()) {
+            if (supplier.hasAgreements()) {
+                for (Agreement agreement : supplier.getAgreements().values()) {
+                    if (agreement.hasProducts()) {
+                        return true; // אם יש לפחות הסכם עם מוצר, אפשר לבצע הזמנה
+                    }
+                }
+            }
+        }
+
+        System.out.println("Cannot create order - no agreements or products available.");
+        return false;
+    }*/
+
 
 }

@@ -1,57 +1,52 @@
 package Domain;
 
-/**
- * Represents a product in the store.
- * Contains identification, storage information, expiration, classification details,
- * and defect status.
- * This class belongs to the Domain layer and models the core product entity.
- */
-public class Product {
-    /** The unique ID of the product - represents an item of some product */
-    private int product_id;
 
-    /** The name of the product */
+public class Product {
+
+
+    private int product_catalog_number;
+
     private String product_name;
 
-    /** The product's expiration date as a string */
-    private String expiring_date;
+    private String category;
 
-    /** The section in which the product is located */
-    private String section;
+    private String sub_category;
 
-    /** The storage location (either "interior" or "warehouse") */
-    private String stored;
+    private int product_demand_level; // integer number between 1-5, 1 is the lowest and 5 is the highest
 
-    /** Indicates whether the product is defective */
-    private boolean isDefect;
+    private int supply_time; //in days
 
-    /** The classification details of the product */
-    private Classification classification;
+    private int total_quantity;
 
-    /**
-     * Constructs a new Product instance.
-     * By default, the product is not marked as defective.
-     */
-    public Product() {
-        isDefect = false;
+    private int minimum_quantity_for_alert;
+
+    private int quantity_in_store;
+
+    private int quantity_in_warehouse;
+
+    private String manufacturer;
+
+    private Discount discount;
+
+    private double supplier_discount;
+
+    private double cost_price_before_supplier_discount;
+
+    private double cost_price_after_supplier_discount;
+
+    private double store_discount;
+
+    private double sale_price_before_store_discount;
+
+    private double sale_price_after_store_discount;
+
+
+    public int getCatalogNumber() {
+        return product_catalog_number;
     }
 
-    /**
-     * Gets the product ID.
-     *
-     * @return the product ID
-     */
-    public int getProductId() {
-        return product_id;
-    }
-
-    /**
-     * Sets the product ID.
-     *
-     * @param product_id the ID to set
-     */
-    public void setProductId(int product_id) {
-        this.product_id = product_id;
+    public void setCatalogNumber(int product_catalog_number) {
+        this.product_catalog_number = product_catalog_number;
     }
 
     /**
@@ -72,93 +67,133 @@ public class Product {
         this.product_name = name;
     }
 
-    /**
-     * Gets the product's expiration date.
-     *
-     * @return the expiration date
-     */
-    public String getExpiringDate() {
-        return expiring_date;
+    public String getCategory() {
+        return category;
     }
 
-    /**
-     * Sets the product's expiration date.
-     *
-     * @param expiring_date the date to set
-     */
-    public void setExpiringDate(String expiring_date) {
-        this.expiring_date = expiring_date;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    /**
-     * Gets the section where the product is located.
-     *
-     * @return the section
-     */
-    public String getSection() {
-        return section;
+    public String getSubCategory() {
+        return sub_category;
     }
 
-    /**
-     * Sets the section of the product.
-     *
-     * @param section the section to set
-     */
-    public void setSection(String section) {
-        this.section = section;
+    public void setSubCategory(String sub_category) {
+        this.sub_category = sub_category;
     }
 
-    /**
-     * Gets the storage location of the product.
-     *
-     * @return the storage location ("interior" or "warehouse")
-     */
-    public String getStored() {
-        return stored;
+    public int getProductDemandLevel() {
+        return product_demand_level;
     }
 
-    /**
-     * Sets the storage location of the product.
-     *
-     * @param stored the storage location to set ("interior" or "warehouse")
-     */
-    public void setStored(String stored) {
-        this.stored = stored;
+    public void setProductDemandLevel(int product_demand_level) {
+        this.product_demand_level = product_demand_level;
     }
 
-    /**
-     * Checks whether the product is defective.
-     *
-     * @return true if the product is defective, false otherwise
-     */
-    public boolean isDefect() {
-        return isDefect;
+    public int getSupplyTime() {
+        return supply_time;
     }
 
-    /**
-     * Marks the product as defective or not.
-     *
-     * @param defect true if defective, false otherwise
-     */
-    public void setDefect(boolean defect) {
-        isDefect = defect;
+    public void setSupplyTime(int supply_time) {
+        this.supply_time = supply_time;
     }
 
-    /**
-     * Gets the classification details of the product.
-     *
-     * @return the classification object
-     */
-    public Classification getClassification() {
-        return classification;
+    public int getTotalQuantity() {
+        return total_quantity;
     }
 
-    /**
-     * Sets the classification details of the product.
-     *
-     * @param classification the classification object to set
-     */
-    public void setClassification(Classification classification) {
-        this.classification = classification;
+    public void setTotalQuantity(int total_quantity) {
+        this.total_quantity = total_quantity;
+    }
+
+    public int getMinimumQuantityForAlert() {
+        return minimum_quantity_for_alert;
+    }
+
+    public void setMinimumQuantityForAlert(int minimum_quantity_for_alert) {
+        this.minimum_quantity_for_alert = minimum_quantity_for_alert;
+    }
+
+    public int getQuantityInStore() {
+        return quantity_in_store;
+    }
+
+    public void setQuantityInStore(int quantity_in_store) {
+        this.quantity_in_store = quantity_in_store;
+    }
+
+    public int getQuantityInWarehouse() {
+        return quantity_in_warehouse;
+    }
+
+    public void setQuantityInWarehouse(int quantity_in_warehouse) {
+        this.quantity_in_warehouse = quantity_in_warehouse;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
+    }
+
+    public double getSupplierDiscount() {
+        return supplier_discount;
+    }
+
+    //need to use here the discount class
+    public void setSupplierDiscount(double supplier_discount) {
+        this.supplier_discount = supplier_discount;
+    }
+
+    public double getCostPriceBeforeSupplierDiscount() {
+        return cost_price_before_supplier_discount;
+    }
+
+    public void setCostPriceBeforeSupplierDiscount(double cost_price_before_supplier_discount) {
+        this.cost_price_before_supplier_discount = cost_price_before_supplier_discount;
+    }
+
+    public double getCostPriceAfterSupplierDiscount() {
+        return cost_price_after_supplier_discount;
+    }
+
+    public void setCostPriceAfterSupplierDiscount(double cost_price_after_supplier_discount) {
+        this.cost_price_after_supplier_discount = cost_price_after_supplier_discount;
+    }
+
+    public double getStoreDiscount() {
+        return store_discount;
+    }
+
+    //need to use here the discount class
+    public void setStoreDiscount(double store_discount) {
+        this.store_discount = store_discount;
+    }
+
+    public double getSalePriceBeforeStoreDiscount() {
+        return sale_price_before_store_discount;
+    }
+
+    public void setSalePriceBeforeStoreDiscount(double sale_price_before_store_discount) {
+        this.sale_price_before_store_discount = sale_price_before_store_discount;
+    }
+
+    public double getSalePriceAfterStoreDiscount() {
+        return sale_price_after_store_discount;
+    }
+
+    public void setSalePriceAfterStoreDiscount(double sale_price_after_store_discount) {
+        this.sale_price_after_store_discount = sale_price_after_store_discount;
     }
 }

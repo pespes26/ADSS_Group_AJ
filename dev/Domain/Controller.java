@@ -125,8 +125,8 @@ public class Controller {
 
 
 //===================================ProductService================================================================\
-    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
-        return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure, int supplierID){
+        return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
     }
 
     public void deleteProductByID(int id){
@@ -139,6 +139,15 @@ public class Controller {
             agreement.removeProductByProductCatalogNumber(catalog_Number);
             productService.delete_by_catalog(catalog_Number); //מחיקת מוצר מהמערך של המוצרים, רק עבור מספר הסכם מזהה
         }
+    }
+
+    public void delete_by_catalogAndSupplierId(int catalog_Number, int supplierID, int agreementID){
+        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            agreement.removeProductByProductCatalogNumber(catalog_Number);//מחיקה מוצר מהסכם
+            productService.delete_by_catalogAndSupplierId(catalog_Number, supplierID);//מחיקה מהמערך של המוצרים
+        }
+
     }
 
     public Product getProductByID(int id){

@@ -37,7 +37,7 @@ public class ProductMenuHandler {
             System.out.println("Enter Unit of Measure: ");
             String unitsOfMeasure = scanner.next();
 
-            Product product = controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+            Product product = controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
             controller.addProductToAgreement(product_id, product, agreementID);
 
             int choice = -1;
@@ -91,11 +91,11 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void removeProduct(Scanner scanner, Controller controller, int agreementID) {
+    public static void removeProduct(Scanner scanner, Controller controller, int agreementID, int supplierID) {
         Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
         if (catalogNumber != null) {
             System.out.println("\nRemoving product...");
-            controller.deleteProductByCatalog(catalogNumber, agreementID);
+            controller.delete_by_catalogAndSupplierId(catalogNumber,supplierID, agreementID);
             System.out.println("Product removed!.");
         }
     }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Product {
+    int supplierID;
     int Catalog_Number;
     int product_id;
     double Price;
@@ -14,14 +15,16 @@ public class Product {
     List<DiscountRule> discountRules = new ArrayList<>(); //array of discounts
 
 
-    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure){
+    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure,int supplierID){
+        this.supplierID = supplierID;
         this.Catalog_Number = catalog_Number;
         this.product_id = product_id;
         this.Price = price;
         this.unitsOfMeasure = unitsOfMeasure;
     }
 
-    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules) {
+    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules, int supplierID) {
+        this.supplierID = supplierID;
         this.Catalog_Number = catalog_Number;
         this.product_id = product_id;
         this.Price = price;
@@ -71,6 +74,10 @@ public class Product {
         }
         discountRules.add(new DiscountRule(discount, amount));
         return false;
+    }
+
+    public int getSupplierID() {
+        return supplierID;
     }
 
     //#להוסיף שיטה שמחזירה את ההנחה בהינתו כמות

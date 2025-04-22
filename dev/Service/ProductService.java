@@ -3,6 +3,7 @@ package Service;
 import Domain.Product;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ProductService {
@@ -42,8 +43,8 @@ public class ProductService {
 
 
 
-    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure) { //create a product
-        Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure);
+    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure, int supplierID) { //create a product
+        Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
         this.productList.add(product);
         return product;
         }
@@ -59,6 +60,17 @@ public class ProductService {
             productList.remove(searchProduct_by_catalog(catalog));
         }
     }
+
+    public void delete_by_catalogAndSupplierId(int catalog, int supplierId) {
+        Iterator<Product> iterator = productList.iterator();
+        while (iterator.hasNext()) {
+            Product product = iterator.next();
+            if (product.getSupplierID() == supplierId && product.getCatalog_Number() == catalog) {
+                iterator.remove(); // הסרה בטוחה תוך כדי איטרציה
+            }
+        }
+    }
+
 
     public Product searchProduct_by_catalog(int catalog){
         for(Product product : productList){ //check product in product_list

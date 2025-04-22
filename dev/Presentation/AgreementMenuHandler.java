@@ -136,7 +136,7 @@ public class AgreementMenuHandler {
 
                     case 2:
                         System.out.println("Removing product from agreement...");
-                        ProductMenuHandler.removeProduct(scanner, controller, agreementID);
+                        ProductMenuHandler.removeProduct(scanner, controller, agreementID, supplierID);
                         System.out.println("Product removed successfully.\n");
                         break;
 

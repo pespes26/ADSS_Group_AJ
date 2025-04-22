@@ -236,4 +236,18 @@ public class Controller {
         return false; // לא נמצא בשום הסכם של הספק
     }
 
+    public boolean thereIsProductWithSameProductID(int productID, int supplierID){
+        Supplier supplier = getSupplierById(supplierID);
+        if (supplier != null) {
+            int[] allAgreementIDs = supplier.getAllAgreementIDs();
+            for (int agreementID : allAgreementIDs) {
+                Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+                if (agreement != null && agreement.hasProductWithProductID(productID)) {
+                    return true; // מצאנו מוצר עם אותו ProductID
+                }
+            }
+        }
+        return false; // לא נמצא בשום הסכם של הספק
+    }
+
 }

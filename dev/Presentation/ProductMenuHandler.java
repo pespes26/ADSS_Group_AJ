@@ -12,6 +12,7 @@ public class ProductMenuHandler {
 
 
 //----------בדיקת מספר קטלוגי ייחודי
+
         int catalog_Number;
         while (true) {
             catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
@@ -21,8 +22,16 @@ public class ProductMenuHandler {
             }
             // אחרת נחזור לראש הלולאה ונבקש שוב
         }
+//----------------בדיקת מספר מזהה ייחודי--------------------
+        int product_id;
+        while (true) {
+            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
+            boolean isProductIDUnique = validateUniqueProductIDNumber(controller, product_id, supplierID);
+            if (isProductIDUnique) {
+                break; // רק אם ה-ID ייחודי → נצא מהלולאה
+            }
+        }
 
-            int product_id = Inputs.read_int(scanner, "Enter Product ID: ");
             double price = Inputs.read_double(scanner, "Enter Product Price: ");
 
             System.out.println("Enter Unit of Measure: ");
@@ -151,7 +160,16 @@ public class ProductMenuHandler {
     public static boolean validateUniqueCatalogNumber(Controller controller, int catalogNumber, int supplierID) {
         boolean exists = controller.thereIsProductWithSameCatalogNumber(catalogNumber, supplierID);
         if (exists) {
-            System.out.println("There is already a product with this catalog number for this supplier. Please try again.\n");
+            System.out.println("This product already exists in an agreement with this supplier. Please enter a different product.\n");
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean validateUniqueProductIDNumber(Controller controller, int productID, int supplierID){
+        boolean exists = controller.thereIsProductWithSameProductID(productID, supplierID);
+        if (exists) {
+            System.out.println("This product already exists in this agreement! Please add other product.\n");
             return false;
         }
         return true;

@@ -69,11 +69,15 @@ public class OrderMenuHandler {
 
             switch (option) {
                 case 1:
-                    int productID = Inputs.read_int(scanner, "Enter Product ID: ");
-                    boolean existsProduct = ProductMenuHandler.validateProductExistsByID(controller, productID);
-                    if (!existsProduct) {
-                        break;//אם אין מוצר עם ID כזה הלולאה עוצרת
+                    int productID;
+                    while (true) {
+                        productID = Inputs.read_int(scanner, "Enter Product ID: ");
+                        boolean existsProduct = ProductMenuHandler.validateProductExistsByID(controller, productID);
+                        if (existsProduct) { // אם יש מוצר כזה אז בסדר
+                            break;//אם אין מוצר עם ID כזה הלולאה עוצרת
+                        }
                     }
+
                     int quantity = Inputs.read_int(scanner, "Enter quantity: ");
 
                     productsInOrder.put(productID, quantity);
@@ -84,7 +88,7 @@ public class OrderMenuHandler {
                     Map<Integer, Map.Entry<Integer, Double>> bestPrice = controller.orderWithBestPrice(productsInOrder);
                     printProductsWithBestPrice(bestPrice);
                     controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder);//יוצר מופע של הזמנה
-                    System.out.println(" Order submitted successfully.");
+                    System.out.println("\nOrder submitted successfully.");
                     return;
                 case 0:
                     System.out.println("\nReturning to previous menu...");
@@ -97,18 +101,27 @@ public class OrderMenuHandler {
 
 
     public static void printProductsWithBestPrice(Map<Integer, Map.Entry<Integer, Double>> bestPriceMap) {
-        System.out.println("\n Products with best supplier price:");
+        System.out.println("\nProducts with best supplier price:");
         System.out.printf("%-12s %-10s %-10s%n", "Product ID", "Amount", "Best Price");
         System.out.println("---------------------------------------------");
+
+        double totalCost = 0;
 
         for (Map.Entry<Integer, Map.Entry<Integer, Double>> entry : bestPriceMap.entrySet()) {
             int productID = entry.getKey();
             int amount = entry.getValue().getKey();
             double price = entry.getValue().getValue();
 
+            double productCost = amount * price;
+            totalCost += productCost;
+
             System.out.printf("%-12d %-10d %-10.2f%n", productID, amount, price);
         }
+
+        System.out.println("---------------------------------------------");
+        System.out.printf("Total order cost: %.2f ₪%n\n", totalCost);
     }
+
 
     public static void printProductsInOrder1(Controller controller, int orderID) {
         Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);

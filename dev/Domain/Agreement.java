@@ -161,5 +161,10 @@ public class Agreement {
         return false;
     }
 
+    public boolean hasProductWithProductID(int productID) {
+        return supplierProducts.containsKey(productID);
+    }
+
+
 
 }

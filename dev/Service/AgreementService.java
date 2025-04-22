@@ -58,8 +58,7 @@ public class AgreementService {
     public int[] deleteAgreementWithSupplier(int agreement_ID) {
         Agreement agreement = getAgreementByID(agreement_ID);
         if (agreement != null) {
-            int[] allCatalogNumbers = agreement.removeAllProducts();
-            return allCatalogNumbers;
+            return agreement.removeAllProductsFromAgreement();
         }
         return new int[0]; // במקום null
     }

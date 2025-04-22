@@ -150,7 +150,7 @@ public class Agreement {
      *
      * @return an array of catalog numbers of all removed products
      */
-    public int[] removeAllProducts() {
+    public int[] removeAllProductsFromAgreement() {
         int size = this.supplierProducts.size(); // Get how many products there are
         int[] productCatalogNumbers = new int[size]; // Prepare array to hold catalog numbers
 

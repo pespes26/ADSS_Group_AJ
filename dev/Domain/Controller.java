@@ -6,9 +6,7 @@ import Service.ProductService;
 import Service.SupplierService;
 
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Controller {
     private final AgreementService agreementService;
@@ -29,12 +27,22 @@ public class Controller {
         supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentCondition);
     }
     //-------------------------
-    public void deleteSupplier(int supplier_ID){
-        if (supplierService.thereIsSupplier(supplier_ID)){
-            deleteAllAgreementFromSupplier(supplier_ID);
+    public void deleteSupplier(int supplier_ID) {
+        if (supplierService.thereIsSupplier(supplier_ID)) {
+
+            // מחיקת כל ההסכמים ואיסוף כל המספרים הקטלוגיים של המוצרים שהוסרו
+            List<Integer> catalogNumbers = deleteAllAgreementFromSupplier(supplier_ID);
+
+            // מחיקת המוצרים ממערכת המוצרים לפי מספר קטלוגי וספק מProductService
+            for (int catalogNumber : catalogNumbers) {
+                productService.delete_by_catalogAndSupplierId(catalogNumber, supplier_ID);
+            }
+
+            // מחיקת הספק עצמו
             supplierService.deleteSupplier(supplier_ID);
         }
     }
+
     //--------------------------
     public Supplier getSupplierById(int id){
         Supplier supplier = supplierService.getSupplierById(id);
@@ -45,19 +53,29 @@ public class Controller {
     }
     //--------------------------
 
-    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
-          if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
-              this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-          }
-    }
+//    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
+//          if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
+//              this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+//          }
+//    }
 
     //--------------------------
-    public void deleteAllAgreementFromSupplier(int supplier_ID){
-        int[] agreementIDS = supplierService.deleteAllAgreementFromSupplier(supplier_ID);
-        for (int agreementID : agreementIDS) {
-            this.agreementService.deleteAgreementWithSupplier(agreementID);
+    public List<Integer> deleteAllAgreementFromSupplier(int supplier_ID) {
+        List<Integer> catalogNumbers = new ArrayList<>();
+
+        int[] agreementIDs = supplierService.deleteAllAgreementFromSupplier(supplier_ID);
+
+        for (int agreementID : agreementIDs) {
+            int[] agreementCatalogNumbers = agreementService.deleteAgreementWithSupplier(agreementID);
+
+            for (int catalogNumber : agreementCatalogNumbers) {
+                catalogNumbers.add(catalogNumber);
+            }
         }
+
+        return catalogNumbers;
     }
+
 
     //--------------------------
     public boolean thereIsSupplier(int id){
@@ -81,9 +99,13 @@ public class Controller {
 
     //--------------------------
     public void deleteAgreement(int agreement_ID) {
-        int[] allCatalogNumbers = this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-        for (int catalogNumber : allCatalogNumbers) {
-            productService.delete_by_catalog(catalogNumber); // Delete each product from the product system
+        Agreement agreement = agreementService.getAgreementByID(agreement_ID);
+        if (agreement != null) {
+            int supplierID = agreement.getSupplier_ID();
+            int[] allCatalogNumbers = this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+            for (int catalogNumber : allCatalogNumbers) {
+                productService.delete_by_catalogAndSupplierId(catalogNumber, supplierID); // Delete each product from the product system
+            }
         }
     }
     //--------------------------
@@ -95,9 +117,9 @@ public class Controller {
         }
     }
     //--------------------------
-    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
-        this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-    }
+//    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
+//        this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+//    }
     //--------------------------
     public void removeProductFromAgreement(int agreementID, int product_id){
         Integer catalogNumber = this.agreementService.removeProductFromAgreement(agreementID, product_id);

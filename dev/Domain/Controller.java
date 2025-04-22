@@ -7,7 +7,6 @@ import Service.SupplierService;
 
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,8 +133,12 @@ public class Controller {
         productService.delete_by_id(id);
     }
 
-    public void deleteProductByCatalog(int catalog_Number){
-        productService.delete_by_catalog(catalog_Number);
+    public void deleteProductByCatalog(int catalog_Number, int agreementID){
+        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            agreement.removeProductByProductCatalogNumber(catalog_Number);
+            productService.delete_by_catalog(catalog_Number); //מחיקת מוצר מהמערך של המוצרים, רק עבור מספר הסכם מזהה
+        }
     }
 
     public Product getProductByID(int id){
@@ -146,10 +149,13 @@ public class Controller {
         return this.productService.searchProduct_by_catalog(catalog);
     }
 
-    public void add_discountRule(int catalog, double discount, int amount){
-        Product product = getProductByCatalog(catalog);
-        if (product != null){
-            product.add_discountRule(discount, amount);
+    public void add_discountRule(int catalog, double discount, int amount,int agreementID){
+        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            Product product = agreement.getProductByCatalog(catalog);
+            if (product != null) {
+                product.add_discountRule(discount, amount);
+            }
         }
     }
 
@@ -166,13 +172,19 @@ public class Controller {
         return productService.productExistsByCatalogAndProductId(catalog, productId);
     }
 
-    public void updateProductPrice(int catalog, double newPrice){
-        Product product = getProductByCatalog(catalog);
-        product.setPrice(newPrice);
+    public void updateProductPrice(int catalog, double newPrice, Integer agreementID){
+        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            Product product = agreement.getProductByCatalog(catalog);
+            product.setPrice(newPrice);
+        }
     }
-    public void updateProductUnit(int catalogNumber, String newUnit){
-        Product product = getProductByCatalog(catalogNumber);
-        product.setUnitsOfMeasure(newUnit);
+    public void updateProductUnit(int catalogNumber, String newUnit, Integer agreementID){
+        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+        if (agreement != null) {
+            Product product = agreement.getProductByCatalog(catalogNumber);
+            product.setUnitsOfMeasure(newUnit);
+        }
     }
 
 //===================================OrderService================================================================\

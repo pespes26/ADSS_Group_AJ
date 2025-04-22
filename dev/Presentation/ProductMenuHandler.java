@@ -52,7 +52,7 @@ public class ProductMenuHandler {
                 switch (choice) {
                     case 1:
                         System.out.println("Use case: Add discount rule to product");
-                        readAndAddDiscountRules(scanner, controller, product_id);
+                        readAndAddDiscountRules(scanner, controller, product_id, agreementID);
                         System.out.println("\nProduct added successfully.");
                         return;
                     case 2:
@@ -66,7 +66,7 @@ public class ProductMenuHandler {
 
     }
 
-    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber) {
+    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber,Integer agreementID) {
         if (controller.productExistsByCatalog(CatalogNumber)) {
             int numOfRules = Inputs.read_int(scanner, "Enter number of discount rules: ");
 
@@ -74,7 +74,7 @@ public class ProductMenuHandler {
                 System.out.println("Discount Rule #" + (i + 1));
                 int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
                 double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
-                controller.add_discountRule(CatalogNumber, discount, amount);
+                controller.add_discountRule(CatalogNumber, discount, amount, agreementID);
             }
         } else {
             System.out.println("Product not found. Cannot add discount rules.");
@@ -91,16 +91,16 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void removeProduct(Scanner scanner, Controller controller) {
+    public static void removeProduct(Scanner scanner, Controller controller, int agreementID) {
         Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
         if (catalogNumber != null) {
             System.out.println("\nRemoving product...");
-            controller.deleteProductByCatalog(catalogNumber);
+            controller.deleteProductByCatalog(catalogNumber, agreementID);
             System.out.println("Product removed!.");
         }
     }
 
-    public static void editProductTerms(Scanner scanner, Controller controller) {
+    public static void editProductTerms(Scanner scanner, Controller controller, Integer agreementID) {
         System.out.println("\nEdit Product Supply Terms:");
 
         Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
@@ -119,13 +119,13 @@ public class ProductMenuHandler {
 
             switch (choice) {
                 case 1:
-                    updateProductPrice(scanner, controller, catalogNumber);
+                    updateProductPrice(scanner, controller, catalogNumber, agreementID);
                     break;
                 case 2:
-                    updateProductUnit(scanner, controller, catalogNumber);
+                    updateProductUnit(scanner, controller, catalogNumber, agreementID);
                     break;
                 case 3:
-                    readAndAddDiscountRules(scanner, controller, catalogNumber);
+                    readAndAddDiscountRules(scanner, controller, catalogNumber, agreementID);
                     break;
                 case 0:
                     System.out.println("Returning to previous menu...");
@@ -136,16 +136,16 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void updateProductPrice(Scanner scanner, Controller controller, int catalogNumber) {
+    public static void updateProductPrice(Scanner scanner, Controller controller, int catalogNumber, Integer agreementID) {
         double newPrice = Inputs.read_double(scanner, "Enter new price: ");
-        controller.updateProductPrice(catalogNumber, newPrice);
+        controller.updateProductPrice(catalogNumber, newPrice, agreementID);
         System.out.println("Product price updated.");
     }
 
-    public static void updateProductUnit(Scanner scanner, Controller controller, int catalogNumber) {
+    public static void updateProductUnit(Scanner scanner, Controller controller, int catalogNumber, Integer agreementID) {
         System.out.print("Enter new unit of measure: ");
         String newUnit = scanner.next();
-        controller.updateProductUnit(catalogNumber, newUnit);
+        controller.updateProductUnit(catalogNumber, newUnit, agreementID);
         System.out.println("Product unit updated.");
     }
 

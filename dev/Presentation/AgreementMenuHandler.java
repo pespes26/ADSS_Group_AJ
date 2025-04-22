@@ -37,12 +37,9 @@ public class AgreementMenuHandler {
             }
             System.out.println("This Agreement ID already exists. Try another one.");
         }
-        scanner.nextLine(); // קולט את ה־\n שנשאר אחרי nextInt()
 
-        //============================================
+        // קבלת ימי אספקה מהמשתמש
         String[] deliveryDays = getDeliveryDays(scanner);
-        //============================================
-
 
         System.out.print("Self Pickup? (Y/N): ");
         String selfPickupInput = scanner.next();
@@ -51,15 +48,14 @@ public class AgreementMenuHandler {
         controller.createAgreement(agreementID, supplierID, deliveryDays, selfPickup);
         System.out.println("Agreement created successfully!.");
 
-        //new:
-
         System.out.print("Would you like to add products to the agreement? (Y/N): ");
         String addProductInput = scanner.next();
 
         if (addProductInput.equalsIgnoreCase("Y")) {
-            addProductsLoop(scanner, controller, supplierID, agreementID);;
+            addProductsLoop(scanner, controller, supplierID, agreementID);
         }
     }
+
 
     public static String[] getDeliveryDays(Scanner scanner) {
         String[] weekDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -71,8 +67,10 @@ public class AgreementMenuHandler {
         }
         System.out.print("Your choices (e.g., 1 3 5): ");
 
-        scanner.nextLine(); // ניקוי התו שנותר מהקלט הקודם
-        String input = scanner.nextLine();
+        // כאן אנחנו מבטיחים שהשורה לא תיבלע
+        scanner.nextLine();
+        String input = scanner.nextLine(); // עכשיו יקלוט את הבחירה
+
         String[] parts = input.trim().split("\\s+");
 
         for (String part : parts) {
@@ -85,8 +83,10 @@ public class AgreementMenuHandler {
                 System.out.println("Invalid input skipped: " + part);
             }
         }
+
         return selectedDays.toArray(new String[0]);
     }
+
 
 
     public static void addProductsLoop(Scanner scanner, Controller controller, int supplierID, int agreementID) {
@@ -136,25 +136,25 @@ public class AgreementMenuHandler {
 
                     case 2:
                         System.out.println("Removing product from agreement...");
-                        ProductMenuHandler.removeProduct(scanner, controller);
+                        ProductMenuHandler.removeProduct(scanner, controller, agreementID);
                         System.out.println("Product removed successfully.\n");
                         break;
 
                     case 3:
                         System.out.println("Editing product supply terms...");
-                        ProductMenuHandler.editProductTerms(scanner, controller);
+                        ProductMenuHandler.editProductTerms(scanner, controller, agreementID);
                         System.out.println("Supply terms updated successfully.\n");
                         break;
 
                     case 4:
                         System.out.println("Editing delivery days...");
-                        editDeliveryDays(scanner, controller);
+                        editDeliveryDays(scanner, controller, agreementID);
                         System.out.println("Delivery days updated.\n");
                         break;
 
                     case 5:
                         System.out.println("Toggling self-pickup status...");
-                        toggleSelfPickup(scanner, controller);
+                        toggleSelfPickup(scanner, controller, agreementID);
 //                        System.out.println("Self-pickup status changed.\n");
                         break;
 
@@ -170,8 +170,7 @@ public class AgreementMenuHandler {
             }
         }
     }
-    public static void editDeliveryDays(Scanner scanner, Controller controller) {
-        Integer agreementID = getValidAgreementID(scanner, controller);
+    public static void editDeliveryDays(Scanner scanner, Controller controller,Integer agreementID) {
         if (agreementID != null) {
             String[] newDays = getDeliveryDays(scanner); // שימוש בפונקציה האינטראקטיבית
             controller.updateDeliveryDays(agreementID, newDays);
@@ -180,8 +179,7 @@ public class AgreementMenuHandler {
     }
 
 
-    public static void toggleSelfPickup(Scanner scanner, Controller controller) {
-        Integer agreementID = getValidAgreementID(scanner, controller);
+    public static void toggleSelfPickup(Scanner scanner, Controller controller,Integer agreementID) {
         if (agreementID != null) {
             boolean newStatus = controller.toggleSelfPickup(agreementID);
             System.out.println("Self-pickup status updated. New status: " + (newStatus ? "Enabled" : "Disabled\n"));

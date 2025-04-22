@@ -48,7 +48,7 @@ public class AgreementService {
     public Integer removeProductFromAgreement(int agreement_ID, int product_ID) {
         Agreement agreement = getAgreementByID(agreement_ID); // Find the relevant agreement
         if (agreement != null) {
-            Integer catalogNumber = agreement.removeProduct(product_ID); // Remove the product and get its catalog number
+            Integer catalogNumber = agreement.removeProductByProductID(product_ID); // Remove the product and get its catalog number
             return catalogNumber;
         }
         return null;

@@ -118,7 +118,7 @@ public class Agreement {
 //        return catalogNumber; // Return the catalog number
 //    }
 
-    public int removeProduct(int productID) {
+    public int removeProductByProductID(int productID) {
         Product product = supplierProducts.get(productID); // Retrieve the product
         if (product == null) {
             throw new IllegalArgumentException("Product not found in agreement.");
@@ -127,6 +127,21 @@ public class Agreement {
         int catalogNumber = product.getCatalog_Number(); // Get its catalog number
         supplierProducts.remove(productID); // Remove from the map
         return catalogNumber; // Return the catalog number
+    }
+
+    public void removeProductByProductCatalogNumber(int catalogNumber) {
+        Integer keyToRemove = null;
+
+        for (Map.Entry<Integer, Product> entry : supplierProducts.entrySet()) {
+            if (entry.getValue().getCatalog_Number() == catalogNumber) {
+                keyToRemove = entry.getKey();
+                break; // ברגע שמצאנו את המוצר, אין צורך להמשיך
+            }
+        }
+
+        if (keyToRemove != null) {
+            supplierProducts.remove(keyToRemove);
+        }
     }
 
 
@@ -167,6 +182,13 @@ public class Agreement {
         return supplierProducts.containsKey(productID);
     }
 
-
+    public Product getProductByCatalog(int catalogNumber){
+        for (Product product : supplierProducts.values()) {
+            if (product.getCatalog_Number() == catalogNumber) {
+                return product;
+            }
+    }
+        return null;
+        }
 
 }

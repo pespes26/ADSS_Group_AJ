@@ -44,7 +44,8 @@ public class SupplierMenuHandler {
         int choice = -1;
         while (choice < 1 || choice > 3) {
             System.out.print("Enter your choice (1-3): ");
-            choice = scanner.nextInt();
+
+            choice = Inputs.read_input_for_choice(scanner);
 
             if (choice < 1 || choice > 3) {
                 System.out.println("Invalid choice. Please try again.");
@@ -67,8 +68,8 @@ public class SupplierMenuHandler {
         System.out.println("3. Standing order (Direct debit)");
         System.out.print("Enter your choice (1-3): ");
 
-        int paymentChoice = scanner.nextInt();
-        scanner.nextLine(); // לניקוי תו מעבר שורה אם צריך
+        int paymentChoice = Inputs.read_input_for_choice(scanner);
+         // לניקוי תו מעבר שורה אם צריך
 
         switch (paymentChoice) {
             case 1:

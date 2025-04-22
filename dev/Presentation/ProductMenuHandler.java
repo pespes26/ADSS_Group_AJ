@@ -94,9 +94,8 @@ public class ProductMenuHandler {
     public static void removeProduct(Scanner scanner, Controller controller, int agreementID, int supplierID) {
         Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
         if (catalogNumber != null) {
-            System.out.println("\nRemoving product...");
             controller.delete_by_catalogAndSupplierId(catalogNumber,supplierID, agreementID);
-            System.out.println("Product removed!.");
+            System.out.println("Product removed successfully.\n");
         }
     }
 

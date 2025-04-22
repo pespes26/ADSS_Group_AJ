@@ -1,57 +1,60 @@
 package Presentation;
 
 import Domain.Controller;
+import Domain.Product;
 
 import java.util.Scanner;
 
 public class ProductMenuHandler {
 
-    public static void addNewProduct(Scanner scanner, Controller controller) {
-        System.out.println("\nAdding new product...");
+    public static void addNewProduct(Scanner scanner, Controller controller, int supplierID,int agreementID) {
+        System.out.println("\nLet's add a new product...");
 
 
-        int catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");//input checking
-
-
-        int product_id;
-        while (true){
-            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
-            if(!controller.productExistsByCatalogAndProductId(catalog_Number, product_id)){
-                break;
+//----------בדיקת מספר קטלוגי ייחודי
+        int catalog_Number;
+        while (true) {
+            catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
+            boolean isCatalogUnique = validateUniqueCatalogNumber(controller, catalog_Number, supplierID);
+            if (isCatalogUnique) {
+                break; // המספר הקטלוגי ייחודי → אפשר לצאת מהלולאה
             }
-            System.out.println("This Product ID already exists for the given catalog number. Please try a different one.");
+            // אחרת נחזור לראש הלולאה ונבקש שוב
         }
 
-        double price = Inputs.read_double(scanner, "Enter Product Price: ");
+            int product_id = Inputs.read_int(scanner, "Enter Product ID: ");
+            double price = Inputs.read_double(scanner, "Enter Product Price: ");
 
-        System.out.println("Enter Unit of Measure: ");
-        String unitsOfMeasure = scanner.next();
+            System.out.println("Enter Unit of Measure: ");
+            String unitsOfMeasure = scanner.next();
 
-        controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+            Product product = controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+            controller.addProductToAgreement(product_id, product, agreementID);
 
-        int choice = -1;
-        while (choice != 2) {
-            System.out.println("Do you want to add new discount rule?");
-            System.out.println("1. Yes");
-            System.out.println("2. No");
-            System.out.print("Enter your choice: ");
+            int choice = -1;
+            while (choice != 2) {
+                System.out.println("Do you want to add new discount rule?");
+                System.out.println("1. Yes");
+                System.out.println("2. No");
+                System.out.print("Enter your choice: ");
 
-            choice = Inputs.read_input_for_choice(scanner);
+                choice = Inputs.read_input_for_choice(scanner);
 
-            switch (choice) {
-                case 1:
-                    System.out.println("Use case: Add discount rule to product");
-                    readAndAddDiscountRules(scanner, controller, product_id);
-                    System.out.println("\nProduct added successfully.");
-                    return;
-                case 2:
-                    System.out.println("No discount rules will be added.");
-                    System.out.println("\nProduct added successfully.");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                switch (choice) {
+                    case 1:
+                        System.out.println("Use case: Add discount rule to product");
+                        readAndAddDiscountRules(scanner, controller, product_id);
+                        System.out.println("\nProduct added successfully.");
+                        return;
+                    case 2:
+                        System.out.println("No discount rules will be added.");
+                        System.out.println("\nProduct added successfully.");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
             }
-        }
+
     }
 
     public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber) {
@@ -136,5 +139,24 @@ public class ProductMenuHandler {
         controller.updateProductUnit(catalogNumber, newUnit);
         System.out.println("Product unit updated.");
     }
+
+    public static boolean validateProductExistsByID(Controller controller, int productID) {
+        boolean existsProduct = controller.existsProductWithID(productID);
+        if (!existsProduct) {
+            System.out.println("This product does not exist. Try another one.\n");
+        }
+        return existsProduct;
+    }
+
+    public static boolean validateUniqueCatalogNumber(Controller controller, int catalogNumber, int supplierID) {
+        boolean exists = controller.thereIsProductWithSameCatalogNumber(catalogNumber, supplierID);
+        if (exists) {
+            System.out.println("There is already a product with this catalog number for this supplier. Please try again.\n");
+            return false;
+        }
+        return true;
+    }
+
+
 
 }

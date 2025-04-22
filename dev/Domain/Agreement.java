@@ -152,4 +152,14 @@ public class Agreement {
         return supplierProducts != null && !supplierProducts.isEmpty();  // אם ה-HashMap לא ריק, יש לפחות מוצר אחד
     }
 
+    public boolean hasProductWithCatalogNumber(int catalogNumber) {
+        for (Product product : supplierProducts.values()) {
+            if (product.getCatalog_Number() == catalogNumber) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

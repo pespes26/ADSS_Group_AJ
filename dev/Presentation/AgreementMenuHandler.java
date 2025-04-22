@@ -24,9 +24,8 @@ public class AgreementMenuHandler {
     }
 
     public static void createNewAgreement(Scanner scanner, Controller controller, int supplierID) {
-        System.out.println("Creating new agreement...");
+        System.out.println("Let's create a new agreement...");
 
-        System.out.print("Enter Agreement ID: ");
         int agreementID;
         while (true) {
             agreementID = Inputs.read_int(scanner, "Enter Agreement ID: ");
@@ -46,7 +45,38 @@ public class AgreementMenuHandler {
 
         controller.createAgreement(agreementID, supplierID, deliveryDays, selfPickup);
         System.out.println("Agreement created successfully!.");
+
+        //new:
+
+        System.out.print("Would you like to add products to the agreement? (Y/N): ");
+        String addProductInput = scanner.next();
+
+        if (addProductInput.equalsIgnoreCase("Y")) {
+            addProductsLoop(scanner, controller, supplierID, agreementID);;
+        }
     }
+
+
+    public static void addProductsLoop(Scanner scanner, Controller controller, int supplierID, int agreementID) {
+        String input;
+        boolean firstTime = true;
+
+        do {
+            if (firstTime) {
+                System.out.println("\nLet's add a product to the agreement:");
+                firstTime = false;
+            }
+
+            ProductMenuHandler.addNewProduct(scanner, controller, supplierID, agreementID);
+
+            System.out.print("Would you like to add another product? (Y/N): ");
+            input = scanner.next();
+        } while (input.equalsIgnoreCase("Y"));
+
+        System.out.println("Finished adding products.\n");
+    }
+
+
 
     public static void editSpecificAgreementMenu(Scanner scanner, Controller controller, int supplierID) {
         System.out.println("Let's edit agreement...");
@@ -68,7 +98,7 @@ public class AgreementMenuHandler {
                 switch (choice) {
                     case 1:
                         System.out.println("Adding new product to agreement...");
-                        ProductMenuHandler.addNewProduct(scanner, controller);
+                        ProductMenuHandler.addNewProduct(scanner, controller,supplierID, agreementID);
                         System.out.println("Product added successfully.\n");
                         break;
 
@@ -149,7 +179,6 @@ public class AgreementMenuHandler {
                     createNewAgreement(scanner, controller, supplierID);
                 }
                 case 3 -> {
-                    System.out.println("Editing agreement...");
 //                    Integer agreementID = AgreementMenuHandler.getValidAgreementID(scanner, controller);
                     editSpecificAgreementMenu(scanner, controller, supplierID);
                 }

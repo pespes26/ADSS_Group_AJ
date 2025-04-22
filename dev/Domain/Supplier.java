@@ -39,7 +39,7 @@ public class Supplier {
 
 
     //set agreement//
-    public void setAgreement(Agreement agreement) {//לא נראה לי קריטי
+    public void addNewAgreement(Agreement agreement) {//לא נראה לי קריטי
         if(agreement != null){
             agreements.put(agreement.getAgreementID(), agreement);
         }
@@ -107,6 +107,17 @@ public class Supplier {
             agreements.remove(agreement_ID);
             agreementIDs[i++] = agreement_ID;
         }
+        return agreementIDs;
+    }
+    //==========================new=====================================
+    public int[] getAllAgreementIDs() {
+        int[] agreementIDs = new int[agreements.size()];
+        int i = 0;
+
+        for (Agreement agreement : agreements.values()) {
+            agreementIDs[i++] = agreement.getAgreementID();
+        }
+
         return agreementIDs;
     }
 

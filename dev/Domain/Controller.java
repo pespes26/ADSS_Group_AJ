@@ -74,8 +74,11 @@ public class Controller {
 //===================================AgreementService================================================================\
 
     public void createAgreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup){
-        this.agreementService.createAgreementWithSupplier(agreement_ID, supplier_ID, deliveryDays, selfPickup);
+        Supplier supplier = supplierService.getSupplierById(supplier_ID);
+        Agreement agreement = this.agreementService.createAgreementWithSupplier(agreement_ID, supplier_ID, deliveryDays, selfPickup);
+        supplier.addNewAgreement(agreement);
     }
+
     //--------------------------
     public void deleteAgreement(int agreement_ID) {
         int[] allCatalogNumbers = this.agreementService.deleteAgreementWithSupplier(agreement_ID);
@@ -85,10 +88,9 @@ public class Controller {
     }
     //--------------------------
 
-    public void addProductToAgreement(int agreementID, int catalog_Number, int product_id, double price, String unitsOfMeasure){
+    public void addProductToAgreement(int product_id, Product newProduct, int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
-        if (agreement != null) {
-            Product newProduct = productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure); // Create the product
+        if (agreement != null && newProduct !=null) {
             agreement.addNewSupplierProduct(product_id, newProduct); // Add the product to the agreement
         }
     }
@@ -124,8 +126,8 @@ public class Controller {
 
 
 //===================================ProductService================================================================\
-    public void createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
-        productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
+    public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure){
+        return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure);
     }
 
     public void deleteProductByID(int id){
@@ -220,5 +222,18 @@ public class Controller {
         return false;
     }*/
 
+    public boolean thereIsProductWithSameCatalogNumber(int catalogNumber, int supplierID) {
+        Supplier supplier = getSupplierById(supplierID);
+        if (supplier != null) {
+            int[] allAgreementIDs = supplier.getAllAgreementIDs();
+            for (int agreementID : allAgreementIDs) {
+                Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+                if (agreement != null && agreement.hasProductWithCatalogNumber(catalogNumber)) {
+                    return true; // מצאנו מוצר עם אותו מספר קטלוגי
+                }
+            }
+        }
+        return false; // לא נמצא בשום הסכם של הספק
+    }
 
 }

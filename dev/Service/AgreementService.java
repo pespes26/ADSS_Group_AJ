@@ -29,9 +29,10 @@ public class AgreementService {
      * @param deliveryDays the days of the week when delivery is possible
      * @param selfPickup   whether the supplier uses self-pickup or not
      */
-    public void createAgreementWithSupplier(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup) {
+    public Agreement createAgreementWithSupplier(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup) {
         Agreement agreement = new Agreement(agreement_ID, supplier_ID, deliveryDays, selfPickup); // Create a new agreement object
         this.agreementHashMap.put(agreement_ID, agreement); // Store it in the internal map
+        return agreement;
     }
 
 

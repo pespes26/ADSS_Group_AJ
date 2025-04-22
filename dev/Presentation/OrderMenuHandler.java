@@ -59,7 +59,6 @@ public class OrderMenuHandler {
 
         while (option != 0) {
             System.out.println("\n========== Order Menu ==========");
-            System.out.println("Let's create an order!\n");
             System.out.print("Choose how to proceed:\n");
             System.out.println("1. Add new product to order");
             System.out.println("2. Submit order and return to main menu");
@@ -71,7 +70,10 @@ public class OrderMenuHandler {
             switch (option) {
                 case 1:
                     int productID = Inputs.read_int(scanner, "Enter Product ID: ");
-
+                    boolean existsProduct = ProductMenuHandler.validateProductExistsByID(controller, productID);
+                    if (!existsProduct) {
+                        break;//אם אין מוצר עם ID כזה הלולאה עוצרת
+                    }
                     int quantity = Inputs.read_int(scanner, "Enter quantity: ");
 
                     productsInOrder.put(productID, quantity);
@@ -85,7 +87,7 @@ public class OrderMenuHandler {
                     System.out.println(" Order submitted successfully.");
                     return;
                 case 0:
-                    System.out.println("\nReturn to privies menu");
+                    System.out.println("\nReturning to previous menu...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");

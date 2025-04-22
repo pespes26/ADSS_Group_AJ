@@ -5,6 +5,7 @@ import Service.OrderService;
 import Service.ProductService;
 import Service.SupplierService;
 
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,8 +26,8 @@ public class Controller {
 
 //===================================SupplierService================================================================\
 
-    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentDay){
-        supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentDay);
+    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentCondition){
+        supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentCondition);
     }
     //-------------------------
     public void deleteSupplier(int supplier_ID){
@@ -117,11 +118,10 @@ public class Controller {
         }
     }
 
-    public void toggleSelfPickup(int agreementID){
+    public boolean toggleSelfPickup(int agreementID){
         Agreement agreement  = this.agreementService.getAgreementByID(agreementID);
-        if (agreement != null) {
-            agreement.updateSelfDeliveryOption();
-        }
+            return agreement.updateSelfDeliveryOption();
+
     }
 
 
@@ -176,7 +176,7 @@ public class Controller {
     }
 
 //===================================OrderService================================================================\
-    public void createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder){
+    public void createOrder(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
         orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
     }
     //--------------------------
@@ -200,6 +200,15 @@ public class Controller {
     }
 
     //-------------------------
+    public String getFormattedOrderDate(int orderID){
+        Order order = orderService.searchOrderById(orderID);
+        return order.getFormattedOrderDate();
+    }
+
+    public int getPhoneNumber(int orderID){
+        Order order = orderService.searchOrderById(orderID);
+        return order.getPhoneNumber();
+    }
    /* public boolean canCreateOrder() {
         // בדיקה אם יש ספקים במערכת
         if (!hasSuppliers()) {

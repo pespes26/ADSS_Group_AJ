@@ -15,22 +15,74 @@ public class SupplierMenuHandler {
 
         int bankAccount = Inputs.read_int(scanner, "Enter Bank Account: ");
 
-        System.out.print("Enter Payment Method: ");
-        String paymentMethod = scanner.next();
+        //===============================
+        String paymentMethod = getPaymentMethod(scanner);
+        //===============================
 
         int phoneNumber = Inputs.read_int(scanner, "Enter Phone Number: ");
 
         System.out.print("Enter Email: ");
         String email = scanner.next();
 
-        System.out.print("Enter Payment Day: ");
-        String paymentDay = scanner.next();
+        //===============================
+        String paymentCondition = getPaymentCondition(scanner);
+        //===============================
 
-        controller.createSupplier(supplierName, supplierID, companyID, bankAccount, paymentMethod, phoneNumber, email, paymentDay);
+        controller.createSupplier(supplierName, supplierID, companyID, bankAccount, paymentMethod, phoneNumber, email, paymentCondition);
 
         System.out.println("Supplier created successfully!");
         return supplierID;
     }
+
+
+    public static String getPaymentMethod(Scanner scanner) {
+        System.out.println("Select payment method:");
+        System.out.println("1. Check");
+        System.out.println("2. Cash");
+        System.out.println("3. Bank Transfer");
+
+        int choice = -1;
+        while (choice < 1 || choice > 3) {
+            System.out.print("Enter your choice (1-3): ");
+            choice = scanner.nextInt();
+
+            if (choice < 1 || choice > 3) {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        switch (choice) {
+            case 1: return "Check";
+            case 2: return "Cash";
+            case 3: return "Bank Transfer";
+            default: return "Unknown"; // זה לא אמור לקרות בגלל הלולאה
+        }
+    }
+
+
+    public static String getPaymentCondition(Scanner scanner) {
+        System.out.println("Select payment condition:");
+        System.out.println("1. Prepaid");
+        System.out.println("2. Pay at delivery");
+        System.out.println("3. Standing order (Direct debit)");
+        System.out.print("Enter your choice (1-3): ");
+
+        int paymentChoice = scanner.nextInt();
+        scanner.nextLine(); // לניקוי תו מעבר שורה אם צריך
+
+        switch (paymentChoice) {
+            case 1:
+                return "Prepaid";
+            case 2:
+                return "Pay at delivery";
+            case 3:
+                return "Standing order";
+            default:
+                System.out.println("Invalid choice. Defaulting to 'Unknown'.");
+                return "Unknown";
+        }
+    }
+
 
     public static Integer getValidSupplierID(Scanner scanner, Controller controller) {
 

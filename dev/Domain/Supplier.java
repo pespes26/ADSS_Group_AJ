@@ -9,7 +9,7 @@ public class Supplier {
     int company_id;
     int bankAccount;
     String paymentMethod;
-    String paymentDay;
+    String paymentCondition;
     int phoneNumber;
     String email;
 
@@ -25,7 +25,7 @@ public class Supplier {
 //        this.agreements = (agreements != null) ? agreements : new HashMap<>(); //if (agreements != null)  -> do agreements
 //    }
 
-    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentDay){
+    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentCondition){
         this.supplierName = supplierName;
         this.supplier_id = supplier_id;
         this.company_id = company_id;
@@ -33,7 +33,7 @@ public class Supplier {
         this.paymentMethod = paymentMethod;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.paymentDay = paymentDay;
+        this.paymentCondition = paymentCondition;
         this.agreements = new HashMap<>();
     }
 
@@ -45,11 +45,11 @@ public class Supplier {
         }
     }
 
-    public String getPaymentDay(){return paymentDay;}
+    public String getPaymentCondition(){return paymentCondition;}
 
 
-    public void setPaymentDay(String paymentDay) {//אולי יש שכפול עם הסכם בנושא הזה
-        this.paymentDay = paymentDay;
+    public void setPaymentCondition(String paymentCondition) {//אולי יש שכפול עם הסכם בנושא הזה
+        this.paymentCondition = paymentCondition;
     }
 
     public void setEmail(String email) {//קריטי?

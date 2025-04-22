@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.time.LocalDateTime;           // נוסיף בתחילת הקובץ
+import java.time.format.DateTimeFormatter;
 
 public class OrderMenuHandler {
     public static void createOrder(Scanner scanner, Controller controller) {
@@ -42,15 +44,13 @@ public class OrderMenuHandler {
         //////////////////////////////
         //maybe change it to local time// ask Maor
         ///////////////////////////////
-        System.out.println("Order date: day, month, year\n");
-        System.out.print("Enter order day (as number): ");
-        int day = scanner.nextInt();
-        System.out.print("Enter month: ");
-        int month = scanner.nextInt();
-        System.out.print("Enter year: ");
-        int year = scanner.nextInt();
 
-        Date orderDate = new Date(year - 1900, month - 1, day); // יצירת תאריך (הערה: deprecated, לשימוש בסיסי)
+
+
+        // === שימוש בזמן נוכחי של המחשב ===
+        LocalDateTime orderDate = LocalDateTime.now();  // תאריך+שעה נוכחיים
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        System.out.println("Order date is set to: " + orderDate.format(formatter)); // הודעה למשתמש
 
 
         Map<Integer, Integer> productsInOrder = new HashMap<>();
@@ -123,26 +123,49 @@ public class OrderMenuHandler {
     }
 
 
-    public static void printProductsInOrder1(Controller controller, int orderID) {
-        Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
+//    public static void printProductsInOrder1(Controller controller, int orderID) {
+//        Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
+//
+//        if (productsInOrder == null || productsInOrder.isEmpty()) { //if not have orders
+//            System.out.println("No products in this order.");
+//            return;
+//        }
+//
+//        System.out.println("\n Products in order:");
+//        System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
+//        System.out.println("---------------------------");
+//
+//
+//        for (Map.Entry<Integer, Integer> entry : productsInOrder.entrySet()) {
+//            int productID = entry.getKey();        // מזהה המוצר
+//            int amount = entry.getValue();         // כמות שהוזמנה
+//
+//            System.out.printf("%-12d %-10d%n", productID, amount);
+//        }
+//    }
 
-        if (productsInOrder == null || productsInOrder.isEmpty()) { //if not have orders
+    public static void printOrderSummaryFromController(Controller controller, int orderID) {
+
+        Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
+        if (productsInOrder == null || productsInOrder.isEmpty()) {
             System.out.println("No products in this order.");
             return;
         }
 
-        System.out.println("\n Products in order:");
-        System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
-        System.out.println("---------------------------");
+        System.out.println("\n========== Order Summary ==========");
+        System.out.println("Order ID      : " + orderID);
+        System.out.println("Phone Number  : " + controller.getPhoneNumber(orderID));
+        System.out.println("Order Date    : " + controller.getFormattedOrderDate(orderID));
 
+        System.out.println("\nOrdered Products:");
+        System.out.printf("%-15s %-10s%n", "Product ID", "Quantity");
+        System.out.println("------------------------------");
 
         for (Map.Entry<Integer, Integer> entry : productsInOrder.entrySet()) {
-            int productID = entry.getKey();        // מזהה המוצר
-            int amount = entry.getValue();         // כמות שהוזמנה
-
-            System.out.printf("%-12d %-10d%n", productID, amount);
+            System.out.printf("%-15d %-10d%n", entry.getKey(), entry.getValue());
         }
     }
+
 
     public static void SearchPastOrder(Scanner scanner,Controller controller){
         int orderID = Inputs.read_int(scanner, "Enter Order ID: ");
@@ -153,7 +176,7 @@ public class OrderMenuHandler {
         else {
             System.out.println("There is such order.");
         }
-        printProductsInOrder1(controller,orderID);//מדפיסה את המוצרים שהיו בהזמנה עם הכמות והמחיר
+        printOrderSummaryFromController(controller,orderID);//מדפיסה את המוצרים שהיו בהזמנה עם הכמות והמחיר
     }
 
 

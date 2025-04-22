@@ -10,6 +10,7 @@ package Service;
 import Domain.Order;
 import Domain.Product;
 
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class OrderService {
 //        this.orderHashMap.put(orderID, order); // Add the order to the internal order list, using its ID as the key
 //    }
 
-    public void createOrder(int orderID, int phoneNumber, Date orderDate, Map<Integer, Integer> productsInOrder) {
+    public void createOrder(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
         Order order = new Order(orderID, phoneNumber, orderDate, productsInOrder); // Create a new Order object using all collected data
         this.orderHashMap.put(orderID, order); // Add the order to the internal order list, using its ID as the key
     }

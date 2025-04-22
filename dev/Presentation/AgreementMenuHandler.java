@@ -1,5 +1,8 @@
 package Presentation;
 import Domain.Controller;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class AgreementMenuHandler {
@@ -36,8 +39,10 @@ public class AgreementMenuHandler {
         }
         scanner.nextLine(); // קולט את ה־\n שנשאר אחרי nextInt()
 
-        System.out.print("Enter Delivery Days (comma separated, e.g. Mon,Wed,Fri): ");
-        String[] deliveryDays = scanner.nextLine().split(",");
+        //============================================
+        String[] deliveryDays = getDeliveryDays(scanner);
+        //============================================
+
 
         System.out.print("Self Pickup? (Y/N): ");
         String selfPickupInput = scanner.next();
@@ -54,6 +59,33 @@ public class AgreementMenuHandler {
         if (addProductInput.equalsIgnoreCase("Y")) {
             addProductsLoop(scanner, controller, supplierID, agreementID);;
         }
+    }
+
+    public static String[] getDeliveryDays(Scanner scanner) {
+        String[] weekDays = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        List<String> selectedDays = new ArrayList<>();
+
+        System.out.println("Select delivery days (enter numbers separated by space, then press ENTER):");
+        for (int i = 0; i < weekDays.length; i++) {
+            System.out.printf("%d. %s%n", i + 1, weekDays[i]);
+        }
+        System.out.print("Your choices (e.g., 1 3 5): ");
+
+        scanner.nextLine(); // ניקוי התו שנותר מהקלט הקודם
+        String input = scanner.nextLine();
+        String[] parts = input.trim().split("\\s+");
+
+        for (String part : parts) {
+            try {
+                int index = Integer.parseInt(part) - 1;
+                if (index >= 0 && index < weekDays.length) {
+                    selectedDays.add(weekDays[index]);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input skipped: " + part);
+            }
+        }
+        return selectedDays.toArray(new String[0]);
     }
 
 
@@ -122,8 +154,8 @@ public class AgreementMenuHandler {
 
                     case 5:
                         System.out.println("Toggling self-pickup status...");
-                        controller.toggleSelfPickup(agreementID);
-                        System.out.println("Self-pickup status changed.\n");
+                        toggleSelfPickup(scanner, controller);
+//                        System.out.println("Self-pickup status changed.\n");
                         break;
 
                     case 0:
@@ -139,20 +171,23 @@ public class AgreementMenuHandler {
         }
     }
     public static void editDeliveryDays(Scanner scanner, Controller controller) {
-        Integer agreementID =  getValidAgreementID(scanner, controller);
+        Integer agreementID = getValidAgreementID(scanner, controller);
         if (agreementID != null) {
-            System.out.print("Enter new delivery days (comma separated, e.g., Mon,Wed,Fri): ");
-            String[] newDays = scanner.nextLine().split(",");
+            String[] newDays = getDeliveryDays(scanner); // שימוש בפונקציה האינטראקטיבית
             controller.updateDeliveryDays(agreementID, newDays);
-            System.out.println("Delivery days updated.");
+            System.out.println("Delivery days updated to: " + String.join(", ", newDays));
         }
     }
 
+
     public static void toggleSelfPickup(Scanner scanner, Controller controller) {
-        Integer agreementID =  getValidAgreementID(scanner, controller);
-        controller.toggleSelfPickup(agreementID);
-        System.out.println("Self-pickup status toggled.");
+        Integer agreementID = getValidAgreementID(scanner, controller);
+        if (agreementID != null) {
+            boolean newStatus = controller.toggleSelfPickup(agreementID);
+            System.out.println("Self-pickup status updated. New status: " + (newStatus ? "Enabled" : "Disabled\n"));
+        }
     }
+
 
 
 

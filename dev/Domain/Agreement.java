@@ -99,8 +99,10 @@ public class Agreement {
     /**
      * Toggles the self-pickup option.
      */
-    public void updateSelfDeliveryOption() {
+    public boolean updateSelfDeliveryOption() {
         this.selfPickup = !this.selfPickup; // Flip the boolean flag
+        boolean res = this.selfPickup;
+        return res;
     }
 
     /**

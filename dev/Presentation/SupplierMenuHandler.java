@@ -94,7 +94,7 @@ public class SupplierMenuHandler {
             return null; // מייצג כישלון
         }
 
-        System.out.println("Supplier found.");
+//        System.out.println("Supplier found.");
         return supplierID; // מייצג הצלחה
     }
 

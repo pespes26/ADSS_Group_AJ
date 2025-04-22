@@ -60,6 +60,7 @@ public class AgreementService {
         if (agreement != null) {
             return agreement.removeAllProductsFromAgreement();
         }
+        agreementHashMap.remove(agreement_ID);
         return new int[0]; // במקום null
     }
 

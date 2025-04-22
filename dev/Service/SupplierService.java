@@ -65,11 +65,12 @@ public class SupplierService {
 
 
     public int[] deleteAllAgreementFromSupplier(int supplier_ID) {
-        Supplier supplier = supplierList.get(supplier_ID);
-        if (supplier != null) {
-            int[] agreementIDS = supplier.removeAllAgreementFromSupplier();
-            return agreementIDS;
+        for (Supplier supplier : supplierList) {
+            if (supplier.getSupplier_id() == supplier_ID) {
+                return supplier.removeAllAgreementFromSupplier();
+            }
         }
-        return new int[0];
+        return new int[0]; // אם לא נמצא ספק עם ה-ID הנתון
     }
+
 }

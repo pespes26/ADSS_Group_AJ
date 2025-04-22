@@ -99,6 +99,7 @@ public class ProductMenuHandler {
         }
     }
 
+
     public static void editProductTerms(Scanner scanner, Controller controller, Integer agreementID) {
         System.out.println("\nEdit Product Supply Terms:");
 

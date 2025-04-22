@@ -71,6 +71,10 @@ public class ProductService {
         }
     }
 
+    public boolean existsZeroProducts() {
+        return productList.isEmpty();
+    }
+
 
     public Product searchProduct_by_catalog(int catalog){
         for(Product product : productList){ //check product in product_list

@@ -25,6 +25,11 @@ public class OrderService {
     public OrderService() {
         orderHashMap = new HashMap<>(); // Initializes the order map
     }
+
+    public boolean existsZeroOrders() {
+        return orderHashMap.isEmpty();
+    }
+
 //
 //    /**
 //     * Creates a new order and adds it to the order list.

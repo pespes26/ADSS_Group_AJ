@@ -151,7 +151,8 @@ public class SupplierMenuHandler {
                         break;
                     case 2:
                         DeleteSupplier(scanner, controller);
-                        break;
+                        System.out.println("Supplier deleted.");
+                        return;
                     case 0:
                         System.out.println("Return to Main Menu. ");
                         break;

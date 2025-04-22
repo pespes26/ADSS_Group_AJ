@@ -155,6 +155,10 @@ public class Controller {
         productService.delete_by_id(id);
     }
 
+    public boolean existsZeroProducts(){
+        return productService.existsZeroProducts();
+    }
+
     public void deleteProductByCatalog(int catalog_Number, int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
         if (agreement != null) {
@@ -273,6 +277,10 @@ public class Controller {
         System.out.println("Cannot create order - no agreements or products available.");
         return false;
     }*/
+
+    public boolean existsZeroOrders(){
+        return orderService.existsZeroOrders();
+    }
 
     public boolean thereIsProductWithSameCatalogNumber(int catalogNumber, int supplierID) {
         Supplier supplier = getSupplierById(supplierID);

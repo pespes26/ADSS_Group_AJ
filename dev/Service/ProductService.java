@@ -32,14 +32,14 @@ public class ProductService {
     }
 
     //new - get catalog_number and product_id
-    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
-        for (Product product : productList) {
-            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
+//        for (Product product : productList) {
+//            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
 
 
@@ -49,11 +49,11 @@ public class ProductService {
         return product;
         }
 
-    public void delete_by_id(int id) {
-        if (existsProductWithID(id)) {
-            productList.remove(searchProduct_by_id(id));
-        }
-    }
+//    public void delete_by_id(int id) {
+//        if (existsProductWithID(id)) {
+//            productList.remove(searchProduct_by_id(id));
+//        }
+//    }
 
     public void delete_by_catalog(int catalog) {
         if(productExistsByCatalog(catalog)) {

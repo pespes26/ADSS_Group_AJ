@@ -57,16 +57,23 @@ public class AgreementService {
 
     public int[] deleteAgreementWithSupplier(int agreement_ID) {
         Agreement agreement = getAgreementByID(agreement_ID);
-        if (agreement != null) {
-            return agreement.removeAllProductsFromAgreement();
+        if (agreement == null) {
+            return new int[0];
         }
-        agreementHashMap.remove(agreement_ID);
-        return new int[0]; // במקום null
+
+        int[] catalogNumbers = new int[0];
+
+        if (agreement.hasProducts()) {
+            catalogNumbers = agreement.removeAllProductsFromAgreement();
+        }
+
+        agreementHashMap.remove(agreement_ID); // הסכם תמיד נמחק
+        return catalogNumbers;
     }
 
-    // מתודה בודקת אם בהסכם יש מוצרים
-    public boolean hasProducts(Agreement agreement) {
-        return agreement.hasProducts();  // בודק אם ההסכם מכיל מוצרים
-    }
 
+//    // מתודה בודקת אם בהסכם יש מוצרים
+//    public boolean hasProducts(Agreement agreement) {
+//        return agreement.hasProducts();  // בודק אם ההסכם מכיל מוצרים
+//    }
 }

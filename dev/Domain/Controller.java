@@ -84,9 +84,9 @@ public class Controller {
 
 
     //--------------------------
-    public boolean hasSuppliers() {//use for order (check if possible to make order)
-        return supplierService.hasSuppliers();
-    }
+//    public boolean hasSuppliers() {//use for order (check if possible to make order)
+//        return supplierService.hasSuppliers();
+//    }
 
 
 //===================================AgreementService================================================================\
@@ -151,9 +151,9 @@ public class Controller {
         return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
     }
 
-    public void deleteProductByID(int id){
-        productService.delete_by_id(id);
-    }
+//    public void deleteProductByID(int id){
+//        productService.delete_by_id(id);
+//    }
 
     public boolean existsZeroProducts(){
         return productService.existsZeroProducts();
@@ -176,13 +176,13 @@ public class Controller {
 
     }
 
-    public Product getProductByID(int id){
-        return this.productService.searchProduct_by_id(id);
-    }
+//    public Product getProductByID(int id){
+//        return this.productService.searchProduct_by_id(id);
+//    }
 
-    public Product getProductByCatalog(int catalog){
-        return this.productService.searchProduct_by_catalog(catalog);
-    }
+//    public Product getProductByCatalog(int catalog){
+//        return this.productService.searchProduct_by_catalog(catalog);
+//    }
 
     public void add_discountRule(int catalog, double discount, int amount,int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -202,10 +202,10 @@ public class Controller {
         return productService.productExistsByCatalog(catalog);
     }
 
-    /////new function
-    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
-        return productService.productExistsByCatalogAndProductId(catalog, productId);
-    }
+
+//    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
+//        return productService.productExistsByCatalogAndProductId(catalog, productId);
+//    }
 
     public void updateProductPrice(int catalog, double newPrice, Integer agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -256,31 +256,11 @@ public class Controller {
         Order order = orderService.searchOrderById(orderID);
         return order.getPhoneNumber();
     }
-   /* public boolean canCreateOrder() {
-        // בדיקה אם יש ספקים במערכת
-        if (!hasSuppliers()) {
-            System.out.println("No suppliers in the system.");
-            return false;
-        }
 
-        // בדיקה אם יש לפחות ספק עם הסכמים ועם מוצרים בתוכם
-        for (Supplier supplier : supplierService.getAllSuppliers()) {
-            if (supplier.hasAgreements()) {
-                for (Agreement agreement : supplier.getAgreements().values()) {
-                    if (agreement.hasProducts()) {
-                        return true; // אם יש לפחות הסכם עם מוצר, אפשר לבצע הזמנה
-                    }
-                }
-            }
-        }
 
-        System.out.println("Cannot create order - no agreements or products available.");
-        return false;
-    }*/
-
-    public boolean existsZeroOrders(){
-        return orderService.existsZeroOrders();
-    }
+//    public boolean existsZeroOrders(){
+//        return orderService.existsZeroOrders();
+//    }
 
     public boolean thereIsProductWithSameCatalogNumber(int catalogNumber, int supplierID) {
         Supplier supplier = getSupplierById(supplierID);

@@ -9,10 +9,10 @@ public class Discount {
 
 
     // Constructor for creating a new discount
-    public Discount(double discountRate, LocalDate startDate, LocalDate endDate ) {
-        this.setDiscountRate(discountRate);
-        this.setStartDate(startDate);
-        this.setEndDate(endDate);
+    public Discount(double discount_rate, LocalDate start_date, LocalDate end_date) {
+        this.setDiscountRate(discount_rate);
+        this.setStartDate(start_date);
+        this.setEndDate(end_date);
     }
 
 
@@ -23,12 +23,12 @@ public class Discount {
         return discount_rate;
     }
 
-    public void setDiscountRate(double discountRate) {
-        if (discountRate < 0 || discountRate > 100) {
+    public void setDiscountRate(double discount_rate) {
+        if (discount_rate < 0 || discount_rate > 100) {
             System.out.println("Discount rate must be between 0 and 100");
             return;
         }
-        this.discount_rate = discountRate;
+        this.discount_rate = discount_rate;
     }
 
     public LocalDate getStartDate() {
@@ -77,9 +77,9 @@ public class Discount {
     @Override
     public String toString() {
         return "Discount{" +
-                "discountRate=" + discount_rate +
-                "%, startDate=" + start_date +
-                ", endDate=" + end_date +
+                "discount_rate=" + discount_rate +
+                "%, start_date=" + start_date +
+                ", end_date=" + end_date +
                 '}';
     }
 }

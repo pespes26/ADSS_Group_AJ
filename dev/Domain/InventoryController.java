@@ -1,6 +1,5 @@
-package Service;
+package Domain;
 
-import Domain.*;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -8,27 +7,26 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class InventoryServiceFacade {
-    private final ItemController itemController;
-    private final ProductController productController;
-    private final DiscountController discountController;
-    private final ReportController reportController;
+public class InventoryController {
+    private final ItemController item_controller;
+    private final ProductController product_controller;
+    private final DiscountController discount_controller;
+    private final ReportController report_controller;
 
     private final HashMap<Integer, Item> items;
     private final HashMap<Integer, Product> products;
-    private final HashMap<Integer, Item> purchased_items;
     private final HashMap<String, HashMap<String, HashMap<String, HashMap<String, Integer>>>> products_amount_map_by_category;
 
-    public InventoryServiceFacade() {
+    public InventoryController() {
         this.items = new HashMap<>();
         this.products = new HashMap<>();
-        this.purchased_items = new HashMap<>();
+        HashMap<Integer, Item> purchased_items = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
 
-        this.itemController = new ItemController(items, products, purchased_items);
-        this.productController = new ProductController(products, purchased_items);
-        this.discountController = new DiscountController(products);
-        this.reportController = new ReportController(items, products);
+        this.item_controller = new ItemController(items, products, purchased_items);
+        this.product_controller = new ProductController(products, purchased_items);
+        this.discount_controller = new DiscountController(products);
+        this.report_controller = new ReportController(items, products);
     }
 
     public void importData(String path) {
@@ -48,15 +46,15 @@ public class InventoryServiceFacade {
                 item.setStorageLocation(productFieldsFromCSV[3]);
                 item.setSectionInStore(productFieldsFromCSV[4]);
                 item.setItemSize(Integer.parseInt(productFieldsFromCSV[8]));
-                item.setCatalogNumber(Integer.parseInt(productFieldsFromCSV[5]));
+                item.setCatalog_number(Integer.parseInt(productFieldsFromCSV[5]));
                 item.setDefect(false);
 
                 items.put(item.getItemId(), item);
 
-                int catalogNumber = Integer.parseInt(productFieldsFromCSV[5]);
-                if (!products.containsKey(catalogNumber)) {
+                int catalog_number = Integer.parseInt(productFieldsFromCSV[5]);
+                if (!products.containsKey(catalog_number)) {
                     Product product = buildProductFromCSV(productFieldsFromCSV);
-                    products.put(catalogNumber, product);
+                    products.put(catalog_number, product);
                 }
 
                 String category = productFieldsFromCSV[6];
@@ -129,18 +127,18 @@ public class InventoryServiceFacade {
     }
 
     public ItemController getItemController() {
-        return itemController;
+        return item_controller;
     }
 
     public ProductController getProductController() {
-        return productController;
+        return product_controller;
     }
 
     public DiscountController getDiscountController() {
-        return discountController;
+        return discount_controller;
     }
 
     public ReportController getReportController() {
-        return reportController;
+        return report_controller;
     }
 }

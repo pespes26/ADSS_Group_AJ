@@ -1,6 +1,7 @@
 package Presentation;
 
-import Service.InventoryServiceFacade;
+import Domain.InventoryController;
+import Init.SystemInitializer;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -9,12 +10,9 @@ import java.util.Map;
 
 public class Menu {
     public static void main(String[] args) {
-
-        InventoryServiceFacade inventoryServiceFacade = new InventoryServiceFacade();
         String path = getPathFromConfig();
-        inventoryServiceFacade.importData(path);
-
-        MenuController menuController = new MenuController(inventoryServiceFacade);
+        InventoryController inventoryController = SystemInitializer.initializeSystem(path);
+        MenuController menuController = new MenuController(inventoryController);
         menuController.runMenu();
     }
 
@@ -24,8 +22,8 @@ public class Menu {
             Map<String, Object> config = yaml.load(inputStream);
             return (String) config.get("path");
         } catch (Exception e) {
-            System.out.println("Error loading path from config.yaml: " + e.getMessage());
+            System.out.println("Error loading path: " + e.getMessage());
+            return "";
         }
-        return "";
     }
 }

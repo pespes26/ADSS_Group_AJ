@@ -1,7 +1,4 @@
-package Service;
-
-import Domain.Item;
-import Domain.Product;
+package Domain;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,8 +24,8 @@ public class ReportController {
         boolean hasDefects = false;
 
         for (Item item : items.values()) {
-            if (item.isDefect()) {
-                Product product = products.get(item.getCatalogNumber());
+            if (item.is_defect()) {
+                Product product = products.get(item.getCatalog_number());
                 if (product != null) {
                     hasDefects = true;
                     report.append(counter++).append(". Item ID: ").append(item.getItemId())
@@ -72,7 +69,7 @@ public class ReportController {
         } else {
             counter = 1;
             for (Item item : expiredItems) {
-                Product product = products.get(item.getCatalogNumber());
+                Product product = products.get(item.getCatalog_number());
                 if (product != null) {
                     report.append(counter++).append(". Item ID: ").append(item.getItemId())
                             .append(", Name: ").append(product.getProductName())
@@ -100,7 +97,7 @@ public class ReportController {
             Map<String, Map<Integer, List<Item>>> subcategoryMap = new TreeMap<>();
 
             for (Item item : items.values()) {
-                Product product = products.get(item.getCatalogNumber());
+                Product product = products.get(item.getCatalog_number());
                 if (product != null && product.getCategory().equalsIgnoreCase(categoryName)) {
                     String subCategory = product.getSubCategory();
                     int size = item.getItemSize();
@@ -138,7 +135,7 @@ public class ReportController {
 
                         int count = 1;
                         for (Item item : sortedItems) {
-                            Product product = products.get(item.getCatalogNumber());
+                            Product product = products.get(item.getCatalog_number());
                             if (product != null) {
                                 report.append("      ").append(count++).append(". ")
                                         .append("Item ID: ").append(item.getItemId())
@@ -168,7 +165,7 @@ public class ReportController {
 
         Map<Integer, Integer> stockCountMap = new HashMap<>();
         for (Item item : items.values()) {
-            int catalogNumber = item.getCatalogNumber();
+            int catalogNumber = item.getCatalog_number();
             stockCountMap.put(catalogNumber, stockCountMap.getOrDefault(catalogNumber, 0) + 1);
         }
 

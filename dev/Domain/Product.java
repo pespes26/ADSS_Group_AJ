@@ -4,7 +4,7 @@ package Domain;
 public class Product {
 
 
-    private int product_catalog_number;
+    private int catalog_number;
 
     private String product_name;
 
@@ -42,11 +42,11 @@ public class Product {
 
 
     public int getCatalogNumber() {
-        return product_catalog_number;
+        return catalog_number;
     }
 
-    public void setCatalogNumber(int product_catalog_number) {
-        this.product_catalog_number = product_catalog_number;
+    public void setCatalogNumber(int catalog_number) {
+        this.catalog_number = catalog_number;
     }
 
     /**

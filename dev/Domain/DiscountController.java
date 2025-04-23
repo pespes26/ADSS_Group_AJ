@@ -1,7 +1,4 @@
-package Service;
-
-import Domain.Discount;
-import Domain.Product;
+package Domain;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -38,7 +35,6 @@ public class DiscountController {
     }
 
     private boolean applyDiscountToGroup(Discount discount, String category, String subCategory, int catalogNumber, DiscountType type) {
-
         LocalDate today = LocalDate.now();
         if (discount.getStartDate() == null || discount.getEndDate() == null || discount.getEndDate().isBefore(discount.getStartDate())) {
             return false;

@@ -1,7 +1,4 @@
-package Service;
-
-import Domain.Item;
-import Domain.Product;
+package Domain;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -9,12 +6,12 @@ import java.util.*;
 public class ItemController {
     private final HashMap<Integer, Item> items;
     private final HashMap<Integer, Product> products;
-    private final HashMap<Integer, Item> purchasedItems;
+    private final HashMap<Integer, Item> purchased_items;
 
-    public ItemController(HashMap<Integer, Item> items, HashMap<Integer, Product> products, HashMap<Integer, Item> purchasedItems) {
+    public ItemController(HashMap<Integer, Item> items, HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
         this.items = items;
         this.products = products;
-        this.purchasedItems = purchasedItems;
+        this.purchased_items = purchased_items;
     }
 
     public boolean addItem(String csvInput) {
@@ -25,7 +22,7 @@ public class ItemController {
             String expiringDate = fields[2];
             String location = fields[3];
             String section = fields[4];
-            int catalogNumber = Integer.parseInt(fields[5]);
+            int catalog_number = Integer.parseInt(fields[5]);
             String category = fields[6];
             String subCategory = fields[7];
             int size = Integer.parseInt(fields[8]);
@@ -42,13 +39,13 @@ public class ItemController {
             item.setStorageLocation(location);
             item.setSectionInStore(section);
             item.setItemSize(size);
-            item.setCatalogNumber(catalogNumber);
+            item.setCatalog_number(catalog_number);
             item.setDefect(false);
             items.put(itemId, item);
 
-            if (!products.containsKey(catalogNumber)) {
+            if (!products.containsKey(catalog_number)) {
                 Product product = new Product();
-                product.setCatalogNumber(catalogNumber);
+                product.setCatalogNumber(catalog_number);
                 product.setProductName(productName);
                 product.setCategory(category);
                 product.setSubCategory(subCategory);
@@ -70,7 +67,7 @@ public class ItemController {
                 product.setQuantityInWarehouse(0);
                 product.setQuantityInStore(0);
 
-                products.put(catalogNumber, product);
+                products.put(catalog_number, product);
             }
 
             return true;
@@ -86,7 +83,7 @@ public class ItemController {
     public void removeItemByPurchase(int itemId) {
         Item item = items.remove(itemId);
         if (item != null) {
-            purchasedItems.put(itemId, item);
+            purchased_items.put(itemId, item);
         }
     }
 
@@ -94,7 +91,7 @@ public class ItemController {
         Item item = items.get(itemId);
         if (item == null) return 0.0;
 
-        Product product = products.get(item.getCatalogNumber());
+        Product product = products.get(item.getCatalog_number());
         if (product == null) return 0.0;
 
         return product.getSalePriceAfterStoreDiscount();
@@ -117,14 +114,14 @@ public class ItemController {
         Item item = items.get(itemId);
         if (item == null) return false;
 
-        int catalogNumber = item.getCatalogNumber();
+        int catalogNumber = item.getCatalog_number();
         Product product = products.get(catalogNumber);
         if (product == null) return false;
 
         int minRequired = (int) (0.5 * product.getProductDemandLevel() + 0.5 * product.getSupplyTime());
 
         long count = items.values().stream()
-                .filter(i -> i.getCatalogNumber() == catalogNumber && !i.isDefect())
+                .filter(i -> i.getCatalog_number() == catalogNumber && !i.is_defect())
                 .count();
 
         return count < minRequired;
@@ -133,7 +130,7 @@ public class ItemController {
     public String getItemName(int itemId) {
         Item item = items.get(itemId);
         if (item == null) return "";
-        Product product = products.get(item.getCatalogNumber());
+        Product product = products.get(item.getCatalog_number());
         return product != null ? product.getProductName() : "";
     }
 
@@ -148,49 +145,6 @@ public class ItemController {
     }
 
 
-    public String showCurrentAmountPerLocationByCatalogNumber(int catalogNumber) {
-        Product product = products.get(catalogNumber);
-        if (product == null) {
-            return "Invalid Product Catalog Number: " + catalogNumber + ". This Product Catalog Number does not exist in the inventory.";
-        }
-
-        int warehouseQuantity = product.getQuantityInWarehouse();
-        int storeQuantity = product.getQuantityInStore();
-
-        if (warehouseQuantity == 0 && storeQuantity == 0) {
-            return "No items found for Product Catalog Number: " + catalogNumber;
-        }
-
-        return "Product Catalog Number: " + catalogNumber + "\n"
-                + "Warehouse quantity: " + warehouseQuantity + "\n"
-                + "Store quantity: " + storeQuantity;
-    }
-
-    public String getPurchasePricesByCatalogNumber(int catalogNumber) {
-        List<Double> prices = new ArrayList<>();
-        for (Item item : purchasedItems.values()) {
-            if (item.getCatalogNumber() == catalogNumber) {
-                Product product = products.get(catalogNumber);
-                if (product != null) {
-                    double price = product.getSalePriceAfterStoreDiscount();
-                    if (price >= 0) {
-                        prices.add(price);
-                    }
-                }
-            }
-        }
-
-        if (prices.isEmpty()) {
-            return "No purchased items found with Product Catalog Number: " + catalogNumber;
-        }
-
-        StringBuilder result = new StringBuilder("Sale prices for Product Catalog Number " + catalogNumber + ":\n");
-        for (int i = 0; i < prices.size(); i++) {
-            result.append((i + 1)).append(". ").append(prices.get(i)).append("\n");
-        }
-
-        return result.toString();
-    }
 
     public String showItemDetails(int itemId) {
         Item item = items.get(itemId);
@@ -198,9 +152,9 @@ public class ItemController {
             return "Item with ID " + itemId + " not found in stock.";
         }
 
-        Product product = products.get(item.getCatalogNumber());
+        Product product = products.get(item.getCatalog_number());
         if (product == null) {
-            return "Product with Product Catalog Number " + item.getCatalogNumber() + " not found.";
+            return "Product with Product Catalog Number " + item.getCatalog_number() + " not found.";
         }
 
         DecimalFormat df = new DecimalFormat("#.00");
@@ -221,8 +175,7 @@ public class ItemController {
                 + "Product demand: " + product.getProductDemandLevel() + "\n"
                 + "Supply time: " + product.getSupplyTime() + " days\n"
                 + "Manufacturer: " + product.getManufacturer() + "\n"
-                + "Defective: " + (item.isDefect() ? "Yes" : "No") + "\n";
+                + "Defective: " + (item.is_defect() ? "Yes" : "No") + "\n";
     }
-
 
 }

@@ -1,26 +1,22 @@
-package Service;
-
-import Domain.Item;
-import Domain.Product;
+package Domain;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ProductController {
     private final HashMap<Integer, Product> products;
-    private final HashMap<Integer, Item> purchasedItems;
+    private final HashMap<Integer, Item> purchased_items;
 
-    public ProductController(HashMap<Integer, Product> products, HashMap<Integer, Item> purchasedItems) {
+    public ProductController(HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
         this.products = products;
-        this.purchasedItems = purchasedItems;
+        this.purchased_items = purchased_items;
     }
 
-    public boolean updateCostPriceByCatalogNumber(int catalogNumber, double newPrice) {
+    public boolean updateCostPriceByCatalogNumber(int catalog_number, double newPrice) {
         boolean found = false;
 
         for (Product p : products.values()) {
-            if (p.getCatalogNumber() == catalogNumber) {
+            if (p.getCatalogNumber() == catalog_number) {
                 p.setCostPriceBeforeSupplierDiscount(newPrice);
                 double costAfter = newPrice * (1 - p.getSupplierDiscount() / 100.0);
                 p.setCostPriceAfterSupplierDiscount(costAfter);
@@ -54,9 +50,6 @@ public class ProductController {
         return true;
     }
 
-    public Product getProduct(int catalogNumber) {
-        return products.get(catalogNumber);
-    }
 
     public boolean hasCategory(String category) {
         for (Product product : products.values()) {
@@ -76,37 +69,37 @@ public class ProductController {
         return false;
     }
 
-    public boolean hasCatalogNumber(int catalogNumber) {
-        return products.containsKey(catalogNumber);
+    public boolean isUnknownCatalogNumber(int catalog_number) {
+        return !products.containsKey(catalog_number);
     }
 
-    public String showProductQuantities(int catalogNumber) {
-        Product product = products.get(catalogNumber);
+    public String showProductQuantities(int catalog_number) {
+        Product product = products.get(catalog_number);
         if (product == null) {
-            return "Invalid Product Catalog Number: " + catalogNumber + ". This Product Catalog Number does not exist in the inventory.";
+            return "Invalid Product Catalog Number: " + catalog_number + ". This Product Catalog Number does not exist in the inventory.";
         }
 
         int warehouseQuantity = product.getQuantityInWarehouse();
         int storeQuantity = product.getQuantityInStore();
 
         if (warehouseQuantity == 0 && storeQuantity == 0) {
-            return "No items found for Product Catalog Number: " + catalogNumber;
+            return "No items found for Product Catalog Number: " + catalog_number;
         }
 
-        return "Product Catalog Number: " + catalogNumber + "\n"
+        return "Product Catalog Number: " + catalog_number + "\n"
                 + "Warehouse quantity: " + warehouseQuantity + "\n"
                 + "Store quantity: " + storeQuantity;
     }
 
-    public String showProductPurchasesPrices(int catalogNumber) {
+    public String showProductPurchasesPrices(int catalog_number) {
         DecimalFormat df = new DecimalFormat("#.00");
         StringBuilder result = new StringBuilder();
         boolean found = false;
         int count = 1;
 
-        for (Item item : purchasedItems.values()) {
-            if (item.getCatalogNumber() == catalogNumber) {
-                Product product = products.get(catalogNumber);
+        for (Item item : purchased_items.values()) {
+            if (item.getCatalog_number() == catalog_number) {
+                Product product = products.get(catalog_number);
                 if (product != null) {
                     found = true;
                     result.append(count++).append(". ")
@@ -116,10 +109,10 @@ public class ProductController {
         }
 
         if (!found) {
-            return "No purchased items found with Product Catalog Number: " + catalogNumber;
+            return "No purchased items found with Product Catalog Number: " + catalog_number;
         }
 
-        return "Sale prices for Product Catalog Number " + catalogNumber + ":\n" + result;
+        return "Sale prices for Product Catalog Number " + catalog_number + ":\n" + result;
     }
 
 

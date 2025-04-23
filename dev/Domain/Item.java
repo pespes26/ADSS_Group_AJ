@@ -3,21 +3,21 @@ package Domain;
 public class Item {
     // Product Catalog Number identifies the type of product this item instance belongs to.
     // It links the item to its corresponding Product entity in the system.
-    private int catalogNumber;
+    private int catalog_number;
     private int item_id;
     private String item_expiring_date;
     private int item_size; //1 - small, 2 - medium, 3 - large
     private String storage_location; //warehouse or Interior store
     private String section_in_store; //for example: E7
-    private boolean isDefect;
+    private boolean is_defect;
 
 
-    public int getCatalogNumber() {
-        return catalogNumber;
+    public int getCatalog_number() {
+        return catalog_number;
     }
 
-    public void setCatalogNumber(int catalogNumber) {
-        this.catalogNumber = catalogNumber;
+    public void setCatalog_number(int catalog_number) {
+        this.catalog_number = catalog_number;
     }
 
     /**
@@ -110,8 +110,8 @@ public class Item {
      *
      * @return true if the product is defective, false otherwise
      */
-    public boolean isDefect() {
-        return isDefect;
+    public boolean is_defect() {
+        return is_defect;
     }
 
     /**
@@ -120,7 +120,7 @@ public class Item {
      * @param defect true if defective, false otherwise
      */
     public void setDefect(boolean defect) {
-        isDefect = defect;
+        is_defect = defect;
     }
 
 }

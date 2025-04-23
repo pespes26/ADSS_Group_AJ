@@ -1,7 +1,7 @@
 package Presentation;
 
 import Domain.Discount;
-import Service.InventoryServiceFacade;
+import Domain.InventoryController;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,11 +11,11 @@ import java.util.Scanner;
 
 public class MenuController {
     private final Scanner scan;
-    private final InventoryServiceFacade inventoryServiceFacade;
+    private final InventoryController inventory_controller;
 
-    public MenuController(InventoryServiceFacade inventoryServiceFacade) {
+    public MenuController(InventoryController inventory_controller) {
         this.scan = new Scanner(System.in);
-        this.inventoryServiceFacade = inventoryServiceFacade;
+        this.inventory_controller = inventory_controller;
     }
 
     public void runMenu() {
@@ -49,7 +49,7 @@ public class MenuController {
                 10. Show product quantity in warehouse and store
                 11. Show low-stock products that need reordering
                 12. Change product supply details
-                13. Change item location
+                13. Change item location details
                 14. Exit
                 """);
     }
@@ -63,10 +63,10 @@ public class MenuController {
             case 5 -> updateCostPrice();
             case 6 -> markAsDefect();
             case 7 -> generateInventoryReport();
-            case 8 -> System.out.println(inventoryServiceFacade.getReportController().defectAndExpiredReport());
+            case 8 -> System.out.println(inventory_controller.getReportController().defectAndExpiredReport());
             case 9 -> applyDiscount();
             case 10 -> showQuantities();
-            case 11 -> System.out.println(inventoryServiceFacade.getReportController().generateReorderAlertReport());
+            case 11 -> System.out.println(inventory_controller.getReportController().generateReorderAlertReport());
             case 12 -> changeSupplyDetails();
             case 13 -> changeItemLocation();
             case 14 -> {} // exit
@@ -77,7 +77,7 @@ public class MenuController {
     private void showItemDetails() {
         System.out.println("Enter item ID: ");
         int itemId = Integer.parseInt(scan.nextLine());
-        System.out.println(inventoryServiceFacade.getItemController().showItemDetails(itemId));
+        System.out.println(inventory_controller.getItemController().showItemDetails(itemId));
     }
 
     private void addNewItem() {
@@ -86,7 +86,7 @@ public class MenuController {
         System.out.print("Item ID (unique number): ");
         int itemId = Integer.parseInt(scan.nextLine());
 
-        if (inventoryServiceFacade.getItemController().itemExists(itemId)) {
+        if (inventory_controller.getItemController().itemExists(itemId)) {
             System.out.println("An item with ID " + itemId + " already exists in the system.");
             System.out.println("Returning to the main menu.");
             return;
@@ -139,7 +139,7 @@ public class MenuController {
                 + catalogNumber + "," + category + "," + subCategory + "," + size + "," + costPriceBefore + ","
                 + demand + "," + supplyTime + "," + manufacturer + "," + supplierDiscount + "," + storeDiscount;
 
-        boolean success = inventoryServiceFacade.getItemController().addItem(csvInput);
+        boolean success = inventory_controller.getItemController().addItem(csvInput);
 
         System.out.println("\n-----------------------------------------");
         if (success) {
@@ -158,7 +158,7 @@ public class MenuController {
         System.out.print("Enter item ID: ");
         int itemId = Integer.parseInt(scan.nextLine());
 
-        if (!inventoryServiceFacade.getItemController().itemExists(itemId)) {
+        if (!inventory_controller.getItemController().itemExists(itemId)) {
             System.out.println("Item does not exist in the inventory.");
             return;
         }
@@ -168,11 +168,11 @@ public class MenuController {
         int reason = Integer.parseInt(scan.nextLine());
 
         if (reason == 1) {
-            boolean alert = inventoryServiceFacade.getItemController().checkReorderAlert(itemId);
-            String productName = inventoryServiceFacade.getItemController().getItemName(itemId);
-            double salePrice = inventoryServiceFacade.getItemController().getSalePriceAfterDiscount(itemId);
+            boolean alert = inventory_controller.getItemController().checkReorderAlert(itemId);
+            String productName = inventory_controller.getItemController().getItemName(itemId);
+            double salePrice = inventory_controller.getItemController().getSalePriceAfterDiscount(itemId);
 
-            inventoryServiceFacade.getItemController().removeItemByPurchase(itemId);
+            inventory_controller.getItemController().removeItemByPurchase(itemId);
 
             System.out.println("\n-----------------------------------------");
             System.out.println("The item \"" + productName + "\" has been marked as purchased and removed.");
@@ -184,10 +184,10 @@ public class MenuController {
             System.out.println("-----------------------------------------");
 
         } else if (reason == 2) {
-            boolean alert = inventoryServiceFacade.getItemController().checkReorderAlert(itemId);
-            String productName = inventoryServiceFacade.getItemController().getItemName(itemId);
+            boolean alert = inventory_controller.getItemController().checkReorderAlert(itemId);
+            String productName = inventory_controller.getItemController().getItemName(itemId);
 
-            inventoryServiceFacade.getItemController().removeItemByDefect(itemId);
+            inventory_controller.getItemController().removeItemByDefect(itemId);
 
             System.out.println("\n-----------------------------------------");
             System.out.println("The item \"" + productName + "\" has been marked as defective and removed.");
@@ -207,22 +207,22 @@ public class MenuController {
     private void showPurchasePrices() {
         System.out.println("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
-        System.out.println(inventoryServiceFacade.getProductController().showProductPurchasesPrices(catalog));
+        System.out.println(inventory_controller.getProductController().showProductPurchasesPrices(catalog));
     }
 
     private void updateCostPrice() {
         System.out.print("Enter Product Catalog Number: ");
-        int catalogNumber;
+        int catalog_number;
 
         try {
-            catalogNumber = Integer.parseInt(scan.nextLine());
+            catalog_number = Integer.parseInt(scan.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Product Catalog Number must be a number.");
             return;
         }
 
-        if (!inventoryServiceFacade.getProductController().hasCatalogNumber(catalogNumber)) {
-            System.out.println("Product Catalog Number " + catalogNumber + " was not found in the system.");
+        if (!inventory_controller.getProductController().isUnknownCatalogNumber(catalog_number)) {
+            System.out.println("Product Catalog Number " + catalog_number + " was not found in the system.");
             return;
         }
 
@@ -240,9 +240,9 @@ public class MenuController {
             return;
         }
 
-        boolean success = inventoryServiceFacade.getProductController().updateCostPriceByCatalogNumber(catalogNumber, newPrice);
+        boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, newPrice);
         if (success) {
-            System.out.println("Cost price for Product Catalog Number " + catalogNumber + " has been updated to " + newPrice + ".");
+            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + newPrice + ".");
         } else {
             System.out.println("Failed to update cost price. Please check the inputs and try again.");
         }
@@ -260,7 +260,7 @@ public class MenuController {
             return;
         }
 
-        boolean success = inventoryServiceFacade.getItemController().markItemAsDefective(itemId);
+        boolean success = inventory_controller.getItemController().markItemAsDefective(itemId);
         if (success) {
             System.out.println("Item with ID " + itemId + " has been marked as defective.");
         } else {
@@ -274,7 +274,7 @@ public class MenuController {
         String[] categories = Arrays.stream(scan.nextLine().split(","))
                 .map(String::trim)
                 .toArray(String[]::new);
-        System.out.println(inventoryServiceFacade.getReportController().inventoryReportByCategories(categories));
+        System.out.println(inventory_controller.getReportController().inventoryReportByCategories(categories));
     }
 
     private void applyDiscount() {
@@ -296,14 +296,14 @@ public class MenuController {
         if (type == 1) {
             System.out.print("Enter category: ");
             category = scan.nextLine();
-            if (!inventoryServiceFacade.getProductController().hasCategory(category)) {
+            if (!inventory_controller.getProductController().hasCategory(category)) {
                 System.out.println("This category does not exist. Returning to menu.");
                 return;
             }
         } else if (type == 2) {
             System.out.print("Enter sub-category: ");
             subCategory = scan.nextLine();
-            if (!inventoryServiceFacade.getProductController().hasSubCategory(subCategory)) {
+            if (!inventory_controller.getProductController().hasSubCategory(subCategory)) {
                 System.out.println("This sub-category does not exist. Returning to menu.");
                 return;
             }
@@ -311,7 +311,7 @@ public class MenuController {
             System.out.print("Enter Product Catalog Number: ");
             try {
                 catalog = Integer.parseInt(scan.nextLine());
-                if (!inventoryServiceFacade.getProductController().hasCatalogNumber(catalog)) {
+                if (!inventory_controller.getProductController().isUnknownCatalogNumber(catalog)) {
                     System.out.println("Product Catalog Number not found. Returning to menu.");
                     return;
                 }
@@ -379,16 +379,16 @@ public class MenuController {
         boolean success;
         if (type == 1) {
             success = isSupplier
-                    ? inventoryServiceFacade.getDiscountController().setSupplierDiscountForCategory(category, discount)
-                    : inventoryServiceFacade.getDiscountController().setStoreDiscountForCategory(category, discount);
+                    ? inventory_controller.getDiscountController().setSupplierDiscountForCategory(category, discount)
+                    : inventory_controller.getDiscountController().setStoreDiscountForCategory(category, discount);
         } else if (type == 2) {
             success = isSupplier
-                    ? inventoryServiceFacade.getDiscountController().setSupplierDiscountForSubCategory(subCategory, discount)
-                    : inventoryServiceFacade.getDiscountController().setStoreDiscountForSubCategory(subCategory, discount);
+                    ? inventory_controller.getDiscountController().setSupplierDiscountForSubCategory(subCategory, discount)
+                    : inventory_controller.getDiscountController().setStoreDiscountForSubCategory(subCategory, discount);
         } else {
             success = isSupplier
-                    ? inventoryServiceFacade.getDiscountController().setSupplierDiscountForCatalogNumber(catalog, discount)
-                    : inventoryServiceFacade.getDiscountController().setStoreDiscountForCatalogNumber(catalog, discount);
+                    ? inventory_controller.getDiscountController().setSupplierDiscountForCatalogNumber(catalog, discount)
+                    : inventory_controller.getDiscountController().setStoreDiscountForCatalogNumber(catalog, discount);
         }
 
         System.out.println("\n-----------------------------------------");
@@ -410,7 +410,7 @@ public class MenuController {
         System.out.print("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
 
-        String result = inventoryServiceFacade.getProductController().showProductQuantities(catalog);
+        String result = inventory_controller.getProductController().showProductQuantities(catalog);
 
         System.out.println("\n-----------------------------");
         System.out.println(result);
@@ -437,7 +437,7 @@ public class MenuController {
             demand = Integer.parseInt(scan.nextLine());
         }
 
-        boolean updated = inventoryServiceFacade.getProductController().updateProductSupplyDetails(catalog, supply, demand);
+        boolean updated = inventory_controller.getProductController().updateProductSupplyDetails(catalog, supply, demand);
 
         if (updated) {
             System.out.println("Product supply details updated successfully.");
@@ -471,7 +471,7 @@ public class MenuController {
             section = scan.nextLine();
         }
 
-        boolean updated = inventoryServiceFacade.getItemController().updateItemLocation(id, location, section);
+        boolean updated = inventory_controller.getItemController().updateItemLocation(id, location, section);
 
         if (updated) {
             System.out.println("Item location updated successfully.");

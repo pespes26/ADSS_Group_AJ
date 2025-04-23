@@ -9,15 +9,31 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * Controller class for managing the user interface menu.
+ * Handles user input, invokes the appropriate system functionality,
+ * and connects to the {@link InventoryController} for backend operations.
+ */
 public class MenuController {
-    private final Scanner scan;
-    private final InventoryController inventory_controller;
+    private final Scanner scan; // Scanner for reading user input
+    private final InventoryController inventory_controller; // Reference to the inventory system logic
 
+    /**
+     * Constructs a MenuController and links it to the inventory controller.
+     *
+     * @param inventory_controller The main inventory controller used to perform system actions.
+     */
     public MenuController(InventoryController inventory_controller) {
         this.scan = new Scanner(System.in);
         this.inventory_controller = inventory_controller;
     }
 
+    /**
+     * Launches the main menu loop.
+     * Continuously prompts the user for input, processes their selection,
+     * and delegates the requested operation to the appropriate controller.
+     * Loop ends when the user selects the exit option (option 14).
+     */
     public void runMenu() {
         int choice = 0;
 
@@ -34,6 +50,12 @@ public class MenuController {
         System.out.println("Thank you! Have a nice day :)");
     }
 
+    /**
+     * Prints the main menu options to the console.
+     * The menu includes all available operations the user can perform,
+     * such as viewing item details, adding/removing items, generating reports,
+     * applying discounts, and exiting the system.
+     */
     private void printMenu() {
         System.out.println("""
                 Menu:
@@ -54,6 +76,12 @@ public class MenuController {
                 """);
     }
 
+    /**
+     * Handles the user’s menu selection based on the given choice.
+     * Executes the appropriate function depending on the selected option number.
+     *
+     * @param choice The numeric input corresponding to a menu option.
+     */
     private void handleChoice(int choice) {
         switch (choice) {
             case 1 -> showItemDetails();
@@ -74,29 +102,43 @@ public class MenuController {
         }
     }
 
+    /**
+     * Prompts the user to enter an item ID and displays the detailed information
+     * of the corresponding item.
+     * Delegates the display logic to the {@code showItemDetails} method
+     * in the {@code ItemController}.
+     */
     private void showItemDetails() {
         System.out.println("Enter item ID: ");
-        int itemId = Integer.parseInt(scan.nextLine());
-        System.out.println(inventory_controller.getItemController().showItemDetails(itemId));
+        int item_Id = Integer.parseInt(scan.nextLine());
+        System.out.println(inventory_controller.getItemController().showItemDetails(item_Id));
     }
 
+    /**
+     * Prompts the user to enter details for a new item and adds it to the inventory system.
+     * The details include product metadata, pricing, demand, supply time, and discounts.
+     * If the item ID already exists in the system, the method will notify the user
+     * and return to the main menu.
+     * All input fields are collected and formatted into a CSV-style string, which is then passed
+     * to the {@code addItem} method of the {@code ItemController}.
+     */
     private void addNewItem() {
         System.out.println("Please enter the following details for the new item:");
 
         System.out.print("Item ID (unique number): ");
-        int itemId = Integer.parseInt(scan.nextLine());
+        int item_Id = Integer.parseInt(scan.nextLine());
 
-        if (inventory_controller.getItemController().itemExists(itemId)) {
-            System.out.println("An item with ID " + itemId + " already exists in the system.");
+        if (inventory_controller.getItemController().itemExists(item_Id)) {
+            System.out.println("An item with ID " + item_Id + " already exists in the system.");
             System.out.println("Returning to the main menu.");
             return;
         }
 
         System.out.print("Product Name: ");
-        String productName = scan.nextLine();
+        String product_name = scan.nextLine();
 
         System.out.print("Expiring Date (format: dd.mm.yyyy): ");
-        String expiringDate = scan.nextLine();
+        String expiring_date = scan.nextLine();
 
         System.out.print("Location (Warehouse/interiorStore): ");
         String location = scan.nextLine();
@@ -105,60 +147,70 @@ public class MenuController {
         String section = scan.nextLine();
 
         System.out.print("Product Catalog Number (unique per product): ");
-        int catalogNumber = Integer.parseInt(scan.nextLine());
+        int catalog_number = Integer.parseInt(scan.nextLine());
 
         System.out.print("Category: ");
         String category = scan.nextLine();
 
         System.out.print("Sub-Category: ");
-        String subCategory = scan.nextLine();
+        String sub_category = scan.nextLine();
 
         System.out.print("Item Size (1 - Small, 2 - Medium, 3 - Big): ");
         int size = Integer.parseInt(scan.nextLine());
 
         System.out.print("Cost Price Before Supplier Discount: ");
-        double costPriceBefore = Double.parseDouble(scan.nextLine());
+        double cost_price_before = Double.parseDouble(scan.nextLine());
 
         System.out.print("Product Demand Level (1-5): ");
         int demand = Integer.parseInt(scan.nextLine());
 
         System.out.print("Supply Time (in days): ");
-        int supplyTime = Integer.parseInt(scan.nextLine());
+        int supply_time = Integer.parseInt(scan.nextLine());
 
         System.out.print("Manufacturer: ");
         String manufacturer = scan.nextLine();
 
         System.out.print("Supplier Discount (%): ");
-        int supplierDiscount = Integer.parseInt(scan.nextLine());
+        int supplier_discount = Integer.parseInt(scan.nextLine());
 
         System.out.print("Store Discount (%): ");
-        int storeDiscount = Integer.parseInt(scan.nextLine());
+        int store_discount = Integer.parseInt(scan.nextLine());
 
         // Compose CSV format string for internal use
-        String csvInput = itemId + "," + productName + "," + expiringDate + "," + location + "," + section + ","
-                + catalogNumber + "," + category + "," + subCategory + "," + size + "," + costPriceBefore + ","
-                + demand + "," + supplyTime + "," + manufacturer + "," + supplierDiscount + "," + storeDiscount;
+        String csvInput = item_Id + "," + product_name + "," + expiring_date + "," + location + "," + section + ","
+                + catalog_number + "," + category + "," + sub_category + "," + size + "," + cost_price_before + ","
+                + demand + "," + supply_time + "," + manufacturer + "," + supplier_discount + "," + store_discount;
 
         boolean success = inventory_controller.getItemController().addItem(csvInput);
 
         System.out.println("\n-----------------------------------------");
         if (success) {
             System.out.println("Item added successfully.");
-            System.out.println("Product Name: " + productName);
-            System.out.println("Catalog Number: " + catalogNumber);
-            System.out.println("Category: " + category + ", Sub-Category: " + subCategory);
+            System.out.println("Product Name: " + product_name);
+            System.out.println("Catalog Number: " + catalog_number);
+            System.out.println("Category: " + category + ", Sub-Category: " + sub_category);
         } else {
             System.out.println("Failed to add item. Please verify all details were entered correctly.");
         }
         System.out.println("-----------------------------------------");
     }
 
-
+    /**
+     * Removes an item from the inventory based on the provided item ID.
+     * The user is prompted to specify the reason for removal:
+     * <ul>
+     *   <li>1 – Purchase: the item is removed and marked as sold, and the sale price is displayed.</li>
+     *   <li>2 – Defect: the item is removed and marked as defective.</li>
+     * </ul>
+     * If the removal causes the associated product to fall below its minimum threshold,
+     * a reorder alert is displayed.
+     * If the item does not exist or the reason is invalid, a corresponding message is printed.
+     */
     private void removeItem() {
         System.out.print("Enter item ID: ");
-        int itemId = Integer.parseInt(scan.nextLine());
+        int item_Id = Integer.parseInt(scan.nextLine());
 
-        if (!inventory_controller.getItemController().itemExists(itemId)) {
+        if (!inventory_controller.getItemController().itemExists(item_Id)) {
             System.out.println("Item does not exist in the inventory.");
             return;
         }
@@ -168,31 +220,31 @@ public class MenuController {
         int reason = Integer.parseInt(scan.nextLine());
 
         if (reason == 1) {
-            boolean alert = inventory_controller.getItemController().checkReorderAlert(itemId);
-            String productName = inventory_controller.getItemController().getItemName(itemId);
-            double salePrice = inventory_controller.getItemController().getSalePriceAfterDiscount(itemId);
+            boolean alert = inventory_controller.getItemController().checkReorderAlert(item_Id);
+            String product_name = inventory_controller.getItemController().getItemName(item_Id);
+            double sale_price = inventory_controller.getItemController().getSalePriceAfterDiscount(item_Id);
 
-            inventory_controller.getItemController().removeItemByPurchase(itemId);
+            inventory_controller.getItemController().removeItemByPurchase(item_Id);
 
             System.out.println("\n-----------------------------------------");
-            System.out.println("The item \"" + productName + "\" has been marked as purchased and removed.");
-            System.out.printf("The item was sold for: %.2f ₪ (after store discount)\n", salePrice);
+            System.out.println("The item \"" + product_name + "\" has been marked as purchased and removed.");
+            System.out.printf("The item was sold for: %.2f ₪ (after store discount)\n", sale_price);
             if (alert) {
-                System.out.println("ALERT: The product \"" + productName + "\" has reached a critical amount!");
+                System.out.println("ALERT: The product \"" + product_name + "\" has reached a critical amount!");
                 System.out.println("Please consider reordering.");
             }
             System.out.println("-----------------------------------------");
 
         } else if (reason == 2) {
-            boolean alert = inventory_controller.getItemController().checkReorderAlert(itemId);
-            String productName = inventory_controller.getItemController().getItemName(itemId);
+            boolean alert = inventory_controller.getItemController().checkReorderAlert(item_Id);
+            String product_name = inventory_controller.getItemController().getItemName(item_Id);
 
-            inventory_controller.getItemController().removeItemByDefect(itemId);
+            inventory_controller.getItemController().removeItemByDefect(item_Id);
 
             System.out.println("\n-----------------------------------------");
-            System.out.println("The item \"" + productName + "\" has been marked as defective and removed.");
+            System.out.println("The item \"" + product_name + "\" has been marked as defective and removed.");
             if (alert) {
-                System.out.println("ALERT: The product \"" + productName + "\" has reached a critical amount!");
+                System.out.println("ALERT: The product \"" + product_name + "\" has reached a critical amount!");
                 System.out.println("Please consider reordering.");
             }
             System.out.println("-----------------------------------------");
@@ -203,13 +255,34 @@ public class MenuController {
     }
 
 
-
+    /**
+     * Prompts the user to enter a product's catalog number and displays
+     * the sale prices (after store discounts) of all items that were purchased
+     * under that product.
+     * Delegates the logic to {@code showProductPurchasesPrices} in {@code ProductController}.
+     */
     private void showPurchasePrices() {
         System.out.println("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
         System.out.println(inventory_controller.getProductController().showProductPurchasesPrices(catalog));
     }
 
+    /**
+     * Updates the cost price (before discounts) of a product identified by its catalog number.
+     * The user is prompted to enter:
+     * <ul>
+     *   <li>The product's catalog number</li>
+     *   <li>The new cost price</li>
+     * </ul>
+     * The method performs input validation to ensure:
+     * <ul>
+     *   <li>The catalog number is numeric and exists in the system</li>
+     *   <li>The new cost price is a non-negative number</li>
+     * </ul>
+     *
+     * Upon success, the cost price is updated and the change is confirmed to the user.
+     * If any validation fails or the update fails, appropriate error messages are shown.
+     */
     private void updateCostPrice() {
         System.out.print("Enter Product Catalog Number: ");
         int catalog_number;
@@ -221,17 +294,17 @@ public class MenuController {
             return;
         }
 
-        if (!inventory_controller.getProductController().isUnknownCatalogNumber(catalog_number)) {
+        if (inventory_controller.getProductController().isUnknownCatalogNumber(catalog_number)) {
             System.out.println("Product Catalog Number " + catalog_number + " was not found in the system.");
             return;
         }
 
         System.out.print("Enter new cost price: ");
-        double newPrice;
+        double new_price;
 
         try {
-            newPrice = Double.parseDouble(scan.nextLine());
-            if (newPrice < 0) {
+            new_price = Double.parseDouble(scan.nextLine());
+            if (new_price < 0) {
                 System.out.println("Cost price cannot be negative.");
                 return;
             }
@@ -240,35 +313,48 @@ public class MenuController {
             return;
         }
 
-        boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, newPrice);
+        boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, new_price);
         if (success) {
-            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + newPrice + ".");
+            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + new_price + ".");
         } else {
             System.out.println("Failed to update cost price. Please check the inputs and try again.");
         }
     }
 
-
+    /**
+     * Marks an item as defective based on the provided item ID.
+     * <p>
+     * Prompts the user to enter the item ID, verifies its validity and existence,
+     * and delegates the update to {@code markItemAsDefective} in the {@code ItemController}.
+     * If the item exists, it is marked as defective and a confirmation message is shown.
+     * Otherwise, an error message is displayed.
+     */
     private void markAsDefect() {
         System.out.print("Enter item ID: ");
-        int itemId;
+        int item_Id;
 
         try {
-            itemId = Integer.parseInt(scan.nextLine());
+            item_Id = Integer.parseInt(scan.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Item ID must be a number.");
             return;
         }
 
-        boolean success = inventory_controller.getItemController().markItemAsDefective(itemId);
+        boolean success = inventory_controller.getItemController().markItemAsDefective(item_Id);
         if (success) {
-            System.out.println("Item with ID " + itemId + " has been marked as defective.");
+            System.out.println("Item with ID " + item_Id + " has been marked as defective.");
         } else {
-            System.out.println("Item with ID " + itemId + " does not exist in the inventory.");
+            System.out.println("Item with ID " + item_Id + " does not exist in the inventory.");
         }
     }
 
-
+    /**
+     * Generates and displays an inventory report grouped by categories.
+     * <p>
+     * Prompts the user to enter one or more category names (comma-separated),
+     * then trims and passes them to {@code inventoryReportByCategories} in the {@code ReportController}.
+     * The resulting report shows sub-categories, sizes, and items grouped accordingly.
+     */
     private void generateInventoryReport() {
         System.out.println("Enter categories separated by commas: ");
         String[] categories = Arrays.stream(scan.nextLine().split(","))
@@ -277,6 +363,30 @@ public class MenuController {
         System.out.println(inventory_controller.getReportController().inventoryReportByCategories(categories));
     }
 
+    /**
+     * Applies a discount (supplier or store) to a group of products based on user selection.
+     * <p>
+     * The user is prompted to choose the group to which the discount will apply:
+     * <ul>
+     *     <li>Category</li>
+     *     <li>Sub-Category</li>
+     *     <li>Specific Product (by catalog number)</li>
+     * </ul>
+     *
+     * Then, the user selects the discount type (supplier or store),
+     * enters a discount rate (0–100), and provides an end date (with today as the start).
+     * <p>
+     * The method validates all input:
+     * <ul>
+     *     <li>Ensures the selected group exists</li>
+     *     <li>Ensures discount rate is within valid bounds</li>
+     *     <li>Ensures the end date is after the current date</li>
+     * </ul>
+     *
+     * A {@link Domain.Discount} object is created and passed to the appropriate method
+     * in the {@code DiscountController}.
+     * A success or failure message is displayed accordingly.
+     */
     private void applyDiscount() {
         System.out.println("Apply Discount");
         System.out.println("Choose group to apply discount on:");
@@ -290,7 +400,7 @@ public class MenuController {
             return;
         }
 
-        String category = null, subCategory = null;
+        String category = null, sub_category = null;
         int catalog = -1;
 
         if (type == 1) {
@@ -302,8 +412,8 @@ public class MenuController {
             }
         } else if (type == 2) {
             System.out.print("Enter sub-category: ");
-            subCategory = scan.nextLine();
-            if (!inventory_controller.getProductController().hasSubCategory(subCategory)) {
+            sub_category = scan.nextLine();
+            if (!inventory_controller.getProductController().hasSubCategory(sub_category)) {
                 System.out.println("This sub-category does not exist. Returning to menu.");
                 return;
             }
@@ -325,20 +435,20 @@ public class MenuController {
         }
 
         System.out.println("Choose discount type:\n(1) Supplier Discount\n(2) Store Discount");
-        int discountTypeInput;
+        int discount_type_input;
         try {
-            discountTypeInput = Integer.parseInt(scan.nextLine());
+            discount_type_input = Integer.parseInt(scan.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Invalid discount type. Returning to menu.");
             return;
         }
 
-        if (discountTypeInput != 1 && discountTypeInput != 2) {
+        if (discount_type_input != 1 && discount_type_input != 2) {
             System.out.println("Invalid discount type. Returning to menu.");
             return;
         }
 
-        boolean isSupplier = discountTypeInput == 1;
+        boolean is_supplier = discount_type_input == 1;
 
         double rate = -1;
         while (rate < 0 || rate > 100) {
@@ -378,23 +488,23 @@ public class MenuController {
 
         boolean success;
         if (type == 1) {
-            success = isSupplier
+            success = is_supplier
                     ? inventory_controller.getDiscountController().setSupplierDiscountForCategory(category, discount)
                     : inventory_controller.getDiscountController().setStoreDiscountForCategory(category, discount);
         } else if (type == 2) {
-            success = isSupplier
-                    ? inventory_controller.getDiscountController().setSupplierDiscountForSubCategory(subCategory, discount)
-                    : inventory_controller.getDiscountController().setStoreDiscountForSubCategory(subCategory, discount);
+            success = is_supplier
+                    ? inventory_controller.getDiscountController().setSupplierDiscountForSubCategory(sub_category, discount)
+                    : inventory_controller.getDiscountController().setStoreDiscountForSubCategory(sub_category, discount);
         } else {
-            success = isSupplier
+            success = is_supplier
                     ? inventory_controller.getDiscountController().setSupplierDiscountForCatalogNumber(catalog, discount)
                     : inventory_controller.getDiscountController().setStoreDiscountForCatalogNumber(catalog, discount);
         }
 
         System.out.println("\n-----------------------------------------");
         if (success) {
-            String target = (type == 1) ? category : (type == 2) ? subCategory : "Catalog #" + catalog;
-            String discountType = isSupplier ? "Supplier" : "Store";
+            String target = (type == 1) ? category : (type == 2) ? sub_category : "Catalog #" + catalog;
+            String discountType = is_supplier ? "Supplier" : "Store";
             System.out.println(discountType + " discount of " + rate + "% was successfully applied to: " + target);
             System.out.println("Active from " + start + " to " + end);
         } else {
@@ -405,7 +515,13 @@ public class MenuController {
 
 
 
-
+    /**
+     * Displays the current quantity of a product in both the warehouse and store.
+     * <p>
+     * Prompts the user to enter a product catalog number and retrieves the relevant
+     * quantities using {@code showProductQuantities} from {@code ProductController}.
+     * The result is printed in a formatted block.
+     */
     private void showQuantities() {
         System.out.print("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
@@ -417,7 +533,19 @@ public class MenuController {
         System.out.println("-----------------------------\n");
     }
 
-
+    /**
+     * Allows the user to update the supply time and/or demand level of a product.
+     * <p>
+     * Prompts the user to enter the product's catalog number and select which details to update:
+     * <ul>
+     *     <li>1 – Supply time only</li>
+     *     <li>2 – Demand level only</li>
+     *     <li>3 – Both</li>
+     * </ul>
+     *
+     * The chosen values are then passed to {@code updateProductSupplyDetails}
+     * in the {@code ProductController}, and a confirmation message is printed if successful.
+     */
     private void changeSupplyDetails() {
         System.out.println("Enter Product Catalog Number:");
         int catalog = Integer.parseInt(scan.nextLine());
@@ -452,6 +580,16 @@ public class MenuController {
         }
     }
 
+    /**
+     * Updates the storage location and/or section of a specific item in the inventory.
+     * <p>
+     * The user is prompted to enter the item ID, choose which fields to update
+     * (location, section, or both), and then provide the new values accordingly.
+
+     * The update is applied via {@code updateItemLocation} in the {@code ItemController}.
+     * If the item exists, a success message is displayed with the updated values;
+     * otherwise, an error message is shown.
+     */
     private void changeItemLocation() {
         System.out.println("Enter item ID:");
         int id = Integer.parseInt(scan.nextLine());

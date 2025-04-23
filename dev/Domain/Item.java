@@ -1,126 +1,122 @@
 package Domain;
 
+/**
+ * Represents a single physical item in the inventory.
+ * Each item is associated with a product (via catalog number) and contains details
+ * such as size, location, expiration date, and defect status.
+ */
 public class Item {
-    // Product Catalog Number identifies the type of product this item instance belongs to.
-    // It links the item to its corresponding Product entity in the system.
     private int catalog_number;
     private int item_id;
     private String item_expiring_date;
-    private int item_size; //1 - small, 2 - medium, 3 - large
-    private String storage_location; //warehouse or Interior store
-    private String section_in_store; //for example: E7
+    private int item_size; // 1 - small, 2 - medium, 3 - large
+    private String storage_location; // warehouse or Interior store
+    private String section_in_store; // for example: E7
     private boolean is_defect;
 
 
-    public int getCatalog_number() {
+    /**
+     * @return The catalog number of the product this item belongs to.
+     */
+    public int getCatalogNumber() {
         return catalog_number;
     }
 
+    /**
+     * @param catalog_number The catalog number to associate with the item.
+     */
     public void setCatalog_number(int catalog_number) {
         this.catalog_number = catalog_number;
     }
 
     /**
-     * Gets the product ID.
-     *
-     * @return the product ID
+     * @return The unique ID of the item.
      */
     public int getItemId() {
         return item_id;
     }
 
     /**
-     * Sets the product ID.
-     *
-     * @param product_id the ID to set
+     * @param product_id The ID to assign to the item.
      */
     public void setItemId(int product_id) {
         this.item_id = product_id;
     }
 
     /**
-     * Gets the product's expiration date.
-     *
-     * @return the expiration date
+     * @return The expiration date of the item, as a string.
      */
     public String getItemExpiringDate() {
         return item_expiring_date;
     }
 
     /**
-     * Sets the product's expiration date.
-     *
-     * @param item_expiring_date the date to set
+     * @param item_expiring_date The expiration date to assign to the item.
      */
     public void setItemExpiringDate(String item_expiring_date) {
         this.item_expiring_date = item_expiring_date;
     }
 
+    /**
+     * Returns the size of the item.
+     * <ul>
+     *   <li>1 – Small</li>
+     *   <li>2 – Medium</li>
+     *   <li>3 – Large</li>
+     * </ul>
+     *
+     * @return The item's size as an integer.
+     */
     public int getItemSize() {
         return item_size;
     }
 
     /**
-     * Sets the product's size.
-     *
-     * @param item_size the size to set (1 = small, 2 = medium, 3 = large)
+     * @param item_size The item's size (1 = small, 2 = medium, 3 = large).
      */
     public void setItemSize(int item_size) {
         this.item_size = item_size;
     }
 
     /**
-     * Gets the section where the product is located.
-     *
-     * @return the section
+     * @return The section in the store or warehouse where the item is stored (e.g., "E7").
      */
     public String getSectionInStore() {
         return section_in_store;
     }
 
     /**
-     * Sets the section of the product.
-     *
-     * @param section the section to set
+     * @param section The section to assign to the item.
      */
     public void setSectionInStore(String section) {
         this.section_in_store = section;
     }
 
     /**
-     * Gets the storage location of the product.
-     *
-     * @return the storage location ("interior" or "warehouse")
+     * @return The location where the item is stored ("warehouse" or "interiorStore").
      */
     public String getStorageLocation() {
         return storage_location;
     }
 
     /**
-     * Sets the storage location of the product.
-     *
-     * @param storage_location the storage location to set ("interior" or "warehouse")
+     * @param storage_location The location where the item is stored.
      */
     public void setStorageLocation(String storage_location) {
         this.storage_location = storage_location;
     }
 
     /**
-     * Checks whether the product is defective.
-     *
-     * @return true if the product is defective, false otherwise
+     * @return true if the item is marked as defective, false otherwise.
      */
-    public boolean is_defect() {
+    public boolean isDefect() {
         return is_defect;
     }
 
     /**
-     * Marks the product as defective or not.
-     *
-     * @param defect true if defective, false otherwise
+     * @param defect true to mark the item as defective, false otherwise.
      */
     public void setDefect(boolean defect) {
         is_defect = defect;
     }
-
 }

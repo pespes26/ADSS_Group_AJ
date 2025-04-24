@@ -9,7 +9,7 @@ public class AgreementMenuHandler {
     public static Integer getValidAgreementID(Scanner scanner, Controller controller) {
         int agreementID = Inputs.read_int(scanner, "Enter Agreement ID: ");
 
-        if (!controller.thereIsAgreement(agreementID)) {
+        if (controller.thereIsAgreement(agreementID)) {
             System.out.println("Agreement does not exist.");
             return null; // מייצג כישלון
         }
@@ -32,7 +32,7 @@ public class AgreementMenuHandler {
         int agreementID;
         while (true) {
             agreementID = Inputs.read_int(scanner, "Enter Agreement ID: ");
-            if (!controller.thereIsAgreement(agreementID)) {
+            if (controller.thereIsAgreement(agreementID)) {
                 break;
             }
             System.out.println("This Agreement ID already exists. Try another one.");

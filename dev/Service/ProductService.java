@@ -12,54 +12,12 @@ public class ProductService {
         this.productList = new ArrayList<>();
     }
 
-
-    public boolean existsProductWithID(int ProductID){
-        for (Product product : productList) {
-            if (product.getProduct_id() == ProductID) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean productExistsByCatalog(int catalog) {
-        for (Product product : productList) {
-            if (product.getCatalog_Number() == catalog) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //new - get catalog_number and product_id
-//    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
-//        for (Product product : productList) {
-//            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-
-
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure, int supplierID) { //create a product
         Product product = new Product(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
         this.productList.add(product);
         return product;
-        }
-
-//    public void delete_by_id(int id) {
-//        if (existsProductWithID(id)) {
-//            productList.remove(searchProduct_by_id(id));
-//        }
-//    }
-
-    public void delete_by_catalog(int catalog) {
-        if(productExistsByCatalog(catalog)) {
-            productList.remove(searchProduct_by_catalog(catalog));
-        }
     }
+
 
     public void delete_by_catalogAndSupplierId(int catalog, int supplierId) {
         Iterator<Product> iterator = productList.iterator();
@@ -71,31 +29,32 @@ public class ProductService {
         }
     }
 
+
+    public boolean productExistsProductWithID(int ProductID){
+        for (Product product : productList) {
+            if (product.getProduct_id() == ProductID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean productExistsByCatalog(int catalog) {
+        for (Product product : productList) {
+            if (product.getCatalog_Number() == catalog) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public boolean existsZeroProducts() {
         return productList.isEmpty();
     }
 
 
-    public Product searchProduct_by_catalog(int catalog){
-        for(Product product : productList){ //check product in product_list
-            if(product.getCatalog_Number()==catalog){ //equal the catalog_number
-                return product; //return the product
-            }
-        }
-        return null;
-    }
-
-    //search by id
-    public Product searchProduct_by_id(int id){
-        for(Product product : productList){ //check product in product_list
-            if(product.getProduct_id()==id){ //equal the id
-                return product; //return the product
-            }
-        }
-        return null;
-    }
-
-    /////////////
     public double best_price(int product_id, int amount){
         //Product best_product = null; //init the best product to null
         double final_price = Double.MAX_VALUE; //init the final_price to MAX_VALUE
@@ -113,5 +72,46 @@ public class ProductService {
         }
         return final_price;
     }
+
+    //new - get catalog_number and product_id
+//    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
+//        for (Product product : productList) {
+//            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+//    public void delete_by_id(int id) {
+//        if (existsProductWithID(id)) {
+//            productList.remove(searchProduct_by_id(id));
+//        }
+//    }
+
+    //search by id
+//    public Product searchProduct_by_id(int id){
+//        for(Product product : productList){ //check product in product_list
+//            if(product.getProduct_id()==id){ //equal the id
+//                return product; //return the product
+//            }
+//        }
+//        return null;
+//    }
+
+//    public void delete_by_catalog(int catalog) {
+//        if(productExistsByCatalog(catalog)) {
+//            productList.remove(getProductByCatalog(catalog));
+//        }
+//    }
+
+//    public Product getProductByCatalog(int catalog){
+//        for(Product product : productList){ //check product in product_list
+//            if(product.getCatalog_Number()==catalog){ //equal the catalog_number
+//                return product; //return the product
+//            }
+//        }
+//        return null;
+//    }
 
 }

@@ -1,8 +1,5 @@
 package Domain;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class Product {
@@ -23,17 +20,6 @@ public class Product {
         this.unitsOfMeasure = unitsOfMeasure;
     }
 
-    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules, int supplierID) {
-        this.supplierID = supplierID;
-        this.Catalog_Number = catalog_Number;
-        this.product_id = product_id;
-        this.Price = price;
-        this.unitsOfMeasure = unitsOfMeasure;
-        if (discountRules != null) {
-            this.discountRules.addAll(discountRules);
-
-        }
-    }
 
     public void add_discountRule(double discount, int amount){
         discountRules.add(new DiscountRule(discount, amount));
@@ -43,9 +29,6 @@ public class Product {
         this.unitsOfMeasure = unitsOfMeasure;
     }
 
-    public List<DiscountRule> getDiscountRules() {
-        return Collections.unmodifiableList(discountRules); //return in a safe way the discountRules "read only"
-    }
 
     public int getProduct_id() {
         return product_id;
@@ -98,6 +81,22 @@ public class Product {
     public double get_price_after_discount(int amount){
         double discount = calcDiscount(amount);//calculate the size of discount(אולי לשנות ל double)
         discount = 1-(discount / 100.0); //percentage to be pay from the original price
-        return this.Price * discount;
+        return getPrice() * discount;
     }
+
+//    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules, int supplierID) {
+//        this.supplierID = supplierID;
+//        this.Catalog_Number = catalog_Number;
+//        this.product_id = product_id;
+//        this.Price = price;
+//        this.unitsOfMeasure = unitsOfMeasure;
+//        if (discountRules != null) {
+//            this.discountRules.addAll(discountRules);
+//
+//        }
+//    }
+
+//    public List<DiscountRule> getDiscountRules() {
+//        return Collections.unmodifiableList(discountRules); //return in a safe way the discountRules "read only"
+//    }
 }

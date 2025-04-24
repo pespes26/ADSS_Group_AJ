@@ -26,6 +26,7 @@ public class Controller {
     public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentCondition){
         supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentCondition);
     }
+
     //-------------------------
     public void deleteSupplier(int supplier_ID) {
         if (supplierService.thereIsSupplier(supplier_ID)) {
@@ -51,13 +52,6 @@ public class Controller {
         }
         return null;
     }
-    //--------------------------
-
-//    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
-//          if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
-//              this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-//          }
-//    }
 
     //--------------------------
     public List<Integer> deleteAllAgreementFromSupplier(int supplier_ID) {
@@ -76,18 +70,21 @@ public class Controller {
         return catalogNumbers;
     }
 
-
     //--------------------------
     public boolean thereIsSupplier(int id){
         return supplierService.thereIsSupplier(id);
     }
 
-
     //--------------------------
+
 //    public boolean hasSuppliers() {//use for order (check if possible to make order)
 //        return supplierService.hasSuppliers();
 //    }
-
+//    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
+//          if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
+//              this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+//          }
+//    }
 
 //===================================AgreementService================================================================\
 
@@ -117,55 +114,46 @@ public class Controller {
         }
     }
     //--------------------------
-//    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
-//        this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-//    }
-    //--------------------------
-    public void removeProductFromAgreement(int agreementID, int product_id){
-        Integer catalogNumber = this.agreementService.removeProductFromAgreement(agreementID, product_id);
-        if (catalogNumber != null) {
-            productService.delete_by_catalog(catalogNumber); // Remove the product from the system
-        }
-    }
 
     public boolean thereIsAgreement(int agreement_ID){
-        return this.agreementService.thereIsAgreement(agreement_ID);
+        return !this.agreementService.thereIsAgreement(agreement_ID);
     }
-
+    //--------------------------
     public void updateDeliveryDays(int agreementID, String[] newDays){
         Agreement agreement  = this.agreementService.getAgreementByID(agreementID);
         if (agreement != null) {
             agreement.updateDeliveryDays(newDays);
         }
     }
-
+    //--------------------------
     public boolean toggleSelfPickup(int agreementID){
         Agreement agreement  = this.agreementService.getAgreementByID(agreementID);
             return agreement.updateSelfDeliveryOption();
 
     }
+    //--------------------------
 
+//    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
+//        this.agreementService.deleteAgreementWithSupplier(agreement_ID);
+//    }
+    //--------------------------
+//    public void removeProductFromAgreement(int agreementID, int product_id){
+//        Integer catalogNumber = this.agreementService.removeProductFromAgreement(agreementID, product_id);
+//        if (catalogNumber != null) {
+//            productService.delete_by_catalog(catalogNumber); // Remove the product from the system
+//        }
+//    }
 
 //===================================ProductService================================================================\
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure, int supplierID){
         return productService.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
     }
 
-//    public void deleteProductByID(int id){
-//        productService.delete_by_id(id);
-//    }
 
     public boolean existsZeroProducts(){
         return productService.existsZeroProducts();
     }
 
-    public void deleteProductByCatalog(int catalog_Number, int agreementID){
-        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
-        if (agreement != null) {
-            agreement.removeProductByProductCatalogNumber(catalog_Number);
-            productService.delete_by_catalog(catalog_Number); //מחיקת מוצר מהמערך של המוצרים, רק עבור מספר הסכם מזהה
-        }
-    }
 
     public void delete_by_catalogAndSupplierId(int catalog_Number, int supplierID, int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -173,16 +161,8 @@ public class Controller {
             agreement.removeProductByProductCatalogNumber(catalog_Number);//מחיקה מוצר מהסכם
             productService.delete_by_catalogAndSupplierId(catalog_Number, supplierID);//מחיקה מהמערך של המוצרים
         }
-
     }
 
-//    public Product getProductByID(int id){
-//        return this.productService.searchProduct_by_id(id);
-//    }
-
-//    public Product getProductByCatalog(int catalog){
-//        return this.productService.searchProduct_by_catalog(catalog);
-//    }
 
     public void add_discountRule(int catalog, double discount, int amount,int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -194,18 +174,16 @@ public class Controller {
         }
     }
 
+
     public boolean existsProductWithID(int id){
-        return productService.existsProductWithID(id);
+        return productService.productExistsProductWithID(id);
     }
+
 
     public boolean productExistsByCatalog(int catalog){
         return productService.productExistsByCatalog(catalog);
     }
 
-
-//    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
-//        return productService.productExistsByCatalogAndProductId(catalog, productId);
-//    }
 
     public void updateProductPrice(int catalog, double newPrice, Integer agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -214,6 +192,8 @@ public class Controller {
             product.setPrice(newPrice);
         }
     }
+
+
     public void updateProductUnit(int catalogNumber, String newUnit, Integer agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
         if (agreement != null) {
@@ -222,18 +202,45 @@ public class Controller {
         }
     }
 
-//===================================OrderService================================================================\
+
+    //    public void deleteProductByID(int id){
+//        productService.delete_by_id(id);
+//    }
+
+    //    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
+//        return productService.productExistsByCatalogAndProductId(catalog, productId);
+//    }
+
+    //    public Product getProductByID(int id){
+//        return this.productService.searchProduct_by_id(id);
+//    }
+
+//    public Product getProductByCatalog(int catalog){
+//        return this.productService.searchProduct_by_catalog(catalog);
+//    }
+
+    //    public void deleteProductByCatalog(int catalog_Number, int agreementID){
+//        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
+//        if (agreement != null) {
+//            agreement.removeProductByProductCatalogNumber(catalog_Number);
+//            productService.delete_by_catalog(catalog_Number); //מחיקת מוצר מהמערך של המוצרים, רק עבור מספר הסכם מזהה
+//        }
+//    }
+
+    //===================================OrderService================================================================\
     public void createOrder(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
         orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
     }
-    //--------------------------
+
+
     public Map<Integer, Integer> getProductsInOrder(int orderID){
         return orderService.getProductsInOrder(orderID);
     }
     public boolean thereIsOrder(int order_ID) {
         return orderService.thereIsOrder(order_ID);
     }
-    //--------------------------
+
+
     public Map<Integer, Map.Entry<Integer, Double>> orderWithBestPrice(Map<Integer, Integer> productsInOrder) {
         Map<Integer, Map.Entry<Integer, Double>> orderedProducts = new HashMap<>();
 
@@ -246,21 +253,18 @@ public class Controller {
         return orderedProducts;
     }
 
-    //-------------------------
+
     public String getFormattedOrderDate(int orderID){
         Order order = orderService.searchOrderById(orderID);
         return order.getFormattedOrderDate();
     }
+
 
     public int getPhoneNumber(int orderID){
         Order order = orderService.searchOrderById(orderID);
         return order.getPhoneNumber();
     }
 
-
-//    public boolean existsZeroOrders(){
-//        return orderService.existsZeroOrders();
-//    }
 
     public boolean thereIsProductWithSameCatalogNumber(int catalogNumber, int supplierID) {
         Supplier supplier = getSupplierById(supplierID);
@@ -276,6 +280,7 @@ public class Controller {
         return false; // לא נמצא בשום הסכם של הספק
     }
 
+
     public boolean thereIsProductWithSameProductID(int productID, int supplierID){
         Supplier supplier = getSupplierById(supplierID);
         if (supplier != null) {
@@ -289,5 +294,10 @@ public class Controller {
         }
         return false; // לא נמצא בשום הסכם של הספק
     }
+
+
+//    public boolean existsZeroOrders(){
+//        return orderService.existsZeroOrders();
+//    }
 
 }

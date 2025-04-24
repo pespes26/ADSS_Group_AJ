@@ -12,7 +12,7 @@ import Domain.Agreement;
 import java.util.HashMap;
 
 public class AgreementService {
-    private HashMap<Integer, Agreement> agreementHashMap; // Stores agreements using agreementID as the key
+    private final HashMap<Integer, Agreement> agreementHashMap; // Stores agreements using agreementID as the key
 
     /**
      * Constructs a new AgreementService with an empty agreement map.
@@ -40,18 +40,9 @@ public class AgreementService {
         return agreementHashMap.get(agreement_ID); // Retrieve the agreement from the map
     }
 
+
     public boolean thereIsAgreement(int agreement_ID) {
         return agreementHashMap.containsKey(agreement_ID);
-    }
-
-
-    public Integer removeProductFromAgreement(int agreement_ID, int product_ID) {
-        Agreement agreement = getAgreementByID(agreement_ID); // Find the relevant agreement
-        if (agreement != null) {
-            Integer catalogNumber = agreement.removeProductByProductID(product_ID); // Remove the product and get its catalog number
-            return catalogNumber;
-        }
-        return null;
     }
 
 
@@ -75,5 +66,14 @@ public class AgreementService {
 //    // מתודה בודקת אם בהסכם יש מוצרים
 //    public boolean hasProducts(Agreement agreement) {
 //        return agreement.hasProducts();  // בודק אם ההסכם מכיל מוצרים
+//    }
+
+//    public Integer removeProductFromAgreement(int agreement_ID, int product_ID) {
+//        Agreement agreement = getAgreementByID(agreement_ID); // Find the relevant agreement
+//        if (agreement != null) {
+//            Integer catalogNumber = agreement.removeProductByProductID(product_ID); // Remove the product and get its catalog number
+//            return catalogNumber;
+//        }
+//        return null;
 //    }
 }

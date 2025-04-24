@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierService {
-    private List<Supplier> supplierList;
+    private final List<Supplier> supplierList;
 
     public SupplierService() {
         supplierList = new ArrayList<>();
@@ -15,6 +15,7 @@ public class SupplierService {
         Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentCondition);
         this.supplierList.add(supplier);
     }
+
 
     public void deleteSupplier(int supplier_ID) {
         Supplier supplier = getSupplierById(supplier_ID);
@@ -39,6 +40,7 @@ public class SupplierService {
         return false;
     }
 
+
     public Supplier getSupplierById(int id) {
         for(Supplier supplier : supplierList){
             if(supplier.getSupplier_id()==id){
@@ -46,21 +48,6 @@ public class SupplierService {
             }
         }
         return null;
-    }
-
-
-    public boolean deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID) {
-        Supplier supplier = supplierList.get(supplier_ID);
-        if (supplier!= null) {
-            supplier.removeAgreement(agreement_ID);
-            return true;
-        }
-        return false;
-    }
-
-     ///new - use for check supplier
-    public List<Supplier> getAllSuppliers() {
-        return new ArrayList<>(supplierList);
     }
 
 

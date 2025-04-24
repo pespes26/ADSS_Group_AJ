@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Agreement {
-    private int agreement_ID; // Unique ID of the agreement
-    private int supplier_ID; // Unique ID of the supplier
+    private final int agreement_ID; // Unique ID of the agreement
+    private final int supplier_ID; // Unique ID of the supplier
     private String[] deliveryDays; // Days on which the supplier can deliver
     private boolean selfPickup; // Whether delivery is self-handled by the supermarket
-    private HashMap<Integer, Product> supplierProducts; // Maps productID → Product
+    private final HashMap<Integer, Product> supplierProducts; // Maps productID → Product
 
     /**
      * Constructs a new Agreement.
@@ -41,6 +41,21 @@ public class Agreement {
         this.supplierProducts.put(productID, newProduct); // Add the product to the map
     }
 
+    public void removeProductByProductCatalogNumber(int catalogNumber) {
+        Integer keyToRemove = null;
+
+        for (Map.Entry<Integer, Product> entry : supplierProducts.entrySet()) {
+            if (entry.getValue().getCatalog_Number() == catalogNumber) {
+                keyToRemove = entry.getKey();
+                break; // ברגע שמצאנו את המוצר, אין צורך להמשיך
+            }
+        }
+
+        if (keyToRemove != null) {
+            supplierProducts.remove(keyToRemove);
+        }
+    }
+
     /**
      * Gets the supplier's ID.
      *
@@ -61,33 +76,6 @@ public class Agreement {
 
 
     /**
-     * Updates the price of a product in the agreement.
-     *
-     * @param productID the ID of the product to update
-     * @param priceNew  the new price
-     */
-    public void updateProductPrice(int productID, int priceNew) {
-        Product product = supplierProducts.get(productID); // Retrieve the product
-        if (product != null) {
-            product.setPrice(priceNew); // Update the price if product exists
-        }
-    }
-
-    /**
-     * Updates the discount details of a product in the agreement.
-     *
-     * @param productID the product ID
-     * @param discount  the discount percentage
-     * @param amount    the minimum amount for the discount
-     */
-    public void updateProductDiscount(int productID, int discount, int amount) {
-        Product product = supplierProducts.get(productID); // Retrieve the product
-        if (product != null) {
-            product.setDiscount(discount, amount); // Update discount info if product exists
-        }
-    }
-
-    /**
      * Updates the delivery days for this agreement.
      *
      * @param newDeliveryDays an array of updated delivery days
@@ -96,6 +84,7 @@ public class Agreement {
         this.deliveryDays = newDeliveryDays; // Update the delivery days
     }
 
+
     /**
      * Toggles the self-pickup option.
      */
@@ -103,45 +92,6 @@ public class Agreement {
         this.selfPickup = !this.selfPickup; // Flip the boolean flag
         boolean res = this.selfPickup;
         return res;
-    }
-
-    /**
-     * Removes a specific product from the agreement.
-     *
-     * @param productID the ID of the product to remove
-     * @return the catalog number of the removed product
-     */
-//    public int removeProduct(int productID) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
-//        supplierProducts.remove(productID); // Remove from the map
-//        return catalogNumber; // Return the catalog number
-//    }
-
-    public int removeProductByProductID(int productID) {
-        Product product = supplierProducts.get(productID); // Retrieve the product
-        if (product == null) {
-            throw new IllegalArgumentException("Product not found in agreement.");
-        }
-
-        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
-        supplierProducts.remove(productID); // Remove from the map
-        return catalogNumber; // Return the catalog number
-    }
-
-    public void removeProductByProductCatalogNumber(int catalogNumber) {
-        Integer keyToRemove = null;
-
-        for (Map.Entry<Integer, Product> entry : supplierProducts.entrySet()) {
-            if (entry.getValue().getCatalog_Number() == catalogNumber) {
-                keyToRemove = entry.getKey();
-                break; // ברגע שמצאנו את המוצר, אין צורך להמשיך
-            }
-        }
-
-        if (keyToRemove != null) {
-            supplierProducts.remove(keyToRemove);
-        }
     }
 
 
@@ -165,8 +115,14 @@ public class Agreement {
         return productCatalogNumbers; // Return all catalog numbers
     }
 
-    public boolean hasProducts() {
-        return supplierProducts != null && !supplierProducts.isEmpty();  // אם ה-HashMap לא ריק, יש לפחות מוצר אחד
+
+    public Product getProductByCatalog(int catalogNumber){
+        for (Product product : supplierProducts.values()) {
+            if (product.getCatalog_Number() == catalogNumber) {
+                return product;
+            }
+        }
+        return null;
     }
 
     public boolean hasProductWithCatalogNumber(int catalogNumber) {
@@ -182,13 +138,49 @@ public class Agreement {
         return supplierProducts.containsKey(productID);
     }
 
-    public Product getProductByCatalog(int catalogNumber){
-        for (Product product : supplierProducts.values()) {
-            if (product.getCatalog_Number() == catalogNumber) {
-                return product;
-            }
+    public boolean hasProducts() {
+        return supplierProducts != null && !supplierProducts.isEmpty();  // אם ה-HashMap לא ריק, יש לפחות מוצר אחד
     }
-        return null;
-        }
+
+
+    //    public int removeProduct(int productID) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
+//        supplierProducts.remove(productID); // Remove from the map
+//        return catalogNumber; // Return the catalog number
+//    }
+
+    //    public int removeProduct(int productID) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
+//        supplierProducts.remove(productID); // Remove from the map
+//        return catalogNumber; // Return the catalog number
+//    }
+
+    //    public int removeProductByProductID(int productID) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        if (product == null) {
+//            throw new IllegalArgumentException("Product not found in agreement.");
+//        }
+//
+//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
+//        supplierProducts.remove(productID); // Remove from the map
+//        return catalogNumber; // Return the catalog number
+//    }
+
+    //    public void updateProductDiscount(int productID, int discount, int amount) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        if (product != null) {
+//            product.setDiscount(discount, amount); // Update discount info if product exists
+//        }
+//    }
+
+
+//    public void updateProductPrice(int productID, int priceNew) {
+//        Product product = supplierProducts.get(productID); // Retrieve the product
+//        if (product != null) {
+//            product.setPrice(priceNew); // Update the price if product exists
+//        }
+//    }
 
 }

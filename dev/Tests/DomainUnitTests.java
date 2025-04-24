@@ -1,7 +1,6 @@
-package Domain;
+package Tests;
 
-import Domain.Product;
-import Domain.Discount;
+import Domain.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

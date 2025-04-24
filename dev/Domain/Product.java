@@ -173,6 +173,13 @@ public class Product {
     /**
      * @return The name of the manufacturer of the product.
      */
+    private void recalculatePrices() {
+        this.cost_price_after_supplier_discount = cost_price_before_supplier_discount * (1 - supplier_discount / 100.0);
+        this.sale_price_before_store_discount = cost_price_after_supplier_discount * 2;
+        this.sale_price_after_store_discount = sale_price_before_store_discount * (1 - store_discount / 100.0);
+    }
+
+
     public String getManufacturer() {
         return manufacturer;
     }
@@ -210,7 +217,9 @@ public class Product {
      */
     public void setSupplierDiscount(double supplier_discount) {
         this.supplier_discount = supplier_discount;
+        recalculatePrices();
     }
+
 
     /**
      * @return Cost price before applying supplier discount.
@@ -224,7 +233,9 @@ public class Product {
      */
     public void setCostPriceBeforeSupplierDiscount(double cost_price_before_supplier_discount) {
         this.cost_price_before_supplier_discount = cost_price_before_supplier_discount;
+        recalculatePrices();
     }
+
 
     /**
      * @return Cost price after applying supplier discount.
@@ -252,6 +263,7 @@ public class Product {
      */
     public void setStoreDiscount(double store_discount) {
         this.store_discount = store_discount;
+        recalculatePrices();
     }
 
     /**

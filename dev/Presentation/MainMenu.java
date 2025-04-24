@@ -7,6 +7,7 @@ public class MainMenu {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Controller controller= new Controller();
+        Init.DataInitializer.populateInitialData(controller);
 
         // Welcome message
         System.out.println("=====================================");

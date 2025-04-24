@@ -1,5 +1,4 @@
 package Service;
-
 import Domain.Agreement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

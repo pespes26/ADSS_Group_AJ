@@ -1,6 +1,5 @@
 package Presentation;
 import Domain.Controller;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -107,27 +106,6 @@ public class OrderMenuHandler {
         System.out.printf("Total order cost: %.2f ₪%n\n", totalCost);
     }
 
-
-//    public static void printProductsInOrder1(Controller controller, int orderID) {
-//        Map<Integer, Integer> productsInOrder = controller.getProductsInOrder(orderID);
-//
-//        if (productsInOrder == null || productsInOrder.isEmpty()) { //if not have orders
-//            System.out.println("No products in this order.");
-//            return;
-//        }
-//
-//        System.out.println("\n Products in order:");
-//        System.out.printf("%-12s %-10s%n", "Product ID", "Amount");
-//        System.out.println("---------------------------");
-//
-//
-//        for (Map.Entry<Integer, Integer> entry : productsInOrder.entrySet()) {
-//            int productID = entry.getKey();        // מזהה המוצר
-//            int amount = entry.getValue();         // כמות שהוזמנה
-//
-//            System.out.printf("%-12d %-10d%n", productID, amount);
-//        }
-//    }
 
     public static void printOrderSummaryFromController(Controller controller, int orderID) {
 

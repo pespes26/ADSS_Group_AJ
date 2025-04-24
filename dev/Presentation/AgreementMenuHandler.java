@@ -197,7 +197,7 @@ public class AgreementMenuHandler {
             System.out.println("1. Delete agreement");
             System.out.println("2. Add new agreement");
             System.out.println("3. Edit existing agreement");
-            System.out.println("0. return to previous menu");
+            System.out.println("0. return to previous menu\n");
             System.out.print("Enter your choice: ");
 
             choice = Inputs.read_input_for_choice(scanner);//input checking
@@ -214,7 +214,7 @@ public class AgreementMenuHandler {
 //                    Integer agreementID = AgreementMenuHandler.getValidAgreementID(scanner, controller);
                     editSpecificAgreementMenu(scanner, controller, supplierID);
                 }
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to previous menu...");
                 default -> System.out.println("Invalid choice. Please try again.");
             }
         } while (choice != 0);

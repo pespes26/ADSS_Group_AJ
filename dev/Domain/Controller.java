@@ -232,7 +232,7 @@ public class Controller {
 //    }
 
     //===================================OrderService================================================================\
-    public void createOrder(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
+    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
         orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
     }
 

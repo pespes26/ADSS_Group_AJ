@@ -62,5 +62,4 @@ public class Inputs {
         return value;
     }
 
-
 }

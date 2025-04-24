@@ -158,7 +158,7 @@ public class ProductMenuHandler {
     }
 
     public static boolean validateUniqueCatalogNumber(Controller controller, int catalogNumber, int supplierID) {
-        boolean exists = controller.thereIsProductWithSameCatalogNumber(catalogNumber, supplierID);
+        boolean exists = controller.thereIsProductWithSameCatalogNumberInAgreement(catalogNumber, supplierID);
         if (exists) {
             System.out.println("This product already exists in an agreement with this supplier. Please enter a different product.\n");
             return false;
@@ -167,7 +167,7 @@ public class ProductMenuHandler {
     }
 
     public static boolean validateUniqueProductIDNumber(Controller controller, int productID, int supplierID){
-        boolean exists = controller.thereIsProductWithSameProductID(productID, supplierID);
+        boolean exists = controller.thereIsProductWithSameProductIDInAgreement(productID, supplierID);
         if (exists) {
             System.out.println("This product already exists in this agreement! Please add other product.\n");
             return false;

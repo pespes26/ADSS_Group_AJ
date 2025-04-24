@@ -47,4 +47,20 @@ public class Inputs {
         }
     }
 
+    public static long read_long(Scanner scanner, String message) {
+        long value;
+        while (true) {
+            System.out.print(message);
+            if (scanner.hasNextLong()) {
+                value = scanner.nextLong();
+                break;
+            } else {
+                System.out.println("Invalid choice. Please enter a valid number again:");
+                scanner.next(); // מדלג על הקלט הבעייתי (כדי שלא ניתקע בלולאה)
+            }
+        }
+        return value;
+    }
+
+
 }

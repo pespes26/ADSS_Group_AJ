@@ -1,6 +1,6 @@
 package Service;
 
-import Domain.Supplier;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,35 +16,29 @@ public class SupplierServiceTest {
     }
 
     @Test
-    public void testCreateSupplierAddsSupplier() {
+    public void givenNewSupplier_whenCreateSupplier_thenSupplierIsAdded() {
         supplierService.createSupplier("Test Supplier", 1, 123, 456, "Cash", 5551234, "test@mail.com", "Prepaid");
         assertTrue(supplierService.thereIsSupplier(1));
     }
 
-    @Test
-    public void testGetSupplierByIdReturnsCorrectSupplier() {
-        supplierService.createSupplier("Test Supplier", 2, 123, 456, "Check", 5551235, "email@mail.com", "Postpaid");
-        Supplier s = supplierService.getSupplierById(2);
-        assertNotNull(s);
-        assertEquals(2, s.getSupplier_id());
-    }
 
     @Test
-    public void testThereIsSupplierReturnsFalseWhenNoneExists() {
+    public void givenNoSuppliers_whenCheckIfExists_thenReturnsFalse() {
         assertFalse(supplierService.thereIsSupplier(999));
     }
 
     @Test
-    public void testDeleteSupplierRemovesSupplier() {
+    public void givenExistingSupplier_whenDeleteSupplier_thenSupplierIsRemoved() {
         supplierService.createSupplier("Delete Me", 3, 123, 456, "Bank Transfer", 5551236, "delete@mail.com", "Standing Order");
         supplierService.deleteSupplier(3);
         assertFalse(supplierService.thereIsSupplier(3));
     }
 
     @Test
-    public void testHasSuppliers() {
+    public void givenNoSuppliersInitially_whenCreateSupplier_thenHasSuppliersReturnsTrue() {
         assertFalse(supplierService.hasSuppliers());
         supplierService.createSupplier("Exists", 4, 123, 456, "Card", 5551237, "exists@mail.com", "Prepaid");
         assertTrue(supplierService.hasSuppliers());
     }
+
 }

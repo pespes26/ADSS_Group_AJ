@@ -19,7 +19,7 @@ public class SupplierMenuHandler {
         String paymentMethod = getPaymentMethod(scanner);
         //===============================
 
-        int phoneNumber = Inputs.read_int(scanner, "Enter Phone Number: ");
+        long phoneNumber = Inputs.read_long(scanner, "Enter Phone Number: ");
 
         System.out.print("Enter Email: ");
         String email = scanner.next();

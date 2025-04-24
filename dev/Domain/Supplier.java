@@ -10,11 +10,11 @@ public class Supplier {
     int bankAccount;
     String paymentMethod;
     String paymentCondition;
-    int phoneNumber;
+    long phoneNumber;
     String email;
 
 
-    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email,String paymentCondition){
+    public Supplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, long phoneNumber, String email,String paymentCondition){
         this.supplierName = supplierName;
         this.supplier_id = supplier_id;
         this.company_id = company_id;

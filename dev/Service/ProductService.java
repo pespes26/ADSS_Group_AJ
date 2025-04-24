@@ -70,7 +70,17 @@ public class ProductService {
         if (final_price == Double.MAX_VALUE){//can't create
             return -1;
         }
-        return final_price;
+//        return final_price;
+        return final_price * amount;
+    }
+
+    public boolean existsProductWithCatalogAndSupplierId(int catalog_Number, int supplierID){
+        for (Product product : productList) {
+            if (product.getCatalog_Number() == catalog_Number && product.getSupplierID() == supplierID) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //new - get catalog_number and product_id

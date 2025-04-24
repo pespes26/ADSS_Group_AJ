@@ -13,7 +13,7 @@ public class OrderService {
     }
 
 
-    public void createOrder(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
+    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
         Order order = new Order(orderID, phoneNumber, orderDate, productsInOrder); // Create a new Order object using all collected data
         this.orderHashMap.put(orderID, order); // Add the order to the internal order list, using its ID as the key
     }

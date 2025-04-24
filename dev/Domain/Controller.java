@@ -23,7 +23,7 @@ public class Controller {
 
 //===================================SupplierService================================================================\
 
-    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentCondition){
+    public void createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, long phoneNumber, String email, String paymentCondition){
         supplierService.createSupplier(supplierName, supplier_id,  company_id,  bankAccount, paymentMethod, phoneNumber,  email, paymentCondition);
     }
 
@@ -163,6 +163,10 @@ public class Controller {
         }
     }
 
+    public boolean existsProductWithCatalogAndSupplierId(int catalog_Number, int supplierID){
+        return productService.existsProductWithCatalogAndSupplierId(catalog_Number, supplierID);
+    }
+
 
     public void add_discountRule(int catalog, double discount, int amount,int agreementID){
         Agreement agreement = this.agreementService.getAgreementByID(agreementID);
@@ -260,13 +264,13 @@ public class Controller {
     }
 
 
-    public int getPhoneNumber(int orderID){
+    public long getPhoneNumber(int orderID){
         Order order = orderService.searchOrderById(orderID);
         return order.getPhoneNumber();
     }
 
 
-    public boolean thereIsProductWithSameCatalogNumber(int catalogNumber, int supplierID) {
+    public boolean thereIsProductWithSameCatalogNumberInAgreement(int catalogNumber, int supplierID) {
         Supplier supplier = getSupplierById(supplierID);
         if (supplier != null) {
             int[] allAgreementIDs = supplier.getAllAgreementIDs();
@@ -281,7 +285,7 @@ public class Controller {
     }
 
 
-    public boolean thereIsProductWithSameProductID(int productID, int supplierID){
+    public boolean thereIsProductWithSameProductIDInAgreement(int productID, int supplierID){
         Supplier supplier = getSupplierById(supplierID);
         if (supplier != null) {
             int[] allAgreementIDs = supplier.getAllAgreementIDs();

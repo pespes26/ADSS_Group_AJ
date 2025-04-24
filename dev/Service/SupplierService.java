@@ -11,7 +11,7 @@ public class SupplierService {
     }
 
 
-    public void  createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, int phoneNumber, String email, String paymentCondition) {
+    public void  createSupplier(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, long phoneNumber, String email, String paymentCondition) {
         Supplier supplier = new Supplier(supplierName, supplier_id, company_id, bankAccount, paymentMethod, phoneNumber, email, paymentCondition);
         this.supplierList.add(supplier);
     }

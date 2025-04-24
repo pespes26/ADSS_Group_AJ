@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class Order {
     private int orderID; // Unique identifier of the order
-    private int phoneNumber; // Customer's phone number
+    private long phoneNumber; // Customer's phone number
     private LocalDateTime orderDate; // The date and time when the order was placed
     private Map<Integer, Integer> productsInOrder; // Maps productID -> quantity
 
@@ -25,7 +25,7 @@ public class Order {
      * @param orderDate        the date and time the order was placed
      * @param productsInOrder  a map of product IDs to their quantities
      */
-    public Order(int orderID, int phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
+    public Order(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
         this.orderID = orderID;
         this.phoneNumber = phoneNumber;
         this.orderDate = orderDate;
@@ -36,7 +36,7 @@ public class Order {
         return orderID;
     }
 
-    public int getPhoneNumber() {
+    public long getPhoneNumber() {
         return phoneNumber;
     }
 

@@ -1,86 +1,78 @@
 package com.superli.deliveries.domain;
 
-
 /**
  * Represents a product within the context of the deliveries module.
- * This might be a minimal representation; full product details may reside elsewhere.
- * Corresponds to the Product class in the Domain Layer class diagram.
+ * Includes basic information such as ID, name, and weight.
+ * Matches the Product class in the Domain Layer class diagram.
  */
 public class Product {
 
-    private final String productId; // Unique identifier for the product (links to Inventory module)
-    private final String name;      // Name of the product (for display and identification)
+    /** Unique identifier for the product (links to Inventory module) */
+    private final String productId;
+
+    /** Name of the product (for display and identification) */
+    private final String name;
+
+    /** Weight of a single unit of the product */
+    private final float weight;
 
     /**
-     * Constructs a new Product object (for use within delivery context).
+     * Constructs a new Product object.
      *
      * @param productId The unique identifier of the product. Cannot be null or empty.
-     * @param name      The name of the product. Cannot be null or empty.
-     * @throws IllegalArgumentException if productId or name is null or empty.
+     * @param name The name of the product. Cannot be null or empty.
+     * @param weight The weight of the product. Must be non-negative.
+     * @throws IllegalArgumentException if productId or name is null/empty, or weight is negative.
      */
-    public Product(String productId, String name) {
+    public Product(String productId, String name, float weight) {
         if (productId == null || productId.trim().isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty.");
         }
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be null or empty.");
         }
-        
+        if (weight < 0) {
+            throw new IllegalArgumentException("Product weight cannot be negative.");
+        }
+
         this.productId = productId;
         this.name = name;
+        this.weight = weight;
     }
 
     // --- Getters ---
 
-    /**
-     * Gets the unique identifier of the product.
-     * @return The product ID.
-     */
     public String getProductId() {
         return productId;
     }
 
-    /**
-     * Gets the name of the product.
-     * @return The product name.
-     */
     public String getName() {
         return name;
     }
 
+    public float getWeight() {
+        return weight;
+    }
+
     // --- Standard Methods ---
 
-    /**
-     * Returns a string representation of the Product object.
-     * @return A string representation including productId and name.
-     */
     @Override
     public String toString() {
         return "Product{" +
-               "productId='" + productId + '\'' +
-               ", name='" + name + '\'' +
-               '}';
+                "productId='" + productId + '\'' +
+                ", name='" + name + '\'' +
+                ", weight=" + weight +
+                '}';
     }
 
-    /**
-     * Checks if this Product is equal to another object.
-     * Equality is based solely on the productId.
-     * @param o The object to compare with.
-     * @return true if the objects are equal (same productId), false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Product)) return false;
         Product product = (Product) o;
         return productId.equals(product.productId);
     }
 
-    /**
-     * Returns the hash code for this Product.
-     * Based solely on the productId.
-     * @return The hash code value for this object.
-     */
     @Override
     public int hashCode() {
         return productId.hashCode();

@@ -3,68 +3,63 @@ package com.superli.deliveries.domain;
 import java.util.Objects;
 
 /**
- * Represents a specific item (product and quantity) that was delivered
- * or planned for delivery at a specific DeliveryStop.
- * Acts as an association class between DeliveryStop and Product, holding the quantity.
+ * Represents a specific item that is part of a delivery document.
+ * A DeliveredItem links a product (via its ID) to the quantity being delivered.
+ *
+ * This class adheres to the UML structure which includes only a productId and quantity.
+ * No direct reference to the Product object is kept to maintain clear traceability.
+ *
+ * Equality is based solely on the productId, assuming each document
+ * will contain at most one DeliveredItem per product.
  */
 public class DeliveredItem {
 
-    // Attributes
-    private final Product product; // The product being delivered (final link)
-    private int quantity;          // The quantity of the product (mutable)
-    private String status;         // Optional: Status of this specific item line (e.g., DELIVERED, MISSING, DAMAGED)
+    /** The unique ID of the product being delivered. */
+    private final String productId;
+
+    /** The quantity of the product delivered. Must be non-negative. */
+    private int quantity;
 
     /**
-     * Constructs a new DeliveredItem record.
-     * @param product The product associated with this item line. Cannot be null.
-     * @param quantity The initial quantity. Must be non-negative (consider if 0 is allowed).
-     * @param initialStatus The initial status (can be null or empty if not used initially).
-     * @throws IllegalArgumentException if product is null or quantity is negative.
+     * Constructs a new DeliveredItem instance.
+     *
+     * @param productId The unique identifier of the product. Cannot be null or blank.
+     * @param quantity The quantity of the product delivered. Must be zero or greater.
+     * @throws IllegalArgumentException if productId is null/blank or quantity is negative.
      */
-    public DeliveredItem(Product product, int quantity, String initialStatus) {
-        // Validation
-        if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null for DeliveredItem.");
+    public DeliveredItem(String productId, int quantity) {
+        if (productId == null || productId.isBlank()) {
+            throw new IllegalArgumentException("Product ID cannot be null or blank.");
         }
-        if (quantity < 0) { // Allow zero quantity? E.g., if removed later?
-             throw new IllegalArgumentException("Quantity cannot be negative.");
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative.");
         }
 
-        this.product = product;
+        this.productId = productId;
         this.quantity = quantity;
-        this.status = initialStatus;
     }
 
-    // --- Getters ---
-
     /**
-     * Gets the product associated with this delivery item line.
-     * @return The Product object.
+     * Returns the product ID associated with this item.
+     *
+     * @return The product's unique identifier.
      */
-    public Product getProduct() {
-        return product;
+    public String getProductId() {
+        return productId;
     }
 
     /**
-     * Gets the quantity of the product for this delivery item line.
-     * @return The quantity.
+     * Returns the quantity of product delivered.
+     *
+     * @return The quantity of the product.
      */
     public int getQuantity() {
         return quantity;
     }
 
     /**
-     * Gets the status of this specific item line (optional).
-     * @return The status string, or null.
-     */
-    public String getStatus() {
-        return status;
-    }
-
-    // --- Setters --- (product is final)
-
-    /**
-     * Sets the quantity for this delivery item line.
+     * Sets a new quantity for the product.
+     *
      * @param quantity The new quantity. Must be non-negative.
      * @throws IllegalArgumentException if quantity is negative.
      */
@@ -76,53 +71,37 @@ public class DeliveredItem {
     }
 
     /**
-     * Sets the status for this specific item line.
-     * @param status The new status string.
-     */
-    public void setStatus(String status) {
-         // Optional: Validate status against known values
-        this.status = status;
-    }
-
-    // --- Standard Methods ---
-
-    /**
-     * Returns a string representation of the DeliveredItem object.
-     * @return A string representation including product ID, quantity, and status.
+     * Returns a string representation of this DeliveredItem.
+     *
+     * @return A string containing productId and quantity.
      */
     @Override
     public String toString() {
-        return "DeliveredItem{" +
-               "productId=" + (product != null ? product.getProductId() : "null") +
-               ", quantity=" + quantity +
-               ", status='" + status + '\'' +
-               '}';
+        return String.format("DeliveredItem{productId='%s', quantity=%d}", productId, quantity);
     }
 
-   /**
-     * Checks if this DeliveredItem is equal to another object.
-     * Equality is based on the associated Product. Assumes a DeliveryStop
-     * will not contain two DeliveredItem entries for the same Product.
-     * @param o The object to compare with.
-     * @return true if the objects refer to the same product, false otherwise.
+    /**
+     * Compares this DeliveredItem with another object.
+     * Two DeliveredItems are considered equal if they refer to the same product ID.
+     *
+     * @param o The object to compare.
+     * @return true if the product IDs match; false otherwise.
      */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof DeliveredItem)) return false;
         DeliveredItem that = (DeliveredItem) o;
-        // Equality based on the referenced Product within the context of a DeliveryStop's list
-        return product.equals(that.product);
+        return Objects.equals(productId, that.productId);
     }
 
-   /**
-     * Returns the hash code for this DeliveredItem.
-     * Based on the associated Product.
+    /**
+     * Returns the hash code of this DeliveredItem, based on product ID.
+     *
      * @return The hash code value.
      */
     @Override
     public int hashCode() {
-        // Hash code based on the referenced Product
-        return Objects.hash(product);
+        return Objects.hash(productId);
     }
 }

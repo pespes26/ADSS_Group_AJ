@@ -6,54 +6,41 @@ package com.superli.deliveries.presentation;
  */
 public class DriverDetailsView {
 
-    // Attributes relevant for display
+    private final String driverId;
     private final String name;
     private final String licenseType;
 
     /**
      * Constructs a DriverDetailsView object.
-     * Usually populated with data originating from a Driver domain object.
      *
-     * @param name        The driver's name to be displayed.
-     * @param licenseType The driver's license type to be displayed.
+     * @param driverId    Unique identifier of the driver.
+     * @param name        Driver's name.
+     * @param licenseType License type (e.g., C, C1).
      */
-    public DriverDetailsView(String name, String licenseType) {
-        // Assuming data validity is handled before creating this view object
+    public DriverDetailsView(String driverId, String name, String licenseType) {
+        this.driverId = driverId;
         this.name = name;
         this.licenseType = licenseType;
     }
 
-    // --- Getters ---
+    public String getDriverId() {
+        return driverId;
+    }
 
-    /**
-     * Gets the driver's name for display.
-     * @return The name string.
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets the driver's license type for display.
-     * @return The license type string.
-     */
     public String getLicenseType() {
         return licenseType;
     }
 
-    // --- Standard Methods ---
-
-    /**
-     * Returns a string representation of the DriverDetailsView object.
-     * @return A string representation of the view data.
-     */
-     @Override
+    @Override
     public String toString() {
         return "DriverDetailsView{" +
-               "name='" + name + '\'' +
-               ", licenseType='" + licenseType + '\'' +
-               '}';
+                "driverId='" + driverId + '\'' +
+                ", name='" + name + '\'' +
+                ", licenseType='" + licenseType + '\'' +
+                '}';
     }
-
-    // equals() and hashCode() are typically not required for display-only DTOs
 }

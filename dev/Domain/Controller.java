@@ -77,15 +77,6 @@ public class Controller {
 
     //--------------------------
 
-//    public boolean hasSuppliers() {//use for order (check if possible to make order)
-//        return supplierService.hasSuppliers();
-//    }
-//    public void deleteOneAgreementFromSupplier(int supplier_ID, int agreement_ID){// אולי למחוק
-//          if (this.supplierService.deleteOneAgreementFromSupplier(supplier_ID, agreement_ID)){
-//              this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-//          }
-//    }
-
 //===================================AgreementService================================================================\
 
     public void createAgreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup){
@@ -131,18 +122,7 @@ public class Controller {
             return agreement.updateSelfDeliveryOption();
 
     }
-    //--------------------------
 
-//    public void deleteAgreementWithSupplier(int agreement_ID){ //אולי למחוק
-//        this.agreementService.deleteAgreementWithSupplier(agreement_ID);
-//    }
-    //--------------------------
-//    public void removeProductFromAgreement(int agreementID, int product_id){
-//        Integer catalogNumber = this.agreementService.removeProductFromAgreement(agreementID, product_id);
-//        if (catalogNumber != null) {
-//            productService.delete_by_catalog(catalogNumber); // Remove the product from the system
-//        }
-//    }
 
 //===================================ProductService================================================================\
     public Product createProduct(int catalog_Number, int product_id, double price, String unitsOfMeasure, int supplierID){
@@ -205,31 +185,6 @@ public class Controller {
             product.setUnitsOfMeasure(newUnit);
         }
     }
-
-
-    //    public void deleteProductByID(int id){
-//        productService.delete_by_id(id);
-//    }
-
-    //    public boolean productExistsByCatalogAndProductId(int catalog, int productId){
-//        return productService.productExistsByCatalogAndProductId(catalog, productId);
-//    }
-
-    //    public Product getProductByID(int id){
-//        return this.productService.searchProduct_by_id(id);
-//    }
-
-//    public Product getProductByCatalog(int catalog){
-//        return this.productService.searchProduct_by_catalog(catalog);
-//    }
-
-    //    public void deleteProductByCatalog(int catalog_Number, int agreementID){
-//        Agreement agreement = this.agreementService.getAgreementByID(agreementID);
-//        if (agreement != null) {
-//            agreement.removeProductByProductCatalogNumber(catalog_Number);
-//            productService.delete_by_catalog(catalog_Number); //מחיקת מוצר מהמערך של המוצרים, רק עבור מספר הסכם מזהה
-//        }
-//    }
 
     //===================================OrderService================================================================\
     public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
@@ -298,10 +253,5 @@ public class Controller {
         }
         return false; // לא נמצא בשום הסכם של הספק
     }
-
-
-//    public boolean existsZeroOrders(){
-//        return orderService.existsZeroOrders();
-//    }
 
 }

@@ -35,8 +35,4 @@ public class OrderService {
         return orderHashMap.containsKey(order_ID);
     }
 
-    //    public boolean existsZeroOrders() {
-//        return orderHashMap.isEmpty();
-//    }
-
 }

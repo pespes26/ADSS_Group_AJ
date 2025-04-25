@@ -47,7 +47,6 @@ public class Product {
     }
 
 
-    ///new !!!!!!!!!  setDiscount
     public boolean setDiscount(double discount, int amount){
         for (int i = 0; i < discountRules.size(); i++){
             if(discountRules.get(i).amount() == amount){
@@ -84,19 +83,5 @@ public class Product {
         return getPrice() * discount;
     }
 
-//    public Product(int catalog_Number, int product_id, double price, String unitsOfMeasure, List<DiscountRule> discountRules, int supplierID) {
-//        this.supplierID = supplierID;
-//        this.Catalog_Number = catalog_Number;
-//        this.product_id = product_id;
-//        this.Price = price;
-//        this.unitsOfMeasure = unitsOfMeasure;
-//        if (discountRules != null) {
-//            this.discountRules.addAll(discountRules);
-//
-//        }
-//    }
 
-//    public List<DiscountRule> getDiscountRules() {
-//        return Collections.unmodifiableList(discountRules); //return in a safe way the discountRules "read only"
-//    }
 }

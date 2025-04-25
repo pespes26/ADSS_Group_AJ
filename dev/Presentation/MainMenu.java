@@ -59,7 +59,6 @@ public class MainMenu {
                     System.out.println("Invalid choice. Please try again.");
             }
 
-
             System.out.println(); // רווח בין הפעולות
         }
         scanner.close();

@@ -83,45 +83,4 @@ public class ProductService {
         return false;
     }
 
-    //new - get catalog_number and product_id
-//    public boolean productExistsByCatalogAndProductId(int catalog, int productId) {
-//        for (Product product : productList) {
-//            if (product.getCatalog_Number() == catalog && product.getProduct_id() == productId) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    public void delete_by_id(int id) {
-//        if (existsProductWithID(id)) {
-//            productList.remove(searchProduct_by_id(id));
-//        }
-//    }
-
-    //search by id
-//    public Product searchProduct_by_id(int id){
-//        for(Product product : productList){ //check product in product_list
-//            if(product.getProduct_id()==id){ //equal the id
-//                return product; //return the product
-//            }
-//        }
-//        return null;
-//    }
-
-//    public void delete_by_catalog(int catalog) {
-//        if(productExistsByCatalog(catalog)) {
-//            productList.remove(getProductByCatalog(catalog));
-//        }
-//    }
-
-//    public Product getProductByCatalog(int catalog){
-//        for(Product product : productList){ //check product in product_list
-//            if(product.getCatalog_Number()==catalog){ //equal the catalog_number
-//                return product; //return the product
-//            }
-//        }
-//        return null;
-//    }
-
 }

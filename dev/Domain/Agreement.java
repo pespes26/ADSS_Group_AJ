@@ -1,8 +1,4 @@
-/**
- * The Agreement class represents an agreement between the supermarket and a supplier.
- * It includes delivery information and a collection of products provided by the supplier.
- * Each product is stored by its ID and includes details such as price and catalog number.
- */
+
 package Domain;
 
 import java.util.HashMap;
@@ -15,14 +11,7 @@ public class Agreement {
     private boolean selfPickup; // Whether delivery is self-handled by the supermarket
     private final HashMap<Integer, Product> supplierProducts; // Maps productID → Product
 
-    /**
-     * Constructs a new Agreement.
-     *
-     * @param agreement_ID   unique ID for the agreement
-     * @param supplier_ID    ID of the supplier
-     * @param deliveryDays   array of delivery days
-     * @param selfPickup     whether the delivery is self pickup or not
-     */
+
     public Agreement(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup) {
         this.agreement_ID = agreement_ID; // Set agreement ID
         this.supplier_ID = supplier_ID; // Set supplier ID
@@ -31,12 +20,7 @@ public class Agreement {
         this.supplierProducts = new HashMap<>(); // Initialize product map
     }
 
-    /**
-     * Adds a new product to the agreement.
-     *
-     * @param productID   the product ID as seen by the supermarket
-     * @param newProduct  the product object to add
-     */
+
     public void addNewSupplierProduct(int productID, Product newProduct) {
         this.supplierProducts.put(productID, newProduct); // Add the product to the map
     }
@@ -56,38 +40,24 @@ public class Agreement {
         }
     }
 
-    /**
-     * Gets the supplier's ID.
-     *
-     * @return the supplier ID
-     */
+
     public int getSupplier_ID() {
         return supplier_ID;
     }
 
-    /**
-     * Gets the agreement's ID.
-     *
-     * @return the agreement ID
-     */
+
     public int getAgreementID() {
         return agreement_ID;
     }
 
 
-    /**
-     * Updates the delivery days for this agreement.
-     *
-     * @param newDeliveryDays an array of updated delivery days
-     */
+
     public void updateDeliveryDays(String[] newDeliveryDays) {
         this.deliveryDays = newDeliveryDays; // Update the delivery days
     }
 
 
-    /**
-     * Toggles the self-pickup option.
-     */
+
     public boolean updateSelfDeliveryOption() {
         this.selfPickup = !this.selfPickup; // Flip the boolean flag
         boolean res = this.selfPickup;
@@ -95,11 +65,7 @@ public class Agreement {
     }
 
 
-    /**
-     * Removes all products from the agreement.
-     *
-     * @return an array of catalog numbers of all removed products
-     */
+
     public int[] removeAllProductsFromAgreement() {
         int size = this.supplierProducts.size(); // Get how many products there are
         int[] productCatalogNumbers = new int[size]; // Prepare array to hold catalog numbers
@@ -141,46 +107,5 @@ public class Agreement {
     public boolean hasProducts() {
         return supplierProducts != null && !supplierProducts.isEmpty();  // אם ה-HashMap לא ריק, יש לפחות מוצר אחד
     }
-
-
-    //    public int removeProduct(int productID) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
-//        supplierProducts.remove(productID); // Remove from the map
-//        return catalogNumber; // Return the catalog number
-//    }
-
-    //    public int removeProduct(int productID) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
-//        supplierProducts.remove(productID); // Remove from the map
-//        return catalogNumber; // Return the catalog number
-//    }
-
-    //    public int removeProductByProductID(int productID) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        if (product == null) {
-//            throw new IllegalArgumentException("Product not found in agreement.");
-//        }
-//
-//        int catalogNumber = product.getCatalog_Number(); // Get its catalog number
-//        supplierProducts.remove(productID); // Remove from the map
-//        return catalogNumber; // Return the catalog number
-//    }
-
-    //    public void updateProductDiscount(int productID, int discount, int amount) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        if (product != null) {
-//            product.setDiscount(discount, amount); // Update discount info if product exists
-//        }
-//    }
-
-
-//    public void updateProductPrice(int productID, int priceNew) {
-//        Product product = supplierProducts.get(productID); // Retrieve the product
-//        if (product != null) {
-//            product.setPrice(priceNew); // Update the price if product exists
-//        }
-//    }
 
 }

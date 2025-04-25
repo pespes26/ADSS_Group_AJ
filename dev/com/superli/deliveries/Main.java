@@ -34,7 +34,7 @@ public class Main {
         var driverController = new DriverController(driverService);
         var truckController = new TruckController(truckService);
         var siteController = new SiteController(siteService, zoneService);
-        var zoneController = new ZoneController(zoneService, scanner);
+        var zoneController = new ZoneController(zoneService, siteService, scanner);
         var transportController = new TransportController(transportService, truckService, driverService);
         var destinationDocController = new DestinationDocController(destinationDocService);
 

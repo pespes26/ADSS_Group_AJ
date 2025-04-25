@@ -19,8 +19,8 @@ class TransportTest {
     @BeforeEach
     void setUp() {
         originSite = new Site("Site1", "Origin St 1", "123", "Contact", new Zone("Zone1", "Central"));
-        truck = new Truck("TR-001", "Volvo", 8000f, 20000f, "C");
-        driver = new Driver("DR-001", "Dan", "C", true);
+        truck = new Truck("TR-001", "Volvo", 8000f, 20000f, LicenseType.C);
+        driver = new Driver("DR-001", "Dan", LicenseType.C, true);
     }
 
     // --- Constructor Tests ---

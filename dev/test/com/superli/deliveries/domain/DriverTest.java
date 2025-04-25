@@ -13,7 +13,7 @@ class DriverTest {
         // Arrange
         String id = "123456789";
         String name = "Israel Israeli";
-        String license = "C";
+        LicenseType license = LicenseType.C;
         boolean available = true;
 
         // Act
@@ -31,7 +31,7 @@ class DriverTest {
     void constructor_NullId_ThrowsIllegalArgumentException() {
         // Arrange
         String name = "Test Driver";
-        String license = "C";
+        LicenseType license = LicenseType.C;
         boolean available = true;
 
         // Act & Assert
@@ -44,7 +44,7 @@ class DriverTest {
     void constructor_BlankId_ThrowsIllegalArgumentException() {
         // Arrange
         String name = "Test Driver";
-        String license = "C";
+        LicenseType license = LicenseType.C;
         boolean available = true;
 
         // Act & Assert
@@ -57,7 +57,7 @@ class DriverTest {
     void constructor_NullName_ThrowsIllegalArgumentException() {
         // Arrange
         String id = "987654321";
-        String license = "C1";
+        LicenseType license = LicenseType.C1;
         boolean available = false;
 
         // Act & Assert
@@ -71,7 +71,7 @@ class DriverTest {
         // Arrange
         String id = "987654321";
         String name = ""; // Empty name
-        String license = "C1";
+        LicenseType license = LicenseType.C1;
         boolean available = false;
 
         // Act & Assert
@@ -83,7 +83,7 @@ class DriverTest {
     @Test
     void setAvailable_UpdatesAvailability() {
         // Arrange
-        Driver driver = new Driver("123", "Test Driver", "C", false);
+        Driver driver = new Driver("123", "Test Driver", LicenseType.C, false);
 
         // Act
         driver.setAvailable(true);
@@ -95,8 +95,8 @@ class DriverTest {
     @Test
     void setLicenseType_ValidType_UpdatesLicenseType() {
         // Arrange
-        Driver driver = new Driver("D789", "Test", "B", true);
-        String newLicenseType = "C1";
+        Driver driver = new Driver("D789", "Test", LicenseType.B, true);
+        LicenseType newLicenseType = LicenseType.C1;
 
         // Act
         driver.setLicenseType(newLicenseType);
@@ -108,8 +108,8 @@ class DriverTest {
     @Test
     void equals_SameId_ShouldBeEqual() {
         // Arrange
-        Driver driver1 = new Driver("ID_EQ", "Name A", "C", true);
-        Driver driver2 = new Driver("ID_EQ", "Name B", "B", false);
+        Driver driver1 = new Driver("ID_EQ", "Name A", LicenseType.C, true);
+        Driver driver2 = new Driver("ID_EQ", "Name B", LicenseType.B, false);
 
         // Act & Assert
         assertEquals(driver1, driver2, "Drivers with same ID should be equal");
@@ -119,8 +119,8 @@ class DriverTest {
     @Test
     void equals_DifferentId_ShouldNotBeEqual() {
         // Arrange
-        Driver driver1 = new Driver("ID1", "Name", "C", true);
-        Driver driver2 = new Driver("ID2", "Name", "C", true);
+        Driver driver1 = new Driver("ID1", "Name", LicenseType.C, true);
+        Driver driver2 = new Driver("ID2", "Name", LicenseType.C, true);
 
         // Act & Assert
         assertNotEquals(driver1, driver2, "Drivers with different IDs should not be equal");

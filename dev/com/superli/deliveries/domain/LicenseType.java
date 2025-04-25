@@ -32,11 +32,22 @@ public enum LicenseType {
      * @return The corresponding LicenseType or null if not found
      */
     public static LicenseType fromString(String value) {
+        if (value == null) return null;
         for (LicenseType type : LicenseType.values()) {
             if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
         }
         return null;
+    }
+
+    /**
+     * Validates if the given string matches this license type.
+     *
+     * @param licenseType The license type to compare
+     * @return true if the strings match (case-insensitive), false otherwise
+     */
+    public boolean matches(String licenseType) {
+        return this.value.equalsIgnoreCase(licenseType);
     }
 }

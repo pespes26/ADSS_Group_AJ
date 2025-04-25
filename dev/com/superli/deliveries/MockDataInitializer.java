@@ -41,36 +41,51 @@ class MockDataInitializer {
     }
 
     private static void initializeZones(ZoneService zoneService) {
-        // Create some zones
-        Zone northZone = new Zone("NORTH", "Northern Region");
-        Zone centralZone = new Zone("CENTRAL", "Central Region");
-        Zone southZone = new Zone("SOUTH", "Southern Region");
+        // Create some zones with plain names in the 'name' field
+        // and combined name+number in the 'id' field
+        Zone northZone = new Zone("North1", "North");
+        Zone centralZone = new Zone("Central2", "Central");
+        Zone southZone = new Zone("South3", "South");
+        Zone jerusalemZone = new Zone("Jerusalem4", "Jerusalem");
+        Zone haifaZone = new Zone("Haifa5", "Haifa");
 
         // Save zones
         zoneService.saveZone(northZone);
         zoneService.saveZone(centralZone);
         zoneService.saveZone(southZone);
+        zoneService.saveZone(jerusalemZone);
+        zoneService.saveZone(haifaZone);
 
-        System.out.println("Initialized 3 zones");
+        System.out.println("Initialized 5 zones");
     }
 
     private static void initializeSites(SiteService siteService, ZoneService zoneService) {
         // Get zones (assuming they were created in initializeZones)
-        Zone northZone = zoneService.getZoneById("NORTH").orElseThrow();
-        Zone centralZone = zoneService.getZoneById("CENTRAL").orElseThrow();
-        Zone southZone = zoneService.getZoneById("SOUTH").orElseThrow();
+        Zone northZone = zoneService.getZoneById("North1").orElseThrow();
+        Zone centralZone = zoneService.getZoneById("Central2").orElseThrow();
+        Zone southZone = zoneService.getZoneById("South3").orElseThrow();
+        Zone jerusalemZone = zoneService.getZoneById("Jerusalem4").orElseThrow();
+        Zone haifaZone = zoneService.getZoneById("Haifa5").orElseThrow();
 
         // Create sites in the north zone
-        Site haifaWarehouse = new Site("HAIFA-WH", "3 Port Avenue, Haifa", "04-8123456", "Dan Cohen", northZone);
-        Site carmielStore = new Site("CARMIEL-1", "50 Main Street, Carmiel", "04-9561234", "Sarah Levy", northZone);
+        Site haifaWarehouse = new Site("S001", "3 Port Avenue, Haifa", "04-8123456", "Dan Cohen", northZone);
+        Site carmielStore = new Site("S002", "50 Main Street, Carmiel", "04-9561234", "Sarah Levy", northZone);
 
         // Create sites in the central zone
-        Site tlvMainHQ = new Site("TLV-HQ", "23 Rothschild Blvd, Tel Aviv", "03-6123456", "David Mizrahi", centralZone);
-        Site petahTikvaWarehouse = new Site("PT-WH", "15 Industrial Zone, Petah Tikva", "03-9123456", "Rachel Green", centralZone);
+        Site tlvMainHQ = new Site("S003", "23 Rothschild Blvd, Tel Aviv", "03-6123456", "David Mizrahi", centralZone);
+        Site petahTikvaWarehouse = new Site("S004", "15 Industrial Zone, Petah Tikva", "03-9123456", "Rachel Green", centralZone);
 
         // Create sites in the south zone
-        Site beerShevaWarehouse = new Site("BS-WH", "7 Ben Gurion, Beer Sheva", "08-6123456", "Moshe Cohen", southZone);
-        Site eilatStore = new Site("EILAT-1", "2 Red Sea Mall, Eilat", "08-6372345", "Noa Levi", southZone);
+        Site beerShevaWarehouse = new Site("S005", "7 Ben Gurion, Beer Sheva", "08-6123456", "Moshe Cohen", southZone);
+        Site eilatStore = new Site("S006", "2 Red Sea Mall, Eilat", "08-6372345", "Noa Levi", southZone);
+
+        // Create sites in Jerusalem zone
+        Site jerusalemCenter = new Site("S007", "12 King David St, Jerusalem", "02-5454545", "Rachel Goldstein", jerusalemZone);
+        Site oldCityBranch = new Site("S008", "7 Jaffa Gate, Jerusalem", "02-5897654", "Daniel Azoulay", jerusalemZone);
+
+        // Create sites in Haifa zone
+        Site haifaPort = new Site("S009", "34 Port Avenue, Haifa", "04-8123456", "Yossi Mizrahi", haifaZone);
+        Site baysideFacility = new Site("S010", "123 Beach Road, Haifa", "04-8349876", "Noa Golan", haifaZone);
 
         // Save all sites
         siteService.saveSite(haifaWarehouse);
@@ -79,8 +94,12 @@ class MockDataInitializer {
         siteService.saveSite(petahTikvaWarehouse);
         siteService.saveSite(beerShevaWarehouse);
         siteService.saveSite(eilatStore);
+        siteService.saveSite(jerusalemCenter);
+        siteService.saveSite(oldCityBranch);
+        siteService.saveSite(haifaPort);
+        siteService.saveSite(baysideFacility);
 
-        System.out.println("Initialized 6 sites");
+        System.out.println("Initialized 10 sites");
     }
 
     private static void initializeDrivers(DriverService driverService) {
@@ -124,6 +143,7 @@ class MockDataInitializer {
                 new Truck("T008", "Ford Transit", 2500.0f, 4600.0f, LicenseType.B),
                 new Truck("T009", "Iveco Stralis", 9300.0f, 25500.0f, LicenseType.E),
                 new Truck("T010", "Mitsubishi Fuso", 6000.0f, 15000.0f, LicenseType.C2)
+
         };
 
         // Set availability (some available, some not)

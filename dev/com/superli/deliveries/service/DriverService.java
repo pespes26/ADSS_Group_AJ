@@ -92,6 +92,74 @@ public class DriverService {
      * @return true if license types match.
      */
     public boolean isDriverQualifiedForTruck(Driver driver, Truck truck) {
-        return driver.getLicenseType() == truck.getRequiredLicenseType();
+        return String.valueOf(driver.getLicenseType()).equals(truck.getRequiredLicenseType());
+    }
+
+    /**
+     * Updates a driver's name.
+     * @param driverId The ID of the driver to update.
+     * @param newName The new name for the driver.
+     * @return true if the update was successful, false otherwise.
+     */
+    public boolean updateDriverName(String driverId, String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            return false; // Invalid name
+        }
+
+        Optional<Driver> driverOpt = driverRepository.findById(driverId);
+        if (driverOpt.isPresent()) {
+            Driver driver = driverOpt.get();
+            driver.setName(newName);
+            driverRepository.save(driver);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Updates a driver's license type.
+     * @param driverId The ID of the driver to update.
+     * @param newLicenseType The new license type for the driver.
+     * @return true if the update was successful, false otherwise.
+     */
+    public boolean updateDriverLicenseType(String driverId, LicenseType newLicenseType) {
+        if (newLicenseType == null) {
+            return false; // Invalid license type
+        }
+
+        Optional<Driver> driverOpt = driverRepository.findById(driverId);
+        if (driverOpt.isPresent()) {
+            Driver driver = driverOpt.get();
+            driver.setLicenseType(newLicenseType);
+            driverRepository.save(driver);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Updates a driver's availability status.
+     * @param driverId The ID of the driver to update.
+     * @param isAvailable The new availability status.
+     * @return true if the update was successful, false otherwise.
+     */
+    public boolean updateDriverAvailability(String driverId, boolean isAvailable) {
+        Optional<Driver> driverOpt = driverRepository.findById(driverId);
+        if (driverOpt.isPresent()) {
+            Driver driver = driverOpt.get();
+            driver.setAvailable(isAvailable);
+            driverRepository.save(driver);
+
+            // Update our tracking of unavailable drivers
+            if (isAvailable) {
+                unavailableDriverIds.remove(driverId);
+            } else {
+                if (!unavailableDriverIds.contains(driverId)) {
+                    unavailableDriverIds.add(driverId);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

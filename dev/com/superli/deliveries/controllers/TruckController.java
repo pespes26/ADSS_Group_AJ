@@ -5,6 +5,7 @@ import com.superli.deliveries.domain.Truck;
 import com.superli.deliveries.service.TruckService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -55,7 +56,7 @@ public class TruckController {
             System.out.println("No trucks found.");
         } else {
             System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║             ALL TRUCKS             ║");
+            System.out.println("║             ALL TRUCKS            ║");
             System.out.println("╚════════════════════════════════════╝");
 
             for (int i = 0; i < trucks.size(); i++) {

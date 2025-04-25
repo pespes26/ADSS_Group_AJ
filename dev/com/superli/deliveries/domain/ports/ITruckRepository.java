@@ -1,4 +1,4 @@
-package com.superli.deliveries.domain.ports; // או .domain, בהתאם למיקום שבחרת
+package com.superli.deliveries.domain.ports;
 
 import com.superli.deliveries.domain.Truck;
 import java.util.Collection;
@@ -22,7 +22,7 @@ public interface ITruckRepository {
      * @param licensePlateNumber The license plate number of the truck to find.
      * @return An Optional containing the Truck if found, or an empty Optional otherwise.
      */
-    Optional<Truck> findByPlate(String licensePlateNumber); // שם מקובל יותר מ-get...By...
+    Optional<Truck> findByPlate(String licensePlateNumber);
 
     /**
      * Finds all trucks currently stored.
@@ -38,7 +38,7 @@ public interface ITruckRepository {
      * @return An Optional containing the removed truck if it was found and deleted,
      * or an empty Optional otherwise.
      */
-    Optional<Truck> deleteByPlate(String licensePlateNumber); // שם מקובל יותר
+    Optional<Truck> deleteByPlate(String licensePlateNumber);
 
     /**
      * Clears all truck data. Mainly for testing purposes.

@@ -62,16 +62,29 @@ public class TransportSummaryView {
 
     @Override
     public String toString() {
-        return "TransportSummaryView{" +
-                "transportId=" + transportId +
-                ", departureDateTime=" + departureDateTime +
-                ", originSite=" + originSite +
-                ", totalWeight=" + totalWeight +
-                ", status=" + status +
-                ", destinations=" + destinationsList.size() +
-                '}';
-    }
+        StringBuilder sb = new StringBuilder();
+        sb.append("====== TRANSPORT SUMMARY ======\n");
+        sb.append("Transport ID: ").append(transportId).append("\n");
+        sb.append("Status: ").append(status).append("\n");
+        sb.append("Departure Time: ").append(departureDateTime).append("\n");
+        sb.append("Total Weight: ").append(totalWeight).append(" kg\n\n");
 
+        sb.append("Origin: ").append(originSite.getAddress()).append("\n");
+        sb.append("Destinations: ").append(destinationsList.size()).append("\n");
+
+        if (!destinationsList.isEmpty()) {
+            int i = 1;
+            for (DestinationDetailsView dest : destinationsList) {
+                sb.append("  ").append(i++).append(". ")
+                        .append(dest.getDestinationSite().getAddress())
+                        .append(" - Status: ").append(dest.getStatus())
+                        .append(" (").append(dest.getDeliveredItems().size()).append(" items)\n");
+            }
+        }
+
+        sb.append("===============================");
+        return sb.toString();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -85,13 +85,22 @@ public class Site {
 
     @Override
     public String toString() {
-        return "Site{" +
-                "siteId='" + siteId + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", contactPersonName='" + contactPersonName + '\'' +
-                ", zoneId=" + (zone != null ? zone.getZoneId() : "null") +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== SITE DETAILS ===\n");
+        sb.append("Site ID: ").append(siteId).append("\n");
+        sb.append("Address: ").append(address).append("\n");
+
+        if (phoneNumber != null && !phoneNumber.isEmpty()) {
+            sb.append("Phone: ").append(phoneNumber).append("\n");
+        }
+
+        if (contactPersonName != null && !contactPersonName.isEmpty()) {
+            sb.append("Contact Person: ").append(contactPersonName).append("\n");
+        }
+
+        sb.append("Zone: ").append(zone.getName()).append(" (").append(zone.getZoneId()).append(")\n");
+        sb.append("====================");
+        return sb.toString();
     }
 
     @Override

@@ -16,9 +16,19 @@ import java.util.stream.Collectors;
 public class TransportService {
 
     private final ITransportRepository transportRepository;
+    private final DriverService driverService;
+    private final TruckService truckService;
+    private final SiteService siteService;
+    private int nextTransportId = 1; // Simple ID generator
 
-    public TransportService(ITransportRepository transportRepository) {
+    public TransportService(ITransportRepository transportRepository,
+                            DriverService driverService,
+                            TruckService truckService,
+                            SiteService siteService) {
         this.transportRepository = transportRepository;
+        this.driverService = driverService;
+        this.truckService = truckService;
+        this.siteService = siteService;
     }
 
     public List<Transport> getAllTransports() {
@@ -35,6 +45,91 @@ public class TransportService {
 
     public boolean deleteTransport(int transportId) {
         return transportRepository.deleteById(transportId).isPresent();
+    }
+
+    /**
+     * Attempt to automatically create a transport by finding compatible driver and truck.
+     *
+     * @return An Optional containing the created Transport if successful, empty otherwise
+     */
+    public Optional<Transport> createTransportAuto() {
+        // Get available trucks and drivers
+        List<Truck> availableTrucks = truckService.getAvailableTrucks();
+        List<Driver> availableDrivers = driverService.getAvailableDrivers();
+
+        if (availableTrucks.isEmpty() || availableDrivers.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Find a compatible truck and driver
+        for (Truck truck : availableTrucks) {
+            for (Driver driver : availableDrivers) {
+                if (driver.getLicenseType() == truck.getRequiredLicenseType()) {
+                    // Found a match! Create the transport
+                    return createTransportWithTruckAndDriver(truck, driver);
+                }
+            }
+        }
+
+        // No compatible truck/driver found
+        return Optional.empty();
+    }
+
+    /**
+     * Create a transport with manually selected truck and driver.
+     *
+     * @param truck The selected truck
+     * @param driver The selected driver
+     * @return An Optional containing the created Transport if successful, empty otherwise
+     */
+    public Optional<Transport> createTransportManual(Truck truck, Driver driver) {
+        // Verify truck and driver are available and compatible
+        if (!truckService.isTruckAvailable(truck.getPlateNum())) {
+            return Optional.empty();
+        }
+
+        if (!driver.isAvailable()) {
+            return Optional.empty();
+        }
+
+        if (driver.getLicenseType() != truck.getRequiredLicenseType()) {
+            return Optional.empty();
+        }
+
+        return createTransportWithTruckAndDriver(truck, driver);
+    }
+
+    /**
+     * Helper method to create a transport with the given truck and driver.
+     */
+    private Optional<Transport> createTransportWithTruckAndDriver(Truck truck, Driver driver) {
+        // Get default origin site
+        List<Site> sites = siteService.getAllSites();
+        if (sites.isEmpty()) {
+            return Optional.empty(); // No sites to use as origin
+        }
+
+        // For simplicity, use the first site as origin
+        Site originSite = sites.get(0);
+
+        // Create the transport
+        Transport transport = new Transport(
+                nextTransportId++,
+                LocalDateTime.now().plusDays(1), // Schedule for tomorrow
+                truck,
+                driver,
+                originSite,
+                TransportStatus.PLANNED
+        );
+
+        // Mark resources as unavailable
+        truckService.markTruckAsUnavailable(truck.getPlateNum());
+        driverService.markDriverAsUnavailable(driver.getDriverId());
+
+        // Save the transport
+        transportRepository.save(transport);
+
+        return Optional.of(transport);
     }
 
     public boolean addDestinationDocToTransport(int transportId, DestinationDoc doc) {
@@ -122,7 +217,6 @@ public class TransportService {
                 .collect(Collectors.toList());
     }
 
-
     public TransportDetailsView getTransportDetailsViewById(int transportId) {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
 
@@ -137,14 +231,14 @@ public class TransportService {
 
             TruckDetailsView truckView = new TruckDetailsView(
                     transport.getTruck().getPlateNum(),
-                    transport.getTruck().getModel(),
+                    transport.getTruck().getRequiredLicenseType().getValue(),
                     transport.getTruck().getMaxWeight()
             );
 
             DriverDetailsView driverView = new DriverDetailsView(
+                    transport.getDriver().getDriverId(),
                     transport.getDriver().getName(),
-                    transport.getDriver().getName(),
-                    transport.getDriver().getLicenseType()
+                    transport.getDriver().getLicenseType().getValue()
             );
 
             List<DestinationDetailsView> destinations = transport.getDestinationList().stream().map(doc ->
@@ -175,9 +269,7 @@ public class TransportService {
                     transport.getDepartureWeight(),
                     transport.getStatus()
             );
-
         }
         return null;
     }
-
 }

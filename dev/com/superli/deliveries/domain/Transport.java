@@ -123,16 +123,39 @@ public class Transport {
 
     @Override
     public String toString() {
-        return "Transport{" +
-                "transportId=" + transportId +
-                ", departureDateTime=" + departureDateTime +
-                ", truck=" + truck.getPlateNum() +
-                ", driver=" + driver.getDriverId() +
-                ", originSite=" + originSite.getSiteId() +
-                ", departureWeight=" + departureWeight +
-                ", status=" + status +
-                ", destinationCount=" + destinationList.size() +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("====== TRANSPORT DETAILS ======\n");
+        sb.append("Transport ID: ").append(transportId).append("\n");
+        sb.append("Status: ").append(status).append("\n");
+        sb.append("Departure Time: ").append(departureDateTime).append("\n");
+        sb.append("Departure Weight: ").append(departureWeight).append(" kg\n\n");
+
+        sb.append("Origin Site: ").append(originSite.getSiteId())
+                .append(" (").append(originSite.getAddress()).append(")\n\n");
+
+        sb.append("Driver Information:\n");
+        sb.append("  ID: ").append(driver.getDriverId()).append("\n");
+        sb.append("  Name: ").append(driver.getName()).append("\n");
+        sb.append("  License Type: ").append(driver.getLicenseType()).append("\n\n");
+
+        sb.append("Truck Information:\n");
+        sb.append("  Plate Number: ").append(truck.getPlateNum()).append("\n");
+        sb.append("  Model: ").append(truck.getModel()).append("\n");
+        sb.append("  Capacity: ").append(truck.getMaxWeight() - truck.getNetWeight()).append(" kg\n\n");
+
+        sb.append("Destinations: ").append(destinationList.size()).append("\n");
+        if (!destinationList.isEmpty()) {
+            int i = 1;
+            for (DestinationDoc doc : destinationList) {
+                sb.append("  ").append(i++).append(". ")
+                        .append(doc.getDestinationId().getSiteId())
+                        .append(" - Status: ").append(doc.getStatus())
+                        .append(" (").append(doc.getDeliveryItems().size()).append(" items)\n");
+            }
+        }
+
+        sb.append("==============================");
+        return sb.toString();
     }
 
     @Override

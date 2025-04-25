@@ -53,7 +53,7 @@ public class MainMenuController {
                     System.out.println("👋 Exiting the system. Goodbye!");
                     return;
                 }
-                default -> System.out.println("❌ Invalid choice. Please try again.");
+                default -> System.out.println("Invalid choice. Please try again.");
             }
         }
     }

@@ -10,32 +10,36 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Repositories
-        DriverRepository driverRepo = new DriverRepository();
-        TruckRepository truckRepo = new TruckRepository();
-        TransportRepository transportRepo = new TransportRepository();
-        SiteRepository siteRepo = new SiteRepository();
-        ZoneRepository zoneRepo = new ZoneRepository();
-        DestinationDocRepository destinationDocRepo = new DestinationDocRepository();
+        // --- Repositories (in-memory) ---
+        var driverRepo = new DriverRepository();
+        var truckRepo = new TruckRepository();
+        var siteRepo = new SiteRepository();
+        var zoneRepo = new ZoneRepository();
+        var transportRepo = new TransportRepository();
+        var destinationDocRepo = new DestinationDocRepository();
 
-        // Services
-        DriverService driverService = new DriverService(driverRepo);
-        TruckService truckService = new TruckService(truckRepo);
-        TransportService transportService = new TransportService(transportRepo);
-        SiteService siteService = new SiteService(siteRepo);
-        ZoneService zoneService = new ZoneService(zoneRepo);
-        DestinationDocService destinationDocService = new DestinationDocService(destinationDocRepo);
+        // --- Services ---
+        var driverService = new DriverService(driverRepo);
+        var truckService = new TruckService(truckRepo);
+        var zoneService = new ZoneService(zoneRepo);
+        var siteService = new SiteService(siteRepo);
+        var destinationDocService = new DestinationDocService(destinationDocRepo);
+        var transportService = new TransportService(transportRepo, driverService, truckService, siteService);
 
-        // Controllers
-        DriverController driverController = new DriverController(driverService);
-        TruckController truckController = new TruckController(truckService);
-        TransportController transportController = new TransportController(transportService);
-        SiteController siteController = new SiteController(siteService);
-        ZoneController zoneController = new ZoneController(zoneService, scanner);
-        DestinationDocController destinationDocController = new DestinationDocController(destinationDocService);
+        // --- Initialize Mock Data for Testing ---
+        // NOTE: This should be removed before final submission
+        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService);
 
-        // Main Menu
-        MainMenuController mainMenuController = new MainMenuController(
+        // --- Controllers ---
+        var driverController = new DriverController(driverService);
+        var truckController = new TruckController(truckService);
+        var siteController = new SiteController(siteService, zoneService);
+        var zoneController = new ZoneController(zoneService, scanner);
+        var transportController = new TransportController(transportService, truckService, driverService);
+        var destinationDocController = new DestinationDocController(destinationDocService);
+
+        // --- Main Menu Controller ---
+        var mainMenuController = new MainMenuController(
                 transportController,
                 driverController,
                 truckController,
@@ -45,6 +49,7 @@ public class Main {
                 scanner
         );
 
+        // --- Run the application ---
         mainMenuController.run();
     }
 }

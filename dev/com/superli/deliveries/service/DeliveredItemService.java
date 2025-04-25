@@ -1,11 +1,11 @@
 package com.superli.deliveries.services;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.superli.deliveries.domain.DeliveredItem;
 import com.superli.deliveries.domain.DestinationDoc;
 import com.superli.deliveries.domain.ports.IDestinationDocRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Service responsible for managing delivered items within destination documents.

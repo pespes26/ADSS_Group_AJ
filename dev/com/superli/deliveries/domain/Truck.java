@@ -21,7 +21,7 @@ public class Truck {
     private final float maxWeight;
 
     /** Required license type to operate this truck */
-    private final String requiredLicenseType;
+    private final LicenseType requiredLicenseType;
 
     /**
      * Constructs a new Truck object.
@@ -30,9 +30,9 @@ public class Truck {
      * @param model Truck model. Cannot be null or empty.
      * @param netWeight Truck's net weight. Must be > 0.
      * @param maxWeight Truck's max weight. Must be >= netWeight.
-     * @param requiredLicenseType Required license type. Cannot be null or empty.
+     * @param requiredLicenseType Required license type. Cannot be null.
      */
-    public Truck(String plateNum, String model, float netWeight, float maxWeight, String requiredLicenseType) {
+    public Truck(String plateNum, String model, float netWeight, float maxWeight, LicenseType requiredLicenseType) {
         if (plateNum == null || plateNum.trim().isEmpty()) {
             throw new IllegalArgumentException("Plate number cannot be null or empty.");
         }
@@ -45,8 +45,8 @@ public class Truck {
         if (maxWeight < netWeight) {
             throw new IllegalArgumentException("Max weight must be greater than or equal to net weight.");
         }
-        if (requiredLicenseType == null || requiredLicenseType.trim().isEmpty()) {
-            throw new IllegalArgumentException("Required license type cannot be null or empty.");
+        if (requiredLicenseType == null) {
+            throw new IllegalArgumentException("Required license type cannot be null.");
         }
 
         this.plateNum = plateNum;
@@ -72,19 +72,21 @@ public class Truck {
         return maxWeight;
     }
 
-    public String getRequiredLicenseType() {
+    public LicenseType getRequiredLicenseType() {
         return requiredLicenseType;
     }
 
     @Override
     public String toString() {
-        return "Truck{" +
-                "plateNum='" + plateNum + '\'' +
-                ", model='" + model + '\'' +
-                ", netWeight=" + netWeight +
-                ", maxWeight=" + maxWeight +
-                ", requiredLicenseType='" + requiredLicenseType + '\'' +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== TRUCK DETAILS ===\n");
+        sb.append("License Plate: ").append(plateNum).append("\n");
+        sb.append("Model: ").append(model).append("\n");
+        sb.append("Weight: ").append(netWeight).append(" kg (net) / ")
+                .append(maxWeight).append(" kg (max)\n");
+        sb.append("Required License: ").append(requiredLicenseType).append("\n");
+        sb.append("=====================");
+        return sb.toString();
     }
 
     @Override

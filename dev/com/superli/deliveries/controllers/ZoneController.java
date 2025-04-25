@@ -57,9 +57,14 @@ public class ZoneController {
         if (zones.isEmpty()) {
             System.out.println("No zones found.");
         } else {
-            System.out.println("\nList of Zones:");
-            for (Zone zone : zones) {
-                System.out.println(zone);
+            System.out.println("\n╔════════════════════════════════════╗");
+            System.out.println("║              ALL ZONES             ║");
+            System.out.println("╚════════════════════════════════════╝");
+
+            for (int i = 0; i < zones.size(); i++) {
+                Zone zone = zones.get(i);
+                System.out.println("\n[" + (i+1) + "] ZONE: " + zone.getName() + " (ID: " + zone.getZoneId() + ")");
+                System.out.println("    " + "-".repeat(40));
             }
         }
     }

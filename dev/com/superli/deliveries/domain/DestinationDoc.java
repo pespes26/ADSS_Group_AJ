@@ -92,13 +92,27 @@ public class DestinationDoc {
 
     @Override
     public String toString() {
-        return "DestinationDoc{" +
-                "destinationDocId=" + destinationDocId +
-                ", transportId=" + transportId +
-                ", destinationId=" + destinationId.getSiteId() +
-                ", status='" + status + '\'' +
-                ", itemsCount=" + deliveryItems.size() +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DESTINATION DOCUMENT ===\n");
+        sb.append("Document ID: ").append(destinationDocId).append("\n");
+        sb.append("Transport ID: ").append(transportId).append("\n");
+        sb.append("Status: ").append(status).append("\n\n");
+
+        sb.append("Destination Site: ").append(destinationId.getSiteId())
+                .append(" (").append(destinationId.getAddress()).append(")\n\n");
+
+        sb.append("Items: ").append(deliveryItems.size()).append("\n");
+        if (!deliveryItems.isEmpty()) {
+            int i = 1;
+            for (DeliveredItem item : deliveryItems) {
+                sb.append("  ").append(i++).append(". Product: ")
+                        .append(item.getProductId())
+                        .append(", Quantity: ").append(item.getQuantity()).append("\n");
+            }
+        }
+
+        sb.append("===========================");
+        return sb.toString();
     }
 
     @Override

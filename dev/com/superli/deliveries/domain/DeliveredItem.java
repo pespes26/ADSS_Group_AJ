@@ -77,7 +77,12 @@ public class DeliveredItem {
      */
     @Override
     public String toString() {
-        return String.format("DeliveredItem{productId='%s', quantity=%d}", productId, quantity);
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DELIVERED ITEM ===\n");
+        sb.append("Product ID: ").append(productId).append("\n");
+        sb.append("Quantity: ").append(quantity).append("\n");
+        sb.append("=====================");
+        return sb.toString();
     }
 
     /**

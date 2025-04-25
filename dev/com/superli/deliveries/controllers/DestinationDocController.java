@@ -25,6 +25,7 @@ public class DestinationDocController {
             System.out.println("\n=== Destination Document Menu ===");
             System.out.println("1. Show all destination documents");
             System.out.println("2. Show destination document by ID");
+            System.out.println("3. Delete destination document");
             System.out.println("0. Back to main menu");
             System.out.print("Your choice: ");
 
@@ -32,11 +33,12 @@ public class DestinationDocController {
             switch (input) {
                 case "1" -> showAllDestinationDocs();
                 case "2" -> showDestinationDocById();
+                case "3" -> deleteDestinationDoc();
                 case "0" -> {
                     System.out.println("Returning to main menu...");
                     return;
                 }
-                default -> System.out.println("❌ Invalid option. Try again.");
+                default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
@@ -53,14 +55,26 @@ public class DestinationDocController {
     private void showDestinationDocById() {
         System.out.print("Enter document ID: ");
         try {
-            String input = scanner.nextLine().trim();
-            int docId = Integer.parseInt(input);
-
+            int docId = Integer.parseInt(scanner.nextLine().trim());
             Optional<DestinationDoc> doc = destinationDocService.getById(docId);
-            if (doc == null) {
-                System.out.println("Document not found.");
+            doc.ifPresentOrElse(
+                    System.out::println,
+                    () -> System.out.println("Document not found.")
+            );
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid ID. Please enter a number.");
+        }
+    }
+
+    private void deleteDestinationDoc() {
+        System.out.print("Enter document ID to delete: ");
+        try {
+            int docId = Integer.parseInt(scanner.nextLine().trim());
+            boolean deleted = destinationDocService.deleteDestinationDoc(docId);
+            if (deleted) {
+                System.out.println("✅ Document deleted successfully.");
             } else {
-                System.out.println(doc);
+                System.out.println("❌ Document not found.");
             }
         } catch (NumberFormatException e) {
             System.out.println("❌ Invalid ID. Please enter a number.");

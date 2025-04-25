@@ -1,6 +1,7 @@
 package com.superli.deliveries.service;
 
 import com.superli.deliveries.domain.Driver;
+import com.superli.deliveries.domain.LicenseType;
 import com.superli.deliveries.domain.Truck;
 import com.superli.deliveries.domain.ports.IDriverRepository;
 
@@ -63,7 +64,7 @@ public class DriverService {
      */
     public void deleteDriver(String driverId) {
         driverRepository.deleteById(driverId);
-        unavailableDriverIds.remove(driverId); // גם מסיר מהלא זמינים אם קיים שם
+        unavailableDriverIds.remove(driverId);
     }
 
     /**
@@ -91,6 +92,6 @@ public class DriverService {
      * @return true if license types match.
      */
     public boolean isDriverQualifiedForTruck(Driver driver, Truck truck) {
-        return driver.getLicenseType().equalsIgnoreCase(truck.getRequiredLicenseType());
+        return driver.getLicenseType() == truck.getRequiredLicenseType();
     }
 }

@@ -49,10 +49,12 @@ public class Zone {
 
     @Override
     public String toString() {
-        return "Zone{" +
-                "zoneId='" + zoneId + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ZONE DETAILS ===\n");
+        sb.append("Zone ID: ").append(zoneId).append("\n");
+        sb.append("Name: ").append(name).append("\n");
+        sb.append("====================");
+        return sb.toString();
     }
 
     @Override

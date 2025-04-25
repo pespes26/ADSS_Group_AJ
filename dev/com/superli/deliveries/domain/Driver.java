@@ -15,8 +15,8 @@ public class Driver {
     /** Driver's full name */
     private String name;
 
-    /** License type (e.g., "C", "C1") */
-    private String licenseType;
+    /** License type (e.g., B, C, C1, C2, E) */
+    private LicenseType licenseType;
 
     /** Availability status for new transports */
     private boolean available;
@@ -26,15 +26,18 @@ public class Driver {
      *
      * @param driverId    Unique driver ID. Cannot be null or blank.
      * @param name        Driver's name. Cannot be null or blank.
-     * @param licenseType Type of license. Can be null/empty.
+     * @param licenseType Type of license. Cannot be null.
      * @param available   Whether the driver is available for assignment.
      */
-    public Driver(String driverId, String name, String licenseType, boolean available) {
+    public Driver(String driverId, String name, LicenseType licenseType, boolean available) {
         if (driverId == null || driverId.trim().isEmpty()) {
             throw new IllegalArgumentException("Driver ID cannot be null or empty.");
         }
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Driver name cannot be null or empty.");
+        }
+        if (licenseType == null) {
+            throw new IllegalArgumentException("License type cannot be null.");
         }
 
         this.driverId = driverId;
@@ -51,7 +54,7 @@ public class Driver {
         return name;
     }
 
-    public String getLicenseType() {
+    public LicenseType getLicenseType() {
         return licenseType;
     }
 
@@ -66,7 +69,10 @@ public class Driver {
         this.name = name;
     }
 
-    public void setLicenseType(String licenseType) {
+    public void setLicenseType(LicenseType licenseType) {
+        if (licenseType == null) {
+            throw new IllegalArgumentException("License type cannot be null.");
+        }
         this.licenseType = licenseType;
     }
 
@@ -74,14 +80,17 @@ public class Driver {
         this.available = available;
     }
 
+
     @Override
     public String toString() {
-        return "Driver{" +
-                "driverId='" + driverId + '\'' +
-                ", name='" + name + '\'' +
-                ", licenseType='" + licenseType + '\'' +
-                ", available=" + available +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DRIVER DETAILS ===\n");
+        sb.append("ID: ").append(driverId).append("\n");
+        sb.append("Name: ").append(name).append("\n");
+        sb.append("License Type: ").append(licenseType).append("\n");
+        sb.append("Status: ").append(available ? "Available" : "Not Available").append("\n");
+        sb.append("=====================");
+        return sb.toString();
     }
 
     @Override

@@ -94,7 +94,7 @@ public class ControllerCoreFunctionsTest {
     public void givenProductWithDiscount_whenOrderWithBestPrice_thenReturnsLowestPrice() {
         controller.createSupplier("PriceCo", 7, 333, 444, "Cash", 1234567896L, "price@co.com", "Prepaid");
         Product p = controller.createProduct(16, 26, 100.0, "kg", 7);
-        p.add_discountRule(10, 10);
+        p.updateOrAddDiscountRule(10, 10);
 
         Map<Integer, Integer> productsInOrder = new HashMap<>();
         productsInOrder.put(26, 12);

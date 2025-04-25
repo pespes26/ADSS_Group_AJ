@@ -43,7 +43,7 @@ public class ProductServiceTest {
     @Test
     public void givenProductWithOneDiscount_whenBestPrice_thenReturnsDiscountedPrice() {
         Product product = productService.createProduct(303, 3, 100.0, "unit", 999);
-        product.add_discountRule(10, 10); // 10% discount from 10 units
+        product.updateOrAddDiscountRule(10, 10); // 10% discount from 10 units
         double price = productService.best_price(3, 15); // 15 units => discount applies
         assertEquals(1350.0, price);
 //        assertEquals(90.0, price);
@@ -53,19 +53,23 @@ public class ProductServiceTest {
     public void givenProductWithDiscounts_whenBestPrice_thenReturnsDiscountedTotalPrice() {
         Product product = productService.createProduct(303, 3, 100.0, "unit", 999);
 
-        product.add_discountRule(10, 10); // 10% discount from 10 units
-        product.add_discountRule(15, 20); // 15% discount from 20 units
+        product.updateOrAddDiscountRule(10, 10); // 10% discount from 10 units
+        product.updateOrAddDiscountRule(15, 20); // 15% discount from 20 units
 
         double price = productService.best_price(3, 15); // Should trigger only the 10% discount
         assertEquals(1350.0, price); // 90 * 15
+
+        product.updateOrAddDiscountRule(20, 10); // 15% discount from 20 units
+        double price1 = productService.best_price(3, 15); // Should trigger only the 10% discount
+        assertEquals(1200.0, price1); // 90 * 15
     }
 
     @Test
     public void givenProductWithHigherTierDiscount_whenBestPrice_thenAppliesBestDiscount() {
         Product product = productService.createProduct(303, 3, 100.0, "unit", 999);
 
-        product.add_discountRule(10, 10); // 10% discount from 10 units
-        product.add_discountRule(15, 20); // 15% discount from 20 units
+        product.updateOrAddDiscountRule(10, 10); // 10% discount from 10 units
+        product.updateOrAddDiscountRule(15, 20); // 15% discount from 20 units
 
         double price = productService.best_price(3, 25); // Should trigger 15% discount
         assertEquals(2125.0, price); // 85 * 25
@@ -75,13 +79,13 @@ public class ProductServiceTest {
     public void givenProductWithDiscounts_whenUpdatingOneDiscount_thenBestPriceReturnsUpdatedDiscountedTotalPrice() {
         Product product = productService.createProduct(303, 3, 100.0, "unit", 999);
 
-        product.add_discountRule(10, 10); // 10% discount from 10 units
-        product.add_discountRule(20, 15); // 15% discount from 20 units
+        product.updateOrAddDiscountRule(10, 10); // 10% discount from 10 units
+        product.updateOrAddDiscountRule(20, 15); // 15% discount from 20 units
 
         double price = productService.best_price(3, 15); // Should trigger 15% discount
         assertEquals(1200.0, price); // 90 * 15
 
-        product.add_discountRule(10, 30); // Update: 30% discount from 10 units
+        product.updateOrAddDiscountRule(10, 30); // Update: 30% discount from 10 units
         double price2 = productService.best_price(3, 12);
         assertEquals(1080.0, price2); // 70 * 12
     }

@@ -74,7 +74,7 @@ public class ProductMenuHandler {
                 System.out.println("Discount Rule #" + (i + 1));
                 int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
                 double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
-                controller.add_discountRule(CatalogNumber, discount, amount, agreementID);
+                controller.updateOrAddDiscountRule(CatalogNumber, discount, amount, agreementID);
             }
         } else {
             System.out.println("Product not found. Cannot add discount rules.");
@@ -127,6 +127,9 @@ public class ProductMenuHandler {
                 case 3:
                     readAndAddDiscountRules(scanner, controller, catalogNumber, agreementID);
                     break;
+//                case 4:
+//                    updateDiscountRules(scanner, controller, catalogNumber, agreementID);
+//                    break;
                 case 0:
                     System.out.println("Returning to previous menu...");
                     break;

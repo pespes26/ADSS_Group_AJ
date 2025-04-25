@@ -29,25 +29,25 @@ public class DataInitializer {
 
         // ===== Create Products with Discount Rules and add to agreements =====
         Product milk = controller.createProduct(1001, 5001, 5.5, "Liter", 101);
-        milk.add_discountRule(10, 5);   // 5% discount for 10+ units
-        milk.add_discountRule(20, 10);  // 10% discount for 20+ units
+        milk.updateOrAddDiscountRule(10, 5);   // 5% discount for 10+ units
+        milk.updateOrAddDiscountRule(20, 10);  // 10% discount for 20+ units
         controller.addProductToAgreement(5001, milk, 201);
 
         Product chocolate = controller.createProduct(1002, 5002, 8.0, "Bar", 101);
-        chocolate.add_discountRule(5, 3); // 3% discount for 5+ units
+        chocolate.updateOrAddDiscountRule(5, 3); // 3% discount for 5+ units
         controller.addProductToAgreement(5002, chocolate, 202);
 
         Product hummus = controller.createProduct(1003, 6001, 6.2, "Pack", 102);
-        hummus.add_discountRule(10, 5); // 5% discount for 10+ units
+        hummus.updateOrAddDiscountRule(10, 5); // 5% discount for 10+ units
         controller.addProductToAgreement(6001, hummus, 203);
 
         Product pasta = controller.createProduct(1004, 7001, 4.3, "Bag", 103);
-        pasta.add_discountRule(15, 7); // 7% discount for 15+ units
+        pasta.updateOrAddDiscountRule(15, 7); // 7% discount for 15+ units
         controller.addProductToAgreement(7001, pasta, 204);
 
         Product coke = controller.createProduct(1005, 8001, 6.0, "Bottle", 104);
-        coke.add_discountRule(12, 4);  // 4% discount for 12+ units
-        coke.add_discountRule(25, 10); // 10% discount for 25+ units
+        coke.updateOrAddDiscountRule(12, 4);  // 4% discount for 12+ units
+        coke.updateOrAddDiscountRule(25, 10); // 10% discount for 25+ units
         controller.addProductToAgreement(8001, coke, 205);
 
         Product chips = controller.createProduct(1006, 8002, 3.5, "Bag", 104);

@@ -7,8 +7,56 @@ import com.superli.deliveries.storage.*;
 import java.util.Scanner;
 
 public class Main {
+
+    // Role enum inside Main
+    enum Role {
+        SYSTEM_ADMIN,
+        TRANSPORT_MANAGER
+    }
+
+    // Static variable to store current user role
+    private static Role currentUserRole;
+
+    /**
+     * Checks if the current user is a system administrator.
+     * @return true if current user is a system administrator, false otherwise
+     */
+    public static boolean isSystemAdmin() {
+        return currentUserRole == Role.SYSTEM_ADMIN;
+    }
+
+    /**
+     * Checks if the current user is a transport manager.
+     * @return true if current user is a transport manager, false otherwise
+     */
+    public static boolean isTransportManager() {
+        return currentUserRole == Role.TRANSPORT_MANAGER;
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        // --- User role selection and password authentication ---
+        System.out.println("Select user type:");
+        System.out.println("1. System Administrator");
+        System.out.println("2. Transport Manager");
+        System.out.print("Your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Clear input buffer after number
+
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        if (choice == 1 && password.equals("admin")) {
+            currentUserRole = Role.SYSTEM_ADMIN;
+            System.out.println("You are logged in as System Administrator.");
+        } else if (choice == 2 && password.equals("transport123")) {
+            currentUserRole = Role.TRANSPORT_MANAGER;
+            System.out.println("You are logged in as Transport Manager.");
+        } else {
+            System.out.println("Invalid password or selection. Program terminating.");
+            return;
+        }
 
         // --- Repositories (in-memory) ---
         var driverRepo = new DriverRepository();
@@ -41,7 +89,6 @@ public class Main {
         var siteController = new SiteController(siteService, zoneService);
         var zoneController = new ZoneController(zoneService, siteService, scanner);
 
-        // Enhanced TransportController with all required dependencies
         var transportController = new TransportController(
                 transportService,
                 truckService,
@@ -49,13 +96,15 @@ public class Main {
                 siteService,
                 productService,
                 destinationDocService,
-                deliveredItemService);
+                deliveredItemService
+        );
 
         var destinationDocController = new DestinationDocController(
                 destinationDocService,
                 deliveredItemService,
                 siteService,
-                transportService);
+                transportService
+        );
 
         // --- Main Menu Controller ---
         var mainMenuController = new MainMenuController(
@@ -71,7 +120,4 @@ public class Main {
         // --- Run the application ---
         mainMenuController.run();
     }
-
-    // No additional initialization methods needed -
-    // all initialization is now handled by MockDataInitializer
 }

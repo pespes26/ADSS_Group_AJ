@@ -9,34 +9,21 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-/**
- * Controller class for managing the user interface menu.
- * Handles user input, invokes the appropriate system functionality,
- * and connects to the {@link InventoryController} for backend operations.
- */
+
 public class MenuController {
     private final Scanner scan; // Scanner for reading user input
     private final InventoryController inventory_controller; // Reference to the inventory system logic
+    private final int current_branch_id; // Tracks the currently active branch selected by the user (1–10)
 
-    /**
-     * Constructs a MenuController and links it to the inventory controller.
-     *
-     * @param inventory_controller The main inventory controller used to perform system actions.
-     */
-    public MenuController(InventoryController inventory_controller) {
+    public MenuController(InventoryController inventory_controller, int currentBranchId) {
         this.scan = new Scanner(System.in);
         this.inventory_controller = inventory_controller;
+        this.current_branch_id = currentBranchId;
     }
 
-    /**
-     * Launches the main menu loop.
-     * Continuously prompts the user for input, processes their selection,
-     * and delegates the requested operation to the appropriate controller.
-     * Loop ends when the user selects the exit option (option 14).
-     */
+
     public void runMenu() {
         int choice = 0;
-
         while (choice != 14) {
             printMenu();
             try {
@@ -91,10 +78,10 @@ public class MenuController {
             case 5 -> updateCostPrice();
             case 6 -> markAsDefect();
             case 7 -> generateInventoryReport();
-            case 8 -> System.out.println(inventory_controller.getReportController().defectAndExpiredReport());
+            case 8 -> System.out.println(inventory_controller.getReportController().defectAndExpiredReport(current_branch_id));
             case 9 -> applyDiscount();
             case 10 -> showQuantities();
-            case 11 -> System.out.println(inventory_controller.getReportController().generateReorderAlertReport());
+            case 11 -> System.out.println(inventory_controller.getReportController().generateReorderAlertReport(current_branch_id));
             case 12 -> changeSupplyDetails();
             case 13 -> changeItemLocation();
             case 14 -> {} // exit
@@ -102,34 +89,22 @@ public class MenuController {
         }
     }
 
-    /**
-     * Prompts the user to enter an item ID and displays the detailed information
-     * of the corresponding item.
-     * Delegates the display logic to the {@code showItemDetails} method
-     * in the {@code ItemController}.
-     */
     private void showItemDetails() {
         System.out.println("Enter item ID: ");
         int item_Id = Integer.parseInt(scan.nextLine());
-        System.out.println(inventory_controller.getItemController().showItemDetails(item_Id));
+        System.out.println(inventory_controller.getItemController().showItemDetails(item_Id, current_branch_id));
     }
 
-    /**
-     * Prompts the user to enter details for a new item and adds it to the inventory system.
-     * The details include product metadata, pricing, demand, supply time, and discounts.
-     * If the item ID already exists in the system, the method will notify the user
-     * and return to the main menu.
-     * All input fields are collected and formatted into a CSV-style string, which is then passed
-     * to the {@code addItem} method of the {@code ItemController}.
-     */
+
+
     private void addNewItem() {
-        System.out.println("Please enter the following details for the new item:");
+        System.out.println("\nPlease enter the following details for the new item in Branch " + current_branch_id + ":");
 
         System.out.print("Item ID (unique number): ");
         int item_Id = Integer.parseInt(scan.nextLine());
 
-        if (inventory_controller.getItemController().itemExists(item_Id)) {
-            System.out.println("An item with ID " + item_Id + " already exists in the system.");
+        if (inventory_controller.getItemController().itemExistsInBranch(item_Id, current_branch_id)) {
+            System.out.println("An item with ID " + item_Id + " already exists in your branch (Branch " + current_branch_id + "). Returning to main menu.");
             System.out.println("Returning to the main menu.");
             return;
         }
@@ -176,8 +151,7 @@ public class MenuController {
         System.out.print("Store Discount (%): ");
         int store_discount = Integer.parseInt(scan.nextLine());
 
-        // Compose CSV format string for internal use
-        String csvInput = item_Id + "," + product_name + "," + expiring_date + "," + location + "," + section + ","
+        String csvInput = item_Id + "," + current_branch_id + "," + product_name + "," + expiring_date + "," + location + "," + section + ","
                 + catalog_number + "," + category + "," + sub_category + "," + size + "," + cost_price_before + ","
                 + demand + "," + supply_time + "," + manufacturer + "," + supplier_discount + "," + store_discount;
 
@@ -185,33 +159,24 @@ public class MenuController {
 
         System.out.println("\n-----------------------------------------");
         if (success) {
-            System.out.println("Item added successfully.");
+            System.out.println("Item added successfully to Branch " + current_branch_id + "!");
             System.out.println("Product Name: " + product_name);
             System.out.println("Catalog Number: " + catalog_number);
             System.out.println("Category: " + category + ", Sub-Category: " + sub_category);
         } else {
             System.out.println("Failed to add item. Please verify all details were entered correctly.");
         }
-        System.out.println("-----------------------------------------");
+        System.out.println("-----------------------------------------\n");
     }
 
-    /**
-     * Removes an item from the inventory based on the provided item ID.
-     * The user is prompted to specify the reason for removal:
-     * <ul>
-     *   <li>1 – Purchase: the item is removed and marked as sold, and the sale price is displayed.</li>
-     *   <li>2 – Defect: the item is removed and marked as defective.</li>
-     * </ul>
-     * If the removal causes the associated product to fall below its minimum threshold,
-     * a reorder alert is displayed.
-     * If the item does not exist or the reason is invalid, a corresponding message is printed.
-     */
+
+
     private void removeItem() {
         System.out.print("Enter item ID: ");
         int item_Id = Integer.parseInt(scan.nextLine());
 
-        if (!inventory_controller.getItemController().itemExists(item_Id)) {
-            System.out.println("Item does not exist in the inventory.");
+        if (!inventory_controller.getItemController().itemExistsInBranch(item_Id, current_branch_id)) {
+            System.out.println("Item does not exist in Branch " + current_branch_id + ".");
             return;
         }
 
@@ -219,39 +184,33 @@ public class MenuController {
         System.out.println("(1) Purchase\n(2) Defect");
         int reason = Integer.parseInt(scan.nextLine());
 
+        int catalog_number = inventory_controller.getItemController().getCatalogNumber(item_Id, current_branch_id);
+        String product_name = inventory_controller.getItemController().getItemName(item_Id, current_branch_id);
+        double sale_price = inventory_controller.getItemController().getSalePriceAfterDiscount(item_Id);
+
         if (reason == 1) {
-            boolean alert = inventory_controller.getItemController().checkReorderAlert(item_Id);
-            String product_name = inventory_controller.getItemController().getItemName(item_Id);
-            double sale_price = inventory_controller.getItemController().getSalePriceAfterDiscount(item_Id);
-
-            inventory_controller.getItemController().removeItemByPurchase(item_Id);
-
-            System.out.println("\n-----------------------------------------");
-            System.out.println("The item \"" + product_name + "\" has been marked as purchased and removed.");
-            System.out.printf("The item was sold for: %.2f ₪ (after store discount)\n", sale_price);
-            if (alert) {
-                System.out.println("ALERT: The product \"" + product_name + "\" has reached a critical amount!");
-                System.out.println("Please consider reordering.");
-            }
-            System.out.println("-----------------------------------------");
-
+            inventory_controller.getItemController().removeItemByPurchase(item_Id, current_branch_id);
         } else if (reason == 2) {
-            boolean alert = inventory_controller.getItemController().checkReorderAlert(item_Id);
-            String product_name = inventory_controller.getItemController().getItemName(item_Id);
-
-            inventory_controller.getItemController().removeItemByDefect(item_Id);
-
-            System.out.println("\n-----------------------------------------");
-            System.out.println("The item \"" + product_name + "\" has been marked as defective and removed.");
-            if (alert) {
-                System.out.println("ALERT: The product \"" + product_name + "\" has reached a critical amount!");
-                System.out.println("Please consider reordering.");
-            }
-            System.out.println("-----------------------------------------");
-
+            inventory_controller.getItemController().removeItemByDefect(item_Id, current_branch_id);
         } else {
             System.out.println("Invalid choice. Please enter 1 or 2.");
+            return;
         }
+
+        boolean alert = inventory_controller.getReportController().shouldTriggerAlertAfterRemoval(current_branch_id, catalog_number);
+
+        System.out.println("\n-----------------------------------------");
+        if (reason == 1) {
+            System.out.println("The item \"" + product_name + "\" has been marked as purchased and removed from Branch " + current_branch_id + ".");
+            System.out.printf("The item was sold for: %.2f ₪ (after store discount)\n", sale_price);
+        } else {
+            System.out.println("The item \"" + product_name + "\" has been marked as defective and removed from Branch " + current_branch_id + ".");
+        }
+        if (alert) {
+            System.out.println("ALERT: The product \"" + product_name + "\" in Branch " + current_branch_id + " has reached a critical amount!");
+            System.out.println("Please consider reordering.");
+        }
+        System.out.println("-----------------------------------------");
     }
 
 
@@ -264,26 +223,33 @@ public class MenuController {
     private void showPurchasePrices() {
         System.out.println("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
-        System.out.println(inventory_controller.getProductController().showProductPurchasesPrices(catalog));
+        System.out.println(inventory_controller.getProductController().showProductPurchasesPrices(catalog, current_branch_id));
     }
 
     /**
      * Updates the cost price (before discounts) of a product identified by its catalog number.
+     * Important: Updating the cost price affects all branches across the network.
+
      * The user is prompted to enter:
      * <ul>
      *   <li>The product's catalog number</li>
      *   <li>The new cost price</li>
      * </ul>
+     *
      * The method performs input validation to ensure:
      * <ul>
      *   <li>The catalog number is numeric and exists in the system</li>
      *   <li>The new cost price is a non-negative number</li>
      * </ul>
      *
-     * Upon success, the cost price is updated and the change is confirmed to the user.
+     * Upon success, the cost price is updated for all branches and a confirmation is shown to the user.
      * If any validation fails or the update fails, appropriate error messages are shown.
      */
     private void updateCostPrice() {
+        System.out.println("------------------------------------------------------");
+        System.out.println("Note: Updating the cost price will apply to ALL branches.");
+        System.out.println("------------------------------------------------------");
+
         System.out.print("Enter Product Catalog Number: ");
         int catalog_number;
 
@@ -314,11 +280,14 @@ public class MenuController {
         }
 
         boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, new_price);
+        System.out.println("\n------------------------------------------------------");
         if (success) {
-            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + new_price + ".");
+            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + new_price + " ₪.");
+            System.out.println("The new cost price has been applied across all branches.");
         } else {
             System.out.println("Failed to update cost price. Please check the inputs and try again.");
         }
+        System.out.println("------------------------------------------------------");
     }
 
     /**
@@ -340,13 +309,14 @@ public class MenuController {
             return;
         }
 
-        boolean success = inventory_controller.getItemController().markItemAsDefective(item_Id);
+        boolean success = inventory_controller.getItemController().markItemAsDefective(item_Id, current_branch_id);
         if (success) {
-            System.out.println("Item with ID " + item_Id + " has been marked as defective.");
+            System.out.println("Item with ID " + item_Id + " in Branch " + current_branch_id + " has been marked as defective.");
         } else {
-            System.out.println("Item with ID " + item_Id + " does not exist in the inventory.");
+            System.out.println("Item with ID " + item_Id + " was not found in Branch " + current_branch_id + ".");
         }
     }
+
 
     /**
      * Generates and displays an inventory report grouped by categories.
@@ -356,12 +326,21 @@ public class MenuController {
      * The resulting report shows sub-categories, sizes, and items grouped accordingly.
      */
     private void generateInventoryReport() {
-        System.out.println("Enter categories separated by commas: ");
+        System.out.println("\n===================================================");
+        System.out.println("Inventory Report by Categories (Branch " + current_branch_id + ")");
+        System.out.println("===================================================");
+
+        System.out.print("Enter categories separated by commas: ");
         String[] categories = Arrays.stream(scan.nextLine().split(","))
                 .map(String::trim)
                 .toArray(String[]::new);
-        System.out.println(inventory_controller.getReportController().inventoryReportByCategories(categories));
+
+        String report = inventory_controller.getReportController().inventoryReportByCategories(categories, current_branch_id);
+
+        System.out.println("\n----------- Report Output -----------");
+        System.out.println(report);
     }
+
 
     /**
      * Applies a discount (supplier or store) to a group of products based on user selection.
@@ -383,12 +362,15 @@ public class MenuController {
      *     <li>Ensures the end date is after the current date</li>
      * </ul>
      *
+     * 🛈 The discount will be applied to **all branches across the network**.
      * A {@link Domain.Discount} object is created and passed to the appropriate method
      * in the {@code DiscountController}.
      * A success or failure message is displayed accordingly.
      */
+
     private void applyDiscount() {
         System.out.println("Apply Discount");
+        System.out.println("Note: The discount you apply will affect ALL branches across the network.");
         System.out.println("Choose group to apply discount on:");
         System.out.println("(1) Category\n(2) Sub-Category\n(3) Product Catalog Number");
 
@@ -464,7 +446,6 @@ public class MenuController {
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
-
         LocalDate start = LocalDate.now();
         LocalDate end;
 
@@ -473,7 +454,6 @@ public class MenuController {
                 System.out.print("Enter end date (format: day.month.year, e.g., 30.5.2025): ");
                 String endInput = scan.nextLine().replace("-", ".").replace("/", ".");
                 end = LocalDate.parse(endInput, formatter);
-
                 if (end.isBefore(start)) {
                     System.out.println("End date must be after today's date (" + start + "). Please try again.");
                 } else {
@@ -507,11 +487,13 @@ public class MenuController {
             String discountType = is_supplier ? "Supplier" : "Store";
             System.out.println(discountType + " discount of " + rate + "% was successfully applied to: " + target);
             System.out.println("Active from " + start + " to " + end);
+            System.out.println("Note: This discount has been applied to ALL branches in the network.");
         } else {
             System.out.println("Failed to apply discount. Check if the group exists or if the discount is valid.");
         }
         System.out.println("-----------------------------------------");
     }
+
 
 
 
@@ -526,9 +508,9 @@ public class MenuController {
         System.out.print("Enter Product Catalog Number: ");
         int catalog = Integer.parseInt(scan.nextLine());
 
-        String result = inventory_controller.getProductController().showProductQuantities(catalog);
-
         System.out.println("\n-----------------------------");
+        System.out.println("Showing product quantities for Branch " + current_branch_id + ":");
+        String result = inventory_controller.getProductController().showProductQuantities(catalog, current_branch_id);
         System.out.println(result);
         System.out.println("-----------------------------\n");
     }
@@ -536,15 +518,22 @@ public class MenuController {
     /**
      * Allows the user to update the supply time and/or demand level of a product.
      * <p>
-     * Prompts the user to enter the product's catalog number and select which details to update:
+     * The update applies globally across all branches where the product is available.
+     * <p>
+     * Prompts the user to:
      * <ul>
-     *     <li>1 – Supply time only</li>
-     *     <li>2 – Demand level only</li>
-     *     <li>3 – Both</li>
+     *     <li>Enter the product's catalog number</li>
+     *     <li>Select which details to update:
+     *         <ul>
+     *             <li>1 – Supply Time only</li>
+     *             <li>2 – Demand Level only</li>
+     *             <li>3 – Both Supply Time and Demand Level</li>
+     *         </ul>
+     *     </li>
+     *     <li>Provide new values for the selected fields</li>
      * </ul>
-     *
-     * The chosen values are then passed to {@code updateProductSupplyDetails}
-     * in the {@code ProductController}, and a confirmation message is printed if successful.
+     * After updating, a confirmation message is displayed, indicating that the change
+     * has been applied to the product across all branches.
      */
     private void changeSupplyDetails() {
         System.out.println("Enter Product Catalog Number:");
@@ -568,26 +557,29 @@ public class MenuController {
         boolean updated = inventory_controller.getProductController().updateProductSupplyDetails(catalog, supply, demand);
 
         if (updated) {
-            System.out.println("Product supply details updated successfully.");
+            System.out.println("\n-----------------------------------------");
+            System.out.println("The supply details for the product with Catalog Number " + catalog + " have been updated across all branches.");
             if (supply != null) {
                 System.out.println("New supply time: " + supply + " days");
             }
             if (demand != null) {
                 System.out.println("New demand level: " + demand);
             }
+            System.out.println("-----------------------------------------\n");
         } else {
-            System.out.println("Product with Product Catalog Number " + catalog + " not found in inventory.");
+            System.out.println("Product with Catalog Number " + catalog + " not found in inventory.");
         }
     }
 
     /**
-     * Updates the storage location and/or section of a specific item in the inventory.
+     * Updates the storage location and/or section of a specific item within the current branch.
      * <p>
      * The user is prompted to enter the item ID, choose which fields to update
      * (location, section, or both), and then provide the new values accordingly.
-
-     * The update is applied via {@code updateItemLocation} in the {@code ItemController}.
-     * If the item exists, a success message is displayed with the updated values;
+     * <p>
+     * The update is applied via {@code updateItemLocation} in the {@code ItemController},
+     * targeting only the currently selected branch.
+     * If the item exists in the current branch, a success message is displayed with the updated values;
      * otherwise, an error message is shown.
      */
     private void changeItemLocation() {
@@ -609,18 +601,20 @@ public class MenuController {
             section = scan.nextLine();
         }
 
-        boolean updated = inventory_controller.getItemController().updateItemLocation(id, location, section);
+        boolean updated = inventory_controller.getItemController().updateItemLocation(id, current_branch_id, location, section);
 
         if (updated) {
-            System.out.println("Item location updated successfully.");
+            System.out.println("\n-----------------------------------------");
+            System.out.println("Item with ID " + id + " updated successfully in Branch " + current_branch_id + ".");
             if (location != null) {
                 System.out.println("New location: " + location);
             }
             if (section != null) {
                 System.out.println("New section: " + section);
             }
+            System.out.println("-----------------------------------------\n");
         } else {
-            System.out.println("Item with ID " + id + " was not found in inventory.");
+            System.out.println("Item with ID " + id + " was not found in Branch " + current_branch_id + ".");
         }
     }
 }

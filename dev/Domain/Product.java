@@ -171,7 +171,12 @@ public class Product {
     }
 
     /**
-     * @return The name of the manufacturer of the product.
+     * Recalculates the product's prices based on the current discounts.
+     * <p>
+     * Updates:
+     * - Cost price after supplier discount
+     * - Sale price before and after store discount
+     * Automatically reflects any recent changes to cost or discount values.
      */
     private void recalculatePrices() {
         this.cost_price_after_supplier_discount = cost_price_before_supplier_discount * (1 - supplier_discount / 100.0);
@@ -179,7 +184,11 @@ public class Product {
         this.sale_price_after_store_discount = sale_price_before_store_discount * (1 - store_discount / 100.0);
     }
 
-
+    /**
+     * Returns the manufacturer name of the product.
+     *
+     * @return the name of the product's manufacturer.
+     */
     public String getManufacturer() {
         return manufacturer;
     }

@@ -7,79 +7,69 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+
 /**
- * Controller responsible for managing the overall inventory system.
- * It serves as a central point that coordinates the item, product, discount,
- * and report controllers, and handles data import from external sources.
+ * Manages inventory operations: items, products, discounts, branches, and reports.
+ * Supports data import from CSV and updates product stock levels across branches.
  */
+
 public class InventoryController {
     private final ItemController item_controller;
     private final ProductController product_controller;
     private final DiscountController discount_controller;
     private final ReportController report_controller;
 
-    private final HashMap<Integer, Item> items; // All items in the inventory, keyed by item ID
-    private final HashMap<Integer, Product> products; // All products in the system, keyed by catalog number
+    private final HashMap<Integer, Product> products;
+    private final HashMap<Integer, Branch> branches;
     private final HashMap<String, HashMap<String, HashMap<String, HashMap<String, Integer>>>> products_amount_map_by_category;
 
-    /**
-     * Initializes the inventory controller and all of its internal sub-controllers.
-     * Also initializes the internal maps that manage items, products, and product inventory structure.
-     */
     public InventoryController() {
-        this.items = new HashMap<>();
         this.products = new HashMap<>();
-        HashMap<Integer, Item> purchased_items = new HashMap<>();
+        this.branches = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
 
-        this.item_controller = new ItemController(items, products, purchased_items);
+        HashMap<Integer, Item> purchased_items = new HashMap<>();
+        this.item_controller = new ItemController(branches, products, purchased_items);
         this.product_controller = new ProductController(products, purchased_items);
         this.discount_controller = new DiscountController(products);
-        this.report_controller = new ReportController(items, products);
+        this.report_controller = new ReportController(branches, products);
     }
 
     /**
-     * Imports item and product data from a CSV file into the system.
-     * Each line in the CSV represents a single item and its associated product.
-     * Products are only added if their catalog number does not already exist in the system.
-     * Also updates the product inventory count by category, sub-category, size, and location.
+     * Imports inventory data from a CSV file.
+     * Each line in the CSV represents an item with various attributes.
      *
-     * @param path The path to the CSV file to import.
+     * @param path The path to the CSV file.
      */
     public void importData(String path) {
         try (CSVReader reader = new CSVReader(new FileReader(path))) {
-            String[] productFieldsFromCSV;
-            while ((productFieldsFromCSV = reader.readNext()) != null) {
-                String input_id = productFieldsFromCSV[0];
+            String[] itemFieldsFromCSV;
+            while ((itemFieldsFromCSV = reader.readNext()) != null) {
+                String input_id = itemFieldsFromCSV[0];
                 if (input_id.startsWith("\uFEFF")) {
                     input_id = input_id.substring(1);
                 }
-                input_id = input_id.trim();
-                productFieldsFromCSV[0] = input_id;
+                itemFieldsFromCSV[0] = input_id.trim();
 
-                Item item = new Item();
-                item.setItemId(Integer.parseInt(productFieldsFromCSV[0]));
-                item.setItemExpiringDate(productFieldsFromCSV[2]);
-                item.setStorageLocation(productFieldsFromCSV[3]);
-                item.setSectionInStore(productFieldsFromCSV[4]);
-                item.setItemSize(Integer.parseInt(productFieldsFromCSV[8]));
-                item.setCatalog_number(Integer.parseInt(productFieldsFromCSV[5]));
-                item.setDefect(false);
+                Item item = buildItemFromCSV(itemFieldsFromCSV);
+                int branchId = item.getBranchId();
 
-                items.put(item.getItemId(), item);
+                branches.putIfAbsent(branchId, new Branch(branchId));
+                branches.get(branchId).addItem(item);
 
-                int catalog_number = Integer.parseInt(productFieldsFromCSV[5]);
+                int catalog_number = item.getCatalogNumber();
                 if (!products.containsKey(catalog_number)) {
-                    Product product = buildProductFromCSV(productFieldsFromCSV);
+                    Product product = buildProductFromCSV(itemFieldsFromCSV);
                     products.put(catalog_number, product);
                 }
 
-                String category = productFieldsFromCSV[6];
-                String sub_category = productFieldsFromCSV[7];
-                String size = productFieldsFromCSV[8];
-                String location = productFieldsFromCSV[3];
+                String category = itemFieldsFromCSV[7];
+                String sub_category = itemFieldsFromCSV[8];
+                String size = itemFieldsFromCSV[9];
+                String location = itemFieldsFromCSV[4];
 
-                updateProductInventoryCount(true, category, sub_category, size, location);
+                updateProductInventoryCount(true, branchId, category, sub_category, size, location);
+
             }
         } catch (IOException | CsvValidationException e) {
             System.err.println("Failed to import data: " + e.getMessage());
@@ -87,73 +77,106 @@ public class InventoryController {
     }
 
     /**
-     * Updates the internal inventory count of products grouped by category, sub-category, size, and location.
-     * Also updates the quantity counters inside each matching product (warehouse or store).
+     * Builds an Item object from a CSV line.
      *
-     * @param add         Indicates whether to increment (true) or decrement (false) the item count.
-     * @param category    The category of the product.
-     * @param sub_category The sub-category of the product.
-     * @param size        The size of the item (as a string, e.g., "1", "2", "3").
-     * @param location    The storage location ("warehouse" or "interiorStore").
+     * @param fields The fields from the CSV line.
+     * @return The constructed Item object.
      */
-    public void updateProductInventoryCount(boolean add, String category, String sub_category, String size, String location) {
+    private Item buildItemFromCSV(String[] fields) {
+        Item item = new Item();
+        item.setItemId(Integer.parseInt(fields[0]));
+        item.setBranchId(Integer.parseInt(fields[1]));
+        item.setItemExpiringDate(fields[3]);
+        item.setStorageLocation(fields[4]);
+        item.setSectionInStore(fields[5]);
+        item.setCatalog_number(Integer.parseInt(fields[6]));
+        item.setItemSize(Integer.parseInt(fields[9]));
+        item.setDefect(false);
+        return item;
+    }
+
+    /**
+     * Returns the map of all existing branches in the system.
+     * <p>
+     * Each branch is identified by its unique branch ID.
+     * Used to access branch-specific inventories and operations.
+     *
+     * @return a map of branch IDs to {@code Branch} objects.
+     */
+    public HashMap<Integer, Branch> getBranches() {
+        return branches;
+    }
+
+    /**
+     * Updates the stock count of a product in a specific branch and location.
+     * <p>
+     * Supports adding or removing items based on category, sub-category, size, and location.
+     * Also updates product warehouse/store quantities accordingly.
+     *
+     * @param add true to add stock, false to remove stock
+     * @param branchId the ID of the branch where the update applies
+     * @param category the product's category
+     * @param sub_category the product's sub-category
+     * @param size the size of the product
+     * @param location the location ("Warehouse" or "InteriorStore")
+     */
+    public void updateProductInventoryCount(boolean add, int branchId, String category, String sub_category, String size, String location) {
         products_amount_map_by_category.putIfAbsent(category, new HashMap<>());
-        HashMap<String, HashMap<String, HashMap<String, Integer>>> sub_category_map = products_amount_map_by_category.get(category);
-        sub_category_map.putIfAbsent(sub_category, new HashMap<>());
-        HashMap<String, HashMap<String, Integer>> sizeMap = sub_category_map.get(sub_category);
+        HashMap<String, HashMap<String, HashMap<String, Integer>>> subCategoryMap = products_amount_map_by_category.get(category);
+        subCategoryMap.putIfAbsent(sub_category, new HashMap<>());
+        HashMap<String, HashMap<String, Integer>> sizeMap = subCategoryMap.get(sub_category);
         sizeMap.putIfAbsent(size, new HashMap<>());
-        HashMap<String, Integer> location_map = sizeMap.get(size);
+        HashMap<String, Integer> locationMap = sizeMap.get(size);
 
         if (add) {
-            location_map.put(location, location_map.getOrDefault(location, 0) + 1);
-            location_map.putIfAbsent(location.equalsIgnoreCase("warehouse") ? "interiorStore" : "warehouse", 0);
+            locationMap.put(location, locationMap.getOrDefault(location, 0) + 1);
+            locationMap.putIfAbsent(location.equalsIgnoreCase("warehouse") ? "interiorStore" : "warehouse", 0);
         } else {
-            location_map.put(location, location_map.getOrDefault(location, 0) - 1);
+            locationMap.put(location, locationMap.getOrDefault(location, 0) - 1);
         }
 
-        for (Product product : products.values()) {
-            if (product.getCategory().equalsIgnoreCase(category) && product.getSubCategory().equalsIgnoreCase(sub_category)) {
-                if (location.equalsIgnoreCase("warehouse")) {
-                    product.setQuantityInWarehouse(add ? product.getQuantityInWarehouse() + 1 : product.getQuantityInWarehouse() - 1);
-                } else if (location.equalsIgnoreCase("interiorStore")) {
-                    product.setQuantityInStore(add ? product.getQuantityInStore() + 1 : product.getQuantityInStore() - 1);
+        Branch branch = branches.get(branchId);
+        if (branch != null) {
+            for (Item item : branch.getItems().values()) {
+                Product product = products.get(item.getCatalogNumber());
+                if (product != null && product.getCategory().equalsIgnoreCase(category)
+                        && product.getSubCategory().equalsIgnoreCase(sub_category)) {
+                    if (location.equalsIgnoreCase("Warehouse")) {
+                        product.setQuantityInWarehouse(add ? product.getQuantityInWarehouse() + 1 : product.getQuantityInWarehouse() - 1);
+                    } else if (location.equalsIgnoreCase("interiorStore")) {
+                        product.setQuantityInStore(add ? product.getQuantityInStore() + 1 : product.getQuantityInStore() - 1);
+                    }
                 }
             }
         }
     }
 
+
     /**
-     * Creates and initializes a new Product object from a line of CSV input fields.
-     * This method parses the CSV fields and calculates pricing and discount data accordingly.
-     * Expected CSV field indices:
-     * [1]  product name
-     * [5]  catalog number
-     * [6]  category
-     * [7]  sub-category
-     * [9]  cost price before discount
-     * [10] product demand level
-     * [11] supply time
-     * [12] manufacturer
-     * [13] supplier discount
-     * [14] store discount
+     * Builds a {@code Product} object from a CSV input line.
+     * <p>
+     * Initializes the product's catalog number, name, category, supply time,
+     * manufacturer, discounts, and calculated prices.
+     * Default warehouse and store quantities are set to zero.
      *
-     * @param fields A string array representing a line from the CSV file.
-     * @return A fully initialized Product object.
+     * @param fields an array of CSV field values representing the product details
+     * @return a fully populated {@code Product} object
      */
+
     private Product buildProductFromCSV(String[] fields) {
-        int catalogNumber = Integer.parseInt(fields[5]);
+        int catalogNumber = Integer.parseInt(fields[6]);
         Product product = new Product();
         product.setCatalogNumber(catalogNumber);
-        product.setProductName(fields[1]);
-        product.setCategory(fields[6]);
-        product.setSubCategory(fields[7]);
-        product.setProductDemandLevel(Integer.parseInt(fields[10]));
-        product.setSupplyTime(Integer.parseInt(fields[11]));
-        product.setManufacturer(fields[12]);
+        product.setProductName(fields[2]);
+        product.setCategory(fields[7]);
+        product.setSubCategory(fields[8]);
+        product.setProductDemandLevel(Integer.parseInt(fields[11]));
+        product.setSupplyTime(Integer.parseInt(fields[12]));
+        product.setManufacturer(fields[13]);
 
-        double cost_before = Double.parseDouble(fields[9]);
-        int supplier_discount = Integer.parseInt(fields[13]);
-        int store_discount = Integer.parseInt(fields[14]);
+        double cost_before = Double.parseDouble(fields[10]);
+        int supplier_discount = Integer.parseInt(fields[14]);
+        int store_discount = Integer.parseInt(fields[15]);
 
         double cost_after = cost_before * (1 - supplier_discount / 100.0);
         double sale_before = cost_after * 2;
@@ -167,6 +190,9 @@ public class InventoryController {
         product.setSalePriceAfterStoreDiscount(sale_after);
         product.setQuantityInWarehouse(0);
         product.setQuantityInStore(0);
+
+        int min_required = (int) (0.5 * product.getProductDemandLevel() + 0.5 * product.getSupplyTime());
+        product.setMinimumQuantityForAlert(min_required);
 
         return product;
     }

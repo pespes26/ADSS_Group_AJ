@@ -1,6 +1,7 @@
 package Domain;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -8,61 +9,57 @@ import java.util.*;
  * and handling item creation and storage logic.
  */
 public class ItemController {
-    private final HashMap<Integer, Item> items;
+    private final HashMap<Integer, Branch> branches;
     private final HashMap<Integer, Product> products;
     private final HashMap<Integer, Item> purchased_items;
 
-
     /**
-     * Constructs an ItemController with existing collections of items, products, and purchased items.
+     * Constructs an ItemController with branches, product map, and purchased item records.
      *
-     * @param items A map of existing items, keyed by item ID.
+     * @param branches A map of all store branches, keyed by branch ID.
      * @param products A map of existing products, keyed by catalog number.
      * @param purchased_items A map of purchased items, keyed by item ID.
      */
-    public ItemController(HashMap<Integer, Item> items, HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
-        this.items = items;
+    public ItemController(HashMap<Integer, Branch> branches, HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
+        this.branches = branches;
         this.products = products;
         this.purchased_items = purchased_items;
     }
 
-    /**
-     * Adds a new item to the inventory using data provided in a CSV-formatted string.
-     * If the associated product (by catalog number) does not already exist, a new product is created and added to the system.
-     * Expected CSV format (15 fields, in order):
-     * item_Id, product_name, expiring_date, location, section, catalog_number, category, sub_category,
-     * size, cost_price_before, demand, supply_time, manufacturer, supplier_discount, store_discount
-     * @param csvInput A comma-separated string containing all 15 fields in the specified order.
-     * @return true if the item was added successfully; false if there was an error (e.g., parsing failure).
-     */
+
     public boolean addItem(String csvInput) {
         try {
             String[] fields = csvInput.split(",");
             int item_Id = Integer.parseInt(fields[0]);
-            String product_name = fields[1];
-            String expiring_date = fields[2];
-            String location = fields[3];
-            String section = fields[4];
-            int catalog_number = Integer.parseInt(fields[5]);
-            String category = fields[6];
-            String sub_category = fields[7];
-            int size = Integer.parseInt(fields[8]);
-            double cost_price_before = Double.parseDouble(fields[9]);
-            int demand = Integer.parseInt(fields[10]);
-            int supply_time = Integer.parseInt(fields[11]);
-            String manufacturer = fields[12];
-            int supplier_discount = Integer.parseInt(fields[13]);
-            int store_discount = Integer.parseInt(fields[14]);
+            int branch_id = Integer.parseInt(fields[1]);
+
+            String product_name = fields[2];
+            String expiring_date = fields[3];
+            String location = fields[4];
+            String section = fields[5];
+            int catalog_number = Integer.parseInt(fields[6]);
+            String category = fields[7];
+            String sub_category = fields[8];
+            int size = Integer.parseInt(fields[9]);
+            double cost_price_before = Double.parseDouble(fields[10]);
+            int demand = Integer.parseInt(fields[11]);
+            int supply_time = Integer.parseInt(fields[12]);
+            String manufacturer = fields[13];
+            int supplier_discount = Integer.parseInt(fields[14]);
+            int store_discount = Integer.parseInt(fields[15]);
 
             Item item = new Item();
             item.setItemId(item_Id);
+            item.setBranchId(branch_id);
             item.setItemExpiringDate(expiring_date);
             item.setStorageLocation(location);
             item.setSectionInStore(section);
             item.setItemSize(size);
             item.setCatalog_number(catalog_number);
             item.setDefect(false);
-            items.put(item_Id, item);
+
+            Branch branch = branches.computeIfAbsent(branch_id, k -> new Branch(branch_id));
+            branch.getItems().put(item_Id, item);
 
             if (!products.containsKey(catalog_number)) {
                 Product product = new Product();
@@ -100,26 +97,34 @@ public class ItemController {
         }
     }
 
-    /**
-     * Checks whether an item with the given item ID exists in the current inventory.
-     *
-     * @param item_Id The unique identifier of the item to check.
-     * @return true if the item exists in the inventory; false otherwise.
-     */
-    public boolean itemExists(int item_Id) {
-        return items.containsKey(item_Id);
+
+
+
+
+
+    public boolean itemExistsInBranch(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch == null) return false;
+        return branch.getItems().containsKey(item_Id);
     }
 
-    /**
-     * Removes an item from the inventory due to a purchase,
-     * and moves it to the map of purchased items.
-     *
-     * @param item_Id The unique identifier of the purchased item.
-     */
-    public void removeItemByPurchase(int item_Id) {
-        Item item = items.remove(item_Id);
-        if (item != null) {
-            purchased_items.put(item_Id, item);
+
+
+    public void removeItemByDefect(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch != null && branch.getItems().containsKey(item_Id)) {
+            branch.getItems().get(item_Id).setDefect(true);
+        }
+    }
+
+    public void removeItemByPurchase(int item_Id, int branchId) {
+        Branch branch = branches.get(branchId);
+        if (branch != null && branch.getItems().containsKey(item_Id)) {
+            Item item = branch.getItems().remove(item_Id);
+            if (item != null) {
+                item.setSaleDate(LocalDate.now());
+                purchased_items.put(item_Id, item);
+            }
         }
     }
 
@@ -131,23 +136,18 @@ public class ItemController {
      * @return The sale price after store discount, or 0.0 if the item or product is not found.
      */
     public double getSalePriceAfterDiscount(int item_Id) {
-        Item item = items.get(item_Id);
-        if (item == null) return 0.0;
-
-        Product product = products.get(item.getCatalogNumber());
-        if (product == null) return 0.0;
-
-        return product.getSalePriceAfterStoreDiscount();
+        for (Branch branch : branches.values()) {
+            Item item = branch.getItems().get(item_Id);
+            if (item != null) {
+                Product product = products.get(item.getCatalogNumber());
+                if (product != null) return product.getSalePriceAfterStoreDiscount();
+            }
+        }
+        return 0.0;
     }
 
-    /**
-     * Removes an item from the inventory due to being marked as defective.
-     *
-     * @param item_Id The unique identifier of the defective item to remove.
-     */
-    public void removeItemByDefect(int item_Id) {
-        items.remove(item_Id);
-    }
+
+
 
     /**
      * Marks a specific item as defective.
@@ -155,41 +155,21 @@ public class ItemController {
      * @param item_Id The unique identifier of the item to mark as defective.
      * @return true if the item exists and was marked as defective; false otherwise.
      */
-    public boolean markItemAsDefective(int item_Id) {
-        Item item = items.get(item_Id);
-        if (item == null) return false;
-
-        item.setDefect(true);
-        return true;
+    public boolean markItemAsDefective(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch != null) {
+            Item item = branch.getItems().get(item_Id);
+            if (item != null) {
+                item.setDefect(true);
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    /**
-     * Checks whether a reorder alert should be triggered for the product
-     * associated with the given item ID.
-     * A reorder alert is triggered if the number of non-defective items
-     * with the same catalog number is less than the product's minimum required quantity,
-     * which is retrieved using {@code getMinimumQuantityForAlert()}.
-     *
-     * @param item_Id The ID of the item whose product should be checked.
-     * @return true if a reorder alert should be raised; false otherwise (e.g., sufficient stock or item not found).
-     */
-    public boolean checkReorderAlert(int item_Id) {
-        Item item = items.get(item_Id);
-        if (item == null) return false;
 
-        int catalog_number = item.getCatalogNumber();
-        Product product = products.get(catalog_number);
-        if (product == null) return false;
 
-        int min_required = product.getMinimumQuantityForAlert();
-
-        long count = items.values().stream()
-                .filter(i -> i.getCatalogNumber() == catalog_number && !i.isDefect())
-                .count();
-
-        return count < min_required;
-    }
 
     /**
      * Retrieves the product name associated with a specific item.
@@ -197,22 +177,31 @@ public class ItemController {
      * @param item_Id The unique identifier of the item.
      * @return The name of the product the item belongs to, or an empty string if not found.
      */
-    public String getItemName(int item_Id) {
-        Item item = items.get(item_Id);
+    public String getItemName(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch == null) return "";
+        Item item = branch.getItems().get(item_Id);
         if (item == null) return "";
         Product product = products.get(item.getCatalogNumber());
         return product != null ? product.getProductName() : "";
     }
 
+
     /**
-     * Updates the location and/or section of a specific item in the inventory.
+     * Updates the location and/or section of a specific item in a specific branch.
+     *
      * @param item_Id  The unique identifier of the item to update.
+     * @param branch_Id The ID of the branch where the item is located.
      * @param location The new storage location (e.g., "Warehouse" or "InteriorStore"). If null, location remains unchanged.
      * @param section  The new section within the location (e.g., "A1"). If null, section remains unchanged.
-     * @return true if the item exists and was updated; false otherwise.
+     * @return true if the item exists in the specified branch and was updated; false otherwise.
      */
-    public boolean updateItemLocation(int item_Id, String location, String section) {
-        Item item = items.get(item_Id);
+    public boolean updateItemLocation(int item_Id, int branch_Id, String location, String section) {
+        Branch branch = branches.get(branch_Id);
+        if (branch == null) {
+            return false;
+        }
+        Item item = branch.getItems().get(item_Id);
         if (item != null) {
             if (location != null) item.setStorageLocation(location);
             if (section != null) item.setSectionInStore(section);
@@ -223,22 +212,30 @@ public class ItemController {
 
 
     /**
-     * Generates a detailed string summary of an item's information,
-     * including its properties and related product details.
+     * Returns a detailed string with information about a specific item in a branch.
+     * <p>
+     * Displays product name, expiration date, location, catalog number, pricing details,
+     * discounts, supply time, and defect status.
      *
-     * @param item_Id The unique identifier of the item.
-     * @return A detailed description of the item and its associated product,
-     *         or an error message if the item or product was not found.
+     * @param item_Id the ID of the item
+     * @param branch_id the ID of the branch where the item is located
+     * @return a formatted string with item and product details, or an error message if not found
      */
-    public String showItemDetails(int item_Id) {
-        Item item = items.get(item_Id);
+
+    public String showItemDetails(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch == null) {
+            return "Branch with ID " + branch_id + " does not exist.";
+        }
+
+        Item item = branch.getItem(item_Id);
         if (item == null) {
-            return "Item with ID " + item_Id + " not found in stock.";
+            return "Item with ID " + item_Id + " not found in branch " + branch_id + ".";
         }
 
         Product product = products.get(item.getCatalogNumber());
         if (product == null) {
-            return "Product with Product Catalog Number " + item.getCatalogNumber() + " not found.";
+            return "Product with catalog number " + item.getCatalogNumber() + " not found.";
         }
 
         DecimalFormat df = new DecimalFormat("#.00");
@@ -261,5 +258,23 @@ public class ItemController {
                 + "Manufacturer: " + product.getManufacturer() + "\n"
                 + "Defective: " + (item.isDefect() ? "Yes" : "No") + "\n";
     }
+
+    /**
+     * Retrieves the catalog number of a specific item in a branch.
+     * <p>
+     * Used for linking an item to its corresponding product.
+     *
+     * @param item_Id the ID of the item
+     * @param branch_id the ID of the branch where the item is located
+     * @return the catalog number if found, or -1 if not found
+     */
+    public int getCatalogNumber(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch == null || !branch.getItems().containsKey(item_Id)) return -1;
+        return branch.getItems().get(item_Id).getCatalogNumber();
+    }
+
+
+
 
 }

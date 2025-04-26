@@ -1,5 +1,7 @@
 package Domain;
 
+import java.time.LocalDate;
+
 /**
  * Represents a single physical item in the inventory.
  * Each item is associated with a product (via catalog number) and contains details
@@ -8,11 +10,13 @@ package Domain;
 public class Item {
     private int catalog_number;
     private int item_id;
+    private int branch_id;
     private String item_expiring_date;
     private int item_size; // 1 - small, 2 - medium, 3 - large
     private String storage_location; // warehouse or Interior store
     private String section_in_store; // for example: E7
     private boolean is_defect;
+    private LocalDate sale_date;
 
 
     /**
@@ -41,6 +45,14 @@ public class Item {
      */
     public void setItemId(int product_id) {
         this.item_id = product_id;
+    }
+
+    public int getBranchId() {
+        return branch_id;
+    }
+
+    public void setBranchId(int branch_id) {
+        this.branch_id = branch_id;
     }
 
     /**
@@ -118,5 +130,27 @@ public class Item {
      */
     public void setDefect(boolean defect) {
         is_defect = defect;
+    }
+
+    /**
+     * Returns the sale date of the item.
+     * <p>
+     * The sale date represents when the item was purchased by a customer.
+     *
+     * @return the {@code LocalDate} of the sale, or {@code null} if not sold yet.
+     */
+    public LocalDate getSaleDate() {
+        return sale_date;
+    }
+
+    /**
+     * Sets the sale date of the item.
+     * <p>
+     * Used to record when the item was purchased.
+     *
+     * @param saleDate the {@code LocalDate} representing the sale date.
+     */
+    public void setSaleDate(LocalDate saleDate) {
+        this.sale_date = saleDate;
     }
 }

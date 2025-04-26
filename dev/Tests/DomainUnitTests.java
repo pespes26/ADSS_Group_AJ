@@ -68,12 +68,13 @@ public class DomainUnitTests {
 
 
 
-
-    /** Returns empty name when item doesn't exist. */
     @Test
     public void testGetItemNameForNonexistentItem() {
-        ItemController controller = new ItemController(new HashMap<>(), new HashMap<>(), new HashMap<>());
-        assertEquals("", controller.getItemName(999));
+        HashMap<Integer, Branch> branches = new HashMap<>();
+        HashMap<Integer, Product> products = new HashMap<>();
+        HashMap<Integer, Item> purchased_items = new HashMap<>();
+        ItemController controller = new ItemController(branches, products, purchased_items);
+        assertEquals("", controller.getItemName(1, 999));
     }
 
     /** Verifies location update on an existing item. */
@@ -81,11 +82,21 @@ public class DomainUnitTests {
     public void testUpdateItemLocation() {
         Item item = new Item();
         item.setItemId(1);
-        HashMap<Integer, Item> items = new HashMap<>();
-        items.put(1, item);
 
-        ItemController controller = new ItemController(items, new HashMap<>(), new HashMap<>());
-        boolean updated = controller.updateItemLocation(1, "Warehouse", "B2");
+        Branch branch = new Branch(2);
+        branch.getItems().put(1, item);
+
+        HashMap<Integer, Branch> branches = new HashMap<>();
+        branches.put(2, branch);
+
+        HashMap<Integer, Product> products = new HashMap<>();
+        HashMap<Integer, Item> purchased = new HashMap<>();
+
+        ItemController controller = new ItemController(branches, products, purchased);
+
+        boolean updated = controller.updateItemLocation(1, 2, "Warehouse", "B2");
+
+
         assertTrue(updated);
     }
 
@@ -123,7 +134,8 @@ public class DomainUnitTests {
     @Test
     public void testUpdateLocationFailsForMissingItem() {
         ItemController controller = new ItemController(new HashMap<>(), new HashMap<>(), new HashMap<>());
-        assertFalse(controller.updateItemLocation(1234, "Warehouse", "A1"));
+        assertFalse(controller.updateItemLocation(1234, 1, "Warehouse", "A1"));
+        //                               itemId  branchId  location   section
     }
 
     /** Ensures discounts with null dates are not accepted. */
@@ -137,23 +149,26 @@ public class DomainUnitTests {
     /** When item is added, existing product should not be overwritten. */
     @Test
     public void testItemAddedButProductNotOverwritten() {
-        HashMap<Integer, Item> items = new HashMap<>();
+        HashMap<Integer, Branch> branches = new HashMap<>();
         HashMap<Integer, Product> products = new HashMap<>();
         HashMap<Integer, Item> purchased = new HashMap<>();
+
+        Branch branch = new Branch(1);
+        branches.put(0, branch);
 
         Product p = new Product();
         p.setCatalogNumber(10);
         p.setProductName("Old");
         products.put(10, p);
 
-        String csv = "1,New,01/01/2026,Warehouse,A1,10,Dairy,Milk,2,100.0,3,2,Brand,0,0";
-        ItemController controller = new ItemController(items, products, purchased);
+        String csv = "1,0,New,01/01/2026,Warehouse,A1,10,Dairy,Milk,2,100.0,3,2,Brand,0,0";
+        ItemController controller = new ItemController(branches, products, purchased);
         controller.addItem(csv);
 
         assertEquals("Old", products.get(10).getProductName());
     }
 
-    /** Checks that expired items are detected in reports. */
+    /** Verifies that expired items are reported correctly. */
     @Test
     public void testExpiredItemDate() {
         Item item = new Item();
@@ -168,16 +183,21 @@ public class DomainUnitTests {
         product.setCatalogNumber(5);
         product.setProductName("Milk");
 
-        HashMap<Integer, Item> items = new HashMap<>();
-        HashMap<Integer, Product> products = new HashMap<>();
+        Branch branch = new Branch(1);
+        branch.getItems().put(1, item);
 
-        items.put(1, item);
+        HashMap<Integer, Branch> branches = new HashMap<>();
+        branches.put(1, branch);
+
+        HashMap<Integer, Product> products = new HashMap<>();
         products.put(5, product);
 
-        ReportController reportController = new ReportController(items, products);
-        String report = reportController.defectAndExpiredReport();
+        ReportController reportController = new ReportController(branches, products);
+        String report = reportController.defectAndExpiredReport(1);
 
         assertTrue(report.contains("Expired Items"));
         assertTrue(report.contains("01/01/2000"));
     }
+
+
 }

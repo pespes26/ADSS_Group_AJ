@@ -3,23 +3,23 @@ package Init;
 import Domain.InventoryController;
 
 /**
- * Responsible for initializing the inventory system by creating the controller
- * and importing data from the provided file path.
+ * Utility class for initializing the inventory system.
+ * Responsible for setting up controllers and importing data from external files.
  */
 public class SystemInitializer {
 
     /**
-     * Initializes the inventory system.
-     * This method creates a new instance of {@link InventoryController},
-     * imports data from the CSV file located at the specified path,
-     * and returns the fully initialized controller.
+     * Initializes the inventory system from a CSV file.
+     * Loads items and products into memory and links branches to the product controller.
      *
-     * @param path The file path to the CSV data source.
-     * @return An initialized {@link InventoryController} with data loaded from the file.
+     * @param path the path to the CSV file containing inventory data
+     * @return an initialized InventoryController instance
      */
     public static InventoryController initializeSystem(String path) {
         InventoryController controller = new InventoryController();
         controller.importData(path);
+        controller.getProductController().setBranches(controller.getBranches());
         return controller;
     }
+
 }

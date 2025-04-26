@@ -3,9 +3,10 @@ package com.superli.deliveries.domain;
 
 public enum TransportStatus {
     PLANNED,
-    DISPATCHED,
+    ONGOING,
     COMPLETED,
-    CANCELLED
+    CANCELLED,
+    SELFDELIVERY
 }
 
 

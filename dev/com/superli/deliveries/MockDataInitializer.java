@@ -2,12 +2,13 @@ package com.superli.deliveries;
 
 import com.superli.deliveries.domain.*;
 import com.superli.deliveries.service.*;
+import com.superli.deliveries.storage.ProductRepository;
 
 /**
  * Utility class for initializing mock data for testing purposes.
  * This class is for development and testing only and should be removed before final deployment.
  */
-class MockDataInitializer {
+public class MockDataInitializer {
 
     /**
      * Initializes the system with mock data.
@@ -16,12 +17,14 @@ class MockDataInitializer {
      * @param truckService Service for managing trucks
      * @param zoneService Service for managing zones
      * @param siteService Service for managing sites
+     * @param productService Service for managing products
      */
-    static void initializeMockData(
+    public static void initializeMockData(
             DriverService driverService,
             TruckService truckService,
             ZoneService zoneService,
-            SiteService siteService) {
+            SiteService siteService,
+            ProductService productService) {
 
         System.out.println("Initializing mock data for testing...");
 
@@ -36,6 +39,9 @@ class MockDataInitializer {
 
         // Initialize trucks
         initializeTrucks(truckService);
+
+        // Initialize products
+        initializeProducts(productService);
 
         System.out.println("Mock data initialization complete!");
     }
@@ -160,5 +166,38 @@ class MockDataInitializer {
         }
 
         System.out.println("Initialized 10 trucks");
+    }
+
+    private static void initializeProducts(ProductService productService) {
+        // Create sample products with realistic weights
+        Product[] products = {
+                new Product("P001", "Milk 3% 1L", 1.05f),
+                new Product("P002", "Sugar 1kg", 1.02f),
+                new Product("P003", "Flour 1kg", 1.03f),
+                new Product("P004", "Rice 5kg", 5.1f),
+                new Product("P005", "Olive Oil 1L", 0.95f),
+                new Product("P006", "Paper Towels 6pk", 0.85f),
+                new Product("P007", "Mineral Water 6pk", 6.2f),
+                new Product("P008", "Laundry Detergent 3kg", 3.15f),
+                new Product("P009", "Bleach 2L", 2.25f),
+                new Product("P010", "Pasta 500g", 0.52f),
+                new Product("P011", "Coffee Beans 1kg", 1.05f),
+                new Product("P012", "Orange Juice 1L", 1.05f),
+                new Product("P013", "Dishwashing Liquid 750ml", 0.8f),
+                new Product("P014", "Toilet Paper 12pk", 2.4f),
+                new Product("P015", "Breakfast Cereal 500g", 0.55f),
+                new Product("P016", "Canned Tuna 4pk", 0.95f),
+                new Product("P017", "Tea Bags 100ct", 0.35f),
+                new Product("P018", "Shampoo 750ml", 0.85f),
+                new Product("P019", "Baby Diapers 48pk", 1.85f),
+                new Product("P020", "Cat Food 5kg", 5.25f)
+        };
+
+        // Save all products
+        for (Product product : products) {
+            productService.saveProduct(product);
+        }
+
+        System.out.println("Initialized 20 products");
     }
 }

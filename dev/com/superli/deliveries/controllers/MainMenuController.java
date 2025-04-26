@@ -50,7 +50,7 @@ public class MainMenuController {
                 case "5" -> zoneController.runMenu();
                 case "6" -> destinationDocController.runMenu();
                 case "0" -> {
-                    System.out.println("👋 Exiting the system. Goodbye!");
+                    System.out.println("Exiting the system. Goodbye!");
                     return;
                 }
                 default -> System.out.println("Invalid choice. Please try again.");

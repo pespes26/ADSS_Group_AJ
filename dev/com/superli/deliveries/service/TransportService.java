@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Service layer for managing Transport operations and business logic.
+ * Enhanced with additional methods for better separation of concerns.
  */
 public class TransportService {
 
@@ -99,7 +100,19 @@ public class TransportService {
      * @return true if deleted successfully, false otherwise
      */
     public boolean deleteTransport(int transportId) {
-        return transportRepository.deleteById(transportId).isPresent();
+        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+
+        if (transportOpt.isPresent()) {
+            Transport transport = transportOpt.get();
+
+            // Release driver and truck resources
+            releaseTransportResources(transport);
+
+            // Now delete the transport
+            return transportRepository.deleteById(transportId).isPresent();
+        }
+
+        return false;
     }
 
     /**
@@ -120,8 +133,14 @@ public class TransportService {
         for (Truck truck : availableTrucks) {
             for (Driver driver : availableDrivers) {
                 if (driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
-                    // Found a match, create transport
-                    return createTransportWithTruckAndDriver(truck, driver);
+                    // Found a match, get a default origin site
+                    Optional<Site> originSiteOpt = getDefaultOriginSite();
+                    if (originSiteOpt.isEmpty()) {
+                        return Optional.empty();
+                    }
+
+                    // Create transport
+                    return createTransportWithTruckDriverAndSite(truck, driver, originSiteOpt.get());
                 }
             }
         }
@@ -148,7 +167,58 @@ public class TransportService {
             return Optional.empty();
         }
 
-        return createTransportWithTruckAndDriver(truck, driver);
+        // Get a default origin site
+        Optional<Site> originSiteOpt = getDefaultOriginSite();
+        if (originSiteOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return createTransportWithTruckDriverAndSite(truck, driver, originSiteOpt.get());
+    }
+
+    /**
+     * Creates a transport manually with the given truck, driver, and specific site.
+     *
+     * @param truck The truck to use
+     * @param driver The driver to assign
+     * @param originSite The origin site for the transport
+     * @return Optional containing the created transport if successful
+     */
+    public Optional<Transport> createTransportManualWithSite(Truck truck, Driver driver, Site originSite,
+                                                             LocalDateTime departureDateTime) {
+        // Check if truck and driver are available
+        if (!truck.isAvailable() || !driver.isAvailable()) {
+            return Optional.empty();
+        }
+
+        // Check license compatibility
+        if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
+            return Optional.empty();
+        }
+
+        // Create transport with specified parameters
+        int transportId = generateTransportId();
+
+        Transport transport = new Transport(
+                transportId,
+                departureDateTime,
+                truck,
+                driver,
+                originSite,
+                TransportStatus.PLANNED
+        );
+
+        // Save to repository
+        saveTransport(transport);
+
+        // Mark truck and driver as unavailable
+        truck.setAvailable(false);
+        truckService.markTruckAsUnavailable(truck.getPlateNum());
+
+        driver.setAvailable(false);
+        driverService.markDriverAsUnavailable(driver.getDriverId());
+
+        return Optional.of(transport);
     }
 
     /**
@@ -156,15 +226,10 @@ public class TransportService {
      *
      * @param truck The truck to use
      * @param driver The driver to assign
+     * @param originSite The origin site
      * @return Optional containing the created transport
      */
-    private Optional<Transport> createTransportWithTruckAndDriver(Truck truck, Driver driver) {
-        // Get a default origin site (would be selected by user in a more complete implementation)
-        Optional<Site> originSiteOpt = getDefaultOriginSite();
-        if (originSiteOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
+    private Optional<Transport> createTransportWithTruckDriverAndSite(Truck truck, Driver driver, Site originSite) {
         // Create transport with next available ID
         int transportId = generateTransportId();
         LocalDateTime departureTime = LocalDateTime.now().plusDays(1); // Default to tomorrow
@@ -174,7 +239,7 @@ public class TransportService {
                 departureTime,
                 truck,
                 driver,
-                originSiteOpt.get(),
+                originSite,
                 TransportStatus.PLANNED
         );
 
@@ -217,7 +282,9 @@ public class TransportService {
     public boolean addDestinationDocToTransport(int transportId, DestinationDoc doc) {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
         if (transportOpt.isPresent()) {
-            transportOpt.get().addDestination(doc);
+            Transport transport = transportOpt.get();
+            transport.addDestination(doc);
+            transportRepository.save(transport);
             return true;
         }
         return false;
@@ -233,7 +300,12 @@ public class TransportService {
     public boolean removeDestinationDocFromTransport(int transportId, DestinationDoc doc) {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
         if (transportOpt.isPresent()) {
-            return transportOpt.get().removeDestination(doc);
+            Transport transport = transportOpt.get();
+            boolean removed = transport.removeDestination(doc);
+            if (removed) {
+                transportRepository.save(transport);
+            }
+            return removed;
         }
         return false;
     }
@@ -249,13 +321,17 @@ public class TransportService {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-            transport.setStatus(newStatus);
 
-            // If completed or cancelled, release the truck and driver
-            if (newStatus == TransportStatus.COMPLETED || newStatus == TransportStatus.CANCELLED) {
+            // Check if this is a significant status change
+            if ((transport.getStatus() != TransportStatus.COMPLETED &&
+                    transport.getStatus() != TransportStatus.CANCELLED) &&
+                    (newStatus == TransportStatus.COMPLETED || newStatus == TransportStatus.CANCELLED)) {
+                // We're completing or cancelling - release resources
                 releaseTransportResources(transport);
             }
 
+            transport.setStatus(newStatus);
+            transportRepository.save(transport);
             return true;
         }
         return false;
@@ -288,7 +364,9 @@ public class TransportService {
     public boolean updateDepartureDateTime(int transportId, LocalDateTime newTime) {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
         if (transportOpt.isPresent()) {
-            transportOpt.get().setDepartureDateTime(newTime);
+            Transport transport = transportOpt.get();
+            transport.setDepartureDateTime(newTime);
+            transportRepository.save(transport);
             return true;
         }
         return false;
@@ -304,7 +382,17 @@ public class TransportService {
     public boolean updateDepartureWeight(int transportId, float weight) {
         Optional<Transport> transportOpt = transportRepository.findById(transportId);
         if (transportOpt.isPresent()) {
-            transportOpt.get().setDepartureWeight(weight);
+            Transport transport = transportOpt.get();
+
+            // Check if weight exceeds truck capacity
+            float maxAllowedWeight = transport.getTruck().getMaxWeight() - transport.getTruck().getNetWeight();
+            if (weight > maxAllowedWeight) {
+                System.out.println("⚠️ Warning: Weight (" + weight + " kg) exceeds truck capacity (" +
+                        maxAllowedWeight + " kg). Cargo may need to be redistributed.");
+            }
+
+            transport.setDepartureWeight(weight);
+            transportRepository.save(transport);
             return true;
         }
         return false;
@@ -338,20 +426,29 @@ public class TransportService {
 
         // Map destinations to destination views
         List<DestinationDetailsView> destinations = transport.getDestinationList().stream()
-                .map(doc -> new DestinationDetailsView(
-                        doc.getDestinationDocId(),
-                        new SiteDetailsView(
-                                doc.getDestinationId().getAddress(),
-                                doc.getDestinationId().getPhoneNumber(),
-                                doc.getDestinationId().getContactPersonName()
-                        ),
-                        doc.getDeliveryItems().stream()
-                                .map(item -> new DeliveredItemDetailsView(
-                                        item.getProductId(),
-                                        item.getQuantity()
-                                )).collect(Collectors.toList()),
-                        TransportStatus.valueOf(doc.getStatus().toUpperCase())
-                ))
+                .map(doc -> {
+                    TransportStatus docStatus;
+                    try {
+                        docStatus = TransportStatus.valueOf(doc.getStatus().toUpperCase());
+                    } catch (Exception e) {
+                        docStatus = TransportStatus.PLANNED; // Default status
+                    }
+
+                    return new DestinationDetailsView(
+                            doc.getDestinationDocId(),
+                            new SiteDetailsView(
+                                    doc.getDestinationId().getAddress(),
+                                    doc.getDestinationId().getPhoneNumber(),
+                                    doc.getDestinationId().getContactPersonName()
+                            ),
+                            doc.getDeliveryItems().stream()
+                                    .map(item -> new DeliveredItemDetailsView(
+                                            item.getProductId(),
+                                            item.getQuantity()
+                                    )).collect(Collectors.toList()),
+                            docStatus
+                    );
+                })
                 .collect(Collectors.toList());
 
         return new TransportSummaryView(
@@ -378,21 +475,30 @@ public class TransportService {
 
             // Create destination detail views
             List<DestinationDetailsView> destinations = transport.getDestinationList().stream()
-                    .map(doc -> new DestinationDetailsView(
-                            doc.getDestinationDocId(),
-                            new SiteDetailsView(
-                                    doc.getDestinationId().getAddress(),
-                                    doc.getDestinationId().getPhoneNumber(),
-                                    doc.getDestinationId().getContactPersonName()
-                            ),
-                            doc.getDeliveryItems().stream().map(item ->
-                                    new DeliveredItemDetailsView(
-                                            item.getProductId(),
-                                            item.getQuantity()
-                                    )
-                            ).collect(Collectors.toList()),
-                            TransportStatus.valueOf(doc.getStatus().toUpperCase())
-                    ))
+                    .map(doc -> {
+                        TransportStatus docStatus;
+                        try {
+                            docStatus = TransportStatus.valueOf(doc.getStatus().toUpperCase());
+                        } catch (Exception e) {
+                            docStatus = TransportStatus.PLANNED; // Default status
+                        }
+
+                        return new DestinationDetailsView(
+                                doc.getDestinationDocId(),
+                                new SiteDetailsView(
+                                        doc.getDestinationId().getAddress(),
+                                        doc.getDestinationId().getPhoneNumber(),
+                                        doc.getDestinationId().getContactPersonName()
+                                ),
+                                doc.getDeliveryItems().stream().map(item ->
+                                        new DeliveredItemDetailsView(
+                                                item.getProductId(),
+                                                item.getQuantity()
+                                        )
+                                ).collect(Collectors.toList()),
+                                docStatus
+                        );
+                    })
                     .collect(Collectors.toList());
 
             return new TransportDetailsView(

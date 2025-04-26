@@ -17,26 +17,45 @@ public class Main {
         var zoneRepo = new ZoneRepository();
         var transportRepo = new TransportRepository();
         var destinationDocRepo = new DestinationDocRepository();
+        var productRepo = new ProductRepository(); // Repository for products
 
         // --- Services ---
+        var productService = new ProductService(productRepo);
         var driverService = new DriverService(driverRepo);
         var truckService = new TruckService(truckRepo);
         var zoneService = new ZoneService(zoneRepo);
         var siteService = new SiteService(siteRepo);
-        var destinationDocService = new DestinationDocService(destinationDocRepo);
         var transportService = new TransportService(transportRepo, driverService, truckService, siteService);
+        var destinationDocService = new DestinationDocService(destinationDocRepo);
+
+        // Initialize services that have interdependencies after creating initial services
+        var deliveredItemService = new DeliveredItemService(destinationDocRepo, transportService, productService);
 
         // --- Initialize Mock Data for Testing ---
         // NOTE: This should be removed before final submission
-        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService);
+        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
 
         // --- Controllers ---
         var driverController = new DriverController(driverService);
         var truckController = new TruckController(truckService);
         var siteController = new SiteController(siteService, zoneService);
         var zoneController = new ZoneController(zoneService, siteService, scanner);
-        var transportController = new TransportController(transportService, truckService, driverService);
-        var destinationDocController = new DestinationDocController(destinationDocService);
+
+        // Enhanced TransportController with all required dependencies
+        var transportController = new TransportController(
+                transportService,
+                truckService,
+                driverService,
+                siteService,
+                productService,
+                destinationDocService,
+                deliveredItemService);
+
+        var destinationDocController = new DestinationDocController(
+                destinationDocService,
+                deliveredItemService,
+                siteService,
+                transportService);
 
         // --- Main Menu Controller ---
         var mainMenuController = new MainMenuController(
@@ -52,4 +71,7 @@ public class Main {
         // --- Run the application ---
         mainMenuController.run();
     }
+
+    // No additional initialization methods needed -
+    // all initialization is now handled by MockDataInitializer
 }

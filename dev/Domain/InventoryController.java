@@ -90,7 +90,6 @@ public class InventoryController {
         item.setStorageLocation(fields[4]);
         item.setSectionInStore(fields[5]);
         item.setCatalog_number(Integer.parseInt(fields[6]));
-        item.setItemSize(Integer.parseInt(fields[9]));
         item.setDefect(false);
         return item;
     }
@@ -155,45 +154,30 @@ public class InventoryController {
     /**
      * Builds a {@code Product} object from a CSV input line.
      * <p>
-     * Initializes the product's catalog number, name, category, supply time,
+     * Initializes the product's catalog number, name, category, size, supply time,
      * manufacturer, discounts, and calculated prices.
      * Default warehouse and store quantities are set to zero.
      *
      * @param fields an array of CSV field values representing the product details
      * @return a fully populated {@code Product} object
      */
-
     private Product buildProductFromCSV(String[] fields) {
         int catalogNumber = Integer.parseInt(fields[6]);
+        String productName = fields[2];
+        String category = fields[7];
+        String subCategory = fields[8];
+        int demandLevel = Integer.parseInt(fields[11]);
+        int supplyTime = Integer.parseInt(fields[12]);
+        String manufacturer = fields[13];
+        int size = Integer.parseInt(fields[9]);
+        double costPriceBefore = Double.parseDouble(fields[10]);
+        int supplierDiscount = Integer.parseInt(fields[14]);
+        int storeDiscount = Integer.parseInt(fields[15]);
+
         Product product = new Product();
-        product.setCatalogNumber(catalogNumber);
-        product.setProductName(fields[2]);
-        product.setCategory(fields[7]);
-        product.setSubCategory(fields[8]);
-        product.setProductDemandLevel(Integer.parseInt(fields[11]));
-        product.setSupplyTime(Integer.parseInt(fields[12]));
-        product.setManufacturer(fields[13]);
-
-        double cost_before = Double.parseDouble(fields[10]);
-        int supplier_discount = Integer.parseInt(fields[14]);
-        int store_discount = Integer.parseInt(fields[15]);
-
-        double cost_after = cost_before * (1 - supplier_discount / 100.0);
-        double sale_before = cost_after * 2;
-        double sale_after = sale_before * (1 - store_discount / 100.0);
-
-        product.setSupplierDiscount(supplier_discount);
-        product.setCostPriceBeforeSupplierDiscount(cost_before);
-        product.setCostPriceAfterSupplierDiscount(cost_after);
-        product.setStoreDiscount(store_discount);
-        product.setSalePriceBeforeStoreDiscount(sale_before);
-        product.setSalePriceAfterStoreDiscount(sale_after);
-        product.setQuantityInWarehouse(0);
-        product.setQuantityInStore(0);
-
-        int min_required = (int) (0.5 * product.getProductDemandLevel() + 0.5 * product.getSupplyTime());
-        product.setMinimumQuantityForAlert(min_required);
-
+        populateProductData(product, catalogNumber, productName, category, subCategory,
+                demandLevel, supplyTime, manufacturer,
+                costPriceBefore, supplierDiscount, storeDiscount, size);
         return product;
     }
 
@@ -232,4 +216,139 @@ public class InventoryController {
     public ReportController getReportController() {
         return report_controller;
     }
+
+    /**
+     * Handles the full process of adding a new product and its associated items to the inventory.
+     *
+     * @param catalogNumber the new product's catalog number
+     * @param branchId the branch ID where the items will be stored
+     * @param scan the Scanner object for reading user input
+     */
+    public void addNewProductAndItems(int catalogNumber, int branchId, Scanner scan) {
+        System.out.println("Product with Catalog Number " + catalogNumber + " does not exist.");
+        System.out.println("Please enter full product details.");
+
+        // Collect new product details from the user
+        System.out.print("Enter Product Name: ");
+        String productName = scan.nextLine().trim();
+
+        System.out.print("Enter Category: ");
+        String category = scan.nextLine().trim();
+
+        System.out.print("Enter Sub-Category: ");
+        String subCategory = scan.nextLine().trim();
+
+        System.out.print("Enter Product Size (numeric value between 1-3): ");
+        int size = Integer.parseInt(scan.nextLine().trim());
+
+        System.out.print("Enter Cost Price Before Supplier Discount: ");
+        double costPriceBefore = Double.parseDouble(scan.nextLine().trim());
+
+        System.out.print("Enter Product Demand Level (1–5): ");
+        int demandLevel = Integer.parseInt(scan.nextLine().trim());
+
+        System.out.print("Enter Supply Time (days): ");
+        int supplyTime = Integer.parseInt(scan.nextLine().trim());
+
+        System.out.print("Enter Manufacturer: ");
+        String manufacturer = scan.nextLine().trim();
+
+        System.out.print("Enter Supplier Discount (%): ");
+        int supplierDiscount = Integer.parseInt(scan.nextLine().trim());
+
+        System.out.print("Enter Store Discount (%): ");
+        int storeDiscount = Integer.parseInt(scan.nextLine().trim());
+
+        // Calculate final prices
+        double costAfterSupplierDiscount = costPriceBefore * (1 - supplierDiscount / 100.0);
+        double salePriceBeforeStoreDiscount = costAfterSupplierDiscount * 2;
+        double salePriceAfterStoreDiscount = salePriceBeforeStoreDiscount * (1 - storeDiscount / 100.0);
+
+        Product newProduct = new Product();
+        populateProductData(newProduct, catalogNumber, productName, category, subCategory,
+                demandLevel, supplyTime, manufacturer,
+                costPriceBefore, supplierDiscount, storeDiscount, size);
+
+        // Add the new product to the system
+        product_controller.addProduct(newProduct);
+
+        System.out.println("\nProduct added successfully!");
+
+        // Collect item details
+        System.out.print("How many items would you like to add for this product? ");
+        int quantityToAdd = Integer.parseInt(scan.nextLine().trim());
+
+        System.out.print("Enter storage location for all items (Warehouse or InteriorStore): ");
+        String storageLocation = scan.nextLine().trim();
+
+        System.out.print("Enter expiry date for all items (format: dd/MM/yyyy): ");
+        String expiryDate = scan.nextLine().trim();
+
+        int nextItemId = item_controller.getNextAvailableItemId();
+
+        for (int i = 0; i < quantityToAdd; i++) {
+            int currentItemId = nextItemId + i;
+            item_controller.addItem(
+                    currentItemId,
+                    branchId,
+                    catalogNumber,
+                    storageLocation,
+                    expiryDate
+            );
+        }
+
+        System.out.println("\n-----------------------------------------");
+        System.out.println(quantityToAdd + " items successfully added for Product Catalog Number " + catalogNumber + ".");
+        System.out.println("-----------------------------------------\n");
+    }
+
+
+    /**
+     * Populates a Product object with all its fields based on the provided data.
+     *
+     * @param product The product to populate.
+     * @param catalogNumber Catalog number.
+     * @param productName Product name.
+     * @param category Category.
+     * @param subCategory Sub-category.
+     * @param demandLevel Demand level (1–5).
+     * @param supplyTime Supply time (days).
+     * @param manufacturer Manufacturer name.
+     * @param costPriceBefore Cost price before supplier discount.
+     * @param supplierDiscount Supplier discount (%).
+     * @param storeDiscount Store discount (%).
+     * @param size Product size.
+     */
+    private void populateProductData(Product product, int catalogNumber, String productName, String category, String subCategory,
+                                     int demandLevel, int supplyTime, String manufacturer,
+                                     double costPriceBefore, int supplierDiscount, int storeDiscount, int size) {
+
+        product.setCatalogNumber(catalogNumber);
+        product.setProductName(productName);
+        product.setCategory(category);
+        product.setSubCategory(subCategory);
+        product.setProductDemandLevel(demandLevel);
+        product.setSupplyTime(supplyTime);
+        product.setManufacturer(manufacturer);
+        product.setSize(size);
+
+        double costAfterSupplierDiscount = costPriceBefore * (1 - supplierDiscount / 100.0);
+        double salePriceBeforeStoreDiscount = costAfterSupplierDiscount * 2;
+        double salePriceAfterStoreDiscount = salePriceBeforeStoreDiscount * (1 - storeDiscount / 100.0);
+
+        product.setSupplierDiscount(supplierDiscount);
+        product.setCostPriceBeforeSupplierDiscount(costPriceBefore);
+        product.setCostPriceAfterSupplierDiscount(costAfterSupplierDiscount);
+        product.setStoreDiscount(storeDiscount);
+        product.setSalePriceBeforeStoreDiscount(salePriceBeforeStoreDiscount);
+        product.setSalePriceAfterStoreDiscount(salePriceAfterStoreDiscount);
+        product.setQuantityInWarehouse(0);
+        product.setQuantityInStore(0);
+
+        int minRequired = (int) (0.5 * demandLevel + 0.5 * supplyTime);
+        product.setMinimumQuantityForAlert(minRequired);
+    }
+
+
+
 }

@@ -12,7 +12,6 @@ public class Item {
     private int item_id;
     private int branch_id;
     private String item_expiring_date;
-    private int item_size; // 1 - small, 2 - medium, 3 - large
     private String storage_location; // warehouse or Interior store
     private String section_in_store; // for example: E7
     private boolean is_defect;
@@ -69,26 +68,7 @@ public class Item {
         this.item_expiring_date = item_expiring_date;
     }
 
-    /**
-     * Returns the size of the item.
-     * <ul>
-     *   <li>1 – Small</li>
-     *   <li>2 – Medium</li>
-     *   <li>3 – Large</li>
-     * </ul>
-     *
-     * @return The item's size as an integer.
-     */
-    public int getItemSize() {
-        return item_size;
-    }
 
-    /**
-     * @param item_size The item's size (1 = small, 2 = medium, 3 = large).
-     */
-    public void setItemSize(int item_size) {
-        this.item_size = item_size;
-    }
 
     /**
      * @return The section in the store or warehouse where the item is stored (e.g., "E7").

@@ -54,7 +54,7 @@ public class ReportController {
                                 .append(", Name: ").append(product.getProductName())
                                 .append(", Category: ").append(product.getCategory())
                                 .append(", Sub-Category: ").append(product.getSubCategory())
-                                .append(", Size: ").append(item.getItemSize())
+                                .append(", Size: ").append(product.getSize())
                                 .append(", Location: ").append(item.getStorageLocation())
                                 .append(", Section: ").append(item.getSectionInStore())
                                 .append("\n");
@@ -103,7 +103,7 @@ public class ReportController {
                             .append(", Expired on: ").append(item.getItemExpiringDate())
                             .append(", Category: ").append(product.getCategory())
                             .append(", Sub-Category: ").append(product.getSubCategory())
-                            .append(", Size: ").append(item.getItemSize())
+                            .append(", Size: ").append(product.getSize())
                             .append(", Location: ").append(item.getStorageLocation())
                             .append("\n");
                 }
@@ -117,79 +117,172 @@ public class ReportController {
 
 
     /**
-     * Generates a detailed inventory report for specified categories in a given branch.
-     * Lists items grouped by sub-category and size, sorted by expiration date.
-     * If a category does not exist, a message is added for it.
-     * Returns an overall report or an error if no categories are found.
+     * Generates an inventory report filtered by categories and sizes.
      *
-     * @param categories an array of category names to report on
-     * @param branch_id the branch ID to generate the report for
-     * @return a formatted string report by categories, or an error message
+     * @param categories the categories to include
+     * @param branchId the branch ID
+     * @param sizeFilters list of sizes to include (1-small, 2-medium, 3-big)
+     * @return formatted report string
      */
-    public String inventoryReportByCategories(String[] categories, int branch_id) {
+    public String inventoryReportByCategories(String[] categories, int branchId, List<Integer> sizeFilters) {
         StringBuilder report = new StringBuilder();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        boolean any_category_found = false;
+        boolean anyCategoryFound = false;
 
-        Branch selected_branch = branches.get(branch_id);
-        if (selected_branch == null) {
-            return "Branch with ID " + branch_id + " does not exist.";
+        Branch branch = branches.get(branchId);
+        if (branch == null) {
+            return "Branch with ID " + branchId + " does not exist.";
         }
 
-        for (String category_name : categories) {
-            report.append("Category: ").append(category_name).append("\n");
+        for (String categoryName : categories) {
+            report.append("Category: ").append(categoryName).append("\n");
 
-            Map<String, Map<Integer, List<Item>>> sub_category_map = new TreeMap<>();
+            Map<String, Map<Integer, List<Item>>> subCategoryMap = new TreeMap<>();
 
-            for (Item item : selected_branch.getItems().values()) {
+            for (Item item : branch.getItems().values()) {
                 Product product = products.get(item.getCatalogNumber());
-                if (product != null && product.getCategory().equalsIgnoreCase(category_name)) {
-                    String sub_category = product.getSubCategory();
-                    int size = item.getItemSize();
-                    sub_category_map
-                            .computeIfAbsent(sub_category, k -> new TreeMap<>())
+                if (product != null
+                        && product.getCategory().equalsIgnoreCase(categoryName)
+                        && sizeFilters.contains(product.getSize())) {
+
+                    String subCategory = product.getSubCategory();
+                    int size = product.getSize();
+                    subCategoryMap
+                            .computeIfAbsent(subCategory, k -> new TreeMap<>())
                             .computeIfAbsent(size, k -> new ArrayList<>())
                             .add(item);
                 }
             }
 
-            if (sub_category_map.isEmpty()) {
-                report.append("  Category does not exist.\n");
+            if (subCategoryMap.isEmpty()) {
+                report.append("  No matching items found for category.\n");
             } else {
-                any_category_found = true;
-                for (Map.Entry<String, Map<Integer, List<Item>>> sub_entry : sub_category_map.entrySet()) {
-                    report.append("  Sub-Category: ").append(sub_entry.getKey()).append("\n");
-                    for (Map.Entry<Integer, List<Item>> size_entry : sub_entry.getValue().entrySet()) {
-                        int size = size_entry.getKey();
-                        String size_label = switch (size) {
-                            case 1 -> "Small";
-                            case 2 -> "Medium";
-                            case 3 -> "Big";
-                            default -> "Unknown Size";
-                        };
-                        report.append("    Size: ").append(size_label).append("\n");
+                anyCategoryFound = true;
+                appendReportData(subCategoryMap, report, formatter);
+            }
 
-                        List<Item> sorted_items = size_entry.getValue();
-                        sorted_items.sort(Comparator.comparing(item -> {
-                            try {
-                                return LocalDate.parse(item.getItemExpiringDate(), formatter);
-                            } catch (Exception e) {
-                                return LocalDate.MAX;
-                            }
-                        }));
+            report.append("------------------------------------------------------------\n");
+        }
 
-                        int count = 1;
-                        for (Item item : sorted_items) {
-                            Product product = products.get(item.getCatalogNumber());
-                            if (product != null) {
-                                report.append("      ").append(count++).append(". ")
-                                        .append("Item ID: ").append(item.getItemId())
-                                        .append(", Name: ").append(product.getProductName())
-                                        .append(", Location: ").append(item.getStorageLocation())
-                                        .append(", Expiring: ").append(item.getItemExpiringDate())
-                                        .append("\n");
-                            }
-                        }
+        if (!anyCategoryFound) {
+            return "No valid categories found or no items matching size filters.";
+        }
+
+        return report.toString();
+    }
+
+    /**
+     * Generates an inventory report filtered by sub-categories and sizes.
+     *
+     * @param subCategories the sub-categories to include
+     * @param branchId the branch ID
+     * @param sizeFilters list of sizes to include
+     * @return formatted report string
+     */
+    public String inventoryReportBySubCategories(String[] subCategories, int branchId, List<Integer> sizeFilters) {
+        StringBuilder report = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        boolean anySubCategoryFound = false;
+
+        Branch branch = branches.get(branchId);
+        if (branch == null) {
+            return "Branch with ID " + branchId + " does not exist.";
+        }
+
+        for (String subCategoryName : subCategories) {
+            report.append("Sub-Category: ").append(subCategoryName).append("\n");
+
+            Map<Integer, List<Item>> sizeMap = new TreeMap<>();
+
+            for (Item item : branch.getItems().values()) {
+                Product product = products.get(item.getCatalogNumber());
+                if (product != null
+                        && product.getSubCategory().equalsIgnoreCase(subCategoryName)
+                        && sizeFilters.contains(product.getSize())) {
+
+                    int size = product.getSize();
+                    sizeMap.computeIfAbsent(size, k -> new ArrayList<>()).add(item);
+                }
+            }
+
+            if (sizeMap.isEmpty()) {
+                report.append("  No matching items found for sub-category.\n");
+            } else {
+                anySubCategoryFound = true;
+                appendReportDataSingleLevel(sizeMap, report, formatter);
+            }
+
+            report.append("------------------------------------------------------------\n");
+        }
+
+        if (!anySubCategoryFound) {
+            return "No valid sub-categories found or no items matching size filters.";
+        }
+
+        return report.toString();
+    }
+
+    /**
+     * Generates an inventory report filtered by catalog numbers and sizes.
+     *
+     * @param catalogNumbers the catalog numbers to include
+     * @param branchId the branch ID
+     * @param sizeFilters list of sizes to include
+     * @return formatted report string
+     */
+    public String inventoryReportByCatalogNumbers(String[] catalogNumbers, int branchId, List<Integer> sizeFilters) {
+        StringBuilder report = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        boolean anyCatalogFound = false;
+
+        Branch branch = branches.get(branchId);
+        if (branch == null) {
+            return "Branch with ID " + branchId + " does not exist.";
+        }
+
+        Set<Integer> catalogSet = new HashSet<>();
+        for (String s : catalogNumbers) {
+            try {
+                catalogSet.add(Integer.parseInt(s.trim()));
+            } catch (NumberFormatException ignored) {}
+        }
+
+        for (Integer catalogNumber : catalogSet) {
+            report.append("Catalog Number: ").append(catalogNumber).append("\n");
+
+            List<Item> matchedItems = new ArrayList<>();
+
+            for (Item item : branch.getItems().values()) {
+                if (item.getCatalogNumber() == catalogNumber) {
+                    Product product = products.get(item.getCatalogNumber());
+                    if (product != null && sizeFilters.contains(product.getSize())) {
+                        matchedItems.add(item);
+                    }
+                }
+            }
+
+            if (matchedItems.isEmpty()) {
+                report.append("  No matching items found for catalog number.\n");
+            } else {
+                anyCatalogFound = true;
+                matchedItems.sort(Comparator.comparing(item -> {
+                    try {
+                        return LocalDate.parse(item.getItemExpiringDate(), formatter);
+                    } catch (Exception e) {
+                        return LocalDate.MAX;
+                    }
+                }));
+
+                int count = 1;
+                for (Item item : matchedItems) {
+                    Product product = products.get(item.getCatalogNumber());
+                    if (product != null) {
+                        report.append("    ").append(count++).append(". ")
+                                .append("Item ID: ").append(item.getItemId())
+                                .append(", Name: ").append(product.getProductName())
+                                .append(", Location: ").append(item.getStorageLocation())
+                                .append(", Expiring: ").append(item.getItemExpiringDate())
+                                .append("\n");
                     }
                 }
             }
@@ -197,12 +290,88 @@ public class ReportController {
             report.append("------------------------------------------------------------\n");
         }
 
-        if (!any_category_found) {
-            return "No valid categories found. All entered categories do not exist.";
+        if (!anyCatalogFound) {
+            return "No valid catalog numbers found or no items matching size filters.";
         }
 
         return report.toString();
     }
+
+    private void appendReportData(Map<String, Map<Integer, List<Item>>> subCategoryMap, StringBuilder report, DateTimeFormatter formatter) {
+        for (Map.Entry<String, Map<Integer, List<Item>>> subEntry : subCategoryMap.entrySet()) {
+            report.append("  Sub-Category: ").append(subEntry.getKey()).append("\n");
+            for (Map.Entry<Integer, List<Item>> sizeEntry : subEntry.getValue().entrySet()) {
+                int size = sizeEntry.getKey();
+                String sizeLabel = switch (size) {
+                    case 1 -> "Small";
+                    case 2 -> "Medium";
+                    case 3 -> "Big";
+                    default -> "Unknown Size";
+                };
+                report.append("    Size: ").append(sizeLabel).append("\n");
+
+                List<Item> sortedItems = sizeEntry.getValue();
+                sortedItems.sort(Comparator.comparing(item -> {
+                    try {
+                        return LocalDate.parse(item.getItemExpiringDate(), formatter);
+                    } catch (Exception e) {
+                        return LocalDate.MAX;
+                    }
+                }));
+
+                int count = 1;
+                for (Item item : sortedItems) {
+                    Product product = products.get(item.getCatalogNumber());
+                    if (product != null) {
+                        report.append("      ").append(count++).append(". ")
+                                .append("Item ID: ").append(item.getItemId())
+                                .append(", Name: ").append(product.getProductName())
+                                .append(", Location: ").append(item.getStorageLocation())
+                                .append(", Expiring: ").append(item.getItemExpiringDate())
+                                .append("\n");
+                    }
+                }
+            }
+        }
+    }
+
+    private void appendReportDataSingleLevel(Map<Integer, List<Item>> sizeMap, StringBuilder report, DateTimeFormatter formatter) {
+        for (Map.Entry<Integer, List<Item>> sizeEntry : sizeMap.entrySet()) {
+            int size = sizeEntry.getKey();
+            String sizeLabel = switch (size) {
+                case 1 -> "Small";
+                case 2 -> "Medium";
+                case 3 -> "Big";
+                default -> "Unknown Size";
+            };
+            report.append("  Size: ").append(sizeLabel).append("\n");
+
+            List<Item> sortedItems = sizeEntry.getValue();
+            sortedItems.sort(Comparator.comparing(item -> {
+                try {
+                    return LocalDate.parse(item.getItemExpiringDate(), formatter);
+                } catch (Exception e) {
+                    return LocalDate.MAX;
+                }
+            }));
+
+            int count = 1;
+            for (Item item : sortedItems) {
+                Product product = products.get(item.getCatalogNumber());
+                if (product != null) {
+                    report.append("    ").append(count++).append(". ")
+                            .append("Item ID: ").append(item.getItemId())
+                            .append(", Name: ").append(product.getProductName())
+                            .append(", Location: ").append(item.getStorageLocation())
+                            .append(", Expiring: ").append(item.getItemExpiringDate())
+                            .append("\n");
+                }
+            }
+        }
+    }
+
+
+
 
 
     /**

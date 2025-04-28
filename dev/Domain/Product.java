@@ -11,6 +11,7 @@ public class Product {
     private String product_name; // Name of the product
     private String category; // Main category the product belongs to
     private String sub_category; // Sub-category under the main category
+    private int size; // Size of the product (e.g., small, medium, large)
     private int product_demand_level; // Demand level (1 - low, 5 - high)
     private int supply_time; // Number of days required to supply the product
     private int total_quantity; // Total number of this product in stock (store + warehouse)
@@ -87,6 +88,20 @@ public class Product {
     }
 
     /**
+     * @return The size of the product (1 - small, 2 - medium, 3 - large).
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * @param size The size to assign to the product (1 - small, 2 - medium, 3 - large).
+     */
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    /**
      * @return The product's demand level (1–5).
      */
     public int getProductDemandLevel() {
@@ -154,6 +169,7 @@ public class Product {
      */
     public void setQuantityInStore(int quantity_in_store) {
         this.quantity_in_store = quantity_in_store;
+        updateTotalQuantity(); // update total when store quantity changes
     }
 
     /**
@@ -168,6 +184,7 @@ public class Product {
      */
     public void setQuantityInWarehouse(int quantity_in_warehouse) {
         this.quantity_in_warehouse = quantity_in_warehouse;
+        updateTotalQuantity(); // update total when warehouse quantity changes
     }
 
     /**
@@ -301,5 +318,12 @@ public class Product {
      */
     public void setSalePriceAfterStoreDiscount(double sale_price_after_store_discount) {
         this.sale_price_after_store_discount = sale_price_after_store_discount;
+    }
+
+    /**
+     * Updates the total quantity field automatically.
+     */
+    private void updateTotalQuantity() {
+        this.total_quantity = this.quantity_in_store + this.quantity_in_warehouse;
     }
 }

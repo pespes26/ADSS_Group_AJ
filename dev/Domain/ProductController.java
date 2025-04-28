@@ -210,6 +210,19 @@ public class ProductController {
         return "Sale prices for Product Catalog Number " + catalog_number + " (Branch " + currentBranchId + "):\n" + result;
     }
 
+    /**
+     * Adds a new product to the inventory system.
+     *
+     * @param product the Product object to add
+     */
+    public void addProduct(Product product) {
+        products.put(product.getCatalogNumber(), product);
+    }
+
+
+
+
+
 
 
 }

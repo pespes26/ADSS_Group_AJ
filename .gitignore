@@ -1,0 +1,42 @@
+# Ignore Maven/Gradle/IntelliJ build output
+target/
+out/
+build/
+
+# Ignore IntelliJ IDEA files
+.idea/
+*.iml
+
+# Ignore Eclipse files
+.project
+.classpath
+.settings/
+
+# Ignore VSCode files (אם מישהו יפתח בפרויקט)
+.vscode/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore binaries
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignore production folder
+production/
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.bak
+*.orig
+
+# Ignore compiled reports or generated docs
+docs/*.pdf
+docs/*.html

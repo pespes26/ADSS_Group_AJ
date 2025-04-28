@@ -26,77 +26,52 @@ public class ItemController {
         this.purchased_items = purchased_items;
     }
 
-
-    public boolean addItem(String csvInput) {
-        try {
-            String[] fields = csvInput.split(",");
-            int item_Id = Integer.parseInt(fields[0]);
-            int branch_id = Integer.parseInt(fields[1]);
-
-            String product_name = fields[2];
-            String expiring_date = fields[3];
-            String location = fields[4];
-            String section = fields[5];
-            int catalog_number = Integer.parseInt(fields[6]);
-            String category = fields[7];
-            String sub_category = fields[8];
-            int size = Integer.parseInt(fields[9]);
-            double cost_price_before = Double.parseDouble(fields[10]);
-            int demand = Integer.parseInt(fields[11]);
-            int supply_time = Integer.parseInt(fields[12]);
-            String manufacturer = fields[13];
-            int supplier_discount = Integer.parseInt(fields[14]);
-            int store_discount = Integer.parseInt(fields[15]);
-
-            Item item = new Item();
-            item.setItemId(item_Id);
-            item.setBranchId(branch_id);
-            item.setItemExpiringDate(expiring_date);
-            item.setStorageLocation(location);
-            item.setSectionInStore(section);
-            item.setItemSize(size);
-            item.setCatalog_number(catalog_number);
-            item.setDefect(false);
-
-            Branch branch = branches.computeIfAbsent(branch_id, k -> new Branch(branch_id));
-            branch.getItems().put(item_Id, item);
-
-            if (!products.containsKey(catalog_number)) {
-                Product product = new Product();
-                product.setCatalogNumber(catalog_number);
-                product.setProductName(product_name);
-                product.setCategory(category);
-                product.setSubCategory(sub_category);
-                product.setProductDemandLevel(demand);
-                product.setSupplyTime(supply_time);
-                product.setManufacturer(manufacturer);
-                product.setSupplierDiscount(supplier_discount);
-                product.setCostPriceBeforeSupplierDiscount(cost_price_before);
-
-                double cost_after = cost_price_before * (1 - supplier_discount / 100.0);
-                double sale_before = cost_after * 2;
-                double sale_after = sale_before * (1 - store_discount / 100.0);
-
-                product.setCostPriceAfterSupplierDiscount(cost_after);
-                product.setStoreDiscount(store_discount);
-                product.setSalePriceBeforeStoreDiscount(sale_before);
-                product.setSalePriceAfterStoreDiscount(sale_after);
-
-                product.setQuantityInWarehouse(0);
-                product.setQuantityInStore(0);
-
-                int min_required = (int) (0.5 * demand + 0.5 * supply_time);
-                product.setMinimumQuantityForAlert(min_required);
-
-                products.put(catalog_number, product);
-            }
-
-            return true;
-        } catch (Exception e) {
-            return false;
+    /**
+     * Returns the next available unique Item ID.
+     *
+     * <p>
+     * This method scans all existing items and finds the highest ID,
+     * then returns the next number (highest ID + 1).
+     * Guarantees that no duplicate item IDs are generated.
+     *
+     * @return the next available Item ID
+     */
+    public int getNextAvailableItemId() {
+        if (purchased_items.isEmpty()) {
+            return 1; // Start from 1 if no items exist
         }
+        int maxId = purchased_items.keySet().stream().max(Integer::compareTo).orElse(0);
+        return maxId + 1;
     }
 
+
+
+
+    /**
+     * Adds a single item directly to the inventory (without using CSV).
+     *
+     * @param itemId the unique ID of the new item
+     * @param branchId the branch where the item is stored
+     * @param catalogNumber the catalog number of the associated product
+     * @param storageLocation the location where the item is stored (Warehouse or InteriorStore)
+     * @param expiryDate the expiry date of the item in dd/MM/yyyy format
+     */
+    public void addItem(int itemId, int branchId, int catalogNumber, String storageLocation, String expiryDate) {
+        Item newItem = new Item();
+        newItem.setItemId(itemId);
+        newItem.setBranchId(branchId);
+        newItem.setCatalog_number(catalogNumber);
+        newItem.setStorageLocation(storageLocation);
+        newItem.setItemExpiringDate(expiryDate);
+        newItem.setDefect(false); // new items are not defective by default
+
+        // Insert into the branch
+        Branch branch = branches.computeIfAbsent(branchId, k -> new Branch(branchId));
+        branch.getItems().put(itemId, newItem);
+
+        // Also insert into the general purchased items map
+        purchased_items.put(itemId, newItem);
+    }
 
 
 
@@ -225,7 +200,7 @@ public class ItemController {
     public String showItemDetails(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
         if (branch == null) {
-            return "Branch with ID " + branch_id + " does not exist.";
+            return "There is not item in branch id with ID " + branch_id + " does not exist.";
         }
 
         Item item = branch.getItem(item_Id);
@@ -246,7 +221,7 @@ public class ItemController {
                 + "Location: " + item.getStorageLocation() + ", Section: " + item.getSectionInStore() + "\n"
                 + "Product Catalog Number: " + product.getCatalogNumber() + ", Category: "
                 + product.getCategory() + ", Sub-Category: " + product.getSubCategory() + "\n"
-                + "Size: " + item.getItemSize() + "\n"
+                + "Size: " + product.getSize() + "\n"
                 + "Supplier Discount: " + product.getSupplierDiscount() + "%\n"
                 + "Cost price before supplier discount: " + df.format(product.getCostPriceBeforeSupplierDiscount()) + "\n"
                 + "Cost price after supplier discount: " + df.format(product.getCostPriceAfterSupplierDiscount()) + "\n"
@@ -274,7 +249,6 @@ public class ItemController {
         return branch.getItems().get(item_Id).getCatalogNumber();
     }
 
-
-
-
 }
+
+

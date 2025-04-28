@@ -16,24 +16,55 @@ import java.util.Scanner;
  */
 public class Menu {
 
+
     /**
      * Entry point of the Super-Li Inventory System.
-     * Loads inventory data, prompts the user to select a branch, and launches the menu controller.
+     * This method initializes the system based on user selection:
+     * - The user can choose to load initial inventory data from a CSV file.
+     * - Alternatively, the user can choose to start the system without any data.
+     * After initialization, the user is prompted to select a branch (1-10),
+     * and the main menu controller is launched to manage further operations.
      *
-     * @param args command-line arguments (not used)
+     * @param args Command-line arguments (not used).
      */
     public static void main(String[] args) {
-        String path = getPathFromConfig();
-        InventoryController inventory_controller = SystemInitializer.initializeSystem(path);
-
         Scanner scan = new Scanner(System.in);
 
+        // Welcome message
         System.out.println("------------------------------------------------------------");
         System.out.println(" Welcome to Super-Li Inventory System ");
         System.out.println("------------------------------------------------------------");
+
+        // Ask user whether to load data or start empty
+        System.out.println("Choose startup mode:");
+        System.out.println("1. Load data from CSV file");
+        System.out.println("2. Start with empty system");
+
+        int startupChoice = -1;
+        while (startupChoice != 1 && startupChoice != 2) {
+            try {
+                startupChoice = Integer.parseInt(scan.nextLine().trim());
+                if (startupChoice != 1 && startupChoice != 2) {
+                    System.out.print("Invalid choice. Please enter 1 or 2: ");
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter 1 or 2: ");
+            }
+        }
+
+        // Initialize inventory system based on the user's choice
+        InventoryController inventory_controller;
+        if (startupChoice == 1) {
+            String path = getPathFromConfig();
+            inventory_controller = SystemInitializer.initializeSystem(path);
+        } else {
+            inventory_controller = SystemInitializer.initializeSystemWithoutData();
+        }
+
+        // Prompt user to select branch ID (1-10)
+        System.out.println("------------------------------------------------------------");
         System.out.println("Please select your branch before continuing.");
         System.out.println("Enter your Branch ID (1 - 10):");
-
 
         int branch_id = -1;
         while (branch_id < 1 || branch_id > 10) {
@@ -47,12 +78,15 @@ public class Menu {
             }
         }
 
+        // Confirm branch selection
         System.out.println("Branch " + branch_id + " selected. All operations will now apply to this branch.");
         System.out.println("------------------------------------------------------------");
 
+        // Launch the main menu controller
         MenuController menu_controller = new MenuController(inventory_controller, branch_id);
         menu_controller.runMenu();
     }
+
 
 
     /**

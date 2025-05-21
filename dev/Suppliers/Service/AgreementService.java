@@ -1,6 +1,6 @@
-package Service;
+package Suppliers.Service;
 
-import Domain.Agreement;
+import Suppliers.Domain.Agreement;
 
 import java.util.HashMap;
 

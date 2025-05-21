@@ -1,6 +1,6 @@
-package Service;
+package Suppliers.Service;
 
-import Domain.Supplier;
+import Suppliers.Domain.Supplier;
 import java.util.ArrayList;
 import java.util.List;
 

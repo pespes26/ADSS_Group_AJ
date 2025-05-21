@@ -1,7 +1,5 @@
-package Inventory.Presentation.Domain;
+package Suppliers.Domain;
 
-import Suppliers.Domain.Agreement;
-import Suppliers.Domain.Order;
 import Suppliers.Service.AgreementService;
 import Suppliers.Service.OrderService;
 import Suppliers.Service.ProductService;

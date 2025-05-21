@@ -1,6 +1,6 @@
-package Service;
+package Suppliers.Service;
 
-import Domain.Order;
+import Suppliers.Domain.Order;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;

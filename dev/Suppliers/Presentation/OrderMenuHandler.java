@@ -1,5 +1,6 @@
-package Presentation;
-import Domain.Controller;
+package Suppliers.Presentation;
+import Suppliers.Domain.Controller;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;

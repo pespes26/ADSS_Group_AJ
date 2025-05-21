@@ -1,6 +1,4 @@
-package Inventory.Presentation.Domain;
-
-import Suppliers.Domain.Agreement;
+package Suppliers.Domain;
 
 import java.util.HashMap;
 

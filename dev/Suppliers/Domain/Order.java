@@ -1,4 +1,4 @@
-package Inventory.Presentation.Domain;
+package Suppliers.Domain;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

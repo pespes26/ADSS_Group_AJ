@@ -1,5 +1,6 @@
-package Presentation;
-import Domain.Controller;
+package Suppliers.Presentation;
+import Suppliers.Domain.Controller;
+
 import java.util.Scanner;
 
 public class MainMenu {
@@ -7,7 +8,7 @@ public class MainMenu {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Controller controller= new Controller();
-        Init.DataInitializer.populateInitialData(controller);
+        DataInitializer.populateInitialData(controller);
 
         // Welcome message
         System.out.println("=====================================");

@@ -1,6 +1,7 @@
-package Service;
+package Suppliers.Service;
 
-import Domain.Product;
+
+import Suppliers.Domain.Product;
 
 import java.util.ArrayList;
 import java.util.Iterator;

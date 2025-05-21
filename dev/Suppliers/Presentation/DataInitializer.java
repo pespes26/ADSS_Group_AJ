@@ -1,7 +1,7 @@
-package Init;
+package Suppliers.Presentation;
 
-import Domain.Controller;
-import Domain.Product;
+import Suppliers.Domain.Controller;
+import Suppliers.Domain.Product;
 
 import java.util.HashMap;
 import java.util.Map;

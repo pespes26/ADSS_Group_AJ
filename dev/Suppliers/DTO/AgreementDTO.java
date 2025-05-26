@@ -1,16 +1,19 @@
 package Suppliers.DTO;
 
 public class AgreementDTO {
-    private final int agreement_ID; // Unique ID of the agreement
-    private final int supplier_ID; // Unique ID of the supplier
+    private  int agreement_ID; // Unique ID of the agreement
+    private  int supplier_ID; // Unique ID of the supplier
     private String[] deliveryDays; // Days on which the supplier can deliver
     private boolean selfPickup; // Whether delivery is self-handled by the supermarket
 
-    public AgreementDTO(boolean selfPickup, String[] deliveryDays, int supplier_ID, int agreement_ID) {
+    public AgreementDTO(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup) {
         this.selfPickup = selfPickup;
         this.deliveryDays = deliveryDays;
         this.supplier_ID = supplier_ID;
         this.agreement_ID = agreement_ID;
+    }
+
+    public AgreementDTO() {
     }
 
     public int getAgreement_ID() {
@@ -27,6 +30,14 @@ public class AgreementDTO {
 
     public boolean isSelfPickup() {
         return selfPickup;
+    }
+
+    public void setAgreement_ID(int agreement_ID) {
+        this.agreement_ID = agreement_ID;
+    }
+
+    public void setSupplier_ID(int supplier_ID) {
+        this.supplier_ID = supplier_ID;
     }
 
     public void setDeliveryDays(String[] deliveryDays) {

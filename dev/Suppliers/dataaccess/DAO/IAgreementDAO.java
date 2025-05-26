@@ -15,5 +15,11 @@ public interface IAgreementDAO {
 
     AgreementDTO getById(int agreementId) throws SQLException;
 
-    List<AgreementDTO> getAll() throws SQLException;
+    List<AgreementDTO> getBySupplierId(int supplierId) throws SQLException;
+
+    void updateDeliveryDays(int agreementId, String[] deliveryDays) throws SQLException;
+
+    void updateSelfPickup(int agreementId, boolean selfPickup) throws SQLException;
+
+    List<AgreementDTO> getAllAgreement() throws SQLException;
 }

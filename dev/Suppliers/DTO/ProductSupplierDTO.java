@@ -1,0 +1,57 @@
+package Suppliers.DTO;
+
+public class ProductSupplierDTO {
+    int supplierID;
+    int Catalog_Number;
+    int product_id;
+    double Price;
+    String unitsOfMeasure;
+
+    public ProductSupplierDTO(int supplierID, int catalog_Number, int product_id, double price, String unitsOfMeasure) {
+        this.supplierID = supplierID;
+        Catalog_Number = catalog_Number;
+        this.product_id = product_id;
+        Price = price;
+        this.unitsOfMeasure = unitsOfMeasure;
+    }
+
+    public int getSupplierID() {
+        return supplierID;
+    }
+
+    public int getCatalog_Number() {
+        return Catalog_Number;
+    }
+
+    public int getProduct_id() {
+        return product_id;
+    }
+
+    public double getPrice() {
+        return Price;
+    }
+
+    public String getUnitsOfMeasure() {
+        return unitsOfMeasure;
+    }
+
+    public void setSupplierID(int supplierID) {
+        this.supplierID = supplierID;
+    }
+
+    public void setCatalog_Number(int catalog_Number) {
+        Catalog_Number = catalog_Number;
+    }
+
+    public void setProduct_id(int product_id) {
+        this.product_id = product_id;
+    }
+
+    public void setPrice(double price) {
+        Price = price;
+    }
+
+    public void setUnitsOfMeasure(String unitsOfMeasure) {
+        this.unitsOfMeasure = unitsOfMeasure;
+    }
+}

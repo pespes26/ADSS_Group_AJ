@@ -1,0 +1,112 @@
+package Inventory.DAO;
+import Inventory.DTO.OrderOnTheWayDTO;
+import java.sql.*;
+public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
+    private static final String DB_URL = "jdbc:sqlite:Inventory.db";
+    static {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+
+            String createTableSql = "CREATE TABLE IF NOT EXISTS ordersOnTheWay (\n"
+                    + " order_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                    + " product_Catalog_Number INTEGER NOT NULL,\n"
+                    + " quantity INTEGER NOT NULL,\n"
+                    + " price REAL NOT NULL,\n"
+                    + "discount REAL NOT NULL,\n"
+                    + " order_date TEXT DEFAULT (datetime('now'))\n"
+                    + ");";
+
+            stmt.execute(createTableSql);
+            System.out.println("OrdersOnTheWay table created (if it didn't already exist).");
+
+        } catch (SQLException e) {
+            System.err.println("Error creating OrdersOnTheWay table:");
+            e.printStackTrace();
+        }
+    }
+
+    public void Insert(OrderOnTheWayDTO dto) throws SQLException{
+        String sql = "INSERT INTO ordersOnTheWay (product_Catalog_Number, quantity,price,discount) VALUES (?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db")) {
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, dto.getProductCatalogNumber());
+                pstmt.setInt(2, dto.getQuantity());
+                pstmt.setDouble(3, dto.getPrice());
+                pstmt.setDouble(4, dto.getDiscount());
+                pstmt.executeUpdate();
+            }
+
+
+        }
+
+    }
+
+
+    @Override
+    public void Update(OrderOnTheWayDTO dto) throws SQLException {
+        String sql = "UPDATE ordersOnTheWay SET product_Catalog_Number = ?, quantity = ?, price = ? ,discount = ? WHERE order_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, dto.getProductCatalogNumber());
+            pstmt.setInt(2, dto.getQuantity());
+            pstmt.setDouble(3, dto.getPrice());
+            pstmt.setDouble(4, dto.getDiscount());
+
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println(" No order found with order_id = " + dto.getOrderId());
+            } else {
+                System.out.println("The order was updated successfully.");
+            }
+        }
+    }
+
+    public void DeleteByOrderId(int Id)throws SQLException{
+        String sql = "DELETE FROM OrdersOnTheWay WHERE order_id = ?";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Id);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public OrderOnTheWayDTO GetById(int id) throws SQLException{
+        String sql = "SELECT * FROM orders WHERE order_id = ?";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    OrderOnTheWayDTO dto = new OrderOnTheWayDTO();
+                    dto.setOrderId(rs.getInt("order_id"));
+                    dto.setProductCatalogNumber(rs.getInt("product_Catalog_Number"));
+                    dto.setQuantity(rs.getInt("quantity"));
+                    dto.setPrice(rs.getDouble("price"));
+                    dto.setDiscount(rs.getDouble("discount"));
+                    dto.setOrderDate(rs.getString("order_date"));
+                    return dto;
+                }
+            }
+        }
+
+        return null;
+
+
+    }
+
+
+
+
+
+
+
+}

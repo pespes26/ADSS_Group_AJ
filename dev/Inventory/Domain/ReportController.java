@@ -1,5 +1,8 @@
 package Inventory.Domain;
 
+import Inventory.DAO.JdbcProductDAO;
+import Inventory.DTO.ProductDTO;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -372,26 +375,7 @@ public class ReportController {
 
 
 
-    /**
-     * Generates a shortage inventory report for a specific branch.
-     *
-     * <p>
-     * This method analyzes all products in the given branch and compares their current stock
-     * against a dynamically calculated minimum required quantity. The minimum is computed as the
-     * average between the product's demand level and its supply time, floored at a minimum of 1.
-     *
-     * <p>
-     * For each product whose stock falls below this threshold, a line is added to the report
-     * detailing the catalog number, name, current quantity, required quantity, and how many units
-     * are missing. If an active discount is associated with the product, it is included as well.
-     *
-     * <p>
-     * If no shortages are found, a message is returned indicating that all products are above
-     * their minimum required amount. If the branch is not found, a branch-not-found message is returned.
-     *
-     * @param branch_id The ID of the branch to generate the report for.
-     * @return A formatted string with the shortage report, or a message indicating no shortages or invalid branch.
-     */
+    
     public String generateShortageInventoryReport(int branch_id) {
         StringBuilder report = new StringBuilder();
         boolean found = false;
@@ -401,7 +385,7 @@ public class ReportController {
             return "Branch " + branch_id + " not found.";
         }
 
-        // Count how many non-defective items exist for each catalog number
+        // Count how many non-defective items exist for each catalog number in the branch
         Map<Integer, Integer> stockCountMap = new HashMap<>();
         for (Item item : branch.getItems().values()) {
             if (!item.isDefect()) {
@@ -412,10 +396,13 @@ public class ReportController {
 
         report.append("Reorder Alert Report for Branch ").append(branch_id).append(":\n");
 
-        // Iterate over all known catalog numbers in the branch
-        for (int catalog_number : branch.getCatalogNumbers()) {
+        // Get all products from the database
+        JdbcProductDAO productDAO = null;
+        List<ProductDTO> dbProducts = productDAO.getAllProducts();
+        for (ProductDTO productDTO : dbProducts) {
+            int catalog_number = productDTO.getCatalogNumber();
             Product product = products.get(catalog_number);
-            if (product == null) continue;
+            if (product == null) continue; // skip if not in memory
 
             int inStock = stockCountMap.getOrDefault(catalog_number, 0);
             int min_required = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * product.getSupplyTime()));

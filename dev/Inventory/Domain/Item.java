@@ -46,10 +46,16 @@ public class Item {
         this.item_id = product_id;
     }
 
+    /**
+     * @return The branch ID where the item is stored.
+     */
     public int getBranchId() {
         return branch_id;
     }
 
+    /**
+     * @param branch_id The branch ID to assign to the item.
+     */
     public void setBranchId(int branch_id) {
         this.branch_id = branch_id;
     }

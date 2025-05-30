@@ -1,4 +1,4 @@
-package Tests;
+package Inventory.Tests;
 
 import Inventory.Domain.InventoryController;
 import org.junit.Before;
@@ -33,16 +33,5 @@ public class InventoryControllerTest {
         assertNotNull("ReportController should not be null", inventory.getReportController());
     }
 
-    /**
-     * Verifies that calling importData on a non-existing file does not crash the program.
-     * This is a smoke test to ensure graceful failure handling.
-     */
-    @Test
-    public void testImportDataHandlesMissingFileGracefully() {
-        try {
-            inventory.importData("non_existing_file.csv");
-        } catch (Exception e) {
-            fail("importData should not throw exception on missing file: " + e.getMessage());
-        }
-    }
+
 }

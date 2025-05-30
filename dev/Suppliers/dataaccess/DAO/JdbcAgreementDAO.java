@@ -13,7 +13,7 @@ public class JdbcAgreementDAO implements IAgreementDAO {
 
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
+             Statement statement = conn.createStatement()) {
 
             String createTableSql = "CREATE TABLE IF NOT EXISTS agreements (\n"
                     + " agreement_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
@@ -22,7 +22,7 @@ public class JdbcAgreementDAO implements IAgreementDAO {
                     + " delivery_days TEXT\n"
                     + ");";
 
-            stmt.execute(createTableSql);
+            statement.execute(createTableSql);
             System.out.println("✅ טבלת agreements נוצרה (אם לא הייתה קיימת).");
 
         } catch (SQLException e) {
@@ -36,15 +36,15 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         String sql = "INSERT INTO agreements (supplier_id, self_pickup, delivery_days) VALUES (?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db")) {
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, dto.getSupplier_ID());
-                pstmt.setBoolean(2, dto.isSelfPickup());
-                pstmt.setString(3, String.join(",", dto.getDeliveryDays()));
-                pstmt.executeUpdate();
+            try (PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
+                prepared_statement.setInt(1, dto.getSupplier_ID());
+                prepared_statement.setBoolean(2, dto.isSelfPickup());
+                prepared_statement.setString(3, String.join(",", dto.getDeliveryDays()));
+                prepared_statement.executeUpdate();
             }
 
-            try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+            try (Statement statement = conn.createStatement();
+                 ResultSet rs = statement.executeQuery("SELECT last_insert_rowid()")) {
                 if (rs.next()) {
                     dto.setAgreement_ID(rs.getInt(1));
                 }
@@ -62,10 +62,10 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         String sql = "DELETE FROM agreements WHERE agreement_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, agreementId);
-            pstmt.executeUpdate();
+            prepared_statement.setInt(1, agreementId);
+            prepared_statement.executeUpdate();
         }
     }
 
@@ -74,11 +74,11 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         String sql = "SELECT * FROM agreements WHERE agreement_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, agreementId);
+            prepared_statement.setInt(1, agreementId);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = prepared_statement.executeQuery()) {
                 if (rs.next()) {
                     AgreementDTO dto = new AgreementDTO();
                     dto.setAgreement_ID(rs.getInt("agreement_id"));
@@ -99,11 +99,11 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         List<AgreementDTO> agreements = new ArrayList<>();
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, supplierId);
+            prepared_statement.setInt(1, supplierId);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = prepared_statement.executeQuery()) {
                 while (rs.next()) {
                     AgreementDTO dto = new AgreementDTO();
                     dto.setAgreement_ID(rs.getInt("agreement_id"));
@@ -123,11 +123,11 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         String sql = "UPDATE agreements SET delivery_days = ? WHERE agreement_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, String.join(",", deliveryDays));
-            pstmt.setInt(2, agreementId);
-            pstmt.executeUpdate();
+            prepared_statement.setString(1, String.join(",", deliveryDays));
+            prepared_statement.setInt(2, agreementId);
+            prepared_statement.executeUpdate();
         }
     }
 
@@ -136,11 +136,11 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         String sql = "UPDATE agreements SET self_pickup = ? WHERE agreement_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setBoolean(1, selfPickup);
-            pstmt.setInt(2, agreementId);
-            pstmt.executeUpdate();
+            prepared_statement.setBoolean(1, selfPickup);
+            prepared_statement.setInt(2, agreementId);
+            prepared_statement.executeUpdate();
         }
     }
 
@@ -150,8 +150,8 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         List<AgreementDTO> agreements = new ArrayList<>();
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql);
+             ResultSet rs = prepared_statement.executeQuery()) {
 
             while (rs.next()) {
                 AgreementDTO dto = new AgreementDTO();

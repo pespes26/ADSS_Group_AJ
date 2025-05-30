@@ -5,18 +5,19 @@ public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
     private static final String DB_URL = "jdbc:sqlite:Inventory.db";
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
+             Statement statement = conn.createStatement()) {
 
-            String createTableSql = "CREATE TABLE IF NOT EXISTS ordersOnTheWay (\n"
-                    + " order_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                    + " product_Catalog_Number INTEGER NOT NULL,\n"
-                    + " quantity INTEGER NOT NULL,\n"
-                    + " price REAL NOT NULL,\n"
-                    + "discount REAL NOT NULL,\n"
-                    + " order_date TEXT DEFAULT (datetime('now'))\n"
-                    + ");";
+            String createTableSql = """
+                    CREATE TABLE IF NOT EXISTS orders_on_the_way (
+                     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     product_catalog_number INTEGER NOT NULL,
+                     quantity INTEGER NOT NULL,
+                     price REAL NOT NULL,
+                    discount REAL NOT NULL,
+                     order_date TEXT DEFAULT (datetime('now'))
+                    );""";
 
-            stmt.execute(createTableSql);
+            statement.execute(createTableSql);
             System.out.println("OrdersOnTheWay table created (if it didn't already exist).");
 
         } catch (SQLException e) {
@@ -26,15 +27,15 @@ public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
     }
 
     public void Insert(OrderOnTheWayDTO dto) throws SQLException{
-        String sql = "INSERT INTO ordersOnTheWay (product_Catalog_Number, quantity,price,discount) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO orders_on_the_way (product_Catalog_Number, quantity,price,discount) VALUES (?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db")) {
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, dto.getProductCatalogNumber());
-                pstmt.setInt(2, dto.getQuantity());
-                pstmt.setDouble(3, dto.getPrice());
-                pstmt.setDouble(4, dto.getDiscount());
-                pstmt.executeUpdate();
+            try (PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
+                prepared_statement.setInt(1, dto.getProductCatalogNumber());
+                prepared_statement.setInt(2, dto.getQuantity());
+                prepared_statement.setDouble(3, dto.getPrice());
+                prepared_statement.setDouble(4, dto.getDiscount());
+                prepared_statement.executeUpdate();
             }
 
 
@@ -45,18 +46,18 @@ public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
 
     @Override
     public void Update(OrderOnTheWayDTO dto) throws SQLException {
-        String sql = "UPDATE ordersOnTheWay SET product_Catalog_Number = ?, quantity = ?, price = ? ,discount = ? WHERE order_id = ?";
+        String sql = "UPDATE orders_on_the_way SET product_catalog_number = ?, quantity = ?, price = ? ,discount = ? WHERE order_id = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, dto.getProductCatalogNumber());
-            pstmt.setInt(2, dto.getQuantity());
-            pstmt.setDouble(3, dto.getPrice());
-            pstmt.setDouble(4, dto.getDiscount());
+            prepared_statement.setInt(1, dto.getProductCatalogNumber());
+            prepared_statement.setInt(2, dto.getQuantity());
+            prepared_statement.setDouble(3, dto.getPrice());
+            prepared_statement.setDouble(4, dto.getDiscount());
 
 
-            int rowsAffected = pstmt.executeUpdate();
+            int rowsAffected = prepared_statement.executeUpdate();
             if (rowsAffected == 0) {
                 System.out.println(" No order found with order_id = " + dto.getOrderId());
             } else {
@@ -66,13 +67,13 @@ public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
     }
 
     public void DeleteByOrderId(int Id)throws SQLException{
-        String sql = "DELETE FROM OrdersOnTheWay WHERE order_id = ?";
+        String sql = "DELETE FROM orders_on_the_way WHERE order_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, Id);
-            pstmt.executeUpdate();
+            prepared_statement.setInt(1, Id);
+            prepared_statement.executeUpdate();
         }
     }
 
@@ -80,18 +81,18 @@ public class JdbcOrdersOnTheWayDAO implements IOrdersOnTheWayDAO {
         String sql = "SELECT * FROM orders WHERE order_id = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, id);
+            prepared_statement.setInt(1, id);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = prepared_statement.executeQuery()) {
                 if (rs.next()) {
                     OrderOnTheWayDTO dto = new OrderOnTheWayDTO();
                     dto.setOrderId(rs.getInt("order_id"));
-                    dto.setProductCatalogNumber(rs.getInt("product_Catalog_Number"));
+                    dto.setProductCatalogNumber(rs.getInt("product_catalog_number"));
                     dto.setQuantity(rs.getInt("quantity"));
-                    dto.setPrice(rs.getDouble("price"));
-                    dto.setDiscount(rs.getDouble("discount"));
+                    dto.setPrice(rs.getDouble("cost_price_before_supplier_discount"));
+                    dto.setDiscount(rs.getDouble("supplier_discount"));
                     dto.setOrderDate(rs.getString("order_date"));
                     return dto;
                 }

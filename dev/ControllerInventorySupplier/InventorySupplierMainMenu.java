@@ -1,46 +1,48 @@
 package ControllerInventorySupplier;
 
-import Inventory.Controllers.Menu;
-import Inventory.Controllers.MenuController;
+import Inventory.Presentation.MenuController;
 
 import Inventory.Domain.InventoryController;
-import Suppliers.Presentation.MainMenu;
 
-//import dev.Suppliers.DataBase.DatabaseConnection;
-//import dev.Suppliers.DataBase.SupllierCreatDb;
-//import dev.Suppliers.DataBase.main_supplier;
 
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class Main {
+public class InventorySupplierMainMenu {
 
     public static void main(String[] args) throws SQLException {  //
         Scanner scanner = new Scanner(System.in);
-        //DatabaseConnection.connect();
-        //SupllierCreatDb.createTables();
-        //DatabaseConnection.main();
-        //Menu.initializeInventorySystem();
-
 
         System.out.println("Welcome! Would you like to manage Inventory or Supplier?");
         System.out.println("Type '1' for Inventory or '2' for Supplier:");
 
         int choice = scanner.nextInt();
+        scanner.nextLine(); // consume newline
 
         switch (choice) {
             case 1:
                 System.out.println("You have selected Inventory.");
 
-                // יצירת InventoryController
+                System.out.println("Do you want to load existing data from the database?");
+                System.out.println("Type '1' to load existing data, or '2' to start with an empty system:");
+                int dataChoice = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+
                 InventoryController inventoryController = new InventoryController();
 
-                // הזנת מזהה סניף
+                if (dataChoice == 1) {
+                    inventoryController.loadFromDatabase();
+                    System.out.println("Data loaded from database.");
+                } else if (dataChoice == 2) {
+                    System.out.println("Starting with empty inventory system.");
+                } else {
+                    System.out.println("Invalid choice. Starting with empty system by default.");
+                }
+
                 System.out.print("Enter your Branch ID (number between 1 and 10): ");
                 int branchId = scanner.nextInt();
-                scanner.nextLine(); // צריכת ENTER
+                scanner.nextLine();
 
-                // הפעלת תפריט המלאי
                 MenuController inventoryMenu = new MenuController(inventoryController, branchId);
                 inventoryMenu.runMenu();
                 break;

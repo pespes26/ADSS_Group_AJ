@@ -1,4 +1,4 @@
-package Inventory.Controllers;
+package Inventory.Presentation;
 
 import Inventory.Domain.Discount;
 import Inventory.Domain.InventoryController;
@@ -21,10 +21,22 @@ public class MenuController {
         this.current_branch_id = currentBranchId;
     }
 
+    private void printWelcome() {
+        System.out.println("""
+    =============================================
+    |                                            |
+    |   Welcome to the Inventory Management!     |
+    |                                            |
+    =============================================""");
+        System.out.println("        You are currently in Branch #" + current_branch_id);
+        System.out.println("=============================================\n");
+    }
+
     public void runMenu() {
+        printWelcome(); // ← נקרא רק פעם אחת
         int choice = 0;
         while (choice != 14) {
-            printMenu();
+            printMenu(); // מציג רק את התפריט
             try {
                 choice = Integer.parseInt(scan.nextLine().trim());
                 handleChoice(choice);
@@ -36,17 +48,6 @@ public class MenuController {
     }
 
     private void printMenu() {
-        System.out.println("""
-            =============================================
-            |                                            |
-            |   Welcome to the Inventory Management!     |
-            |                                            |
-            =============================================
-
-            Please select an option from the menu below:
-            """);
-
-
         System.out.println("""
         Menu:
         1. Show item details
@@ -293,7 +294,7 @@ public class MenuController {
 
     /**
      * Marks an item as defective based on the provided item ID.
-     * <p>
+     *
      * Prompts the user to enter the item ID, verifies its validity and existence,
      * and delegates the update to {@code markItemAsDefective} in the {@code ItemController}.
      * If the item exists, it is marked as defective and a confirmation message is shown.
@@ -301,20 +302,28 @@ public class MenuController {
      */
     private void markAsDefect() {
         System.out.print("Enter item ID: ");
-        int item_Id;
+        int itemId;
 
         try {
-            item_Id = Integer.parseInt(scan.nextLine());
+            itemId = Integer.parseInt(scan.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Item ID must be a number.");
+            System.out.println("Invalid input. Item ID must be a numeric value.");
             return;
         }
 
-        boolean success = inventory_controller.getItemController().markItemAsDefective(item_Id, current_branch_id);
+        // Check if the item exists in the current branch
+        if (!inventory_controller.getItemController().itemExistsInBranch(itemId, current_branch_id)) {
+            System.out.println("Item with ID " + itemId + " was not found in Branch " + current_branch_id + ".");
+            return;
+        }
+
+        // Proceed to mark as defective
+        boolean success = inventory_controller.getItemController().markItemAsDefective(itemId, current_branch_id);
+
         if (success) {
-            System.out.println("Item with ID " + item_Id + " in Branch " + current_branch_id + " has been marked as defective.");
+            System.out.println("Item with ID " + itemId + " in Branch " + current_branch_id + " has been marked as defective.");
         } else {
-            System.out.println("Item with ID " + item_Id + " was not found in Branch " + current_branch_id + ".");
+            System.out.println("Failed to mark item as defective. Please try again.");
         }
     }
 

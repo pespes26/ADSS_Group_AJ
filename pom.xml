@@ -15,11 +15,11 @@
             <version>2.0</version>
         </dependency>
 
-        <!-- OpenCSV -->
+        <!-- SLF4J Simple Logger -->
         <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>5.7.1</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
         </dependency>
 
         <!-- ✅ JUnit 4.13.2 -->
@@ -74,7 +74,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>dev.ControllerInventorySupplier.Main</mainClass>
+                            <mainClass>dev.ControllerInventorySupplier.InventorySupplierMainMenu</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

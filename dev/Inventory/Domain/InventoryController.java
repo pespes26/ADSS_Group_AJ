@@ -2,11 +2,14 @@ package Inventory.Domain;
 
 
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
+import Inventory.DAO.IItemsDAO;
+import Inventory.DAO.IProductDAO;
+import Inventory.DAO.JdbcItemDAO;
+import Inventory.DAO.JdbcProductDAO;
+import Inventory.DTO.ItemDTO;
+import Inventory.DTO.ProductDTO;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 
@@ -37,64 +40,9 @@ public class InventoryController {
         this.report_controller = new ReportController(branches, products);
     }
 
-    /**
-     * Imports inventory data from a CSV file.
-     * Each line in the CSV represents an item with various attributes.
-     *
-     * @param path The path to the CSV file.
-     */
-    public void importData(String path) {
-        try (CSVReader reader = new CSVReader(new FileReader(path))) {
-            String[] itemFieldsFromCSV;
-            while ((itemFieldsFromCSV = reader.readNext()) != null) {
-                String input_id = itemFieldsFromCSV[0];
-                if (input_id.startsWith("\uFEFF")) {
-                    input_id = input_id.substring(1);
-                }
-                itemFieldsFromCSV[0] = input_id.trim();
 
-                Item item = buildItemFromCSV(itemFieldsFromCSV);
-                int branchId = item.getBranchId();
 
-                branches.putIfAbsent(branchId, new Branch(branchId));
-                branches.get(branchId).addItem(item);
 
-                int catalog_number = item.getCatalogNumber();
-                if (!products.containsKey(catalog_number)) {
-                    Product product = buildProductFromCSV(itemFieldsFromCSV);
-                    products.put(catalog_number, product);
-                }
-
-                String category = itemFieldsFromCSV[7];
-                String sub_category = itemFieldsFromCSV[8];
-                String size = itemFieldsFromCSV[9];
-                String location = itemFieldsFromCSV[4];
-
-                updateProductInventoryCount(true, branchId, category, sub_category, size, location);
-
-            }
-        } catch (IOException | CsvValidationException e) {
-            System.err.println("Failed to import data: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Builds an Item object from a CSV line.
-     *
-     * @param fields The fields from the CSV line.
-     * @return The constructed Item object.
-     */
-    private Item buildItemFromCSV(String[] fields) {
-        Item item = new Item();
-        item.setItemId(Integer.parseInt(fields[0]));
-        item.setBranchId(Integer.parseInt(fields[1]));
-        item.setItemExpiringDate(fields[3]);
-        item.setStorageLocation(fields[4]);
-        item.setSectionInStore(fields[5]);
-        item.setCatalog_number(Integer.parseInt(fields[6]));
-        item.setDefect(false);
-        return item;
-    }
 
     /**
      * Returns the map of all existing branches in the system.
@@ -153,35 +101,82 @@ public class InventoryController {
     }
 
 
-    /**
-     * Builds a {@code Product} object from a CSV input line.
-     * <p>
-     * Initializes the product's catalog number, name, category, size, supply time,
-     * manufacturer, discounts, and calculated prices.
-     * Default warehouse and store quantities are set to zero.
-     *
-     * @param fields an array of CSV field values representing the product details
-     * @return a fully populated {@code Product} object
-     */
-    private Product buildProductFromCSV(String[] fields) {
-        int catalogNumber = Integer.parseInt(fields[6]);
-        String productName = fields[2];
-        String category = fields[7];
-        String subCategory = fields[8];
-        int demandLevel = Integer.parseInt(fields[11]);
-        int supplyTime = Integer.parseInt(fields[12]);
-        String manufacturer = fields[13];
-        int size = Integer.parseInt(fields[9]);
-        double costPriceBefore = Double.parseDouble(fields[10]);
-        int supplierDiscount = Integer.parseInt(fields[14]);
-        int storeDiscount = Integer.parseInt(fields[15]);
+    public void loadFromDatabase() {
+        System.out.println("Loading data from database using DAO and DTO...");
 
-        Product product = new Product();
-        populateProductData(product, catalogNumber, productName, category, subCategory,
-                demandLevel, supplyTime, manufacturer,
-                costPriceBefore, supplierDiscount, storeDiscount, size);
-        return product;
+        try {
+            // Load products from DB
+            IProductDAO productDAO = new JdbcProductDAO();
+            List<ProductDTO> productDTOs = productDAO.getAllProducts();
+
+            for (ProductDTO dto : productDTOs) {
+                Product product = new Product();
+
+                product.setCatalogNumber(dto.getCatalogNumber());
+                product.setProductName(dto.getProductName());
+                product.setCategory(dto.getCategory());
+                product.setSubCategory(dto.getSubCategory());
+                product.setProductDemandLevel(dto.getProductDemandLevel());
+                product.setSupplyTime(dto.getSupplyTime());
+                product.setManufacturer(dto.getManufacturer());
+                product.setSize(dto.getSize());
+                product.setCostPriceBeforeSupplierDiscount(dto.getCostPriceBeforeSupplierDiscount());
+                product.setSupplierDiscount(dto.getSupplierDiscount());
+                product.setCostPriceAfterSupplierDiscount(dto.getCostPriceAfterSupplierDiscount());
+                product.setStoreDiscount(dto.getStoreDiscount());
+                product.setSalePriceBeforeStoreDiscount(dto.getSalePriceBeforeStoreDiscount());
+                product.setSalePriceAfterStoreDiscount(dto.getSalePriceAfterStoreDiscount());
+                product.setQuantityInWarehouse(dto.getQuantityInWarehouse());
+                product.setQuantityInStore(dto.getQuantityInStore());
+                product.setMinimumQuantityForAlert(dto.getMinimumQuantityForAlert());
+
+                products.put(product.getCatalogNumber(), product);
+            }
+
+            // Load items from DB
+            IItemsDAO itemDAO = new JdbcItemDAO();
+            List<ItemDTO> itemDTOs = itemDAO.getAllItems();
+
+            for (ItemDTO dto : itemDTOs) {
+                Item item = new Item();
+
+                item.setItemId(dto.getItemId());
+                item.setBranchId(dto.getBranchId());
+                item.setItemExpiringDate(dto.getItemExpiringDate());
+                item.setStorageLocation(dto.getStorageLocation());
+                item.setCatalog_number(dto.getCatalogNumber());
+                item.setDefect(dto.IsDefective());
+
+                int branchId = item.getBranchId();
+                int catalogNumber = item.getCatalogNumber();
+
+                branches.putIfAbsent(branchId, new Branch(branchId));
+                branches.get(branchId).addItem(item);
+
+                if (!products.containsKey(catalogNumber)) {
+                    System.err.println("Warning: Item references missing Product (Catalog #" + catalogNumber + ")");
+                    continue;
+                }
+
+                Product product = products.get(catalogNumber);
+                updateProductInventoryCount(
+                        true,
+                        branchId,
+                        product.getCategory(),
+                        product.getSubCategory(),
+                        String.valueOf(product.getSize()),
+                        item.getStorageLocation()
+                );
+            }
+
+            System.out.println("Data loaded successfully from SQLite via DAOs and DTOs.");
+
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to load data from database: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
 
     /**
      * Provides access to the internal ItemController instance.

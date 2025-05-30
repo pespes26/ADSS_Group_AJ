@@ -22,4 +22,8 @@ public interface IAgreementDAO {
     void updateSelfPickup(int agreementId, boolean selfPickup) throws SQLException;
 
     List<AgreementDTO> getAllAgreement() throws SQLException;
+
+    void deleteBySupplierID(int supplier_ID) throws SQLException;
+
+//    List<Integer> getAgreementsIDBySupplierId(int supplierId) throws SQLException;
 }

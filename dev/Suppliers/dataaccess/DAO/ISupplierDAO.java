@@ -1,5 +1,6 @@
 package Suppliers.dataaccess.DAO;
 
+import Suppliers.DTO.AgreementDTO;
 import Suppliers.DTO.SupplierDTO;
 
 import java.sql.SQLException;
@@ -15,4 +16,5 @@ public interface ISupplierDAO {
     SupplierDTO getById(int supplierId) throws SQLException;
 
     List<SupplierDTO> getAll() throws SQLException;
+
 }

@@ -2,6 +2,8 @@ package Suppliers.Domain;
 
 import Suppliers.DTO.AgreementDTO;
 import Suppliers.dataaccess.DAO.IAgreementDAO;
+import Suppliers.dataaccess.DAO.IDiscountDAO;
+import Suppliers.dataaccess.DAO.IProductSupplierDAO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,11 +23,15 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
     };
 
     private final IAgreementDAO agreementDao;
+    private final IProductSupplierDAO productSupplierDao;
+    private final IDiscountDAO discountDao;
 
 
 
-    public AgreementRepositoryImpl(IAgreementDAO dao) {
+    public AgreementRepositoryImpl(IAgreementDAO dao, IProductSupplierDAO productSupplierDao,IDiscountDAO discountDao ) {
         this.agreementDao = dao;
+        this.productSupplierDao = productSupplierDao;
+        this.discountDao = discountDao;
     }
 
     @Override
@@ -56,14 +62,24 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
     }
 
     @Override
-    public void deleteAgreementWithSupplier(int agreementId, int supplierId) { //לשקול להוסיף עמודה הבטבלת עם הסכם עם ID ספק
+    public void deleteAgreement(int agreementId) {
         try {
-            agreementDao.deleteById(agreementId);   // מחיקה פיזית מה-DB
-            cache.remove(agreementId);     // הסרה מה-Identity Map
+            // מחיקת כל ההנחות שמקושרות להסכם
+            discountDao.deleteByAgreement(agreementId);
+
+            // מחיקת כל מוצרי הספק שמקושרים להסכם
+            productSupplierDao.deleteAllProductsFromAgreement(agreementId);
+
+            // מחיקת ההסכם עצמו
+            agreementDao.deleteById(agreementId);
+
+            // ניקוי מה-cache
+            cache.remove(agreementId);
         } catch (SQLException e) {
-            throw new RuntimeException("שגיאה במחיקת הסכם מהמסד", e);
+            throw new RuntimeException(" Failed to delete agreement with ID: " + agreementId, e);
         }
     }
+
 
     @Override
     public List<AgreementDTO> getBySupplierId(int supplierId) {

@@ -11,7 +11,7 @@ public class AgreementManagementController {
         agreementRepository.createAgreementWithSupplier(agreementDTO);
     }
     public void deleteAgreementWithSupplier(int agreementId, int supplierId){
-        agreementRepository.deleteAgreementWithSupplier(agreementId,supplierId);
+        agreementRepository.deleteAgreementWithSupplier(agreementId);
     }
 
     public void getAgreementByID(int id){// מחזירים לפה מופע ממש של הסכם בהינתן ID
@@ -26,8 +26,11 @@ public class AgreementManagementController {
         agreementRepository.updateSelfPickup(agreementID,selfPickup);
     }
 
-    public void getAgreementsBySupplierID(int supplierId){
+    public List<AgreementDTO> getAgreementsBySupplierID(int supplierId){
         List<AgreementDTO> agreementDTOList =  agreementRepository.getBySupplierId(supplierId);
+        return agreementDTOList;
     }
+
+
 
 }

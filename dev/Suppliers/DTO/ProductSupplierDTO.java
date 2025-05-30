@@ -1,16 +1,19 @@
 package Suppliers.DTO;
 
-public class ProductSupplierDTO {
-    int supplierID;
-    int Catalog_Number;
-    int product_id;
-    double Price;
-    String unitsOfMeasure;
+    public class ProductSupplierDTO {
+        int supplierID;
+        int Catalog_Number;
+        int product_id;
+        int agreement_id;
+        double Price;
+        String unitsOfMeasure;
 
-    public ProductSupplierDTO(int supplierID, int catalog_Number, int product_id, double price, String unitsOfMeasure) {
+
+    public ProductSupplierDTO(int catalog_Number, int product_id,int supplierID, int  agreement_ID,  double price, String unitsOfMeasure) {
         this.supplierID = supplierID;
         Catalog_Number = catalog_Number;
         this.product_id = product_id;
+        this.agreement_id = agreement_ID;
         Price = price;
         this.unitsOfMeasure = unitsOfMeasure;
     }
@@ -21,6 +24,10 @@ public class ProductSupplierDTO {
 
     public int getCatalog_Number() {
         return Catalog_Number;
+    }
+
+    public int getAgreement_id() {
+        return agreement_id;
     }
 
     public int getProduct_id() {

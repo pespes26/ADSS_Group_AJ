@@ -1,13 +1,31 @@
 package Suppliers.Presentation;
+import Suppliers.DTO.SupplierDTO;
+import Suppliers.Domain.AgreementManagementController;
 import Suppliers.Domain.Controller;
+import Suppliers.Domain.SupplierManagementController;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class SupplierMenuHandler {
-    public static int createSupplier(Scanner scanner, Controller controller) {
+//    public AgreementManagementController agreementManagementController;
+    public static SupplierManagementController supplierManagementController;
+
+
+    public SupplierMenuHandler() {
+         this.supplierManagementController = new SupplierManagementController();
+
+    }
+
+
+    public SupplierManagementController getSupplierManagementController() {
+        return supplierManagementController;
+    }
+
+    public static int createSupplier(Scanner scanner) throws SQLException {
         System.out.println("Let's create a new supplier!");
 
-        int supplierID = Inputs.read_int(scanner, "Enter Supplier ID: ");
 
         System.out.print("Enter Supplier Name: ");
         String supplierName = scanner.next();
@@ -28,11 +46,11 @@ public class SupplierMenuHandler {
         //===============================
         String paymentCondition = getPaymentCondition(scanner);
         //===============================
-
-        controller.createSupplier(supplierName, supplierID, companyID, bankAccount, paymentMethod, phoneNumber, email, paymentCondition);
+        SupplierDTO supplierDTO = new SupplierDTO(supplierName, companyID, bankAccount, paymentMethod, paymentCondition, phoneNumber, email);
+        supplierManagementController.createSupplier(supplierDTO);
 
         System.out.println("Supplier created successfully!");
-        return supplierID;
+        return supplierDTO.getSupplier_id();
     }
 
 
@@ -86,28 +104,53 @@ public class SupplierMenuHandler {
     }
 
 
-    public static Integer getValidSupplierID(Scanner scanner, Controller controller) {
 
-        int supplierID = Inputs.read_int(scanner, "Enter Supplier ID: ");
 
-        if (!controller.thereIsSupplier(supplierID)) {
-            System.out.println("Supplier does not exist.");
-            return null; // מייצג כישלון
-        }
 
-//        System.out.println("Supplier found.");
-        return supplierID; // מייצג הצלחה
+
+public void DeleteSupplier(Scanner scanner) throws SQLException {
+    System.out.println("OK, let's delete a supplier!");
+
+    List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();
+
+    if (supplierDTOList.isEmpty()) {
+        System.out.println("No suppliers found.");
+        return;
     }
 
-    public static void DeleteSupplier(Scanner scanner, Controller controller){
-        System.out.println("OK Let's Delete a supplier!");
-        Integer supplierID = getValidSupplierID(scanner, controller);
-        if (supplierID != null) {
-            controller.deleteSupplier(supplierID);
-        }
+    int counter = 1;
+    System.out.println("List of suppliers:");
+    for (SupplierDTO supplierDTO : supplierDTOList) {
+        System.out.println(counter++ + ". Supplier ID: " + supplierDTO.getSupplier_id());
+        System.out.println("   Supplier Name: " + supplierDTO.getSupplierName());
+        System.out.println("   Company ID: " + supplierDTO.getCompany_id());
+        System.out.println("----------------------------------");
     }
 
-    public static void afterSupplierCreatedMenu(Scanner scanner, Controller controller, int supplier_ID) {/// ////////////////to do
+    System.out.print("Choose the number of the supplier to delete (1 to " + supplierDTOList.size() + "): ");
+    int selectedIndex;
+
+    try {
+        selectedIndex = Integer.parseInt(scanner.nextLine());
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a number.");
+        return;
+    }
+
+    if (selectedIndex < 1 || selectedIndex > supplierDTOList.size()) {
+        System.out.println("Invalid choice. Please select a number within the given range.");
+        return;
+    }
+
+    SupplierDTO selectedSupplier = supplierDTOList.get(selectedIndex - 1);
+    int supplierIdToDelete = selectedSupplier.getSupplier_id();
+
+    supplierManagementController.deleteSupplier(supplierIdToDelete);
+    System.out.println("Supplier with ID " + supplierIdToDelete + " has been deleted.");
+}
+
+
+    public static void afterSupplierCreatedMenu(Scanner scanner, int supplier_ID) {/// ////////////////to do
         int choice = -1;
         while (choice != 2) {
             System.out.println("\nWhat would you like to do next?");
@@ -120,7 +163,7 @@ public class SupplierMenuHandler {
             switch (choice) {
                 case 1:
                     //System.out.println("Creating a new agreement...");
-                    AgreementMenuHandler.createNewAgreement(scanner,controller,supplier_ID);
+                    AgreementMenuHandler.createNewAgreement(scanner,supplier_ID);
                     break;
                 case 2:
                     System.out.println("Returning to main menu.");
@@ -131,10 +174,50 @@ public class SupplierMenuHandler {
         }
     }
 
-    public static void searchSupplierMenu(Scanner scanner,Controller controller) {
+    public static SupplierDTO showSuppliers(Scanner scanner) throws SQLException {
+
+        List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();
+
+        if (supplierDTOList.isEmpty()) {
+            System.out.println("No suppliers found.");
+            return null;
+        }
+
+        int counter = 1;
+        System.out.println("List of suppliers:");
+
+        for (SupplierDTO supplierDTO : supplierDTOList) {
+            System.out.println(counter++ + ". Supplier ID: " + supplierDTO.getSupplier_id());
+            System.out.println("   Supplier Name: " + supplierDTO.getSupplierName());
+            System.out.println("   Company ID: " + supplierDTO.getCompany_id());
+            System.out.println("--------------------------------------------------");
+        }
+
+        System.out.print("Choose the number of the supplier (1 to " + supplierDTOList.size() + "): ");
+
+        int selectedIndex;
+        try {
+            selectedIndex = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            return null;
+        }
+
+        if (selectedIndex < 1 || selectedIndex > supplierDTOList.size()) {
+            System.out.println("Invalid choice. Please select a number within the given range.");
+            return null;
+        }
+
+        SupplierDTO selectedSupplier = supplierDTOList.get(selectedIndex - 1);
+        return selectedSupplier;
+    }
+
+
+    public void searchSupplierMenu(Scanner scanner) throws SQLException {
         System.out.println("Let's search supplier!");
-        Integer supplierID = getValidSupplierID(scanner, controller);
-        if(supplierID != null) {
+        SupplierDTO supplierDTO = showSuppliers(scanner);
+        int supplierID = supplierDTO.getSupplier_id();
+        if(supplierDTO != null) {
             int choice = -1;
             while (choice != 0) {
                 System.out.println("\nWhat would you like to do next?");
@@ -148,10 +231,10 @@ public class SupplierMenuHandler {
                 switch (choice) {
                     case 1:
                         System.out.println("Manage agreements...");
-                        AgreementMenuHandler.agreementMenu(scanner, controller, supplierID);
+                        AgreementMenuHandler.agreementMenu(scanner, supplierID);
                         break;
                     case 2:
-                        DeleteSupplier(scanner, controller);
+                        DeleteSupplier(scanner);
                         System.out.println("Supplier deleted.");
                         return;
                     case 0:

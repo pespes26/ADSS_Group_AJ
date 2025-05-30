@@ -7,15 +7,21 @@ import java.util.List;
 
 public interface IProductSupplierDAO {
 
-    void insert(ProductSupplierDTO dto) throws SQLException;
+ void insert(ProductSupplierDTO dto) throws SQLException;
 
     void update(ProductSupplierDTO dto) throws SQLException;
 
-    void delete(int productId, int supplierId) throws SQLException;
+    void deleteOneProduct(int productId, int catalogNumber, int supplierId) throws SQLException;
 
-    ProductSupplierDTO get(int productId, int supplierId) throws SQLException;
+    void deleteAllProductsFromSupplier(int Supplier_ID) throws SQLException;
 
-    List<ProductSupplierDTO> getSuppliersByProduct(int productId) throws SQLException;
+    void deleteAllProductsFromAgreement(int Agreement_ID) throws SQLException;
 
-    List<ProductSupplierDTO> getProductsBySupplier(int supplierId) throws SQLException;
+     void updateProductUnit(int catalogNumber, String newUnit, int agreementID);
+
+    void SetPrice(int catalogNumber, int newPrice, int agreementID);
+
+    ProductSupplierDTO getOneProduct(int productId, int catalogNumber, int supplierId) throws SQLException;
+
+     List<ProductSupplierDTO> getProductsByAgreement(int supplier_ID, int agreement_ID) throws SQLException;
 }

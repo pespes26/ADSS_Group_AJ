@@ -1,14 +1,30 @@
 package Suppliers.Presentation;
+import Suppliers.Domain.AgreementManagementController;
 import Suppliers.Domain.Controller;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainMenu {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+        AgreementManagementController agreementManagementController = new AgreementManagementController();
+        SupplierMenuHandler supplierMenuHandler = new SupplierMenuHandler();
+        OrderMenuHandler orderMenuHandler = new OrderMenuHandler();
+        ProductMenuHandler productMenuHandler = new ProductMenuHandler();
+
         Scanner scanner = new Scanner(System.in);
-        Controller controller= new Controller();
-        DataInitializer.populateInitialData(controller);
+        SystemInitializer initializer = new SystemInitializer();
+
+//        initializer.clearAllData();
+// Ask user whether to load sample data
+        System.out.print("Do you want to initialize the system with sample data? (yes/no): ");
+        String input = scanner.nextLine().trim().toLowerCase();
+        boolean withSampleData = input.equals("yes");
+
+// Initialize database accordingly
+        initializer.initializeDatabase(withSampleData);
+
 
         // Welcome message
         System.out.println("=====================================");
@@ -43,11 +59,13 @@ public class MainMenu {
                     OrderMenuHandler.createOrder(scanner, controller); // תיקון הקריאה לפונקציה
                     break;
                 case 2:
-                     SupplierMenuHandler.searchSupplierMenu(scanner, controller);
+                    supplierMenuHandler.searchSupplierMenu(scanner);
+
                     break;
                 case 3:
-                     int supplier_ID = SupplierMenuHandler.createSupplier(scanner, controller);
-                    SupplierMenuHandler.afterSupplierCreatedMenu(scanner, controller, supplier_ID);
+                    int supplier_ID = supplierMenuHandler.createSupplier(scanner);
+                    supplierMenuHandler.afterSupplierCreatedMenu(scanner, supplier_ID);
+
                     break;
                 case 4:
                     System.out.println(); // רווח בין הפעולות

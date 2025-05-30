@@ -6,16 +6,19 @@ public class AgreementDTO {
     private String[] deliveryDays; // Days on which the supplier can deliver
     private boolean selfPickup; // Whether delivery is self-handled by the supermarket
 
-    public AgreementDTO(int agreement_ID, int supplier_ID, String[] deliveryDays, boolean selfPickup) {
+    public AgreementDTO(int supplier_ID, String[] deliveryDays, boolean selfPickup) {
         this.selfPickup = selfPickup;
         this.deliveryDays = deliveryDays;
         this.supplier_ID = supplier_ID;
-        this.agreement_ID = agreement_ID;
+        this.agreement_ID = 0;
     }
 
     public AgreementDTO() {
     }
 
+    public boolean getSelfPickup(){
+        return selfPickup;
+    }
     public int getAgreement_ID() {
         return agreement_ID;
     }

@@ -10,9 +10,9 @@ public class SupplierDTO {
     long phoneNumber;
     String email;
 
-    public SupplierDTO(String supplierName, int supplier_id, int company_id, int bankAccount, String paymentMethod, String paymentCondition, long phoneNumber, String email) {
+    public SupplierDTO(String supplierName,  int company_id, int bankAccount, String paymentMethod, String paymentCondition, long phoneNumber, String email) {
         this.supplierName = supplierName;
-        this.supplier_id = supplier_id;
+        this.supplier_id = 0;
         this.company_id = company_id;
         this.bankAccount = bankAccount;
         this.paymentMethod = paymentMethod;

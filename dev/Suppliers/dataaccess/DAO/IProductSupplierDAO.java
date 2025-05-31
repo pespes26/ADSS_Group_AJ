@@ -24,4 +24,6 @@ public interface IProductSupplierDAO {
     ProductSupplierDTO getOneProduct(int productId, int catalogNumber, int supplierId) throws SQLException;
 
      List<ProductSupplierDTO> getProductsByAgreement(int supplier_ID, int agreement_ID) throws SQLException;
+
+    ProductSupplierDTO getCheapestProductSupplier(int productId);
 }

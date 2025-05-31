@@ -231,8 +231,8 @@ public class Controller {
     /**
      * Creates a new order with the given details.
      */
-    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder){
-        orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder);
+    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder, int supplierID){
+        orderService.createOrder(orderID, phoneNumber, orderDate, productsInOrder, supplierID);
     }
 
     /**

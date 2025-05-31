@@ -174,6 +174,43 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
         return list;
     }
 
+    @Override
+    public ProductSupplierDTO getCheapestProductSupplier(int productId) {
+        String sql = "SELECT * FROM product_supplier " +
+                "WHERE product_id = ? " +
+                "ORDER BY price ASC " +
+                "LIMIT 1;";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, productId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                int catalogNumber = rs.getInt("catalog_number");
+                int supplierID = rs.getInt("supplier_id");
+                int agreementID = rs.getInt("agreement_id");
+                double price = rs.getDouble("price");
+                String unit = rs.getString("unit"); // שם העמודה לפי הסכימה
+
+                return new ProductSupplierDTO(
+                        catalogNumber,
+                        productId,
+                        supplierID,
+                        agreementID,
+                        price,
+                        unit
+                );
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching cheapest product supplier:");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 
 

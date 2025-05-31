@@ -71,7 +71,7 @@ public class OrderMenuHandler {
                     case 2:
                         Map<Integer, Map.Entry<Integer, Double>> bestPrice = controller.orderWithBestPrice(productsInOrder);
                         printProductsWithBestPrice(bestPrice);
-                        controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder);//יוצר מופע של הזמנה
+//                        controller.createOrder(orderID, phoneNumber, orderDate, productsInOrder,);//יוצר מופע של הזמנה/======================================
                         System.out.println("\nOrder submitted successfully.");
                         return;
                     case 0:

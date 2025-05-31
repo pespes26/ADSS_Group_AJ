@@ -9,8 +9,6 @@ public interface IOrderDAO {
 
     void insert(OrderDTO dto) throws SQLException;
 
-    void update(OrderDTO dto) throws SQLException;
-
     void deleteById(int orderId) throws SQLException;
 
     OrderDTO getById(int orderId) throws SQLException;

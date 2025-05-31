@@ -13,6 +13,7 @@ public class Order {
     private long phoneNumber; // Customer's phone number
     private LocalDateTime orderDate; // The date and time when the order was placed
     private Map<Integer, Integer> productsInOrder; // Maps productID -> quantity
+    private int supplierID;
 
     /**
      * Constructs a new Order with the given details.
@@ -22,11 +23,12 @@ public class Order {
      * @param orderDate       the date and time when the order was placed
      * @param productsInOrder a map of product IDs to their ordered quantities
      */
-    public Order(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
+    public Order(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder,int supplierID) {
         this.orderID = orderID;
         this.phoneNumber = phoneNumber;
         this.orderDate = orderDate;
         this.productsInOrder = productsInOrder;
+        this.supplierID = supplierID;
     }
 
     /**

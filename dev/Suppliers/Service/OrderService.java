@@ -27,8 +27,8 @@ public class OrderService {
      * @param orderDate       the date and time when the order was created
      * @param productsInOrder a map of product IDs to their quantities in the order
      */
-    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder) {
-        Order order = new Order(orderID, phoneNumber, orderDate, productsInOrder); // Create a new Order object using all collected data
+    public void createOrder(int orderID, long phoneNumber, LocalDateTime orderDate, Map<Integer, Integer> productsInOrder, int SupplierID) {
+        Order order = new Order(orderID, phoneNumber, orderDate, productsInOrder, SupplierID); // Create a new Order object using all collected data
         this.orderHashMap.put(orderID, order); // Add the order to the internal order list, using its ID as the key
     }
 

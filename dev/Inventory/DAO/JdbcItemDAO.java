@@ -21,8 +21,8 @@ public class JdbcItemDAO implements IItemsDAO {
                      storage_location TEXT,
                      section_in_store TEXT,
                      is_defect BOOLEAN DEFAULT 0,
-                     expiration_date TEXT,
-                     sale_date TEXT,
+                     expiration_date Text,
+                     sale_date Date,                     
                      FOREIGN KEY (catalog_number) REFERENCES Products(catalog_number)
                     );""";
 
@@ -37,7 +37,7 @@ public class JdbcItemDAO implements IItemsDAO {
 
     @Override
     public void Insert(ItemDTO dto) throws SQLException {
-        String sql = "INSERT INTO items (catalog_number, branch_id, storage_location, is_defect, expiration_date) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO items (catalog_number, branch_id, storage_location, is_defect, expiration_date,sale_date) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.connect();
              PreparedStatement pstatement = conn.prepareStatement(sql)) {
@@ -47,13 +47,14 @@ public class JdbcItemDAO implements IItemsDAO {
             pstatement.setString(3, dto.getStorageLocation());
             pstatement.setBoolean(4, dto.IsDefective());
             pstatement.setString(5, dto.getItemExpiringDate());
+            pstatement.setObject(6, dto.getSale_date(), Types.DATE);
             pstatement.executeUpdate();
         }
     }
 
     @Override
     public void Update(ItemDTO dto) throws SQLException {
-        String sql = "UPDATE items SET catalog_number = ?, branch_id = ?, storage_location = ?, is_defect = ?, expiration_date = ? WHERE item_id = ?";
+        String sql = "UPDATE items SET catalog_number = ?, branch_id = ?, storage_location = ?,section_in_store = ?, is_defect = ?, expiration_date = ? WHERE item_id = ?";
 
         try (Connection conn = DatabaseConnector.connect();
              PreparedStatement pstatement = conn.prepareStatement(sql)) {
@@ -61,9 +62,11 @@ public class JdbcItemDAO implements IItemsDAO {
             pstatement.setInt(1, dto.getCatalogNumber());
             pstatement.setInt(2, dto.getBranchId());
             pstatement.setString(3, dto.getStorageLocation());
-            pstatement.setBoolean(4, dto.IsDefective());
-            pstatement.setString(5, dto.getItemExpiringDate());
-            pstatement.setInt(6, dto.getItemId());
+            pstatement.setString(4, dto.getSectionInStore());
+            pstatement.setBoolean(5, dto.IsDefective());
+
+            pstatement.setString(6, dto.getItemExpiringDate());
+            pstatement.setInt(7, dto.getItemId());
 
             int rowsAffected = pstatement.executeUpdate();
             if (rowsAffected == 0) {
@@ -73,6 +76,30 @@ public class JdbcItemDAO implements IItemsDAO {
             }
         }
     }
+
+
+    public void UpdateStorageLocation(ItemDTO dto) throws SQLException {
+        String sql = "UPDATE items SET storage_location = ? WHERE item_id = ?";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstatement = conn.prepareStatement(sql)) {
+
+
+
+            pstatement.setString(1, dto.getStorageLocation());
+            pstatement.setInt(2, dto.getItemId());
+
+            int rowsAffected = pstatement.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println("No item found with item_id = " + dto.getItemId());
+            } else {
+                System.out.println("The item was updated successfully.");
+            }
+        }
+    }
+
+
+
 
     @Override
     public void DeleteByItemId(int id) throws SQLException {
@@ -111,6 +138,36 @@ public class JdbcItemDAO implements IItemsDAO {
         return null;
     }
 
+
+
+
+    public int GetId(ItemDTO item1) throws SQLException {
+        String sql = "SELECT item_id FROM items " +
+                "WHERE catalog_number = ? AND branch_id = ? AND storage_location = ? " +
+                "AND is_defect = ? AND expiration_date = ? " +
+                "ORDER BY item_id DESC LIMIT 1";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstatement = conn.prepareStatement(sql)) {
+
+            pstatement.setInt(1, item1.getCatalogNumber());
+            pstatement.setInt(2, item1.getBranchId());
+            pstatement.setString(3, item1.getStorageLocation());
+            pstatement.setBoolean(4, item1.IsDefective());
+            pstatement.setString(5, item1.getItemExpiringDate());
+
+            try (ResultSet rs = pstatement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("item_id");
+                }
+            }
+        }
+
+        return 0; // אם לא נמצאה שורה מתאימה
+    }
+
+
+
     @Override
     public void signAsDefective(int itemId) throws SQLException {
         String sql = "UPDATE items SET is_defect = 1 WHERE item_id = ?";
@@ -128,6 +185,9 @@ public class JdbcItemDAO implements IItemsDAO {
             }
         }
     }
+
+
+
 
     @Override
     public List<ItemDTO> getAllItems() throws SQLException {

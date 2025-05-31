@@ -6,7 +6,7 @@ import Inventory.Domain.Product;
 import Inventory.Domain.ReportController;
 import org.junit.Before;
 import org.junit.Test;
-
+import Inventory.DTO.ItemDTO;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -31,12 +31,12 @@ public class ReportControllerTest {
         products = new HashMap<>();
 
         Branch branch = new Branch(1);
-        Item item = new Item();
+        ItemDTO item = new ItemDTO();
         item.setItemId(1);
-        item.setCatalog_number(1001);
-        item.setItemExpiringDate("01/01/2000");  // clearly expired
-        item.setStorageLocation("Warehouse");
-        item.setDefect(true);
+        item.setCatalogNumber(1001);
+        item.setExpirationDate("01/01/2000");  // clearly expired
+        item.setLocation("Warehouse");
+        item.setIsDefective(true);
         branch.getItems().put(1, item);
 
         Product product = new Product();

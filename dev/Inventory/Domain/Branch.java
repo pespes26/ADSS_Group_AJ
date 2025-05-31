@@ -2,6 +2,12 @@ package Inventory.Domain;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import Inventory.Domain.ItemController;
+import Inventory.Domain.ItemRepository;
+import Inventory.Domain.ItemRepositoryImpl;
+import java.util.List;
+import Inventory.DTO.ItemDTO;
+import java.sql.SQLException;
 
 /**
  * Represents a single branch in the inventory system.
@@ -10,7 +16,7 @@ import java.util.HashSet;
 public class Branch {
 
     private final int branchId;
-    private final HashMap<Integer, Item> items; // Key: item_id, Value: Item
+    private final HashMap<Integer, ItemDTO> items; // Key: item_id, Value: Item
     private final HashSet<Integer> catalog_numbers;
 
     /**
@@ -22,6 +28,7 @@ public class Branch {
         this.branchId = branchId;
         this.items = new HashMap<>();
         this.catalog_numbers = new HashSet<>();
+
     }
 
     /**
@@ -38,7 +45,7 @@ public class Branch {
      *
      * @param item the item to add
      */
-    public void addItem(Item item) {
+    public void addItem(ItemDTO item) {
         items.put(item.getItemId(), item);
         catalog_numbers.add(item.getCatalogNumber());
     }
@@ -49,7 +56,7 @@ public class Branch {
      * @param itemId the ID of the item to remove
      */
     public void removeItem(int itemId) {
-        Item removedItem = items.remove(itemId);
+        ItemDTO removedItem = items.remove(itemId);
         if (removedItem != null) {
             // Ensure the catalog number remains in the catalog_numbers set
             catalog_numbers.add(removedItem.getCatalogNumber());
@@ -62,7 +69,7 @@ public class Branch {
      * @param itemId the ID of the item to retrieve
      * @return the item if found, null otherwise
      */
-    public Item getItem(int itemId) {
+    public ItemDTO getItem(int itemId) {
         return items.get(itemId);
     }
 
@@ -71,7 +78,7 @@ public class Branch {
      *
      * @return the map of item IDs to items
      */
-    public HashMap<Integer, Item> getItems() {
+    public HashMap<Integer, ItemDTO> getItems() {
         return items;
     }
 
@@ -82,5 +89,16 @@ public class Branch {
      */
     public HashSet<Integer> getCatalogNumbers() {
         return catalog_numbers;
+    }
+
+    public void loadAllItemsFromDB() {
+
+            ItemRepository a=new ItemRepositoryImpl();
+            List<ItemDTO> itemsFromDB = a.getAllItems(); // נניח שזו הפונקציה שמחזירה את כל הפריטים
+            for (ItemDTO item : itemsFromDB) {
+                this.items.put(item.getItemId(), item);
+            }
+            System.out.println("Loaded " + itemsFromDB.size() + " items into branch.");
+
     }
 }

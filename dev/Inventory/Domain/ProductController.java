@@ -1,6 +1,6 @@
 package Inventory.Domain;
-
-import Inventory.Domain.Branch;
+import Inventory.DTO.ItemDTO;
+import Inventory.DTO.ProductDTO;
 
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
@@ -12,9 +12,9 @@ import java.util.HashMap;
  * and tracking purchased items.
  */
 public class ProductController {
-
+    private final ProductRepository productRepository;
     private final HashMap<Integer, Product> products; // Map of all products, keyed by catalog number
-    private final HashMap<Integer, Item> purchased_items; // Map of purchased items, keyed by item ID
+    private final HashMap<Integer, ItemDTO> purchased_items; // Map of purchased items, keyed by item ID
     private final HashMap<Integer, Branch> branches; // Map of all branches, keyed by branch ID
 
     /**
@@ -23,10 +23,11 @@ public class ProductController {
      * @param products A map of all products, keyed by catalog number.
      * @param purchased_items A map of all purchased items, keyed by catalog number.
      */
-    public ProductController(HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
+    public ProductController(HashMap<Integer, Product> products, HashMap<Integer, ItemDTO> purchased_items) {
         this.products = products;
         this.purchased_items = purchased_items;
         this.branches = new HashMap<>();
+        this.productRepository=new ProductRepositoryImpl();
     }
 
     /**
@@ -75,6 +76,10 @@ public class ProductController {
      */
     public boolean updateProductSupplyDetails(int catalog_number, Integer supply_time, Integer demand) {
         Product product = products.get(catalog_number);
+
+
+
+
         if (product == null) {
             return false;
         }
@@ -85,6 +90,11 @@ public class ProductController {
         if (demand != null) {
             product.setProductDemandLevel(demand);
         }
+        ProductDTO dto=new ProductDTO(product.getCatalogNumber(),product.getProductName(),product.getCategory(),product.getSubCategory(),product.getManufacturer(),product.getSize(),product.getCostPriceBeforeSupplierDiscount(),product.getSupplierDiscount());
+        dto.setSupplyTime(supply_time);
+        dto.setProductDemandLevel(demand);
+        ProductRepository a=new ProductRepositoryImpl();
+        a.UpdateProduct(dto);
         return true;
     }
 
@@ -152,8 +162,8 @@ public class ProductController {
         int warehouse_quantity = 0;
         int store_quantity = 0;
 
-        for (Item item : branch.getItems().values()) {
-            if (item.getCatalogNumber() == catalog_number && !item.isDefect()) {
+        for (ItemDTO item : branch.getItems().values()) {
+            if (item.getCatalogNumber() == catalog_number && !item.IsDefective()) {
                 if (item.getStorageLocation().equalsIgnoreCase("Warehouse")) {
                     warehouse_quantity++;
                 } else if (item.getStorageLocation().equalsIgnoreCase("InteriorStore")) {
@@ -187,7 +197,7 @@ public class ProductController {
         boolean found = false;
         int count = 1;
 
-        for (Item item : purchased_items.values()) {
+        for (ItemDTO item : purchased_items.values()) {
             if (item.getCatalogNumber() == catalog_number && item.getBranchId() == currentBranchId) {
                 Product product = products.get(catalog_number);
                 if (product != null) {
@@ -195,8 +205,8 @@ public class ProductController {
                     result.append(count++).append(". ")
                             .append(df.format(product.getSalePriceAfterStoreDiscount()))
                             .append(" ₪ (Sale Date: ");
-                    if (item.getSaleDate() != null) {
-                        result.append(item.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    if (item.getSale_date() != null) {
+                        result.append(item.getSale_date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                     } else {
                         result.append("No Date");
                     }

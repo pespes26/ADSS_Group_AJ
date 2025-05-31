@@ -739,6 +739,7 @@ public class MenuController {
      * If the product does not exist, an error message is shown.
      */
     private void updateProductSupplyAndDemand() {
+
         // Prompt user to enter the product catalog number
         System.out.println("Enter Product Catalog Number:");
         int catalog = Integer.parseInt(scan.nextLine());

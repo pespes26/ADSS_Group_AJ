@@ -18,14 +18,14 @@ public class DatabaseConnector {
         return DriverManager.getConnection(DB_URL);
     }
 
-//    public static void main(String[] args) {
-//        try (Connection conn = connect()) {
-//            if (conn != null) {
-//                System.out.println("Connected to SQLite database successfully.");
-//            }
-//        } catch (SQLException e) {
-//            System.err.println("Failed to connect to the database.");
-//            e.printStackTrace();
-//        }
-//    }
+   public static void main(String[] args) {
+       try (Connection conn = connect()) {
+           if (conn != null) {
+               System.out.println("Connected to SQLite database successfully.");
+           }
+       } catch (SQLException e) {
+           System.err.println("Failed to connect to the database.");
+          e.printStackTrace();
+        }
+   }
 }

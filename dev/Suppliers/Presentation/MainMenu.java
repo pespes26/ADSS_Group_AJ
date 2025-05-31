@@ -8,15 +8,15 @@ import java.util.Scanner;
 public class MainMenu {
 
     public static void main(String[] args) throws SQLException {
-        AgreementManagementController agreementManagementController = new AgreementManagementController();
         SupplierMenuHandler supplierMenuHandler = new SupplierMenuHandler();
         OrderMenuHandler orderMenuHandler = new OrderMenuHandler();
         ProductMenuHandler productMenuHandler = new ProductMenuHandler();
+        Controller controller = new Controller();
 
         Scanner scanner = new Scanner(System.in);
         SystemInitializer initializer = new SystemInitializer();
+        SystemInitializer.initializeAllTables();
 
-//        initializer.clearAllData();
 // Ask user whether to load sample data
         System.out.print("Do you want to initialize the system with sample data? (yes/no): ");
         String input = scanner.nextLine().trim().toLowerCase();

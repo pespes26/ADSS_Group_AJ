@@ -12,7 +12,7 @@ public interface IProductSupplierRepository {
     void deleteProductSupplier(int productID, int catalogNumber, int supplierID, int agreementID) throws SQLException;
     List<ProductSupplierDTO> getProductDTOsFromAgreement(int supplier_ID, int agreement_ID) throws SQLException;
     ProductSupplierDTO getProductSupplier(int supplierID, int productID, int CatalogNumber) throws SQLException;
-    void setProductPrice(int supplierID, int productID, int CatalogNumber, int newPrice);
+    void setProductPrice(int supplierID, int productID, int CatalogNumber, double  newPrice);
     void updateProductUnit( int catalogNumber, String newUnit, int agreementID);
     void updateOrAddDiscountRule(DiscountDTO discountDTO) throws SQLException;
 

@@ -1,8 +1,7 @@
 package Suppliers.Presentation;
 import Suppliers.DTO.SupplierDTO;
-import Suppliers.Domain.AgreementManagementController;
-import Suppliers.Domain.Controller;
-import Suppliers.Domain.SupplierManagementController;
+import Suppliers.Domain.*;
+import Suppliers.dataaccess.DAO.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,7 +13,15 @@ public class SupplierMenuHandler {
 
 
     public SupplierMenuHandler() {
-         this.supplierManagementController = new SupplierManagementController();
+        // אתחול DAO-ים
+        ISupplierDAO supplierDAO = new JdbcSupplierDAO();
+        IAgreementDAO agreementDAO = new JdbcAgreementDAO();
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+
+        // יצירת Repository
+        ISupplierRepository supplierRepository = new SupplierRepositoryImpl(supplierDAO,agreementDAO,productSupplierDAO,discountDAO);
+         this.supplierManagementController = new SupplierManagementController(supplierRepository);
 
     }
 
@@ -150,7 +157,7 @@ public void DeleteSupplier(Scanner scanner) throws SQLException {
 }
 
 
-    public static void afterSupplierCreatedMenu(Scanner scanner, int supplier_ID) {/// ////////////////to do
+    public static void afterSupplierCreatedMenu(Scanner scanner, int supplier_ID) throws SQLException {/// ////////////////to do
         int choice = -1;
         while (choice != 2) {
             System.out.println("\nWhat would you like to do next?");

@@ -8,7 +8,11 @@ import java.util.List;
 
 public class SupplierManagementController {
 
-    public ISupplierRepository supplierRepository;
+    private final ISupplierRepository supplierRepository;
+
+    public SupplierManagementController(ISupplierRepository supplierRepository) {
+        this.supplierRepository = supplierRepository;
+    }
 
     public void createSupplier(SupplierDTO supplierDTO) throws SQLException {
         supplierRepository.createSupplier(supplierDTO);

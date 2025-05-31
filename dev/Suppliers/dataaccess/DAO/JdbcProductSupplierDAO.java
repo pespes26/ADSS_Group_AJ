@@ -109,11 +109,11 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
 
 
     @Override
-    public void SetPrice(int catalogNumber, int newPrice, int agreementID) {
+    public void SetPrice(int catalogNumber, double  newPrice, int agreementID) {
         String sql = "UPDATE product_supplier SET price = ? WHERE catalog_number = ? AND agreement_id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, newPrice);
+            pstmt.setDouble (1, newPrice);
             pstmt.setInt(2, catalogNumber);
             pstmt.setInt(3, agreementID);
             pstmt.executeUpdate();

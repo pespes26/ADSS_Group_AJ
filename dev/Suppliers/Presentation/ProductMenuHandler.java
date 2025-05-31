@@ -1,44 +1,69 @@
 package Suppliers.Presentation;
 
+import Suppliers.DTO.DiscountDTO;
+import Suppliers.DTO.ProductSupplierDTO;
 import Suppliers.Domain.Controller;
-import Suppliers.Domain.Product;
+import Suppliers.Domain.IProductSupplierRepository;
+import Suppliers.Domain.ProductSupplierManagementController;
+import Suppliers.Domain.ProductSupplierRepositoryImpl;
+import Suppliers.dataaccess.DAO.IDiscountDAO;
+import Suppliers.dataaccess.DAO.IProductSupplierDAO;
+import Suppliers.dataaccess.DAO.JdbcDiscountDAO;
+import Suppliers.dataaccess.DAO.JdbcProductSupplierDAO;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ProductMenuHandler {
+    public static ProductSupplierManagementController productSupplierManagementController;
 
-    public static void addNewProduct(Scanner scanner, Controller controller, int supplierID,int agreementID) {
+
+    public ProductMenuHandler() {
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+        // יצירת Repository
+        IProductSupplierRepository productSupplierRepository = new ProductSupplierRepositoryImpl(productSupplierDAO,discountDAO);
+        // יצירת קונטרולרים
+        productSupplierManagementController = new ProductSupplierManagementController(productSupplierRepository);
+    }
+
+    public static void addNewProduct(Scanner scanner, int supplierID, int agreementID) throws SQLException {
         System.out.println("\nLet's add a new product...");
 
-
+      int catalog_Number = scanner.nextInt();
 //----------בדיקת מספר קטלוגי ייחודי
 
-        int catalog_Number;
-        while (true) {
-            catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
-            boolean isCatalogUnique = validateUniqueCatalogNumber(controller, catalog_Number, supplierID);
-            if (isCatalogUnique) {
-                break; // המספר הקטלוגי ייחודי → אפשר לצאת מהלולאה
-            }
-            // אחרת נחזור לראש הלולאה ונבקש שוב
-        }
+//        int catalog_Number;
+//        while (true) {
+//            catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
+//            boolean isCatalogUnique = validateUniqueCatalogNumber(controller, catalog_Number, supplierID);
+//            if (isCatalogUnique) {
+//                break; // המספר הקטלוגי ייחודי → אפשר לצאת מהלולאה
+//            }
+//            // אחרת נחזור לראש הלולאה ונבקש שוב
+//        }
 //----------------בדיקת מספר מזהה ייחודי--------------------
-        int product_id;
-        while (true) {
-            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
-            boolean isProductIDUnique = validateUniqueProductIDNumber(controller, product_id, supplierID);
-            if (isProductIDUnique) {
-                break; // רק אם ה-ID ייחודי → נצא מהלולאה
-            }
-        }
+        int product_id = scanner.nextInt();
+//        int product_id;
+//        while (true) {
+//            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
+//            boolean isProductIDUnique = validateUniqueProductIDNumber(controller, product_id, supplierID);
+//            if (isProductIDUnique) {
+//                break; // רק אם ה-ID ייחודי → נצא מהלולאה
+//            }
+//        }
 
             double price = Inputs.read_double(scanner, "Enter Product Price: ");
 
             System.out.println("Enter Unit of Measure: ");
             String unitsOfMeasure = scanner.next();
 
-            Product product = controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
-            controller.addProductToAgreement(product_id, product, agreementID);
+
+        ProductSupplierDTO productSupplierDTO = new ProductSupplierDTO(catalog_Number,product_id,supplierID, agreementID, price, unitsOfMeasure);
+            productSupplierManagementController.createProductSupplier(productSupplierDTO);
+//            Product product = controller.createProduct(catalog_Number, product_id, price, unitsOfMeasure, supplierID);
+//            controller.addProductToAgreement(product_id, product, agreementID);
 
             int choice = -1;
             while (choice != 2) {
@@ -52,7 +77,7 @@ public class ProductMenuHandler {
                 switch (choice) {
                     case 1:
                         System.out.println("Use case: Add discount rule to product");
-                        readAndAddDiscountRules(scanner, controller, product_id, agreementID);
+                        readAndAddDiscountRules(scanner, productSupplierDTO.getCatalog_Number(), product_id,  supplierID,  agreementID);
                         System.out.println("\nProduct added successfully.");
                         return;
                     case 2:
@@ -66,45 +91,115 @@ public class ProductMenuHandler {
 
     }
 
-    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber,Integer agreementID) {
-        if (controller.productExistsByCatalog(CatalogNumber)) {
+//    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber,Integer agreementID) {
+//        if (controller.productExistsByCatalog(CatalogNumber)) {
+//            int numOfRules = Inputs.read_int(scanner, "Enter number of discount rules: ");
+//
+//            for (int i = 0; i < numOfRules; i++) {
+//                System.out.println("Discount Rule #" + (i + 1));
+//                int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
+//                double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
+//                controller.updateOrAddDiscountRule(CatalogNumber, discount, amount, agreementID);
+//            }
+//        } else {
+//            System.out.println("Product not found. Cannot add discount rules.");
+//        }
+//    }
+
+
+    public static void readAndAddDiscountRules(Scanner scanner, int catalogNumber, int productID, int supplierID, int agreementID) throws SQLException {
+
             int numOfRules = Inputs.read_int(scanner, "Enter number of discount rules: ");
 
             for (int i = 0; i < numOfRules; i++) {
                 System.out.println("Discount Rule #" + (i + 1));
                 int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
-                double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
-                controller.updateOrAddDiscountRule(CatalogNumber, discount, amount, agreementID);
+                int discount = Inputs.read_int(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
+
+                DiscountDTO dto = new DiscountDTO(productID, supplierID, agreementID, amount, discount);
+                productSupplierManagementController.addOrUpdateDiscount(dto);
             }
-        } else {
-            System.out.println("Product not found. Cannot add discount rules.");
-        }
+
     }
 
-    public static Integer getProductCatalogNumberFromUser(Controller controller, Scanner scanner) {
-        int catalogNumber = Inputs.read_int(scanner, "Enter catalogNumber: ");
-        if (controller.productExistsByCatalog(catalogNumber)) {
-            return catalogNumber;
-        } else {
-            System.out.println("Product not found.");
+
+//    public static Integer getProductCatalogNumberFromUser(Controller controller, Scanner scanner) {
+//        int catalogNumber = Inputs.read_int(scanner, "Enter catalogNumber: ");
+//        if (controller.productExistsByCatalog(catalogNumber)) {
+//            return catalogNumber;
+//        } else {
+//            System.out.println("Product not found.");
+//            return null;
+//        }
+//    }
+
+    public static void removeProduct(Scanner scanner, int agreementID, int supplierID) throws SQLException {
+        List<ProductSupplierDTO> productList = productSupplierManagementController.getProductSuppliers(supplierID, agreementID);
+
+        if (productList.isEmpty()) {
+            System.out.println(" No products found in this agreement.");
+            return;
+        }
+
+        System.out.println(" Products in the agreement:");
+        for (int i = 0; i < productList.size(); i++) {
+            ProductSupplierDTO dto = productList.get(i);
+            System.out.println((i + 1) + ") Catalog #" + dto.getCatalog_Number() +
+                    " | Product ID: " + dto.getProduct_id() +
+                    " | Unit: " + dto.getUnitsOfMeasure() +
+                    " | Price: " + dto.getPrice());
+        }
+
+        int choice = Inputs.read_int(scanner, "Enter the number of the product to remove (1-" + productList.size() + "): ");
+
+        if (choice < 1 || choice > productList.size()) {
+            System.out.println(" Invalid choice. Operation cancelled.");
+            return;
+        }
+
+        ProductSupplierDTO selectedProduct = productList.get(choice - 1);
+        int catalogNumber = selectedProduct.getCatalog_Number();
+        int productID = selectedProduct.getProduct_id();
+
+        productSupplierManagementController.deleteProductFromAgreement(productID, catalogNumber, supplierID, agreementID);
+        System.out.println(" Product removed successfully.\n");
+    }
+
+    public static ProductSupplierDTO showProduct(Scanner scanner,int supplierID, int agreementID) throws SQLException {
+        List<ProductSupplierDTO> productList = productSupplierManagementController.getProductSuppliers(supplierID, agreementID);
+
+        if (productList.isEmpty()) {
+            System.out.println(" No products found in this agreement.");
             return null;
         }
-    }
 
-    public static void removeProduct(Scanner scanner, Controller controller, int agreementID, int supplierID) {
-        Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
-        if (catalogNumber != null) {
-            controller.delete_by_catalogAndSupplierId(catalogNumber,supplierID, agreementID);
-            System.out.println("Product removed successfully.\n");
+        System.out.println(" Products in the agreement:");
+        for (int i = 0; i < productList.size(); i++) {
+            ProductSupplierDTO dto = productList.get(i);
+            System.out.println((i + 1) + ") Catalog #" + dto.getCatalog_Number() +
+                    " | Product ID: " + dto.getProduct_id() +
+                    " | Unit: " + dto.getUnitsOfMeasure() +
+                    " | Price: " + dto.getPrice());
         }
+
+        int choice = Inputs.read_int(scanner, "Enter the number of the product to remove (1-" + productList.size() + "): ");
+
+        if (choice < 1 || choice > productList.size()) {
+            System.out.println(" Invalid choice. Operation cancelled.");
+            return null;
+        }
+
+        ProductSupplierDTO selectedProduct = productList.get(choice - 1);
+        return selectedProduct;
     }
 
 
-    public static void editProductTerms(Scanner scanner, Controller controller, Integer agreementID) {
+    public static void editProductTerms(Scanner scanner, int supplierID, Integer agreementID) throws SQLException {
         System.out.println("\nEdit Product Supply Terms:");
 
-        Integer catalogNumber = getProductCatalogNumberFromUser(controller, scanner);
-        if (catalogNumber == null) return;
+        ProductSupplierDTO productSupplierDTO = showProduct(scanner,supplierID,agreementID);
+
+        if (productSupplierDTO == null) return;
 
         int choice = -1;
         while (choice != 0) {
@@ -119,13 +214,13 @@ public class ProductMenuHandler {
 
             switch (choice) {
                 case 1:
-                    updateProductPrice(scanner, controller, catalogNumber, agreementID);
+                    updateProductPrice(scanner, productSupplierDTO.getProduct_id(),supplierID, productSupplierDTO.getCatalog_Number(),agreementID);
                     break;
                 case 2:
-                    updateProductUnit(scanner, controller, catalogNumber, agreementID);
+                    updateProductUnit(scanner, productSupplierDTO.getProduct_id(), productSupplierDTO.getCatalog_Number(), agreementID);
                     break;
                 case 3:
-                    readAndAddDiscountRules(scanner, controller, catalogNumber, agreementID);
+                    readAndAddDiscountRules( scanner, productSupplierDTO.getCatalog_Number(),productSupplierDTO.getProduct_id(),  supplierID, agreementID);
                     break;
 //                case 4:
 //                    updateDiscountRules(scanner, controller, catalogNumber, agreementID);
@@ -139,16 +234,16 @@ public class ProductMenuHandler {
         }
     }
 
-    public static void updateProductPrice(Scanner scanner, Controller controller, int catalogNumber, Integer agreementID) {
+    public static void updateProductPrice(Scanner scanner, int productID, int supplierID, int catalogNumber, Integer agreementID) throws SQLException {
         double newPrice = Inputs.read_double(scanner, "Enter new price: ");
-        controller.updateProductPrice(catalogNumber, newPrice, agreementID);
+        productSupplierManagementController.setProductPrice(productID, catalogNumber, supplierID, newPrice);
         System.out.println("Product price updated.");
     }
 
-    public static void updateProductUnit(Scanner scanner, Controller controller, int catalogNumber, Integer agreementID) {
+    public static void updateProductUnit(Scanner scanner, int productID, int catalogNumber, Integer agreementID) throws SQLException {
         System.out.print("Enter new unit of measure: ");
         String newUnit = scanner.next();
-        controller.updateProductUnit(catalogNumber, newUnit, agreementID);
+        productSupplierManagementController.updateUnit(productID, catalogNumber, agreementID,newUnit);
         System.out.println("Product unit updated.");
     }
 

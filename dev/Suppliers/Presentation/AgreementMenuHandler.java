@@ -1,19 +1,30 @@
 package Suppliers.Presentation;
 import Suppliers.DTO.AgreementDTO;
-import Suppliers.Domain.Controller;
-import Suppliers.Domain.AgreementManagementController;
+import Suppliers.Domain.*;
+import Suppliers.dataaccess.DAO.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class AgreementMenuHandler {
     public static AgreementManagementController agreementManagementController;
+//    public static ProductSupplierManagementController productSupplierManagementController;
 
     public AgreementMenuHandler() {
-        agreementManagementController = new AgreementManagementController();
-    }
+        // אתחול DAO-ים
+        IAgreementDAO agreementDAO = new JdbcAgreementDAO();
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
 
+        // יצירת Repository
+        IAgreementRepository agreementRepository = new AgreementRepositoryImpl(agreementDAO, productSupplierDAO, discountDAO);
+        IProductSupplierRepository productSupplierRepository = new ProductSupplierRepositoryImpl(productSupplierDAO,discountDAO);
+        // יצירת קונטרולרים
+        agreementManagementController = new AgreementManagementController(agreementRepository);
+//        productSupplierManagementController = new ProductSupplierManagementController(productSupplierRepository);
+    }
 
 
     public static void deleteAgreement(Scanner scanner, int supplierId) {
@@ -56,7 +67,7 @@ public class AgreementMenuHandler {
         System.out.println("Agreement deleted.");
     }
 
-    public static void createNewAgreement(Scanner scanner, int supplierID) {
+    public static void createNewAgreement(Scanner scanner, int supplierID) throws SQLException {
         System.out.println("Let's create a new agreement...");
 
         // קבלת ימי אספקה מהמשתמש
@@ -75,7 +86,7 @@ public class AgreementMenuHandler {
         String addProductInput = scanner.next();
 
         if (addProductInput.equalsIgnoreCase("Y")) {
-            addProductsLoop(scanner, controller, supplierID, agreementID);
+            addProductsLoop(scanner, supplierID, agreementDTO.getAgreement_ID());
         }
     }
 
@@ -112,7 +123,7 @@ public class AgreementMenuHandler {
 
 
 
-    public static void addProductsLoop(Scanner scanner, Controller controller, int supplierID, int agreementID) {
+    public static void addProductsLoop(Scanner scanner, int supplierID, int agreementID) throws SQLException {
         String input;
         boolean firstTime = true;
 
@@ -122,7 +133,7 @@ public class AgreementMenuHandler {
                 firstTime = false;
             }
 
-            ProductMenuHandler.addNewProduct(scanner, controller, supplierID, agreementID);
+            ProductMenuHandler.addNewProduct(scanner,  supplierID, agreementID);
 
             System.out.print("Would you like to add another product? (Y/N): ");
             input = scanner.next();
@@ -171,7 +182,7 @@ public class AgreementMenuHandler {
     }
 
 
-    public static void editSpecificAgreementMenu(Scanner scanner, int supplierID) {
+    public static void editSpecificAgreementMenu(Scanner scanner, int supplierID) throws SQLException {
         System.out.println("Let's edit agreement...");
         AgreementDTO agreementDTO = showAgreements(scanner, supplierID);
         if (agreementDTO != null) {
@@ -192,18 +203,18 @@ public class AgreementMenuHandler {
                 switch (choice) {
                     case 1:
                         System.out.println("Let's add a new product to the agreement...");
-                        ProductMenuHandler.addNewProduct(scanner, controller, supplierID, agreementID);
+                        ProductMenuHandler.addNewProduct(scanner, supplierID, agreementID);
                         System.out.println("Product added successfully.\n");
                         break;
 
                     case 2:
                         System.out.println("Let's remove a product from the agreement...");
-                        ProductMenuHandler.removeProduct(scanner, controller, agreementID, supplierID);
+                        ProductMenuHandler.removeProduct(scanner,  agreementID, supplierID);
                         break;
 
                     case 3:
                         System.out.println("Let's edit the product's supply terms...");
-                        ProductMenuHandler.editProductTerms(scanner, controller, agreementID);
+                        ProductMenuHandler.editProductTerms( scanner,  supplierID, agreementID);
                         System.out.println("Supply terms updated successfully.\n");
                         break;
 
@@ -249,7 +260,7 @@ public class AgreementMenuHandler {
 
 
 
-    public static void agreementMenu(Scanner scanner, Integer supplierID) {
+    public static void agreementMenu(Scanner scanner, Integer supplierID) throws SQLException {
         if (supplierID == null) return;
 
         int choice;

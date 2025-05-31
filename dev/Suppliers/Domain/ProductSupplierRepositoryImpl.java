@@ -75,8 +75,8 @@ public class ProductSupplierRepositoryImpl implements IProductSupplierRepository
     }
 
     @Override
-    public void setProductPrice(int supplierID, int productID, int catalogNumber, int newPrice) {
-        productSupplierDAO.SetPrice(productID, catalogNumber, newPrice);
+    public void setProductPrice(int supplierID, int productID, int catalogNumber, double  newPrice) {
+        productSupplierDAO.SetPrice(catalogNumber, newPrice, productID);
         String key = buildCacheKey(supplierID, productID, catalogNumber);
         if (cache.containsKey(key)) {
             ProductSupplierDTO cached = cache.get(key);

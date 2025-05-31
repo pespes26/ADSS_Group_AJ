@@ -28,7 +28,7 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
 
 
 
-    public AgreementRepositoryImpl(IAgreementDAO dao, IProductSupplierDAO productSupplierDao,IDiscountDAO discountDao ) {
+    public AgreementRepositoryImpl(IAgreementDAO dao, IProductSupplierDAO productSupplierDao, IDiscountDAO discountDao ) {
         this.agreementDao = dao;
         this.productSupplierDao = productSupplierDao;
         this.discountDao = discountDao;
@@ -62,7 +62,7 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
     }
 
     @Override
-    public void deleteAgreement(int agreementId) {
+    public void deleteAgreementWithSupplier(int agreementId) {
         try {
             // מחיקת כל ההנחות שמקושרות להסכם
             discountDao.deleteByAgreement(agreementId);

@@ -19,7 +19,7 @@ public interface IProductSupplierDAO {
 
      void updateProductUnit(int catalogNumber, String newUnit, int agreementID);
 
-    void SetPrice(int catalogNumber, int newPrice, int agreementID);
+    void SetPrice(int catalogNumber, double  newPrice, int agreementID);
 
     ProductSupplierDTO getOneProduct(int productId, int catalogNumber, int supplierId) throws SQLException;
 

@@ -3,6 +3,8 @@ package Suppliers.Presentation;
 import Suppliers.DTO.AgreementDTO;
 import Suppliers.Domain.Controller;
 import Suppliers.dataaccess.DAO.JdbcAgreementDAO;
+import Suppliers.dataaccess.DAO.JdbcDiscountDAO;
+import Suppliers.dataaccess.DAO.JdbcProductSupplierDAO;
 import Suppliers.dataaccess.DAO.JdbcSupplierDAO;
 
 import java.sql.Connection;
@@ -24,6 +26,13 @@ public class SystemInitializer {
     }
 
     public static void SystemInitializer() {
+    }
+
+    public static void initializeAllTables() {
+        new JdbcSupplierDAO().createTableIfNotExists();
+        new JdbcAgreementDAO().createTableIfNotExists();
+        new JdbcProductSupplierDAO().createProductSupplierTableIfNotExists();
+        new JdbcDiscountDAO().createTableIfNotExists();
     }
 
     public void initializeDatabase(boolean withSampleData) throws SQLException {

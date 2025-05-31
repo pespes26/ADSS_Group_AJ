@@ -10,6 +10,28 @@ public class JdbcDiscountDAO implements IDiscountDAO {
 
     private static final String DB_URL = "jdbc:sqlite:suppliers.db";
 
+
+    public void createTableIfNotExists() {
+        String sql = "CREATE TABLE IF NOT EXISTS discounts (\n"
+                + " product_id INTEGER NOT NULL,\n"
+                + " supplier_id INTEGER NOT NULL,\n"
+                + " agreement_id INTEGER NOT NULL,\n"
+                + " amount INTEGER NOT NULL,\n"
+                + " discount_percentage REAL NOT NULL,\n"
+                + " PRIMARY KEY (product_id, supplier_id, agreement_id, amount)\n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.err.println("Error creating discounts table:");
+            e.printStackTrace();
+        }
+    }
+
+
+
     @Override
     public void insert(DiscountDTO discount) throws SQLException {
         String sql = "INSERT OR REPLACE INTO discounts (product_id, supplier_id, agreement_id, amount, discount_percentage) VALUES (?, ?, ?, ?, ?)";

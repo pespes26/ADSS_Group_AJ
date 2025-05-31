@@ -1,5 +1,6 @@
 package ControllerInventorySupplier;
 
+import Inventory.Init.SystemInitializer;
 import Inventory.Presentation.MenuController;
 
 import Inventory.Domain.InventoryController;
@@ -28,7 +29,9 @@ public class InventorySupplierMainMenu {
                 int dataChoice = scanner.nextInt();
                 scanner.nextLine(); // consume newline
 
-                InventoryController inventoryController = new InventoryController();
+                // Initialize the inventory system from the database
+                InventoryController inventoryController = SystemInitializer.initializeSystemFromDatabase();
+
 
                 if (dataChoice == 1) {
                     inventoryController.loadFromDatabase();
@@ -42,7 +45,8 @@ public class InventorySupplierMainMenu {
                 System.out.print("Enter your Branch ID (number between 1 and 10): ");
                 int branchId = scanner.nextInt();
                 scanner.nextLine();
-
+                SystemInitializer.preloadProducts();
+                SystemInitializer.preloadItems();
                 MenuController inventoryMenu = new MenuController(inventoryController, branchId);
                 inventoryMenu.runMenu();
                 break;

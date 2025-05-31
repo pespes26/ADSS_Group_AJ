@@ -18,7 +18,7 @@ public class JdbcProductDAO implements IProductDAO {
                     + " product_name TEXT NOT NULL,\n"
                     + " category TEXT,\n"
                     + " sub_category TEXT,\n"
-                    + " size_item INTEGER,\n"
+                    + " product_size INTEGER,\n"
                     + " product_demand_level INTEGER,\n"
                     + " supply_time INTEGER,\n"
                     + " quantity_in_store INTEGER DEFAULT 0,\n"
@@ -40,7 +40,7 @@ public class JdbcProductDAO implements IProductDAO {
 
     public void Insert(ProductDTO dto) throws SQLException {
         String sql = "INSERT INTO Products (" +
-                "catalog_number, product_name, category, sub_category, size_item, " +
+                "catalog_number, product_name, category, sub_category, product_size, " +
                 "product_demand_level, supply_time, quantity_in_store, quantity_in_warehouse, " +
                 "minimum_quantity_for_alert, cost_price_before_supplier_discount, " +
                 "supplier_discount, store_discount) " +
@@ -69,7 +69,7 @@ public class JdbcProductDAO implements IProductDAO {
 
     @Override
     public void Update(ProductDTO dto) throws SQLException {
-        String sql = "UPDATE Products SET product_name = ?, category = ?, sub_category = ?, size_item = ?, cost_price_before_supplier_discount = ?, supplier_discount = ?, store_discount = ?, supply_time = ?, product_demand_level=?  WHERE catalog_number = ?";
+        String sql = "UPDATE Products SET product_name = ?, category = ?, sub_category = ?, product_size = ?, cost_price_before_supplier_discount = ?, supplier_discount = ?, store_discount = ?, supply_time = ?, product_demand_level=?  WHERE catalog_number = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
@@ -191,7 +191,7 @@ public class JdbcProductDAO implements IProductDAO {
         dto.setProductName(rs.getString("product_name"));
         dto.setCategory(rs.getString("category"));
         dto.setSubCategory(rs.getString("sub_category"));
-        dto.setSubSubCategory(rs.getString("size_item"));
+        dto.setSize(rs.getInt("product_size"));
         dto.setCostPriceBeforeSupplierDiscount(rs.getDouble("cost_price_before_supplier_discount"));
         dto.setSupplierDiscount(rs.getDouble("supplier_discount"));
         dto.setStoreDiscount(rs.getDouble("store_discount"));

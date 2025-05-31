@@ -14,8 +14,8 @@ public class MenuController {
     private final Scanner scan;
     private final InventoryController inventory_controller;
     private final int current_branch_id;
-
     public MenuController(InventoryController inventory_controller, int currentBranchId) {
+
         this.scan = new Scanner(System.in);
         this.inventory_controller = inventory_controller;
         this.current_branch_id = currentBranchId;

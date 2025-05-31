@@ -23,6 +23,7 @@ public class Menu {
         // Initialize the inventory system from the database
         InventoryController inventoryController = SystemInitializer.initializeSystemFromDatabase();
         SystemInitializer.preloadProducts();
+        SystemInitializer.preloadItems();
 
         // Prompt user to select branch ID (1-10)
         System.out.println("------------------------------------------------------------");

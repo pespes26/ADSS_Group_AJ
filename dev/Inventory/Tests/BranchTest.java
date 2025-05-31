@@ -5,7 +5,7 @@ import Inventory.Domain.Item;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+import Inventory.DTO.ItemDTO;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -16,8 +16,8 @@ import java.util.HashSet;
 public class BranchTest {
 
     private Branch branch;
-    private Item item1;
-    private Item item2;
+    private ItemDTO item1;
+    private ItemDTO item2;
 
     /**
      * Initializes a new Branch and two Item instances before each test.
@@ -26,17 +26,17 @@ public class BranchTest {
     public void setUp() {
         branch = new Branch(101);
 
-        item1 = new Item();
+        item1 = new ItemDTO();
         item1.setItemId(1);
-        item1.setCatalog_number(1234);
-        item1.setStorageLocation("Warehouse");
-        item1.setSectionInStore("A1");
+        item1.setCatalogNumber(1234);
+        item1.setLocation("Warehouse");
+        item1.setSection_in_store("A1");
 
-        item2 = new Item();
+        item2 = new ItemDTO();
         item2.setItemId(2);
-        item2.setCatalog_number(5678);
-        item2.setStorageLocation("InteriorStore");
-        item2.setSectionInStore("B2");
+        item2.setCatalogNumber(5678);
+        item2.setLocation("InteriorStore");
+        item2.setSection_in_store("B2");
     }
 
     /**
@@ -53,7 +53,7 @@ public class BranchTest {
     @Test
     public void testAddAndGetItem() {
         branch.addItem(item1);
-        Item retrieved = branch.getItem(1);
+        ItemDTO retrieved = branch.getItem(1);
         assertNotNull("Item should be found", retrieved);
         assertEquals(1234, retrieved.getCatalogNumber());
     }
@@ -65,7 +65,7 @@ public class BranchTest {
     public void testGetItems() {
         branch.addItem(item1);
         branch.addItem(item2);
-        HashMap<Integer, Item> items = branch.getItems();
+        HashMap<Integer, ItemDTO> items = branch.getItems();
         assertEquals("Two items should be stored", 2, items.size());
         assertTrue(items.containsKey(1));
         assertTrue(items.containsKey(2));
@@ -89,7 +89,7 @@ public class BranchTest {
      */
     @Test
     public void testGetNonExistentItem() {
-        Item notFound = branch.getItem(999);
+        ItemDTO notFound = branch.getItem(999);
         assertNull("Non-existent item should return null", notFound);
     }
 }

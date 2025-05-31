@@ -5,7 +5,7 @@ import Inventory.Domain.Product;
 import Inventory.Domain.ProductController;
 import org.junit.Before;
 import org.junit.Test;
-
+import Inventory.DTO.ItemDTO;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ public class ProductControllerTest {
     @Before
     public void setUp() {
         HashMap<Integer, Product> products = new HashMap<>();
-        HashMap<Integer, Item> purchasedItems = new HashMap<>();
+        HashMap<Integer, ItemDTO> purchasedItems = new HashMap<>();
 
         product = new Product();
         product.setCatalogNumber(101);

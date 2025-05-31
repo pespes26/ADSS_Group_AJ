@@ -83,6 +83,10 @@ public class Item {
         return section_in_store;
     }
 
+    public LocalDate getSaleDate() {
+        return sale_date;
+    }
+
     /**
      * @param section The section to assign to the item.
      */
@@ -118,25 +122,7 @@ public class Item {
         is_defect = defect;
     }
 
-    /**
-     * Returns the sale date of the item.
-     * <p>
-     * The sale date represents when the item was purchased by a customer.
-     *
-     * @return the {@code LocalDate} of the sale, or {@code null} if not sold yet.
-     */
-    public LocalDate getSaleDate() {
-        return sale_date;
-    }
-
-    /**
-     * Sets the sale date of the item.
-     * <p>
-     * Used to record when the item was purchased.
-     *
-     * @param saleDate the {@code LocalDate} representing the sale date.
-     */
-    public void setSaleDate(LocalDate saleDate) {
-        this.sale_date = saleDate;
+    public void setSaleDate(LocalDate sale_date) {
+        this.sale_date = sale_date;
     }
 }

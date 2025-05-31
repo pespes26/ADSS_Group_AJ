@@ -18,13 +18,12 @@ public class JdbcProductDAO implements IProductDAO {
                     + " product_name TEXT NOT NULL,\n"
                     + " category TEXT,\n"
                     + " sub_category TEXT,\n"
-                    + " size INTEGER,\n"
+                    + " size_item INTEGER,\n"
                     + " product_demand_level INTEGER,\n"
                     + " supply_time INTEGER,\n"
                     + " quantity_in_store INTEGER DEFAULT 0,\n"
                     + " quantity_in_warehouse INTEGER DEFAULT 0,\n"
                     + " minimum_quantity_for_alert INTEGER,\n"
-                    + " supplier_name TEXT,\n"
                     + " cost_price_before_supplier_discount REAL,\n"
                     + " supplier_discount REAL DEFAULT 0.0,\n"
                     + " store_discount REAL DEFAULT 0.0\n"
@@ -40,33 +39,37 @@ public class JdbcProductDAO implements IProductDAO {
     }
 
     public void Insert(ProductDTO dto) throws SQLException {
-        String sql = "INSERT INTO products (catalog_number, product_name, category, sub_category, size, product_demand_level, supply_time, quantity_in_store, quantity_in_warehouse, minimum_quantity_for_alert, supplier_name, cost_price_before_supplier_discount, supplier_discount, store_discount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Products (" +
+                "catalog_number, product_name, category, sub_category, size_item, " +
+                "product_demand_level, supply_time, quantity_in_store, quantity_in_warehouse, " +
+                "minimum_quantity_for_alert, cost_price_before_supplier_discount, " +
+                "supplier_discount, store_discount) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:Inventory.db");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            preparedStatement.setInt(1, dto.getCatalogNumber());
-            preparedStatement.setString(2, dto.getProductName());
-            preparedStatement.setString(3, dto.getCategory());
-            preparedStatement.setString(4, dto.getSubCategory());
-            preparedStatement.setInt(5, dto.getSize());
-            preparedStatement.setInt(6, dto.getProductDemandLevel());
-            preparedStatement.setInt(7, dto.getSupplyTime());
-            preparedStatement.setInt(8, dto.getQuantityInStore());
-            preparedStatement.setInt(9, dto.getQuantityInWarehouse());
-            preparedStatement.setInt(10, dto.getMinimumQuantityForAlert());
-            preparedStatement.setString(11, dto.getManufacturer()); // supplier_name
-            preparedStatement.setDouble(12, dto.getCostPriceBeforeSupplierDiscount());
-            preparedStatement.setDouble(13, dto.getSupplierDiscount());
-            preparedStatement.setDouble(14, dto.getStoreDiscount());
+            pstmt.setInt(1, dto.getCatalogNumber());
+            pstmt.setString(2, dto.getProductName());
+            pstmt.setString(3, dto.getCategory());
+            pstmt.setString(4, dto.getSubCategory());
+            pstmt.setInt(5, dto.getSize());
+            pstmt.setInt(6, dto.getProductDemandLevel());
+            pstmt.setInt(7, dto.getSupplyTime());
+            pstmt.setInt(8, dto.getQuantityInStore());
+            pstmt.setInt(9, dto.getQuantityInWarehouse());
+            pstmt.setInt(10, dto.getMinimumQuantityForAlert());
+            pstmt.setDouble(11, dto.getCostPriceBeforeSupplierDiscount());
+            pstmt.setDouble(12, dto.getSupplierDiscount());
+            pstmt.setDouble(13, dto.getStoreDiscount());
 
-            preparedStatement.executeUpdate();
+            pstmt.executeUpdate();
         }
     }
 
     @Override
     public void Update(ProductDTO dto) throws SQLException {
-        String sql = "UPDATE Products SET product_name = ?, category = ?, sub_category = ?, size = ?, manufacturer = ?, price = ?, supplier_discount = ?, store_discount = ? WHERE catalog_number = ?";
+        String sql = "UPDATE Products SET product_name = ?, category = ?, sub_category = ?, size_item = ?, cost_price_before_supplier_discount = ?, supplier_discount = ?, store_discount = ?, supply_time = ?, product_demand_level=?  WHERE catalog_number = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
@@ -75,11 +78,13 @@ public class JdbcProductDAO implements IProductDAO {
             prepared_statement.setString(2, dto.getCategory());
             prepared_statement.setString(3, dto.getSubCategory());
             prepared_statement.setString(4, dto.getSubSubCategory());
-            prepared_statement.setString(5, dto.getManufacturer());
-            prepared_statement.setDouble(6, dto.getCostPriceBeforeSupplierDiscount());
-            prepared_statement.setDouble(7, dto.getSupplierDiscount());
-            prepared_statement.setDouble(8, dto.getStoreDiscount());
-            prepared_statement.setInt(9, dto.getCatalogNumber());
+
+            prepared_statement.setDouble(5, dto.getCostPriceBeforeSupplierDiscount());
+            prepared_statement.setDouble(6, dto.getSupplierDiscount());
+            prepared_statement.setDouble(7, dto.getStoreDiscount());
+            prepared_statement.setInt(8, dto.getSupplyTime());
+            prepared_statement.setInt(9, dto.getProductDemandLevel());
+            prepared_statement.setInt(10, dto.getCatalogNumber());
 
             int rowsAffected = prepared_statement.executeUpdate();
             if (rowsAffected == 0) {
@@ -89,6 +94,46 @@ public class JdbcProductDAO implements IProductDAO {
             }
         }
     }
+
+    public void UpdateProductSupplyTime(ProductDTO dto) throws SQLException {
+        String sql = "UPDATE Products SET supply_time = ?  WHERE catalog_number = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
+
+            prepared_statement.setInt(1, dto.getSupplyTime());
+            prepared_statement.setInt(2, dto.getCatalogNumber());
+
+
+            int rowsAffected = prepared_statement.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println("The product with catalog number = " + dto.getCatalogNumber() + " not found");
+            } else {
+                System.out.println("The product was updated successfully");
+            }
+        }
+    }
+
+    public void UpdateDemand(ProductDTO dto) throws SQLException {
+        String sql = "UPDATE Products SET product_demand_level= ?  WHERE catalog_number = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement prepared_statement = conn.prepareStatement(sql)) {
+
+            prepared_statement.setInt(1, dto.getProductDemandLevel());
+            prepared_statement.setInt(2, dto.getCatalogNumber());
+
+
+            int rowsAffected = prepared_statement.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println("The product with catalog number = " + dto.getCatalogNumber() + " not found");
+            } else {
+                System.out.println("The product was updated successfully");
+            }
+        }
+    }
+
+
 
     public void DeleteByCatalogNumber(int catalogNumber) throws SQLException {
         String sql = "DELETE FROM Products WHERE catalog_number = ?";
@@ -146,8 +191,7 @@ public class JdbcProductDAO implements IProductDAO {
         dto.setProductName(rs.getString("product_name"));
         dto.setCategory(rs.getString("category"));
         dto.setSubCategory(rs.getString("sub_category"));
-        dto.setSubSubCategory(rs.getString("size"));
-        dto.setManufacturer(rs.getString("supplier_name"));
+        dto.setSubSubCategory(rs.getString("size_item"));
         dto.setCostPriceBeforeSupplierDiscount(rs.getDouble("cost_price_before_supplier_discount"));
         dto.setSupplierDiscount(rs.getDouble("supplier_discount"));
         dto.setStoreDiscount(rs.getDouble("store_discount"));

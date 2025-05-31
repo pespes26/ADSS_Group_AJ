@@ -33,7 +33,7 @@ public class InventoryController {
         this.branches = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
 
-        HashMap<Integer, Item> purchased_items = new HashMap<>();
+        HashMap<Integer, ItemDTO> purchased_items = new HashMap<Integer, ItemDTO>();
         this.item_controller = new ItemController(branches, products, purchased_items);
         this.product_controller = new ProductController(products, purchased_items);
         this.discount_controller = new DiscountController(products);
@@ -86,7 +86,7 @@ public class InventoryController {
 
         Branch branch = branches.get(branchId);
         if (branch != null) {
-            for (Item item : branch.getItems().values()) {
+            for (ItemDTO item : branch.getItems().values()) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null && product.getCategory().equalsIgnoreCase(category)
                         && product.getSubCategory().equalsIgnoreCase(sub_category)) {
@@ -138,14 +138,14 @@ public class InventoryController {
             List<ItemDTO> itemDTOs = itemDAO.getAllItems();
 
             for (ItemDTO dto : itemDTOs) {
-                Item item = new Item();
+                ItemDTO item = new ItemDTO();
 
                 item.setItemId(dto.getItemId());
                 item.setBranchId(dto.getBranchId());
-                item.setItemExpiringDate(dto.getItemExpiringDate());
-                item.setStorageLocation(dto.getStorageLocation());
-                item.setCatalog_number(dto.getCatalogNumber());
-                item.setDefect(dto.IsDefective());
+                item.setExpirationDate(dto.getItemExpiringDate());
+                item.setLocation(dto.getStorageLocation());
+                item.setCatalogNumber(dto.getCatalogNumber());
+                item.setIsDefective(dto.IsDefective());
 
                 int branchId = item.getBranchId();
                 int catalogNumber = item.getCatalogNumber();

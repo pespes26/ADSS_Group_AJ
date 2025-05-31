@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-
+import Inventory.DTO.ItemDTO;
 /**
  * Controller class for generating inventory-related reports.
  * Manages reports for defective, expired, and low-stock items per branch.
@@ -48,8 +48,8 @@ public class ReportController {
         for (Branch branch : branches.values()) {
             if (branch.getBranchId() != current_branch_id) continue;
 
-            for (Item item : branch.getItems().values()) {
-                if (item.isDefect()) {
+            for (ItemDTO item : branch.getItems().values()) {
+                if (item.IsDefective()) {
                     Product product = products.get(item.getCatalogNumber());
                     if (product != null) {
                         has_defects = true;
@@ -71,12 +71,12 @@ public class ReportController {
         }
 
         report.append("\nExpired Items in Branch ").append(current_branch_id).append(":\n");
-        List<Item> expired_items = new ArrayList<>();
+        List<ItemDTO> expired_items = new ArrayList<>();
 
         for (Branch branch : branches.values()) {
             if (branch.getBranchId() != current_branch_id) continue;
 
-            for (Item item : branch.getItems().values()) {
+            for (ItemDTO item : branch.getItems().values()) {
                 try {
                     LocalDate expiring_date = LocalDate.parse(item.getItemExpiringDate(), formatter);
                     if (expiring_date.isBefore(today)) {
@@ -98,7 +98,7 @@ public class ReportController {
             report.append("No expired items found in Branch ").append(current_branch_id).append(".\n");
         } else {
             counter = 1;
-            for (Item item : expired_items) {
+            for (ItemDTO item : expired_items) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null) {
                     report.append(counter++).append(". Item ID: ").append(item.getItemId())
@@ -140,9 +140,9 @@ public class ReportController {
         for (String categoryName : categories) {
             report.append("Category: ").append(categoryName).append("\n");
 
-            Map<String, Map<Integer, List<Item>>> subCategoryMap = new TreeMap<>();
+            Map<String, Map<Integer, List<ItemDTO>>> subCategoryMap = new TreeMap<>();
 
-            for (Item item : branch.getItems().values()) {
+            for (ItemDTO item : branch.getItems().values()) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null
                         && product.getCategory().equalsIgnoreCase(categoryName)
@@ -195,9 +195,9 @@ public class ReportController {
         for (String subCategoryName : subCategories) {
             report.append("Sub-Category: ").append(subCategoryName).append("\n");
 
-            Map<Integer, List<Item>> sizeMap = new TreeMap<>();
+            Map<Integer, List<ItemDTO>> sizeMap = new TreeMap<>();
 
-            for (Item item : branch.getItems().values()) {
+            for (ItemDTO item : branch.getItems().values()) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null
                         && product.getSubCategory().equalsIgnoreCase(subCategoryName)
@@ -253,9 +253,9 @@ public class ReportController {
         for (Integer catalogNumber : catalogSet) {
             report.append("Catalog Number: ").append(catalogNumber).append("\n");
 
-            List<Item> matchedItems = new ArrayList<>();
+            List<ItemDTO> matchedItems = new ArrayList<>();
 
-            for (Item item : branch.getItems().values()) {
+            for (ItemDTO item : branch.getItems().values()) {
                 if (item.getCatalogNumber() == catalogNumber) {
                     Product product = products.get(item.getCatalogNumber());
                     if (product != null && sizeFilters.contains(product.getSize())) {
@@ -277,7 +277,7 @@ public class ReportController {
                 }));
 
                 int count = 1;
-                for (Item item : matchedItems) {
+                for (ItemDTO item : matchedItems) {
                     Product product = products.get(item.getCatalogNumber());
                     if (product != null) {
                         report.append("    ").append(count++).append(". ")
@@ -300,10 +300,10 @@ public class ReportController {
         return report.toString();
     }
 
-    private void appendReportData(Map<String, Map<Integer, List<Item>>> subCategoryMap, StringBuilder report, DateTimeFormatter formatter) {
-        for (Map.Entry<String, Map<Integer, List<Item>>> subEntry : subCategoryMap.entrySet()) {
+    private void appendReportData(Map<String, Map<Integer, List<ItemDTO>>> subCategoryMap, StringBuilder report, DateTimeFormatter formatter) {
+        for (Map.Entry<String, Map<Integer, List<ItemDTO>>> subEntry : subCategoryMap.entrySet()) {
             report.append("  Sub-Category: ").append(subEntry.getKey()).append("\n");
-            for (Map.Entry<Integer, List<Item>> sizeEntry : subEntry.getValue().entrySet()) {
+            for (Map.Entry<Integer, List<ItemDTO>> sizeEntry : subEntry.getValue().entrySet()) {
                 int size = sizeEntry.getKey();
                 String sizeLabel = switch (size) {
                     case 1 -> "Small";
@@ -313,7 +313,7 @@ public class ReportController {
                 };
                 report.append("    Size: ").append(sizeLabel).append("\n");
 
-                List<Item> sortedItems = sizeEntry.getValue();
+                List<ItemDTO> sortedItems = sizeEntry.getValue();
                 sortedItems.sort(Comparator.comparing(item -> {
                     try {
                         return LocalDate.parse(item.getItemExpiringDate(), formatter);
@@ -323,7 +323,7 @@ public class ReportController {
                 }));
 
                 int count = 1;
-                for (Item item : sortedItems) {
+                for (ItemDTO item : sortedItems) {
                     Product product = products.get(item.getCatalogNumber());
                     if (product != null) {
                         report.append("      ").append(count++).append(". ")
@@ -338,8 +338,8 @@ public class ReportController {
         }
     }
 
-    private void appendReportDataSingleLevel(Map<Integer, List<Item>> sizeMap, StringBuilder report, DateTimeFormatter formatter) {
-        for (Map.Entry<Integer, List<Item>> sizeEntry : sizeMap.entrySet()) {
+    private void appendReportDataSingleLevel(Map<Integer, List<ItemDTO>> sizeMap, StringBuilder report, DateTimeFormatter formatter) {
+        for (Map.Entry<Integer, List<ItemDTO>> sizeEntry : sizeMap.entrySet()) {
             int size = sizeEntry.getKey();
             String sizeLabel = switch (size) {
                 case 1 -> "Small";
@@ -349,7 +349,7 @@ public class ReportController {
             };
             report.append("  Size: ").append(sizeLabel).append("\n");
 
-            List<Item> sortedItems = sizeEntry.getValue();
+            List<ItemDTO> sortedItems = sizeEntry.getValue();
             sortedItems.sort(Comparator.comparing(item -> {
                 try {
                     return LocalDate.parse(item.getItemExpiringDate(), formatter);
@@ -359,7 +359,7 @@ public class ReportController {
             }));
 
             int count = 1;
-            for (Item item : sortedItems) {
+            for (ItemDTO item : sortedItems) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null) {
                     report.append("    ").append(count++).append(". ")
@@ -387,8 +387,8 @@ public class ReportController {
 
         // Count how many non-defective items exist for each catalog number in the branch
         Map<Integer, Integer> stockCountMap = new HashMap<>();
-        for (Item item : branch.getItems().values()) {
-            if (!item.isDefect()) {
+        for (ItemDTO item : branch.getItems().values()) {
+            if (!item.IsDefective()) {
                 int catalog_number = item.getCatalogNumber();
                 stockCountMap.put(catalog_number, stockCountMap.getOrDefault(catalog_number, 0) + 1);
             }
@@ -449,7 +449,7 @@ public class ReportController {
         if (branch == null) return false;
 
         long count = branch.getItems().values().stream()
-                .filter(item -> item.getCatalogNumber() == catalog_number && !item.isDefect())
+                .filter(item -> item.getCatalogNumber() == catalog_number && !item.IsDefective())
                 .count();
 
         Product product = products.get(catalog_number);

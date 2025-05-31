@@ -1,6 +1,7 @@
 package Inventory.Domain;
 
 
+import Inventory.DTO.ProductDTO;
 
 /**
  * Represents a product in the inventory system.
@@ -129,6 +130,8 @@ public class Product {
      */
     public void setSupplyTime(int supply_time) {
         this.supply_time = supply_time;
+
+
     }
 
     /**

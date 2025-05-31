@@ -1,8 +1,12 @@
 package Inventory.Domain;
 
+import Inventory.DTO.ItemDTO;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
+import Inventory.Domain.ProductRepository;
+import Inventory.Domain.ProductRepositoryImpl;
 
 /**
  * Controller responsible for managing individual items, their relation to products,
@@ -11,7 +15,7 @@ import java.util.*;
 public class ItemController {
     private final HashMap<Integer, Branch> branches;
     private final HashMap<Integer, Product> products;
-    private final HashMap<Integer, Item> purchased_items;
+    private final HashMap<Integer, ItemDTO> purchased_items;
 
     /**
      * Constructs an ItemController with branches, product map, and purchased item records.
@@ -20,7 +24,7 @@ public class ItemController {
      * @param products A map of existing products, keyed by catalog number.
      * @param purchased_items A map of purchased items, keyed by item ID.
      */
-    public ItemController(HashMap<Integer, Branch> branches, HashMap<Integer, Product> products, HashMap<Integer, Item> purchased_items) {
+    public ItemController(HashMap<Integer, Branch> branches, HashMap<Integer, Product> products, HashMap<Integer, ItemDTO> purchased_items) {
         this.branches = branches;
         this.products = products;
         this.purchased_items = purchased_items;
@@ -57,13 +61,13 @@ public class ItemController {
      * @param expiryDate the expiry date of the item in dd/MM/yyyy format
      */
     public void addItem(int itemId, int branchId, int catalogNumber, String storageLocation, String expiryDate) {
-        Item newItem = new Item();
+        ItemDTO newItem = new ItemDTO();
         newItem.setItemId(itemId);
         newItem.setBranchId(branchId);
-        newItem.setCatalog_number(catalogNumber);
-        newItem.setStorageLocation(storageLocation);
-        newItem.setItemExpiringDate(expiryDate);
-        newItem.setDefect(false); // new items are not defective by default
+        newItem.setCatalogNumber(catalogNumber);
+        newItem.setLocation(storageLocation);
+        newItem.setExpirationDate(expiryDate);
+        newItem.setIsDefective(false); // new items are not defective by default
 
         // Insert into the branch
         Branch branch = branches.computeIfAbsent(branchId, k -> new Branch(branchId));
@@ -71,6 +75,8 @@ public class ItemController {
 
         // Also insert into the general purchased items map
         purchased_items.put(itemId, newItem);
+        ItemRepository a=new ItemRepositoryImpl();
+        a.addItem(newItem);
     }
 
 
@@ -88,9 +94,9 @@ public class ItemController {
     public void removeItemByDefect(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
         if (branch != null && branch.getItems().containsKey(item_Id)) {
-            Item item = branch.getItem(item_Id);
+            ItemDTO item = branch.getItem(item_Id);
             if (item != null) {
-                item.setDefect(true);
+                item.setIsDefective(true);
                 branch.removeItem(item_Id);
             }
         }
@@ -99,11 +105,12 @@ public class ItemController {
     public void removeItemByPurchase(int item_Id, int branchId) {
         Branch branch = branches.get(branchId);
         if (branch != null && branch.getItems().containsKey(item_Id)) {
-            Item item = branch.getItem(item_Id);
+            ItemDTO item = branch.getItem(item_Id);
             branch.removeItem(item_Id);
 
             if (item != null) {
                 item.setSaleDate(LocalDate.now());
+
                 purchased_items.put(item_Id, item);
             }
         }
@@ -118,7 +125,7 @@ public class ItemController {
      */
     public double getSalePriceAfterDiscount(int item_Id) {
         for (Branch branch : branches.values()) {
-            Item item = branch.getItems().get(item_Id);
+            ItemDTO item = branch.getItems().get(item_Id);
             if (item != null) {
                 Product product = products.get(item.getCatalogNumber());
                 if (product != null) return product.getSalePriceAfterStoreDiscount();
@@ -139,9 +146,9 @@ public class ItemController {
     public boolean markItemAsDefective(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
         if (branch != null) {
-            Item item = branch.getItems().get(item_Id);
+            ItemDTO item = branch.getItems().get(item_Id);
             if (item != null) {
-                item.setDefect(true);
+                item.setIsDefective(true);
                 return true;
             }
         }
@@ -161,7 +168,7 @@ public class ItemController {
     public String getItemName(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
         if (branch == null) return "";
-        Item item = branch.getItems().get(item_Id);
+        ItemDTO item = branch.getItems().get(item_Id);
         if (item == null) return "";
         Product product = products.get(item.getCatalogNumber());
         return product != null ? product.getProductName() : "";
@@ -182,10 +189,22 @@ public class ItemController {
         if (branch == null) {
             return false;
         }
-        Item item = branch.getItems().get(item_Id);
+        ItemDTO item = branch.getItems().get(item_Id);
         if (item != null) {
-            if (location != null) item.setStorageLocation(location);
-            if (section != null) item.setSectionInStore(section);
+            if (location != null) item.setLocation(location);
+            if (section != null) item.setSection_in_store(section);
+
+            ItemDTO dto = new ItemDTO(item.getCatalogNumber(),
+                    item.getBranchId(),
+                    item.getStorageLocation(),
+                    item.getSectionInStore(),
+                    item.IsDefective(),
+                    item.getItemExpiringDate(),
+                    item.getSale_date()
+            );
+            dto.setItemId(item_Id);
+            ItemRepository a=new ItemRepositoryImpl();
+            a.updateItem(dto);
             return true;
         }
         return false;
@@ -209,7 +228,7 @@ public class ItemController {
             return "There is not item in branch id with ID " + branch_id + " does not exist.";
         }
 
-        Item item = branch.getItem(item_Id);
+        ItemDTO item = branch.getItem(item_Id);
         if (item == null) {
             return "Item with ID " + item_Id + " not found in branch " + branch_id + ".";
         }
@@ -237,7 +256,7 @@ public class ItemController {
                 + "Product demand: " + product.getProductDemandLevel() + "\n"
                 + "Supply time: " + product.getSupplyTime() + " days\n"
                 + "Manufacturer: " + product.getManufacturer() + "\n"
-                + "Defective: " + (item.isDefect() ? "Yes" : "No") + "\n";
+                + "Defective: " + (item.IsDefective() ? "Yes" : "No") + "\n";
     }
 
     /**

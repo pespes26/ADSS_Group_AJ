@@ -1,8 +1,9 @@
-package com.superli.deliveries.controllers;
+package application.controllers;
 
-import com.superli.deliveries.domain.Driver;
-import com.superli.deliveries.domain.LicenseType;
-import com.superli.deliveries.service.DriverService;
+import application.services.*;
+
+
+import domain.core.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public class DriverController {
 
             for (int i = 0; i < drivers.size(); i++) {
                 Driver driver = drivers.get(i);
-                System.out.println("\n[" + (i+1) + "] DRIVER: " + driver.getName() + " (ID: " + driver.getDriverId() + ")");
+                System.out.println("\n[" + (i+1) + "] DRIVER: " + driver.getFullName() + " (ID: " + driver.getDriverId() + ")");
                 System.out.println("    License Type: " + driver.getLicenseType());
                 System.out.println("    Status: " + (driver.isAvailable() ? "Available" : "Not Available"));
                 System.out.println("    " + "-".repeat(40));
@@ -82,7 +83,7 @@ public class DriverController {
 
             for (int i = 0; i < availableDrivers.size(); i++) {
                 Driver driver = availableDrivers.get(i);
-                System.out.println("\n[" + (i+1) + "] DRIVER: " + driver.getName() + " (ID: " + driver.getDriverId() + ")");
+                System.out.println("\n[" + (i+1) + "] DRIVER: " + driver.getFullName() + " (ID: " + driver.getDriverId() + ")");
                 System.out.println("    License Type: " + driver.getLicenseType());
                 System.out.println("    " + "-".repeat(40));
             }
@@ -155,7 +156,7 @@ public class DriverController {
         // Display current info
         System.out.println("\nCurrent Driver Information:");
         System.out.println("ID: " + driver.getDriverId());
-        System.out.println("Name: " + driver.getName());
+        System.out.println("Name: " + driver.getFullName());
         System.out.println("License Type: " + driver.getLicenseType());
         System.out.println("Status: " + (driver.isAvailable() ? "Available" : "Not Available"));
 
@@ -170,31 +171,31 @@ public class DriverController {
         String choice = scanner.nextLine().trim();
 
         switch (choice) {
-            case "1" -> editDriverName(driver);
-            case "2" -> editDriverLicenseType(driver);
-            case "3" -> editDriverAvailability(driver);
+            // case "1" -> editDriverName(driver);
+            case "1" -> editDriverLicenseType(driver);
+            case "2" -> editDriverAvailability(driver);
             case "0" -> System.out.println("Edit cancelled.");
             default -> System.out.println("Invalid choice. Edit cancelled.");
         }
     }
 
-    private void editDriverName(Driver driver) {
-        System.out.println("\nCurrent name: " + driver.getName());
-        System.out.print("Enter new name (or press Enter to keep current): ");
-        String newName = scanner.nextLine().trim();
+    // private void editDriverName(Driver driver) {
+    //     System.out.println("\nCurrent name: " + driver.getFullName());
+    //     System.out.print("Enter new name (or press Enter to keep current): ");
+    //     String newName = scanner.nextLine().trim();
 
-        if (newName.isEmpty()) {
-            System.out.println("Name not changed.");
-            return;
-        }
+    //     if (newName.isEmpty()) {
+    //         System.out.println("Name not changed.");
+    //         return;
+    //     }
 
-        boolean success = driverService.updateDriverName(driver.getDriverId(), newName);
-        if (success) {
-            System.out.println("Name updated successfully to: " + newName);
-        } else {
-            System.out.println("Failed to update name. Please try again.");
-        }
-    }
+    //     boolean success = driverService.updateDriverName(driver.getDriverId(), newName);
+    //     if (success) {
+    //         System.out.println("Name updated successfully to: " + newName);
+    //     } else {
+    //         System.out.println("Failed to update name. Please try again.");
+    //     }
+    // }
 
     private void editDriverLicenseType(Driver driver) {
         System.out.println("\nCurrent license type: " + driver.getLicenseType());

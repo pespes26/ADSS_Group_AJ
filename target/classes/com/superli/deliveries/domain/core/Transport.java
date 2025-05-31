@@ -1,12 +1,12 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
-import domain.core.employee.Driver;
-import domain.core.employee.Site;
-import domain.core.employee.DestinationDoc;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import domain.core.Driver;
+import domain.core.Site;
+import domain.core.DestinationDoc;
 
 /**
  * Represents a transport event containing truck, driver, origin, delivery list, and transport status.

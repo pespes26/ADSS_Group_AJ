@@ -1,8 +1,11 @@
-package com.superli.deliveries.domain;
+package domain.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import domain.core.DeliveredItem;
+import domain.core.Site;
 
 /**
  * Represents a delivery document that is part of a specific transport and is linked to a destination site.

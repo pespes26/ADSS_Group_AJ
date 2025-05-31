@@ -1,4 +1,4 @@
-package com.superli.deliveries.storage;
+package com.superli.deliveries.infrastructure.repositories;
 
 // --- ייבואים ---
 import com.superli.deliveries.domain.Site;

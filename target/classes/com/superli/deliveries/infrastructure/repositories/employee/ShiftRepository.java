@@ -1,9 +1,9 @@
 package com.superli.deliveries.infrastructure.repositories.employee;
 
-import com.superli.deliveries.domain.core.employee.Shift;
-import com.superli.deliveries.domain.core.employee.ShiftType;
-import com.superli.deliveries.domain.core.employee.Employee;
-import com.superli.deliveries.domain.core.employee.Role;
+import com.superli.deliveries.domain.enums.employee.Employee;
+import com.superli.deliveries.domain.enums.employee.Role;
+import com.superli.deliveries.domain.enums.employee.Shift;
+import com.superli.deliveries.domain.enums.employee.ShiftType;
 import com.superli.deliveries.domain.ports.employee.IShiftRepository;
 
 import java.time.DayOfWeek;

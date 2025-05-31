@@ -1,4 +1,4 @@
-package com.superli.deliveries.storage;
+package com.superli.deliveries.infrastructure.repositories;
 
 import com.superli.deliveries.domain.DestinationDoc;
 import com.superli.deliveries.domain.ports.IDestinationDocRepository;

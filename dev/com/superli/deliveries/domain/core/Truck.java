@@ -1,7 +1,8 @@
 package domain.core;
 
 import java.util.Objects;
-import domain.core.employee.LicenseType;
+
+import domain.core.LicenseType;
 
 /**
  * Represents a truck in the company's fleet.

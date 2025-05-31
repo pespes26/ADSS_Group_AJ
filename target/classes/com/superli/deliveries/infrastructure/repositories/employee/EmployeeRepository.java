@@ -1,6 +1,6 @@
-package com.superli.deliveries.infrastructure.repositories;
+package com.superli.deliveries.infrastructure.repositories.employee;
 
-import com.superli.deliveries.domain.core.employee.*;
+import com.superli.deliveries.domain.enums.employee.*;
 import com.superli.deliveries.domain.ports.employee.IEmployeeRepository;
 
 import java.util.*;

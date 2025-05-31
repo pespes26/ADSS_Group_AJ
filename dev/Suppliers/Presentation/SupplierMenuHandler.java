@@ -115,42 +115,42 @@ public class SupplierMenuHandler {
 
 
 
-public void DeleteSupplier(Scanner scanner) throws SQLException {
+public void DeleteSupplier(Scanner scanner, int supplierIdToDelete) throws SQLException {
     System.out.println("OK, let's delete a supplier!");
-
-    List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();
-
-    if (supplierDTOList.isEmpty()) {
-        System.out.println("No suppliers found.");
-        return;
-    }
-
-    int counter = 1;
-    System.out.println("List of suppliers:");
-    for (SupplierDTO supplierDTO : supplierDTOList) {
-        System.out.println(counter++ + ". Supplier ID: " + supplierDTO.getSupplier_id());
-        System.out.println("   Supplier Name: " + supplierDTO.getSupplierName());
-        System.out.println("   Company ID: " + supplierDTO.getCompany_id());
-        System.out.println("----------------------------------");
-    }
-
-    System.out.print("Choose the number of the supplier to delete (1 to " + supplierDTOList.size() + "): ");
-    int selectedIndex;
-
-    try {
-        selectedIndex = Integer.parseInt(scanner.nextLine());
-    } catch (NumberFormatException e) {
-        System.out.println("Invalid input. Please enter a number.");
-        return;
-    }
-
-    if (selectedIndex < 1 || selectedIndex > supplierDTOList.size()) {
-        System.out.println("Invalid choice. Please select a number within the given range.");
-        return;
-    }
-
-    SupplierDTO selectedSupplier = supplierDTOList.get(selectedIndex - 1);
-    int supplierIdToDelete = selectedSupplier.getSupplier_id();
+//
+//    List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();
+//
+//    if (supplierDTOList.isEmpty()) {
+//        System.out.println("No suppliers found.");
+//        return;
+//    }
+//
+//    int counter = 1;
+//    System.out.println("List of suppliers:");
+//    for (SupplierDTO supplierDTO : supplierDTOList) {
+//        System.out.println(counter++ + ". Supplier ID: " + supplierDTO.getSupplier_id());
+//        System.out.println("   Supplier Name: " + supplierDTO.getSupplierName());
+//        System.out.println("   Company ID: " + supplierDTO.getCompany_id());
+//        System.out.println("----------------------------------");
+//    }
+//
+//    System.out.print("Choose the number of the supplier to delete (1 to " + supplierDTOList.size() + "): ");
+//    int selectedIndex;
+//
+//    try {
+//        selectedIndex = Integer.parseInt(scanner.nextLine());
+//    } catch (NumberFormatException e) {
+//        System.out.println("Invalid input. Please enter a number.");
+//        return;
+//    }
+//
+//    if (selectedIndex < 1 || selectedIndex > supplierDTOList.size()) {
+//        System.out.println("Invalid choice. Please select a number within the given range.");
+//        return;
+//    }
+//
+//    SupplierDTO selectedSupplier = supplierDTOList.get(selectedIndex - 1);
+//    int supplierIdToDelete = selectedSupplier.getSupplier_id();
 
     supplierManagementController.deleteSupplier(supplierIdToDelete);
     System.out.println("Supplier with ID " + supplierIdToDelete + " has been deleted.");
@@ -190,39 +190,52 @@ public void DeleteSupplier(Scanner scanner) throws SQLException {
             return null;
         }
 
-        int counter = 1;
-        System.out.println("List of suppliers:");
+        if (scanner.hasNextLine()) scanner.nextLine();
 
-        for (SupplierDTO supplierDTO : supplierDTOList) {
-            System.out.println(counter++ + ". Supplier ID: " + supplierDTO.getSupplier_id());
-            System.out.println("   Supplier Name: " + supplierDTO.getSupplierName());
-            System.out.println("   Company ID: " + supplierDTO.getCompany_id());
+
+        System.out.println("List of suppliers:");
+        for (int i = 0; i < supplierDTOList.size(); i++) {
+            SupplierDTO dto = supplierDTOList.get(i);
+            System.out.println((i + 1) + ". Supplier ID: " + dto.getSupplier_id());
+            System.out.println("   Supplier Name: " + dto.getSupplierName());
+            System.out.println("   Company ID: " + dto.getCompany_id());
             System.out.println("--------------------------------------------------");
         }
 
-        System.out.print("Choose the number of the supplier (1 to " + supplierDTOList.size() + "): ");
+        int selectedIndex = -1;
 
-        int selectedIndex;
-        try {
-            selectedIndex = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
-            return null;
+        while (true) {
+            System.out.print("Choose the number of the supplier (1 to " + supplierDTOList.size() + "): ");
+            String input = scanner.nextLine();
+
+            try {
+                selectedIndex = Integer.parseInt(input);
+
+                if (selectedIndex >= 1 && selectedIndex <= supplierDTOList.size()) {
+                    break;  // קלט תקין
+                } else {
+                    System.out.println("Invalid choice. Please select a number within the range.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
         }
 
-        if (selectedIndex < 1 || selectedIndex > supplierDTOList.size()) {
-            System.out.println("Invalid choice. Please select a number within the given range.");
-            return null;
-        }
-
-        SupplierDTO selectedSupplier = supplierDTOList.get(selectedIndex - 1);
-        return selectedSupplier;
+        return supplierDTOList.get(selectedIndex - 1);
     }
+
 
 
     public void searchSupplierMenu(Scanner scanner) throws SQLException {
         System.out.println("Let's search supplier!");
         SupplierDTO supplierDTO = showSuppliers(scanner);
+
+        if (supplierDTO == null) {
+            System.out.println("No valid supplier selected. Returning to main menu.");
+            return;
+        }
+
+
         int supplierID = supplierDTO.getSupplier_id();
         if(supplierDTO != null) {
             int choice = -1;
@@ -241,7 +254,7 @@ public void DeleteSupplier(Scanner scanner) throws SQLException {
                         AgreementMenuHandler.agreementMenu(scanner, supplierID);
                         break;
                     case 2:
-                        DeleteSupplier(scanner);
+                        DeleteSupplier(scanner, supplierID);
                         System.out.println("Supplier deleted.");
                         return;
                     case 0:

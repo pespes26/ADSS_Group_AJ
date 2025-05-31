@@ -24,7 +24,7 @@ public class JdbcAgreementDAO implements IAgreementDAO {
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.err.println("❌ שגיאה ביצירת טבלת agreements:");
+            System.err.println(" שגיאה ביצירת טבלת agreements:");
             e.printStackTrace();
         }
     }

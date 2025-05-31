@@ -11,6 +11,7 @@ public class MainMenu {
         SupplierMenuHandler supplierMenuHandler = new SupplierMenuHandler();
         OrderMenuHandler orderMenuHandler = new OrderMenuHandler();
         ProductMenuHandler productMenuHandler = new ProductMenuHandler();
+        AgreementMenuHandler agreementMenuHandler = new AgreementMenuHandler();
         Controller controller = new Controller();
 
         Scanner scanner = new Scanner(System.in);

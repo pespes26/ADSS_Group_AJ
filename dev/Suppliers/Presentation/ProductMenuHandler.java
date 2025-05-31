@@ -30,8 +30,8 @@ public class ProductMenuHandler {
 
     public static void addNewProduct(Scanner scanner, int supplierID, int agreementID) throws SQLException {
         System.out.println("\nLet's add a new product...");
-
-      int catalog_Number = scanner.nextInt();
+        int catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
+//      int catalog_Number = scanner.nextInt();
 //----------בדיקת מספר קטלוגי ייחודי
 
 //        int catalog_Number;
@@ -44,7 +44,8 @@ public class ProductMenuHandler {
 //            // אחרת נחזור לראש הלולאה ונבקש שוב
 //        }
 //----------------בדיקת מספר מזהה ייחודי--------------------
-        int product_id = scanner.nextInt();
+        int  product_id = Inputs.read_int(scanner, "Enter Product ID: ");
+//        int product_id = scanner.nextInt();
 //        int product_id;
 //        while (true) {
 //            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
@@ -182,7 +183,7 @@ public class ProductMenuHandler {
                     " | Price: " + dto.getPrice());
         }
 
-        int choice = Inputs.read_int(scanner, "Enter the number of the product to remove (1-" + productList.size() + "): ");
+        int choice = Inputs.read_int(scanner, "Enter the number of the product (1-" + productList.size() + "): ");
 
         if (choice < 1 || choice > productList.size()) {
             System.out.println(" Invalid choice. Operation cancelled.");

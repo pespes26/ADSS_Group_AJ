@@ -42,12 +42,12 @@ public class AgreementMenuHandler {
             System.out.println(counter++ + ". Agreement ID: " + agreementDTO.getAgreement_ID());
             System.out.println("   Supplier ID: " + agreementDTO.getSupplier_ID());
             System.out.println("   Self Pickup: " + (agreementDTO.isSelfPickup() ? "Yes" : "No"));
-            System.out.println("   Delivery Days: " + agreementDTO.getDeliveryDays());
+            System.out.println("   Delivery Days: " + String.join(", ", agreementDTO.getDeliveryDays()));
             System.out.println("--------------------------------------------------");
         }
 
         System.out.print("Choose the number of the agreement you want to delete (1 to " + agreementDTOList.size() + "): ");
-
+        scanner.nextLine(); // ניקוי התו מהקריאה הקודמת
         int selectedIndex;
         try {
             selectedIndex = Integer.parseInt(scanner.nextLine());
@@ -158,15 +158,27 @@ public class AgreementMenuHandler {
             System.out.println(counter++ + ". Agreement ID: " + agreementDTO.getAgreement_ID());
             System.out.println("   Supplier ID: " + agreementDTO.getSupplier_ID());
             System.out.println("   Self Pickup: " + (agreementDTO.isSelfPickup() ? "Yes" : "No"));
-            System.out.println("   Delivery Days: " + agreementDTO.getDeliveryDays());
+
+            // הדפסת ימי אספקה בצורה נוחה
+            String[] daysArray = agreementDTO.getDeliveryDays();
+            String daysFormatted = (daysArray != null) ? String.join(", ", daysArray) : "None";
+            System.out.println("   Delivery Days: " + daysFormatted);
+
             System.out.println("--------------------------------------------------");
         }
 
         System.out.print("Choose the number of the agreement (1 to " + agreementDTOList.size() + "): ");
+        scanner.nextLine(); // ניקוי קלט קודם
+
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) {
+            System.out.println("No input entered. Please enter a number.");
+            return null;
+        }
 
         int selectedIndex;
         try {
-            selectedIndex = Integer.parseInt(scanner.nextLine());
+            selectedIndex = Integer.parseInt(input);
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a number.");
             return null;
@@ -177,9 +189,9 @@ public class AgreementMenuHandler {
             return null;
         }
 
-        AgreementDTO selectedAgreement = agreementDTOList.get(selectedIndex - 1);
-        return selectedAgreement;
+        return agreementDTOList.get(selectedIndex - 1);
     }
+
 
 
     public static void editSpecificAgreementMenu(Scanner scanner, int supplierID) throws SQLException {

@@ -1,119 +1,68 @@
 package Inventory.Domain;
 
+import Inventory.DTO.ProductDTO;
+import Inventory.Repository.ProductRepositoryImpl;
 
 import java.util.HashMap;
 
-/**
- * Controller responsible for applying discounts to products in the inventory,
- * based on category, sub-category, or catalog number.
- */
 public class DiscountController {
-    private final HashMap<Integer, Product> products; // All products in the system, keyed by catalog number
+    private final HashMap<Integer, Product> products; // All products in memory
+    private final ProductRepositoryImpl productRepository;
 
-    /**
-     * Constructs a DiscountController with access to the map of products.
-     *
-     * @param products A map of all products in the system, keyed by catalog number.
-     */
     public DiscountController(HashMap<Integer, Product> products) {
         this.products = products;
+        this.productRepository = new ProductRepositoryImpl();
     }
 
-    /**
-     * Applies a store discount to all products that match a specific category.
-     *
-     * @param category The category name to apply the discount to.
-     * @param discount The discount object containing discount value and validity period.
-     * @return true if at least one product was updated; false otherwise.
-     */
     public boolean setStoreDiscountForCategory(String category, Discount discount) {
-        return applyDiscountToGroup(discount, category, null, -1, DiscountType.STORE);
+        return applyDiscountToGroup(discount, category, null, -1, DiscountType.STORE, -1);
     }
 
-    /**
-     * Applies a store discount to all products within a specific sub-category.
-     *
-     * @param sub_category The name of the sub-category to apply the discount to.
-     * @param discount     The discount object containing the discount value and validity period.
-     * @return true if at least one product was updated; false otherwise.
-     */
     public boolean setStoreDiscountForSubCategory(String sub_category, Discount discount) {
-        return applyDiscountToGroup(discount, null, sub_category, -1, DiscountType.STORE);
+        return applyDiscountToGroup(discount, null, sub_category, -1, DiscountType.STORE, -1);
     }
 
-    /**
-     * Applies a store discount to a single product identified by its catalog number.
-     *
-     * @param catalogNumber The catalog number of the product to apply the discount to.
-     * @param discount      The discount object containing the discount value and validity period.
-     * @return true if the product was updated; false otherwise.
-     */
     public boolean setStoreDiscountForCatalogNumber(int catalogNumber, Discount discount) {
-        return applyDiscountToGroup(discount, null, null, catalogNumber, DiscountType.STORE);
+        return applyDiscountToGroup(discount, null, null, catalogNumber, DiscountType.STORE, -1);
     }
 
-    /**
-     * Applies a supplier discount to all products within a specific category.
-     *
-     * @param category The name of the category to apply the discount to.
-     * @param discount The discount object containing the discount value and validity period.
-     * @return true if at least one product was updated; false otherwise.
-     */
+    public boolean setStoreDiscountForSize(int size, Discount discount) {
+        return applyDiscountToGroup(discount, null, null, -1, DiscountType.STORE, size);
+    }
+
     public boolean setSupplierDiscountForCategory(String category, Discount discount) {
-        return applyDiscountToGroup(discount, category, null, -1, DiscountType.SUPPLIER);
+        return applyDiscountToGroup(discount, category, null, -1, DiscountType.SUPPLIER, -1);
     }
 
-    /**
-     * Applies a supplier discount to all products within a specific sub-category.
-     *
-     * @param sub_category The name of the sub-category to apply the discount to.
-     * @param discount     The discount object containing the discount value and validity period.
-     * @return true if at least one product was updated; false otherwise.
-     */
     public boolean setSupplierDiscountForSubCategory(String sub_category, Discount discount) {
-        return applyDiscountToGroup(discount, null, sub_category, -1, DiscountType.SUPPLIER);
+        return applyDiscountToGroup(discount, null, sub_category, -1, DiscountType.SUPPLIER, -1);
     }
 
-    /**
-     * Applies a supplier discount to a single product identified by its catalog number.
-     *
-     * @param catalogNumber The catalog number of the product to apply the discount to.
-     * @param discount      The discount object containing the discount value and validity period.
-     * @return true if the product was updated; false otherwise.
-     */
     public boolean setSupplierDiscountForCatalogNumber(int catalogNumber, Discount discount) {
-        return applyDiscountToGroup(discount, null, null, catalogNumber, DiscountType.SUPPLIER);
+        return applyDiscountToGroup(discount, null, null, catalogNumber, DiscountType.SUPPLIER, -1);
     }
 
-    /**
-     * Applies a discount to products matching the specified filter: category, sub-category, or catalog number.
-     * The method first validates the discount's date range.
-     * A product is considered a match if:
-     * - Its category matches the given category (case-insensitive), or
-     * - Its sub-category matches the given sub-category (case-insensitive), or
-     * - Its catalog number matches the given catalog number (if catalogNumber != -1).
-     * The discount type determines whether the discount is applied as a store discount or supplier discount.
-     * The method also recalculates cost and sale prices after applying the discount.
-     *
-     * @param discount      The discount object containing rate, start date, and end date.
-     * @param category      The category name to match (nullable).
-     * @param sub_category  The sub-category name to match (nullable).
-     * @param catalogNumber The specific catalog number to match, or -1 if unused.
-     * @param type          The type of discount to apply (STORE or SUPPLIER).
-     * @return true if at least one product was updated; false if the discount is invalid or no products matched.
-     */
-    private boolean applyDiscountToGroup(Discount discount, String category, String sub_category, int catalogNumber, DiscountType type) {
+    public boolean setSupplierDiscountForSize(int size, Discount discount) {
+        return applyDiscountToGroup(discount, null, null, -1, DiscountType.SUPPLIER, size);
+    }
+
+    private boolean applyDiscountToGroup(Discount discount, String category, String sub_category,
+                                         int catalogNumber, DiscountType type, int size) {
         if (discount.getStartDate() == null || discount.getEndDate() == null || discount.getEndDate().isBefore(discount.getStartDate())) {
             return false;
         }
 
         boolean applied = false;
+
         for (Product product : products.values()) {
-            boolean match = (product.getCategory().equalsIgnoreCase(category))
-                    || (product.getSubCategory().equalsIgnoreCase(sub_category))
-                    || (catalogNumber != -1 && product.getCatalogNumber() == catalogNumber);
+            boolean match =
+                    (category != null && product.getCategory().equalsIgnoreCase(category)) ||
+                            (sub_category != null && product.getSubCategory().equalsIgnoreCase(sub_category)) ||
+                            (catalogNumber != -1 && product.getCatalogNumber() == catalogNumber) ||
+                            (size != -1 && product.getSize() == size);
 
             if (match) {
+                // Apply discount to memory
                 if (type == DiscountType.STORE) {
                     product.setStoreDiscount(discount.getDiscountRate());
                 } else {
@@ -122,34 +71,48 @@ public class DiscountController {
 
                 product.setDiscount(discount);
                 recalculatePrices(product);
+
+                // Apply to DB
+                ProductDTO dto = new ProductDTO(
+                        product.getCatalogNumber(),
+                        product.getProductName(),
+                        product.getCategory(),
+                        product.getSubCategory(),
+                        product.getSupplierName(),
+                        product.getSize(),
+                        product.getCostPriceBeforeSupplierDiscount(),
+                        product.getSupplierDiscount(),
+                        product.getStoreDiscount(),
+                        product.getSupplyDaysInTheWeek(),
+                        product.getProductDemandLevel()
+                );
+
+                dto.setCostPriceAfterSupplierDiscount(product.getCostPriceAfterSupplierDiscount());
+                dto.setSalePriceBeforeStoreDiscount(product.getSalePriceBeforeStoreDiscount());
+                dto.setSalePriceAfterStoreDiscount(product.getSalePriceAfterStoreDiscount());
+
+                try {
+                    productRepository.updateProduct(dto);
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to update product in DB: " + product.getCatalogNumber());
+                }
+
                 applied = true;
 
-                if (catalogNumber != -1) break;
+                if (catalogNumber != -1) break; // Single product match only
             }
         }
 
         return applied;
     }
 
-    /**
-     * Recalculates the product's pricing after applying supplier and/or store discounts.
-     * - Cost price after supplier discount is calculated as:
-     *   cost_price_before × (1 - supplier_discount%)
-     * - Sale price before store discount is calculated as:
-     *   cost_after × 2
-     * - Sale price after store discount is calculated as:
-     *   sale_before × (1 - store_discount%)
-     * The method updates the product's pricing fields accordingly.
-     *
-     * @param product The product whose prices need to be updated.
-     */
     private void recalculatePrices(Product product) {
-        double cost_after = product.getCostPriceBeforeSupplierDiscount() * (1 - product.getSupplierDiscount() / 100.0);
-        double sale_before = cost_after * 2;
-        double sale_after = sale_before * (1 - product.getStoreDiscount() / 100.0);
+        double costAfter = product.getCostPriceBeforeSupplierDiscount() * (1 - product.getSupplierDiscount() / 100.0);
+        double saleBefore = costAfter * 2;
+        double saleAfter = saleBefore * (1 - product.getStoreDiscount() / 100.0);
 
-        product.setCostPriceAfterSupplierDiscount(cost_after);
-        product.setSalePriceBeforeStoreDiscount(sale_before);
-        product.setSalePriceAfterStoreDiscount(sale_after);
+        product.setCostPriceAfterSupplierDiscount(costAfter);
+        product.setSalePriceBeforeStoreDiscount(saleBefore);
+        product.setSalePriceAfterStoreDiscount(saleAfter);
     }
 }

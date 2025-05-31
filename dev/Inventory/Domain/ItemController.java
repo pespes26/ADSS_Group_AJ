@@ -5,8 +5,9 @@ import Inventory.DTO.ItemDTO;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
-import Inventory.Domain.ProductRepository;
-import Inventory.Domain.ProductRepositoryImpl;
+
+import Inventory.Repository.IItemRepository;
+import Inventory.Repository.ItemRepositoryImpl;
 
 /**
  * Controller responsible for managing individual items, their relation to products,
@@ -75,7 +76,7 @@ public class ItemController {
 
         // Also insert into the general purchased items map
         purchased_items.put(itemId, newItem);
-        ItemRepository a=new ItemRepositoryImpl();
+        IItemRepository a = new ItemRepositoryImpl();
         a.addItem(newItem);
     }
 
@@ -203,7 +204,7 @@ public class ItemController {
                     item.getSale_date()
             );
             dto.setItemId(item_Id);
-            ItemRepository a=new ItemRepositoryImpl();
+            IItemRepository a = new ItemRepositoryImpl();
             a.updateItem(dto);
             return true;
         }
@@ -254,8 +255,8 @@ public class ItemController {
                 + "Sale price before store discount: " + df.format(product.getSalePriceBeforeStoreDiscount()) + "\n"
                 + "Sale price after store discount: " + df.format(product.getSalePriceAfterStoreDiscount()) + "\n"
                 + "Product demand: " + product.getProductDemandLevel() + "\n"
-                + "Supply time: " + product.getSupplyTime() + " days\n"
-                + "Manufacturer: " + product.getManufacturer() + "\n"
+                + "Supply time: " + product.getSupplyDaysInTheWeek() + " days\n"
+                + "supplierName: " + product.getSupplierName() + "\n"
                 + "Defective: " + (item.IsDefective() ? "Yes" : "No") + "\n";
     }
 

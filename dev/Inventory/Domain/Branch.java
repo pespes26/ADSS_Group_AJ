@@ -2,12 +2,10 @@ package Inventory.Domain;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import Inventory.Domain.ItemController;
-import Inventory.Domain.ItemRepository;
-import Inventory.Domain.ItemRepositoryImpl;
+import Inventory.Repository.IItemRepository;
 import java.util.List;
 import Inventory.DTO.ItemDTO;
-import java.sql.SQLException;
+import Inventory.Repository.ItemRepositoryImpl;
 
 /**
  * Represents a single branch in the inventory system.
@@ -92,13 +90,11 @@ public class Branch {
     }
 
     public void loadAllItemsFromDB() {
-
-            ItemRepository a=new ItemRepositoryImpl();
-            List<ItemDTO> itemsFromDB = a.getAllItems(); // נניח שזו הפונקציה שמחזירה את כל הפריטים
+            IItemRepository a = new ItemRepositoryImpl();
+            List<ItemDTO> itemsFromDB = a.getAllItems();
             for (ItemDTO item : itemsFromDB) {
                 this.items.put(item.getItemId(), item);
             }
             System.out.println("Loaded " + itemsFromDB.size() + " items into branch.");
-
     }
 }

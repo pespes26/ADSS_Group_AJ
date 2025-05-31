@@ -5,12 +5,9 @@ import Inventory.DTO.OrderOnTheWayDTO;
 import java.sql.SQLException;
 
 public interface IOrdersOnTheWayDAO {
-    void Insert(OrderOnTheWayDTO dto) throws SQLException;
-
-    void Update(OrderOnTheWayDTO dto) throws SQLException;
-
-    void DeleteByOrderId(int Id) throws SQLException;
-
-    OrderOnTheWayDTO GetById(int Id) throws SQLException;
+    void insertOrderOnTheWay(OrderOnTheWayDTO dto) throws SQLException;
+    void updateOrderOnTheWay(OrderOnTheWayDTO dto) throws SQLException;
+    void deleteOrderOnTheWayById(int id) throws SQLException;
+    OrderOnTheWayDTO getOrderOnTheWayById(int id) throws SQLException;
 
 }

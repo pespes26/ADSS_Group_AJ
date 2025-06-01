@@ -95,29 +95,41 @@ public class JdbcDiscountDAO implements IDiscountDAO {
 
 
     @Override
-    public List<DiscountDTO> getDiscountsForProduct(int productId, int supplierId, int agreementId) throws SQLException {
-        List<DiscountDTO> discounts = new ArrayList<>();
-        String sql = "SELECT * FROM discounts WHERE product_id = ? AND supplier_id = ? AND agreement_id = ?";
+    public DiscountDTO getBestMatchingDiscount(int productId, int supplierId, int agreementId, int quantity) throws SQLException {
+        String sql = """
+        SELECT * FROM discounts 
+        WHERE product_id = ? 
+          AND supplier_id = ? 
+          AND agreement_id = ? 
+          AND amount <= ?
+        ORDER BY amount DESC
+        LIMIT 1
+    """;
+
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setInt(1, productId);
             pstmt.setInt(2, supplierId);
             pstmt.setInt(3, agreementId);
+            pstmt.setInt(4, quantity);
+
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    DiscountDTO dto = new DiscountDTO(
+                if (rs.next()) {
+                    return new DiscountDTO(
                             rs.getInt("product_id"),
                             rs.getInt("supplier_id"),
                             rs.getInt("agreement_id"),
                             rs.getInt("amount"),
                             rs.getInt("discount_percentage")
                     );
-                    discounts.add(dto);
                 }
             }
         }
-        return discounts;
+
+        return null; // אין הנחה מתאימה
     }
+
 
     @Override
     public DiscountDTO getBestDiscount(int productId, int quantity) throws SQLException {
@@ -145,5 +157,35 @@ public class JdbcDiscountDAO implements IDiscountDAO {
         }
         return null;
     }
+
+    @Override
+    public List<DiscountDTO> getDiscountsForProductByID(int productId, int quantity) throws SQLException {
+        List<DiscountDTO> discounts = new ArrayList<>();
+        String sql = "SELECT * FROM discounts WHERE product_id = ? AND amount <= ? ORDER BY amount ASC";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.setInt(2, quantity);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    DiscountDTO dto = new DiscountDTO(
+                            rs.getInt("product_id"),
+                            rs.getInt("supplier_id"),
+                            rs.getInt("agreement_id"),
+                            rs.getInt("amount"),
+                            rs.getDouble("discount_percentage")
+                    );
+                    discounts.add(dto);
+                }
+            }
+        }
+
+        return discounts;
+    }
+
+
 
 }

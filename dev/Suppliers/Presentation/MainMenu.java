@@ -1,6 +1,6 @@
 package Suppliers.Presentation;
 import Suppliers.Domain.AgreementManagementController;
-import Suppliers.Domain.Controller;
+
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -12,7 +12,6 @@ public class MainMenu {
         OrderMenuHandler orderMenuHandler = new OrderMenuHandler();
         ProductMenuHandler productMenuHandler = new ProductMenuHandler();
         AgreementMenuHandler agreementMenuHandler = new AgreementMenuHandler();
-        Controller controller = new Controller();
 
         Scanner scanner = new Scanner(System.in);
         SystemInitializer initializer = new SystemInitializer();
@@ -37,10 +36,9 @@ public class MainMenu {
         int choice = -1;
         while (choice != 0) {
             System.out.println("========== Main Menu ==========");
-            System.out.println("1. Create a new order");
-            System.out.println("2. Search supplier");
-            System.out.println("3. Create new supplier");
-            System.out.println("4. Search for a past order");
+            System.out.println("1. Search supplier");
+            System.out.println("2. Create new supplier");
+            System.out.println("3. Search for a past order");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -57,20 +55,15 @@ public class MainMenu {
 
             switch (choice) {
                 case 1:
-                    OrderMenuHandler.createOrder(scanner, controller); // תיקון הקריאה לפונקציה
+                    supplierMenuHandler.searchSupplierMenu(scanner);
                     break;
                 case 2:
-                    supplierMenuHandler.searchSupplierMenu(scanner);
-
-                    break;
-                case 3:
                     int supplier_ID = supplierMenuHandler.createSupplier(scanner);
                     supplierMenuHandler.afterSupplierCreatedMenu(scanner, supplier_ID);
-
                     break;
-                case 4:
+                case 3:
                     System.out.println(); // רווח בין הפעולות
-                    OrderMenuHandler.SearchPastOrder(scanner, controller);
+                    orderMenuHandler.printPastOrder();
                     break;
                 case 0:
                     System.out.println("Exiting the system. Goodbye!");

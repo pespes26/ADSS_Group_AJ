@@ -47,6 +47,7 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
         }
     }
 
+
     @Override
     public void update(ProductSupplierDTO dto) throws SQLException {
         String sql = "UPDATE product_supplier SET unit = ?, price = ? WHERE product_id = ? AND catalog_number = ? AND supplier_id = ?";
@@ -148,6 +149,61 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
         return null;
     }
 
+    @Override
+    public ProductSupplierDTO getOneProductByProductIDAndSupplierID(int productId, int supplierId) throws SQLException {
+        String sql = "SELECT * FROM product_supplier WHERE product_id = ? AND supplier_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productId);
+            pstmt.setInt(2, supplierId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new ProductSupplierDTO(
+                            rs.getInt("product_id"),
+                            rs.getInt("catalog_number"),
+                            rs.getInt("supplier_id"),
+                            rs.getInt("agreement_id"),
+                            rs.getDouble("price"),
+                            rs.getString("unit")
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<ProductSupplierDTO> getProductsByProductID(int productID) throws SQLException {
+        List<ProductSupplierDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM product_supplier WHERE product_id = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productID);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ProductSupplierDTO dto = new ProductSupplierDTO(
+                            rs.getInt("product_id"),
+                            rs.getInt("catalog_number"),
+                            rs.getInt("supplier_id"),
+                            rs.getInt("agreement_id"),
+                            rs.getDouble("price"),       // שים לב: צריך setDouble ולא setInt
+                            rs.getString("unit")
+                    );
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public ProductSupplierDTO getOneProductByProductIDAgreementIDSupplierID(int productId, int supplierId, int agreementId) throws SQLException {
+        return null;
+    }
+
 
     @Override
     public List<ProductSupplierDTO> getProductsByAgreement(int supplier_ID, int agreement_ID) throws SQLException {
@@ -212,6 +268,31 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
         return null;
     }
 
+    @Override
+    public ProductSupplierDTO getOneProductByProductID(int productId, int supplierId) throws SQLException {
+        String sql = "SELECT * FROM product_supplier WHERE product_id = ? AND supplier_id = ? LIMIT 1";
 
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.setInt(2, supplierId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new ProductSupplierDTO(
+                            rs.getInt("catalog_number"),
+                            rs.getInt("product_id"),
+                            rs.getInt("supplier_id"),
+                            rs.getInt("agreement_id"),
+                            rs.getDouble("price"),
+                            rs.getString("unit")
+                    );
+                }
+            }
+        }
+
+        return null; // אם לא נמצא מוצר מתאים
+    }
 
 }

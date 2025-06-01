@@ -1,11 +1,12 @@
 package Suppliers.Presentation;
 
+import Inventory.DAO.JdbcProductDAO;
+import Inventory.DTO.ProductDTO;
 import Suppliers.DTO.AgreementDTO;
-import Suppliers.Domain.Controller;
-import Suppliers.dataaccess.DAO.JdbcAgreementDAO;
-import Suppliers.dataaccess.DAO.JdbcDiscountDAO;
-import Suppliers.dataaccess.DAO.JdbcProductSupplierDAO;
-import Suppliers.dataaccess.DAO.JdbcSupplierDAO;
+import Suppliers.DTO.DiscountDTO;
+import Suppliers.DTO.ProductSupplierDTO;
+import Suppliers.DTO.SupplierDTO;
+import Suppliers.dataaccess.DAO.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,10 +20,15 @@ import java.sql.Statement;
 public class SystemInitializer {
     private final JdbcSupplierDAO supplierDAO;
     private final JdbcAgreementDAO agreementDAO;
+    private final JdbcProductSupplierDAO productSupplierDAO ;
+    private final JdbcDiscountDAO discountDAO;
 
     public SystemInitializer() {
         this.supplierDAO = new JdbcSupplierDAO();
         this.agreementDAO = new JdbcAgreementDAO();
+        this.productSupplierDAO = new JdbcProductSupplierDAO();
+        this.discountDAO = new JdbcDiscountDAO();
+
     }
 
     public static void SystemInitializer() {
@@ -33,6 +39,7 @@ public class SystemInitializer {
         new JdbcAgreementDAO().createTableIfNotExists();
         new JdbcProductSupplierDAO().createProductSupplierTableIfNotExists();
         new JdbcDiscountDAO().createTableIfNotExists();
+        new JdbcOrderDAO().createTableIfNotExists();
     }
 
     public void initializeDatabase(boolean withSampleData) throws SQLException {
@@ -45,26 +52,29 @@ public class SystemInitializer {
     }
 
     private void insertSampleData() throws SQLException {
-//        supplierDAO.insert(new SupplierDTO(1, "ספק ניסיוני", "test@example.com", "123456789"));
-        agreementDAO.insert(new AgreementDTO( 101, new String[]{"Mon", "Wed", "Fri"}, false));
-        agreementDAO.insert(new AgreementDTO( 101, new String[]{"Tue", "Thu"}, true));
-        agreementDAO.insert(new AgreementDTO( 102, new String[]{"Sun", "Wed"}, false));
-        agreementDAO.insert(new AgreementDTO( 103, new String[]{"Mon", "Tue"}, false));
+
+        int supplierID1 =  supplierDAO.insertAndGetID(new SupplierDTO("Prigat", 0123, 9987,"Cash","Prepaid",5551234, "data@mail.com" ));
+        int supplierID2 =  supplierDAO.insertAndGetID(new SupplierDTO("Tnuva", 0124, 9007,"Bank Transfer","Standing Order",5671234, "OneMoreData@mail.com" ));
+        int supplierID3 =  supplierDAO.insertAndGetID(new SupplierDTO("Osem", 0125, 9107,"Bank Transfer","Standing Order",5678234, "BlaBlaData@mail.com" ));
+
+
+        int agreementID1 = agreementDAO.insertAndGetID(new AgreementDTO( supplierID1, new String[]{"Mon", "Wed", "Fri"}, false));
+        int agreementID2 = agreementDAO.insertAndGetID(new AgreementDTO( supplierID2, new String[]{"Tue", "Thu"}, true));
+        int agreementID3 = agreementDAO.insertAndGetID(new AgreementDTO( supplierID3, new String[]{"Sun", "Wed"}, false));
+
+
+        productSupplierDAO.insert(new ProductSupplierDTO(0,1004, 1,agreementID1,6.5,"L"));
+        productSupplierDAO.insert(new ProductSupplierDTO(1,1005, 2,agreementID2,8.0,"g"));
+        productSupplierDAO.insert(new ProductSupplierDTO(2,1006, 3,agreementID3,4.5,"g"));
+
+        discountDAO.insert(new DiscountDTO(1004, 0, 0, 20,10.0 ));
+        discountDAO.insert(new DiscountDTO(1005, 1, 1, 10,5.0 ));
+        discountDAO.insert(new DiscountDTO(1006, 2, 2, 50,15.0 ));
+
 
     }
-    public void clearAllData() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
-             Statement stmt = conn.createStatement()) {
+//                    new ProductDTO(1004, "Orange Juice 1L", "Beverages", "Juices", "Prigat", 1, 6.5, 10.0),
+//                new ProductDTO(1005, "Butter 200g", "Dairy", "Butter", "Tnuva", 1, 8.0, 5.0),
+//                new ProductDTO(1006, "White Rice 1kg", "Grocery", "Rice", "Osem", 1, 4.5, 15.0),
 
-            stmt.execute("DELETE FROM agreements;");
-            stmt.execute("DELETE FROM suppliers;");
-            // הוסף כאן עוד טבלאות אם יש
-
-            System.out.println("All data deleted from tables.");
-
-        } catch (SQLException e) {
-            System.err.println("Failed to clear data from tables:");
-            e.printStackTrace();
-        }
-    }
 }

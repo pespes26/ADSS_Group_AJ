@@ -12,7 +12,6 @@ public class Order {
     private int orderID; // Unique identifier of the order
     private long phoneNumber; // Customer's phone number
     private LocalDateTime orderDate; // The date and time when the order was placed
-    private Map<Integer, Integer> productsInOrder; // Maps productID -> quantity
     private int supplierID;
 
     /**
@@ -27,7 +26,6 @@ public class Order {
         this.orderID = orderID;
         this.phoneNumber = phoneNumber;
         this.orderDate = orderDate;
-        this.productsInOrder = productsInOrder;
         this.supplierID = supplierID;
     }
 
@@ -59,13 +57,6 @@ public class Order {
         return orderDate.format(formatter);
     }
 
-    /**
-     * Returns the map of products in the order.
-     * Each entry maps a product ID to the ordered quantity.
-     *
-     * @return the map of products in the order
-     */
-    public Map<Integer, Integer> getProductsInOrder() {
-        return productsInOrder;
-    }
+
+
 }

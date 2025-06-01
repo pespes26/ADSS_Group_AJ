@@ -1,6 +1,5 @@
 package Suppliers.dataaccess.DAO;
 
-import Inventory.Domain.Discount;
 import Suppliers.DTO.DiscountDTO;
 
 import java.sql.SQLException;
@@ -20,8 +19,10 @@ public interface IDiscountDAO {
     void deleteDiscountForProduct(int productId, int supplierId, int agreementId) throws SQLException;
 
     // שליפת כל ההנחות למוצר מסוים בהסכם
-    List<DiscountDTO> getDiscountsForProduct(int productId, int supplierId, int catalogNumber) throws SQLException;
 
     // שליפת הנחה מתאימה לפי כמות
     DiscountDTO getBestDiscount(int productId, int quantity) throws SQLException;
+    List<DiscountDTO> getDiscountsForProductByID(int productId, int quantity) throws SQLException;
+
+    DiscountDTO getBestMatchingDiscount(int productId, int supplierId, int agreementId, int quantity) throws SQLException;
 }

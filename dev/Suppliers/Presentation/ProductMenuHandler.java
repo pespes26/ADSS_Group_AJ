@@ -2,7 +2,6 @@ package Suppliers.Presentation;
 
 import Suppliers.DTO.DiscountDTO;
 import Suppliers.DTO.ProductSupplierDTO;
-import Suppliers.Domain.Controller;
 import Suppliers.Domain.IProductSupplierRepository;
 import Suppliers.Domain.ProductSupplierManagementController;
 import Suppliers.Domain.ProductSupplierRepositoryImpl;
@@ -92,20 +91,6 @@ public class ProductMenuHandler {
 
     }
 
-//    public static void readAndAddDiscountRules(Scanner scanner, Controller controller, int CatalogNumber,Integer agreementID) {
-//        if (controller.productExistsByCatalog(CatalogNumber)) {
-//            int numOfRules = Inputs.read_int(scanner, "Enter number of discount rules: ");
-//
-//            for (int i = 0; i < numOfRules; i++) {
-//                System.out.println("Discount Rule #" + (i + 1));
-//                int amount = Inputs.read_int(scanner, "Enter minimum amount for discount: ");
-//                double discount = Inputs.read_double(scanner, "Enter discount percentage (e.g., 10 for 10%): ");
-//                controller.updateOrAddDiscountRule(CatalogNumber, discount, amount, agreementID);
-//            }
-//        } else {
-//            System.out.println("Product not found. Cannot add discount rules.");
-//        }
-//    }
 
 
     public static void readAndAddDiscountRules(Scanner scanner, int catalogNumber, int productID, int supplierID, int agreementID) throws SQLException {
@@ -124,15 +109,6 @@ public class ProductMenuHandler {
     }
 
 
-//    public static Integer getProductCatalogNumberFromUser(Controller controller, Scanner scanner) {
-//        int catalogNumber = Inputs.read_int(scanner, "Enter catalogNumber: ");
-//        if (controller.productExistsByCatalog(catalogNumber)) {
-//            return catalogNumber;
-//        } else {
-//            System.out.println("Product not found.");
-//            return null;
-//        }
-//    }
 
     public static void removeProduct(Scanner scanner, int agreementID, int supplierID) throws SQLException {
         List<ProductSupplierDTO> productList = productSupplierManagementController.getProductSuppliers(supplierID, agreementID);
@@ -248,30 +224,6 @@ public class ProductMenuHandler {
         System.out.println("Product unit updated.");
     }
 
-    public static boolean validateProductExistsByID(Controller controller, int productID) {
-        boolean existsProduct = controller.existsProductWithID(productID);
-        if (!existsProduct) {
-            System.out.println("This product does not exist. Try another one.\n");
-        }
-        return existsProduct;
-    }
 
-    public static boolean validateUniqueCatalogNumber(Controller controller, int catalogNumber, int supplierID) {
-        boolean exists = controller.thereIsProductWithSameCatalogNumberInAgreement(catalogNumber, supplierID);
-        if (exists) {
-            System.out.println("This product already exists in an agreement with this supplier. Please enter a different product.\n");
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean validateUniqueProductIDNumber(Controller controller, int productID, int supplierID){
-        boolean exists = controller.thereIsProductWithSameProductIDInAgreement(productID, supplierID);
-        if (exists) {
-            System.out.println("This product already exists in this agreement! Please add other product.\n");
-            return false;
-        }
-        return true;
-    }
 
 }

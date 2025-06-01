@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ISupplierDAO {
     void insert(SupplierDTO dto) throws SQLException;
+    int insertAndGetID(SupplierDTO dto) throws SQLException;
 
     void update(SupplierDTO dto) throws SQLException;
 

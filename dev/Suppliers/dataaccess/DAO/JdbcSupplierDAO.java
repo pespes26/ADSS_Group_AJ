@@ -8,8 +8,6 @@ import java.util.List;
 
 public class JdbcSupplierDAO implements ISupplierDAO {
 
-
-
     private static final String DB_URL = "jdbc:sqlite:suppliers.db";
 
     public void createTableIfNotExists() {
@@ -17,14 +15,14 @@ public class JdbcSupplierDAO implements ISupplierDAO {
              Statement stmt = conn.createStatement()) {
 
             String sql = "CREATE TABLE IF NOT EXISTS suppliers (\n"
-                    + " supplier_id INTEGER PRIMARY KEY,\n"
+                    + " supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + " supplier_name TEXT NOT NULL,\n"
-                    + " company_id TEXT NOT NULL,\n"
-                    + " bank_account TEXT NOT NULL,\n"
+                    + " company_id INTEGER NOT NULL,\n"
+                    + " bank_account INTEGER NOT NULL,\n"
                     + " payment_method TEXT NOT NULL,\n"
                     + " payment_condition TEXT NOT NULL,\n"
-                    + " phone_number TEXT,\n"
-                    + " email TEXT\n"
+                    + " phone_number INTEGER NOT NULL,\n"
+                    + " email TEXT NOT NULL\n"
                     + ");";
 
             stmt.execute(sql);
@@ -35,29 +33,57 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         }
     }
 
-
-
     @Override
     public void insert(SupplierDTO dto) throws SQLException {
-        String sql = "INSERT INTO suppliers (supplier_id, supplier_name, company_id, bank_account, payment_method, payment_condition, phone_number, email) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO suppliers (supplier_name, company_id, bank_account, payment_method, payment_condition, phone_number, email) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, dto.getSupplier_id());                // int
-            pstmt.setString(2, dto.getSupplierName());            // String
-            pstmt.setInt(3, dto.getCompany_id());                 // int
-            pstmt.setInt(4, dto.getBankAccount());                // int
-            pstmt.setString(5, dto.getPaymentMethod());           // String
-            pstmt.setString(6, dto.getPaymentCondition());        // String
-            pstmt.setLong(7, dto.getPhoneNumber());               // long
-            pstmt.setString(8, dto.getEmail());                   // String
+            pstmt.setString(1, dto.getSupplierName());
+            pstmt.setInt(2, dto.getCompany_id());
+            pstmt.setInt(3, dto.getBankAccount());
+            pstmt.setString(4, dto.getPaymentMethod());
+            pstmt.setString(5, dto.getPaymentCondition());
+            pstmt.setLong(6, dto.getPhoneNumber());
+            pstmt.setString(7, dto.getEmail());
 
             pstmt.executeUpdate();
         }
     }
 
+    @Override
+    public int insertAndGetID(SupplierDTO dto) throws SQLException {
+        String sql = "INSERT INTO suppliers (supplier_name, company_id, bank_account, payment_method, payment_condition, phone_number, email) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, dto.getSupplierName());
+                pstmt.setInt(2, dto.getCompany_id());
+                pstmt.setInt(3, dto.getBankAccount());
+                pstmt.setString(4, dto.getPaymentMethod());
+                pstmt.setString(5, dto.getPaymentCondition());
+                pstmt.setLong(6, dto.getPhoneNumber());
+                pstmt.setString(7, dto.getEmail());
+
+                pstmt.executeUpdate();
+            }
+
+            // קבל את ה-ID האחרון שהוזן
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    dto.setSupplier_id(generatedId);
+                    return generatedId;
+                }
+            }
+        }
+
+        return 0;
+    }
 
 
     @Override
@@ -65,7 +91,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         String sql = "UPDATE suppliers SET supplier_name = ?, company_id = ?, bank_account = ?, payment_method = ?, " +
                 "payment_condition = ?, phone_number = ?, email = ? WHERE supplier_id = ?";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, dto.getSupplierName());
@@ -81,12 +107,11 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         }
     }
 
-
     @Override
     public void deleteById(int supplierId) throws SQLException {
         String sql = "DELETE FROM suppliers WHERE supplier_id = ?";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, supplierId);
@@ -94,12 +119,11 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         }
     }
 
-
     @Override
     public SupplierDTO getById(int supplierId) throws SQLException {
         String sql = "SELECT * FROM suppliers WHERE supplier_id = ?";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, supplierId);
@@ -122,13 +146,12 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         }
     }
 
-
     @Override
     public List<SupplierDTO> getAll() throws SQLException {
         List<SupplierDTO> suppliers = new ArrayList<>();
         String sql = "SELECT * FROM suppliers";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -149,7 +172,4 @@ public class JdbcSupplierDAO implements ISupplierDAO {
 
         return suppliers;
     }
-
-
-
 }

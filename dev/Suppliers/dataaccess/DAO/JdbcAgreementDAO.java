@@ -53,6 +53,33 @@ public class JdbcAgreementDAO implements IAgreementDAO {
     }
 
     @Override
+    public int insertAndGetID(AgreementDTO dto) throws SQLException {
+        String sql = "INSERT INTO agreements (supplier_id, self_pickup, delivery_days) VALUES (?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db")) {
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, dto.getSupplier_ID());
+                pstmt.setBoolean(2, dto.isSelfPickup());
+                pstmt.setString(3, String.join(",", dto.getDeliveryDays()));
+                pstmt.executeUpdate();
+            }
+
+            // קבל את ה-ID האחרון שהוזן
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    dto.setAgreement_ID(generatedId);
+                    return generatedId;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+
+    @Override
     public void update(AgreementDTO dto) throws SQLException {
         // מימוש בעתיד אם תרצה עדכון כולל
     }

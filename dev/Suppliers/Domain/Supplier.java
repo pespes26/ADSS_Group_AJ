@@ -7,7 +7,6 @@ import java.util.HashMap;
  * A supplier has basic contact and financial details and can be associated with multiple agreements.
  */
 public class Supplier {
-    private final HashMap<Integer, Agreement> agreements; // Maps agreement ID → Agreement
     String supplierName;
     int supplier_id;
     int company_id;
@@ -38,18 +37,6 @@ public class Supplier {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.paymentCondition = paymentCondition;
-        this.agreements = new HashMap<>();
-    }
-
-    /**
-     * Adds a new agreement to the supplier.
-     *
-     * @param agreement the agreement to be added
-     */
-    public void addNewAgreement(Agreement agreement) { // Not critical, but used to associate agreement with supplier
-        if (agreement != null) {
-            agreements.put(agreement.getAgreementID(), agreement);
-        }
     }
 
     /**
@@ -61,37 +48,4 @@ public class Supplier {
         return supplier_id;
     }
 
-    /**
-     * Removes all agreements associated with the supplier and returns their IDs.
-     *
-     * @return array of removed agreement IDs
-     */
-    public int[] removeAllAgreementFromSupplier() {
-        int size = agreements.size();
-        int[] agreementIDs = new int[size];
-        int i = 0;
-
-        for (Agreement agreement : new HashMap<>(agreements).values()) {
-            int agreement_ID = agreement.getAgreementID();
-            agreements.remove(agreement_ID);
-            agreementIDs[i++] = agreement_ID;
-        }
-        return agreementIDs;
-    }
-
-    /**
-     * Retrieves all agreement IDs associated with this supplier.
-     *
-     * @return array of agreement IDs
-     */
-    public int[] getAllAgreementIDs() {
-        int[] agreementIDs = new int[agreements.size()];
-        int i = 0;
-
-        for (Agreement agreement : agreements.values()) {
-            agreementIDs[i++] = agreement.getAgreementID();
-        }
-
-        return agreementIDs;
-    }
 }

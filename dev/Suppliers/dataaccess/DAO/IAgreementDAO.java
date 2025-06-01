@@ -9,6 +9,8 @@ public interface IAgreementDAO {
 
     void insert(AgreementDTO dto) throws SQLException;
 
+    int insertAndGetID(AgreementDTO dto) throws SQLException;
+
     void update(AgreementDTO dto) throws SQLException;
 
     void deleteById(int agreementId) throws SQLException;

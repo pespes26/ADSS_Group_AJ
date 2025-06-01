@@ -29,7 +29,7 @@ public class MenuController {
         System.out.println("""
     =============================================
     |                                            |
-    |   Welcome to the Inventory Management!     |
+    |   Welcome to the Inventory Module!     |
     |                                            |
     =============================================""");
         System.out.println("        You are currently in Branch #" + current_branch_id);
@@ -53,7 +53,7 @@ public class MenuController {
 
     private void printMenu() {
         System.out.println("""
-    Menu:
+    Inventory Module Menu:
     1. Show item details
     2. Add item(s) to inventory (new or existing product)
     3. Remove an item
@@ -87,8 +87,7 @@ public class MenuController {
             case 12 -> updateProductSupplyAndDemand();
             case 13 -> updateItemStorageLocation();
             case 14 -> {
-                Inventory.Init.DatabaseCleaner.dropAllTables();
-                System.out.println("All database tables have been dropped. Exiting the system.");
+                System.out.println("Exiting the Inventory menu.");
             }
             default -> System.out.println("Invalid option. Please try again.");
         }

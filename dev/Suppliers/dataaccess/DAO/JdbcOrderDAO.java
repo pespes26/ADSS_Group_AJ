@@ -148,4 +148,17 @@ public class JdbcOrderDAO implements IOrderDAO {
 
         return filteredOrders;
     }
+
+    public void clearTable() {
+        String sql = "DELETE FROM orders";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("✅ Cleared all records from 'orders' table.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear 'orders' table: " + e.getMessage());
+        }
+    }
+
+
 }

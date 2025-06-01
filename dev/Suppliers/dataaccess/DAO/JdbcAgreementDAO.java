@@ -206,6 +206,18 @@ public class JdbcAgreementDAO implements IAgreementDAO {
         return agreements;
     }
 
+
+    public void clearTable() {
+        String sql = "DELETE FROM agreements";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("✅ Cleared all records from 'agreements' table.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear 'agreements' table: " + e.getMessage());
+        }
+    }
+
 //    @Override
 //    public List<Integer> getAgreementsIDBySupplierId(int supplierId) throws SQLException {
 //        String sql = "SELECT agreement_id FROM agreements WHERE supplier_id = ?";

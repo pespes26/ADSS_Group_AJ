@@ -1,7 +1,6 @@
 package Inventory.Init;
 
 import Inventory.DAO.*;
-import Inventory.Domain.InventoryController;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 
@@ -12,23 +11,8 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
-public class SystemInitializer {
+public class InventoryInitializer {
 
-    public static InventoryController initializeSystemFromDatabase() {
-        System.out.println("Initializing the system from the database...");
-
-        initializeAllTables();
-
-        preloadAllInitialData();
-
-        InventoryController controller = new InventoryController();
-        controller.loadFromDatabase();
-
-        controller.getProductController().updateAllProductQuantities();
-
-        System.out.println("System initialized successfully from the database.");
-        return controller;
-    }
 
     public static void initializeAllTables() {
         System.out.println("Creating all necessary tables using DAO static initializers...");
@@ -42,11 +26,11 @@ public class SystemInitializer {
     public static void preloadProducts() {
         JdbcProductDAO productDAO = new JdbcProductDAO();
         List<ProductDTO> products = Arrays.asList(
-                new ProductDTO(1004, "Orange Juice 1L", "Beverages", "Juices", "Prigat", 1, 6.5, 10.0, 5.0, "MONDAY", 2),
-                new ProductDTO(1005, "Butter 200g", "Dairy", "Butter", "Tnuva", 1, 8.0, 5.0, 3.0, "TUESDAY", 2),
-                new ProductDTO(1006, "White Rice 1kg", "Grocery", "Rice", "Osem", 1, 4.5, 15.0, 7.0, "WEDNESDAY", 3),
+                new ProductDTO(1004, "Orange Juice 1L", "Beverages", "Juices", "Prigat", 1, 6.5, 10.0, 5.0, "MONDAY, WEDNESDAY, FRIDAY", 2),
+                new ProductDTO(1005, "Butter 200g", "Dairy", "Butter", "Tnuva", 1, 8.0, 5.0, 3.0, "TUESDAY, THURSDAY", 2),
+                new ProductDTO(1006, "White Rice 1kg", "Grocery", "Rice", "Osem", 1, 4.5, 15.0, 7.0, "Sunday, WEDNESDAY", 3),
                 new ProductDTO(1007, "Tomato Sauce 500ml", "Grocery", "Sauces", "Heinz", 1, 6.0, 8.0, 4.0, "THURSDAY", 3),
-                new ProductDTO(1008, "Yellow Cheese 200g", "Dairy", "Cheese", "Tnuva", 1, 9.5, 12.0, 5.0, "FRIDAY", 4),
+                new ProductDTO(1008, "Yellow Cheese 200g", "Dairy", "Cheese", "Tnuva", 1, 9.5, 12.0, 5.0, "TUESDAY, THURSDAY", 4),
                 new ProductDTO(1009, "Toilet Paper 12-pack", "Household", "Toiletries", "Sano", 2, 20.0, 20.0, 10.0, "MONDAY", 2),
                 new ProductDTO(1010, "Chocolate Bar 100g", "Snacks", "Chocolate", "Elite", 1, 5.0, 7.5, 2.5, "TUESDAY", 1),
                 new ProductDTO(1011, "Mineral Water 1.5L", "Beverages", "Water", "Neviot", 1, 3.0, 5.0, 1.0, "WEDNESDAY", 2),
@@ -138,4 +122,6 @@ public class SystemInitializer {
         preloadItems();
         System.out.println("✅ Preload completed.");
     }
+
+
 }

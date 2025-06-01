@@ -172,4 +172,16 @@ public class JdbcSupplierDAO implements ISupplierDAO {
 
         return suppliers;
     }
+
+    public void clearTable() {
+        String sql = "DELETE FROM suppliers";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("✅ Cleared all records from 'suppliers' table.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear 'suppliers' table: " + e.getMessage());
+        }
+    }
+
 }

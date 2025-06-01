@@ -187,5 +187,18 @@ public class JdbcDiscountDAO implements IDiscountDAO {
     }
 
 
+    public void clearTable() {
+        String sql = "DELETE FROM discounts";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("✅ Cleared all records from 'discounts' table.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear 'discounts' table: " + e.getMessage());
+        }
+    }
+
+
+
 
 }

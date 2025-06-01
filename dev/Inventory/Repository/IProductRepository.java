@@ -1,5 +1,6 @@
 package Inventory.Repository;
 
+import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 
 import java.sql.SQLException;
@@ -81,10 +82,26 @@ public interface IProductRepository {
     /**
      * Updates both the store and warehouse quantities for a product.
      *
-     * @param catalogNumber    The catalog number of the product.
-     * @param storeQuantity    The new store quantity.
+     * @param catalogNumber     The catalog number of the product.
+     * @param storeQuantity     The new store quantity.
      * @param warehouseQuantity The new warehouse quantity.
      * @throws SQLException If a database access error occurs.
      */
     void updateQuantities(int catalogNumber, int storeQuantity, int warehouseQuantity) throws SQLException;
+
+    /**
+     * Updates product quantities based on a list of item entries.
+     *
+     * @param items List of ItemDTOs used to calculate store and warehouse quantities.
+     * @throws SQLException If a database access error occurs.
+     */
+    void updateQuantitiesFromItems(List<ItemDTO> items) throws SQLException;
+
+    void UpdateCostPrice(int catalogNumber, double newCostPrice) throws SQLException;
+
+    void UpdateCalculatedPrices(ProductDTO product) throws SQLException;
+
+    List<ProductDTO> getProductsBySizes(List<Integer> sizes) throws SQLException;
+
+
 }

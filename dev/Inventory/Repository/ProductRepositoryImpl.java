@@ -2,10 +2,13 @@ package Inventory.Repository;
 
 import Inventory.DAO.IProductDAO;
 import Inventory.DAO.JdbcProductDAO;
+import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProductRepositoryImpl implements IProductRepository {
     private final IProductDAO productdao;
@@ -55,6 +58,12 @@ public class ProductRepositoryImpl implements IProductRepository {
     }
 
     @Override
+    public void UpdateCostPrice(int catalogNumber, double newCostPrice) throws SQLException {
+        productdao.UpdateCostPrice(catalogNumber, newCostPrice);
+    }
+
+
+    @Override
     public void updateQuantityInWarehouse(int catalogNumber, int quantity) throws SQLException {
         ProductDTO product = productdao.GetProductByCatalogNumber(catalogNumber);
         if (product != null) {
@@ -71,5 +80,45 @@ public class ProductRepositoryImpl implements IProductRepository {
             product.setQuantityInWarehouse(warehouseQuantity);
             productdao.Update(product);
         }
+    }
+
+    public void updateQuantitiesFromItems(List<ItemDTO> items) throws SQLException {
+        Map<Integer, Integer> storeQuantities = new HashMap<>();
+        Map<Integer, Integer> warehouseQuantities = new HashMap<>();
+
+        for (ItemDTO item : items) {
+            if (item.IsDefective()) continue; // דלג על פגומים
+            int catalog = item.getCatalogNumber();
+            String location = item.getStorageLocation();
+
+            if ("Warehouse".equalsIgnoreCase(location)) {
+                warehouseQuantities.put(catalog, warehouseQuantities.getOrDefault(catalog, 0) + 1);
+            } else if ("InteriorStore".equalsIgnoreCase(location) || "Store".equalsIgnoreCase(location)) {
+                storeQuantities.put(catalog, storeQuantities.getOrDefault(catalog, 0) + 1);
+            }
+        }
+
+        for (Integer catalogNumber : storeQuantities.keySet()) {
+            int storeQty = storeQuantities.getOrDefault(catalogNumber, 0);
+            int warehouseQty = warehouseQuantities.getOrDefault(catalogNumber, 0);
+            updateQuantities(catalogNumber, storeQty, warehouseQty);
+        }
+
+        for (Integer catalogNumber : warehouseQuantities.keySet()) {
+            if (!storeQuantities.containsKey(catalogNumber)) {
+                int warehouseQty = warehouseQuantities.get(catalogNumber);
+                updateQuantities(catalogNumber, 0, warehouseQty);
+            }
+        }
+    }
+
+    @Override
+    public void UpdateCalculatedPrices(ProductDTO product) throws SQLException {
+        productdao.UpdateCalculatedPrices(product);
+    }
+
+    @Override
+    public List<ProductDTO> getProductsBySizes(List<Integer> sizes) throws SQLException {
+        return productdao.getProductsBySizes(sizes);
     }
 }

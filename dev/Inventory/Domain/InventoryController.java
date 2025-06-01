@@ -10,7 +10,9 @@ import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 import Inventory.InventoryUtils.DateUtils;
 import Inventory.Repository.IItemRepository;
+import Inventory.Repository.IProductRepository;
 import Inventory.Repository.ItemRepositoryImpl;
+import Inventory.Repository.ProductRepositoryImpl;
 
 import java.util.List;
 import java.sql.SQLException;
@@ -31,6 +33,8 @@ public class InventoryController {
     private final ProductController product_controller;
     private final DiscountController discount_controller;
     private final ReportController report_controller;
+    private final IProductRepository productRepository;
+
 
     public InventoryController() {
         this.products = new HashMap<>();
@@ -45,10 +49,8 @@ public class InventoryController {
         this.discount_controller = new DiscountController(products);
 
         this.report_controller = new ReportController(branches, products);
+        this.productRepository = new ProductRepositoryImpl();
     }
-
-
-
 
 
     /**
@@ -322,7 +324,9 @@ public class InventoryController {
         product.setMinimumQuantityForAlert(minRequired);
     }
 
-
+    public IProductRepository getProductRepository() {
+        return productRepository;
+    }
 
 
 

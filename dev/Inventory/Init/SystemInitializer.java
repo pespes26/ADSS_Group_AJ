@@ -5,7 +5,10 @@ import Inventory.Domain.InventoryController;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,14 +17,14 @@ public class SystemInitializer {
     public static InventoryController initializeSystemFromDatabase() {
         System.out.println("Initializing the system from the database...");
 
-        DatabaseCleaner.dropAllTables();
-
         initializeAllTables();
 
         preloadAllInitialData();
 
         InventoryController controller = new InventoryController();
         controller.loadFromDatabase();
+
+        controller.getProductController().updateAllProductQuantities();
 
         System.out.println("System initialized successfully from the database.");
         return controller;
@@ -53,7 +56,10 @@ public class SystemInitializer {
 
         for (ProductDTO dto : products) {
             try {
-                productDAO.Insert(dto);
+                if (productDAO.GetProductByCatalogNumber(dto.getCatalogNumber()) == null) {
+                    productDAO.Insert(dto);
+                }
+
             } catch (SQLException e) {
                 System.err.println("❌ Failed to preload product: " + dto.getProductName());
                 e.printStackTrace();
@@ -66,45 +72,63 @@ public class SystemInitializer {
     public static void preloadItems() {
         JdbcItemDAO itemDAO = new JdbcItemDAO();
         List<ItemDTO> items = Arrays.asList(
-                new ItemDTO(1004, 1, "Warehouse", "A1", false, "2025-06-30", null),
-                new ItemDTO(1005, 1, "Store", "B1", false, "2025-07-15", null),
-                new ItemDTO(1006, 1, "Store", "C1", false, "2025-09-10", null),
-                new ItemDTO(1007, 2, "Warehouse", "A2", false, "2025-05-01", null),
-                new ItemDTO(1008, 2, "Store", "B2", false, "2025-06-20", null),
-                new ItemDTO(1009, 2, "Store", "C2", false, "2025-07-25", null),
-                new ItemDTO(1010, 3, "Warehouse", "A3", false, "2025-08-30", null),
-                new ItemDTO(1011, 3, "Store", "B3", false, "2025-10-10", null),
-                new ItemDTO(1012, 3, "Store", "C3", false, "2025-11-15", null),
-                new ItemDTO(1013, 4, "Warehouse", "A4", false, "2025-12-01", null),
-                new ItemDTO(1004, 4, "Store", "B4", false, "2026-01-20", null),
-                new ItemDTO(1005, 4, "Store", "C4", false, "2026-02-28", null),
-                new ItemDTO(1006, 5, "Warehouse", "A5", false, "2025-09-05", null),
-                new ItemDTO(1007, 5, "Store", "B5", false, "2025-10-01", null),
-                new ItemDTO(1008, 5, "Store", "C5", false, "2025-11-11", null),
-                new ItemDTO(1009, 6, "Warehouse", "A6", false, "2025-12-12", null),
-                new ItemDTO(1010, 6, "Store", "B6", false, "2026-01-01", null),
-                new ItemDTO(1011, 6, "Store", "C6", false, "2026-02-14", null),
-                new ItemDTO(1012, 7, "Warehouse", "A7", false, "2026-03-03", null),
-                new ItemDTO(1013, 7, "Store", "B7", false, "2026-04-04", null),
-                new ItemDTO(1004, 7, "Store", "C7", false, "2026-05-05", null),
-                new ItemDTO(1005, 8, "Warehouse", "A8", false, "2026-06-06", null),
-                new ItemDTO(1006, 8, "Store", "B8", false, "2026-07-07", null),
-                new ItemDTO(1007, 8, "Store", "C8", false, "2026-08-08", null),
-                new ItemDTO(1008, 9, "Warehouse", "A9", false, "2026-09-09", null),
-                new ItemDTO(1009, 9, "Store", "B9", false, "2026-10-10", null),
-                new ItemDTO(1010, 9, "Store", "C9", false, "2026-11-11", null),
-                new ItemDTO(1011, 10, "Warehouse", "A10", false, "2026-12-12", null),
-                new ItemDTO(1012, 10, "Store", "B10", false, "2027-01-01", null),
-                new ItemDTO(1013, 10, "Store", "C10", false, "2027-02-02", null)
+                new ItemDTO(1004, 1, "Warehouse", "A1", false, "2025-06-30"),
+                new ItemDTO(1005, 1, "Store", "B1", false, "2025-07-15"),
+                new ItemDTO(1006, 1, "Store", "C1", false, "2025-09-10"),
+                new ItemDTO(1007, 2, "Warehouse", "A2", false, "2025-05-01"),
+                new ItemDTO(1008, 2, "Store", "B2", false, "2025-06-20"),
+                new ItemDTO(1009, 2, "Store", "C2", false, "2025-07-25"),
+                new ItemDTO(1010, 3, "Warehouse", "A3", false, "2025-08-30"),
+                new ItemDTO(1011, 3, "Store", "B3", false, "2025-10-10"),
+                new ItemDTO(1012, 3, "Store", "C3", false, "2025-11-15"),
+                new ItemDTO(1013, 4, "Warehouse", "A4", false, "2025-12-01"),
+                new ItemDTO(1004, 4, "Store", "B4", false, "2026-01-20"),
+                new ItemDTO(1005, 4, "Store", "C4", false, "2026-02-28"),
+                new ItemDTO(1006, 5, "Warehouse", "A5", false, "2025-09-05"),
+                new ItemDTO(1007, 5, "Store", "B5", false, "2025-10-01"),
+                new ItemDTO(1008, 5, "Store", "C5", false, "2025-11-11"),
+                new ItemDTO(1009, 6, "Warehouse", "A6", false, "2025-12-12"),
+                new ItemDTO(1010, 6, "Store", "B6", false, "2026-01-01"),
+                new ItemDTO(1011, 6, "Store", "C6", false, "2026-02-14"),
+                new ItemDTO(1012, 7, "Warehouse", "A7", false, "2026-03-03"),
+                new ItemDTO(1013, 7, "Store", "B7", false, "2026-04-04"),
+                new ItemDTO(1004, 7, "Store", "C7", false, "2026-05-05"),
+                new ItemDTO(1005, 8, "Warehouse", "A8", false, "2026-06-06"),
+                new ItemDTO(1006, 8, "Store", "B8", false, "2026-07-07"),
+                new ItemDTO(1007, 8, "Store", "C8", false, "2026-08-08"),
+                new ItemDTO(1008, 9, "Warehouse", "A9", false, "2026-09-09"),
+                new ItemDTO(1009, 9, "Store", "B9", false, "2026-10-10"),
+                new ItemDTO(1010, 9, "Store", "C9", false, "2026-11-11"),
+                new ItemDTO(1011, 10, "Warehouse", "A10", false, "2026-12-12"),
+                new ItemDTO(1012, 10, "Store", "B10", false, "2027-01-01"),
+                new ItemDTO(1013, 10, "Store", "C10", false, "2027-02-02")
         );
 
         for (ItemDTO item : items) {
             try {
                 itemDAO.Insert(item);
-                item.setItemId(itemDAO.GetId(item));
-            } catch (SQLException e) {
-                System.err.println("Failed to insert item with catalog number: " + item.getCatalogNumber());
+            } catch (Exception e) {
+                System.err.println("❌ Failed to preload item: " + e.getMessage());
             }
+        }
+    }
+
+    public static void clearAllTables() {
+        String url = "jdbc:sqlite:Inventory.db";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+
+            // סדר המחיקות חשוב
+            stmt.executeUpdate("DELETE FROM items");
+            stmt.executeUpdate("DELETE FROM sold_items");
+            stmt.executeUpdate("DELETE FROM periodic_orders");
+            stmt.executeUpdate("DELETE FROM orders_on_the_way");
+            stmt.executeUpdate("DELETE FROM products");
+
+            System.out.println("🧹 All existing table data has been cleared.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear table data: " + e.getMessage());
         }
     }
 

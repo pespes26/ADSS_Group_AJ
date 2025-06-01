@@ -2,12 +2,16 @@ package Inventory.Domain;
 
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
+import Inventory.DTO.SoldItemDTO;
 import Inventory.Repository.IProductRepository;
 import Inventory.Repository.ItemRepositoryImpl;
+import Inventory.Repository.IItemRepository;
 import Inventory.Repository.ProductRepositoryImpl;
+import Inventory.Repository.ISoldItemRepository;
+import Inventory.Repository.SoldItemRepositoryImpl;
+
 
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +23,9 @@ import java.util.List;
  * and tracking purchased items.
  */
 public class ProductController {
+    private final IItemRepository itemRepository;
     private final IProductRepository productRepository;
+    private final ISoldItemRepository soldItemRepository;
     private final HashMap<Integer, Product> products; // Map of all products, keyed by catalog number
     private final HashMap<Integer, ItemDTO> purchased_items; // Map of purchased items, keyed by item ID
     private final HashMap<Integer, Branch> branches; // Map of all branches, keyed by branch ID
@@ -35,6 +41,9 @@ public class ProductController {
         this.purchased_items = purchased_items;
         this.branches = new HashMap<>();
         this.productRepository = new ProductRepositoryImpl();
+        this.itemRepository = new ItemRepositoryImpl();
+        this.soldItemRepository = new SoldItemRepositoryImpl();
+
     }
 
     /**
@@ -48,32 +57,30 @@ public class ProductController {
         this.branches.putAll(branches);
     }
 
-    /**
-     * Updates the cost price of a product identified by catalog number and recalculates
-     * all derived prices based on the product's supplier and store discounts.
-     *
-     * @param catalog_number the catalog number of the product to update
-     * @param new_price the new base cost price of the product
-     * @return true if the product was found and updated; false otherwise
-     * @throws SQLException if an error occurs while persisting changes to the database
-     */
+
+
     public boolean updateCostPriceByCatalogNumber(int catalog_number, double new_price) throws SQLException {
-        boolean found = false;
-        for (Product p : products.values()) {
-            if (p.getCatalogNumber() == catalog_number) {
-                p.setCostPriceBeforeSupplierDiscount(new_price);
-                double costAfter = new_price * (1 - p.getSupplierDiscount() / 100.0);
-                p.setCostPriceAfterSupplierDiscount(costAfter);
-
-                double saleBefore = costAfter * 2;
-                double saleAfter = saleBefore * (1 - p.getStoreDiscount() / 100.0);
-                p.setSalePriceBeforeStoreDiscount(saleBefore);
-                p.setSalePriceAfterStoreDiscount(saleAfter);
-
-                found = true;
-            }
+        ProductDTO product = productRepository.getProductByCatalogNumber(catalog_number);
+        if (product == null) {
+            return false;
         }
-        return found;
+
+        // Update business logic prices
+        product.setCostPriceBeforeSupplierDiscount(new_price);
+
+        double costAfter = new_price * (1 - product.getSupplierDiscount() / 100.0);
+        product.setCostPriceAfterSupplierDiscount(costAfter);
+
+        double saleBefore = costAfter * 2;
+        double saleAfter = saleBefore * (1 - product.getStoreDiscount() / 100.0);
+        product.setSalePriceBeforeStoreDiscount(saleBefore);
+        product.setSalePriceAfterStoreDiscount(saleAfter);
+
+        // Update the database
+        productRepository.UpdateCostPrice(catalog_number, new_price);  // רק מחיר העלות
+        productRepository.UpdateCalculatedPrices(product);             // כל השאר (נוכל גם לאחד אותם)
+
+        return true;
     }
 
 
@@ -136,15 +143,7 @@ public class ProductController {
         return !products.containsKey(catalog_number);
     }
 
-    /**
-     * Retrieves the count of non-defective items for a specific product in the specified branch,
-     * separated into warehouse and store quantities, using data from the database (via ItemRepository).
-     *
-     * @param catalog_number the catalog number of the product to query
-     * @param branch_id      the ID of the branch in which to count items
-     * @return a formatted string indicating warehouse and store quantities,
-     *         or an error message if the product does not exist or no items are found
-     */
+
     public String showProductQuantities(int catalog_number, int branch_id) {
         ProductDTO productDTO;
         try {
@@ -187,35 +186,32 @@ public class ProductController {
                 + "Store quantity: " + store_quantity;
     }
 
-    public String showProductPurchasesPrices(int catalog_number, int currentBranchId) {
-        DecimalFormat df = new DecimalFormat("#.00");
+
+    public String showProductPurchasesPrices(int catalogNumber, int branchId) {
+        List<SoldItemDTO> sales = soldItemRepository.getSalesByCatalogAndBranch(catalogNumber, branchId);
+
+        if (sales.isEmpty()) {
+            return "No purchases found for Product Catalog Number " + catalogNumber + " in Branch " + branchId + ".";
+        }
+
         StringBuilder result = new StringBuilder();
-        boolean found = false;
-        int count = 1;
+        result.append("Sale prices for Product Catalog Number ")
+                .append(catalogNumber)
+                .append(" (Branch ").append(branchId).append("):\n");
 
-        for (ItemDTO item : purchased_items.values()) {
-            if (item.getCatalogNumber() == catalog_number && item.getBranchId() == currentBranchId) {
-                Product product = products.get(catalog_number);
-                if (product != null) {
-                    found = true;
-                    result.append(count++).append(". ")
-                            .append(df.format(product.getSalePriceAfterStoreDiscount()))
-                            .append(" ₪ (Sale Date: ");
-                    if (item.getSale_date() != null) {
-                        result.append(item.getSale_date().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                    } else {
-                        result.append("No Date");
-                    }
-                    result.append(")\n");
-                }
-            }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (int i = 0; i < sales.size(); i++) {
+            SoldItemDTO sale = sales.get(i);
+            result.append(i + 1)
+                    .append(". ")
+                    .append(String.format("%.2f", sale.getSalePrice()))
+                    .append(" ₪ (Sale Date: ")
+                    .append(sale.getSaleDate().format(formatter))
+                    .append(")\n");
         }
 
-        if (!found) {
-            return "No purchased items found in Branch " + currentBranchId + " with Product Catalog Number: " + catalog_number;
-        }
-
-        return "Sale prices for Product Catalog Number " + catalog_number + " (Branch " + currentBranchId + "):\n" + result;
+        return result.toString();
     }
 
     /**
@@ -233,6 +229,20 @@ public class ProductController {
 
     public boolean productExists(int catalogNumber) {
         return products.containsKey(catalogNumber);
+    }
+
+    public void updateAllProductQuantities() {
+        try {
+            // שלוף את כל הפריטים מה־DB
+            List<ItemDTO> items = itemRepository.getAllItems();
+
+            // שלח את הרשימה לרפוזיטורי כדי שיחשב ויעדכן כמויות בטבלת products
+            productRepository.updateQuantitiesFromItems(items);
+
+            System.out.println("✅ Product quantities updated in database.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to update product quantities: " + e.getMessage());
+        }
     }
 
 }

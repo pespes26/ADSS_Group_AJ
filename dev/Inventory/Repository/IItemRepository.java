@@ -2,6 +2,8 @@ package Inventory.Repository;
 
 import Inventory.DTO.ItemDTO;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -57,4 +59,14 @@ public interface IItemRepository {
      * @return list of defective item DTOs
      */
     List<ItemDTO> getDefectiveItems();
+
+    List<ItemDTO> getItemsByBranchId(int branchId);
+
+    void markItemAsDefective(int itemId, int branchId) throws SQLException;
+
+    List<ItemDTO> getItemsByBranch(int branchId) throws SQLException;
+
+    List<ItemDTO> getExpiredItemsByBranchId(int branchId, LocalDate today) throws SQLException;
+
+
 }

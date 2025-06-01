@@ -41,11 +41,13 @@ public class InventorySupplierMainMenu {
                     SystemInitializer.preloadItems();
                     System.out.println("✅ Preload completed.");
 
-                    // Load data from database into controller
                     inventoryController.loadFromDatabase();
                 } else if (dataChoice == 2) {
+                    // ⬅️ כאן תכניס את השורה החדשה
+                    SystemInitializer.clearAllTables();
+
                     System.out.println("Starting with empty inventory system.");
-                    // Tables are already initialized but empty - no need to load or preload data
+                    // אין צורך לטעון נתונים – התחל ריק
                 } else {
                     System.out.println("Invalid choice. Starting with empty system by default.");
                 }

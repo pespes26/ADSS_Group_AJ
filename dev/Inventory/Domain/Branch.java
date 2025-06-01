@@ -97,4 +97,14 @@ public class Branch {
             }
             System.out.println("Loaded " + itemsFromDB.size() + " items into branch.");
     }
+
+    public boolean isCriticalStockLevel(int catalogNumber, int minRequired) {
+        int total = 0;
+        for (ItemDTO item : items.values()) {
+            if (item.getCatalogNumber() == catalogNumber && !item.IsDefective()) {
+                total++;
+            }
+        }
+        return total < minRequired;
+    }
 }

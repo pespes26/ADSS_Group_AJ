@@ -29,13 +29,7 @@ Make sure the following are installed on your system:
 
 1. **Clone or download** this project.
 2. Open the project in your Java IDE (e.g., IntelliJ).
-3. Run the main class:
-
-ControllerInventorySupplier.InventorySupplierMainMenu
-
-yaml
-Copy
-Edit
+3. Run the main class: ControllerInventorySupplier.InventorySupplierMainMenu
 
 ---
 
@@ -45,15 +39,9 @@ After launching, you'll see:
 
 Welcome to the Inventory-Suppliers Menu! What would you like to manage?
 
-Inventory System
-
-Supplier System
-
-Exit the Inventory-Suppliers system
-
-yaml
-Copy
-Edit
+    1.Inventory System
+    2.Supplier System
+    3.Exit the Inventory-Suppliers system
 
 Choose one of the options:
 
@@ -179,7 +167,6 @@ When the system is first launched, all necessary tables are created automaticall
 | Heinz         | 0126    | Cash, Prepaid      | THURSDAY                   |
 | Sano          | 0127    | Bank Transfer      | MONDAY                     |
 
-> For full preload data, see `InventoryInitializer.preloadProducts()` and `SuppliersInitializer.insertSampleData()`.
 
 ---
 

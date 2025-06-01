@@ -1,8 +1,7 @@
 package Inventory.Tests;
-
 import Inventory.Domain.Product;
 import org.junit.Test;
-
+import Inventory.InventoryUtils.DateUtils;
 import static org.junit.Assert.*;
 
 /**
@@ -22,29 +21,33 @@ public class ProductTest {
         p.setCategory("Dairy");
         p.setSubCategory("Low Fat");
         p.setSize(2);
-        p.setManufacturer("Tnuva");
+        p.setSupplierName("Tnuva");
 
         assertEquals("Catalog number should be 1001", 1001, p.getCatalogNumber());
         assertEquals("Product name should be 'Milk'", "Milk", p.getProductName());
         assertEquals("Category should be 'Dairy'", "Dairy", p.getCategory());
         assertEquals("Sub-category should be 'Low Fat'", "Low Fat", p.getSubCategory());
         assertEquals("Size should be 2", 2, p.getSize());
-        assertEquals("Manufacturer should be 'Tnuva'", "Tnuva", p.getManufacturer());
+        assertEquals("SupplierName should be 'Tnuva'", "Tnuva", p.getSupplierName());
     }
 
     /**
-     * Verifies that supply and demand-related fields can be updated and retrieved correctly.
+     * Verifies that supply and demand-related fields can be updated and retrieved correctly,
+     * including calculated supplyTime based on supplyDaysInWeek.
      */
     @Test
     public void testDemandAndSupplyFields() {
         Product p = new Product();
         p.setProductDemandLevel(4);
-        p.setSupplyTime(3);
-        p.setMinimumQuantityForAlert(5);
+        p.setSupplyDaysInTheWeek("WEDNESDAY"); // must match DayOfWeek enum names
 
         assertEquals("Demand level should be 4", 4, p.getProductDemandLevel());
-        assertEquals("Supply time should be 3", 3, p.getSupplyTime());
-        assertEquals("Minimum quantity for alert should be 5", 5, p.getMinimumQuantityForAlert());
+
+        int expectedSupplyTime = DateUtils.calculateNextSupplyDayOffset("WEDNESDAY");
+        assertEquals("Supply time should match calculated offset", expectedSupplyTime, p.getSupplyTime());
+
+        int expectedMinQty = (int) (0.5 * 4 + 0.5 * expectedSupplyTime);
+        assertEquals("Minimum quantity for alert should match expected", expectedMinQty, p.getMinimumQuantityForAlert());
     }
 
     /**

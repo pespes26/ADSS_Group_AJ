@@ -8,9 +8,14 @@ import Inventory.DAO.JdbcItemDAO;
 import Inventory.DAO.JdbcProductDAO;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
+import Inventory.InventoryUtils.DateUtils;
+import Inventory.Repository.IItemRepository;
+import Inventory.Repository.ItemRepositoryImpl;
 
+import java.util.List;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -19,24 +24,26 @@ import java.util.*;
  */
 
 public class InventoryController {
+    private final HashMap<Integer, Product> products;
+    private final HashMap<Integer, Branch> branches;
+    private final HashMap<String, HashMap<String, HashMap<String, Integer>>> products_amount_map_by_category;
     private final ItemController item_controller;
     private final ProductController product_controller;
     private final DiscountController discount_controller;
     private final ReportController report_controller;
-
-    private final HashMap<Integer, Product> products;
-    private final HashMap<Integer, Branch> branches;
-    private final HashMap<String, HashMap<String, HashMap<String, HashMap<String, Integer>>>> products_amount_map_by_category;
 
     public InventoryController() {
         this.products = new HashMap<>();
         this.branches = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
 
-        HashMap<Integer, ItemDTO> purchased_items = new HashMap<Integer, ItemDTO>();
+        HashMap<Integer, ItemDTO> purchased_items = new HashMap<>();
         this.item_controller = new ItemController(branches, products, purchased_items);
         this.product_controller = new ProductController(products, purchased_items);
+
+        int defaultBranchId = 1; // אם אין לך branchId דינאמי עדיין
         this.discount_controller = new DiscountController(products);
+
         this.report_controller = new ReportController(branches, products);
     }
 
@@ -56,45 +63,39 @@ public class InventoryController {
         return branches;
     }
 
-    /**
-     * Updates the stock count of a product in a specific branch and location.
-     * <p>
-     * Supports adding or removing items based on category, sub-category, size, and location.
-     * Also updates product warehouse/store quantities accordingly.
-     *
-     * @param add true to add stock, false to remove stock
-     * @param branchId the ID of the branch where the update applies
-     * @param category the product's category
-     * @param sub_category the product's sub-category
-     * @param size the size of the product
-     * @param location the location ("Warehouse" or "InteriorStore")
-     */
-    public void updateProductInventoryCount(boolean add, int branchId, String category, String sub_category, String size, String location) {
+
+    public void updateProductInventoryCount(boolean add, int branchId, String category, String subCategory, String size, String location) {
+        // Ensure nested structure exists
         products_amount_map_by_category.putIfAbsent(category, new HashMap<>());
-        HashMap<String, HashMap<String, HashMap<String, Integer>>> subCategoryMap = products_amount_map_by_category.get(category);
-        subCategoryMap.putIfAbsent(sub_category, new HashMap<>());
-        HashMap<String, HashMap<String, Integer>> sizeMap = subCategoryMap.get(sub_category);
-        sizeMap.putIfAbsent(size, new HashMap<>());
-        HashMap<String, Integer> locationMap = sizeMap.get(size);
+        HashMap<String, HashMap<String, Integer>> subCategoryMap = products_amount_map_by_category.get(category);
 
-        if (add) {
-            locationMap.put(location, locationMap.getOrDefault(location, 0) + 1);
-            locationMap.putIfAbsent(location.equalsIgnoreCase("warehouse") ? "interiorStore" : "warehouse", 0);
-        } else {
-            locationMap.put(location, locationMap.getOrDefault(location, 0) - 1);
-        }
+        subCategoryMap.putIfAbsent(subCategory, new HashMap<>());
+        HashMap<String, Integer> sizeMap = subCategoryMap.get(subCategory);
 
-        Branch branch = branches.get(branchId);
-        if (branch != null) {
-            for (ItemDTO item : branch.getItems().values()) {
-                Product product = products.get(item.getCatalogNumber());
-                if (product != null && product.getCategory().equalsIgnoreCase(category)
-                        && product.getSubCategory().equalsIgnoreCase(sub_category)) {
-                    if (location.equalsIgnoreCase("Warehouse")) {
-                        product.setQuantityInWarehouse(add ? product.getQuantityInWarehouse() + 1 : product.getQuantityInWarehouse() - 1);
-                    } else if (location.equalsIgnoreCase("interiorStore")) {
-                        product.setQuantityInStore(add ? product.getQuantityInStore() + 1 : product.getQuantityInStore() - 1);
-                    }
+        sizeMap.putIfAbsent(size, 0);
+        sizeMap.put(size, sizeMap.get(size) + (add ? 1 : -1));
+
+        // Update quantities in Product object using DB repository
+        IItemRepository itemRepo = new ItemRepositoryImpl();
+        List<ItemDTO> items = itemRepo.getAllItems().stream()
+                .filter(i -> i.getBranchId() == branchId)
+                .collect(Collectors.toList());
+
+        for (ItemDTO item : items) {
+            Product product = products.get(item.getCatalogNumber());
+            if (product != null
+                    && product.getCategory().equalsIgnoreCase(category)
+                    && product.getSubCategory().equalsIgnoreCase(subCategory)
+                    && String.valueOf(product.getSize()).equals(size)) {
+
+                if (location.equalsIgnoreCase("Warehouse")) {
+                    product.setQuantityInWarehouse(
+                            Math.max(0, product.getQuantityInWarehouse() + (add ? 1 : -1))
+                    );
+                } else if (location.equalsIgnoreCase("InteriorStore")) {
+                    product.setQuantityInStore(
+                            Math.max(0, product.getQuantityInStore() + (add ? 1 : -1))
+                    );
                 }
             }
         }
@@ -117,8 +118,8 @@ public class InventoryController {
                 product.setCategory(dto.getCategory());
                 product.setSubCategory(dto.getSubCategory());
                 product.setProductDemandLevel(dto.getProductDemandLevel());
-                product.setSupplyTime(dto.getSupplyTime());
-                product.setManufacturer(dto.getManufacturer());
+                product.setSupplyDaysInTheWeek(dto.getSupplyDaysInWeek());
+                product.setSupplierName(dto.getSupplierName());
                 product.setSize(dto.getSize());
                 product.setCostPriceBeforeSupplierDiscount(dto.getCostPriceBeforeSupplierDiscount());
                 product.setSupplierDiscount(dto.getSupplierDiscount());
@@ -214,13 +215,6 @@ public class InventoryController {
         return report_controller;
     }
 
-    /**
-     * Handles the full process of adding a new product and its associated items to the inventory.
-     *
-     * @param catalogNumber the new product's catalog number
-     * @param branchId the branch ID where the items will be stored
-     * @param scan the Scanner object for reading user input
-     */
     public void addNewProductAndItems(int catalogNumber, int branchId, Scanner scan) {
         System.out.println("Product with Catalog Number " + catalogNumber + " does not exist.");
         System.out.println("Please enter full product details.");
@@ -244,11 +238,11 @@ public class InventoryController {
         System.out.print("Enter Product Demand Level (1–5): ");
         int demandLevel = Integer.parseInt(scan.nextLine().trim());
 
-        System.out.print("Enter Supply Time (days): ");
-        int supplyTime = Integer.parseInt(scan.nextLine().trim());
+        System.out.print("Enter Supply Days In The Week (e.g., Sunday,Wednesday): ");
+        String supplyDays = scan.nextLine().trim();
 
-        System.out.print("Enter Manufacturer: ");
-        String manufacturer = scan.nextLine().trim();
+        System.out.print("Enter Supplier Name: ");
+        String supplierName = scan.nextLine().trim();
 
         System.out.print("Enter Supplier Discount (%): ");
         int supplierDiscount = Integer.parseInt(scan.nextLine().trim());
@@ -256,14 +250,10 @@ public class InventoryController {
         System.out.print("Enter Store Discount (%): ");
         int storeDiscount = Integer.parseInt(scan.nextLine().trim());
 
-        // Calculate final prices
-        double costAfterSupplierDiscount = costPriceBefore * (1 - supplierDiscount / 100.0);
-        double salePriceBeforeStoreDiscount = costAfterSupplierDiscount * 2;
-        double salePriceAfterStoreDiscount = salePriceBeforeStoreDiscount * (1 - storeDiscount / 100.0);
-
+        // Create and populate new Product object
         Product newProduct = new Product();
         populateProductData(newProduct, catalogNumber, productName, category, subCategory,
-                demandLevel, supplyTime, manufacturer,
+                demandLevel, supplyDays, supplierName,
                 costPriceBefore, supplierDiscount, storeDiscount, size);
 
         // Add the new product to the system
@@ -300,24 +290,9 @@ public class InventoryController {
     }
 
 
-    /**
-     * Populates a Product object with all its fields based on the provided data.
-     *
-     * @param product The product to populate.
-     * @param catalogNumber Catalog number.
-     * @param productName Product name.
-     * @param category Category.
-     * @param subCategory Sub-category.
-     * @param demandLevel Demand level (1–5).
-     * @param supplyTime Supply time (days).
-     * @param manufacturer Manufacturer name.
-     * @param costPriceBefore Cost price before supplier discount.
-     * @param supplierDiscount Supplier discount (%).
-     * @param storeDiscount Store discount (%).
-     * @param size Product size.
-     */
+
     private void populateProductData(Product product, int catalogNumber, String productName, String category, String subCategory,
-                                     int demandLevel, int supplyTime, String manufacturer,
+                                     int demandLevel, String supplyDaysInWeek, String supplierName,
                                      double costPriceBefore, int supplierDiscount, int storeDiscount, int size) {
 
         product.setCatalogNumber(catalogNumber);
@@ -325,8 +300,8 @@ public class InventoryController {
         product.setCategory(category);
         product.setSubCategory(subCategory);
         product.setProductDemandLevel(demandLevel);
-        product.setSupplyTime(supplyTime);
-        product.setManufacturer(manufacturer);
+        product.setSupplyDaysInTheWeek(supplyDaysInWeek);
+        product.setSupplierName(supplierName);
         product.setSize(size);
 
         double costAfterSupplierDiscount = costPriceBefore * (1 - supplierDiscount / 100.0);
@@ -342,9 +317,12 @@ public class InventoryController {
         product.setQuantityInWarehouse(0);
         product.setQuantityInStore(0);
 
-        int minRequired = (int) (0.5 * demandLevel + 0.5 * supplyTime);
+        int calculatedSupplyTime = DateUtils.calculateNextSupplyDayOffset(supplyDaysInWeek);
+        int minRequired = (int) (0.5 * demandLevel + 0.5 * calculatedSupplyTime);
         product.setMinimumQuantityForAlert(minRequired);
     }
+
+
 
 
 

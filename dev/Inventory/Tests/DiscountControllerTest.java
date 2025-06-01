@@ -28,9 +28,15 @@ public class DiscountControllerTest {
         product.setCatalogNumber(101);
         product.setCategory("Snacks");
         product.setSubCategory("Chips");
+        product.setSize(1);
         product.setCostPriceBeforeSupplierDiscount(50.0);
+        product.setSupplierDiscount(0.0);
+        product.setStoreDiscount(0.0);
+        product.setBranchId(1); // חדש
+
         products.put(101, product);
 
+        int currentBranchId = 1; // או כל מזהה סניף שאתה רוצה לבדוק
         discountController = new DiscountController(products);
     }
 

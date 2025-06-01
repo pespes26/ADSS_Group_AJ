@@ -1,10 +1,17 @@
 package Inventory.Domain;
+
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
+import Inventory.Repository.IProductRepository;
+import Inventory.Repository.ItemRepositoryImpl;
+import Inventory.Repository.ProductRepositoryImpl;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Controller responsible for managing products in the inventory system.
@@ -12,7 +19,7 @@ import java.util.HashMap;
  * and tracking purchased items.
  */
 public class ProductController {
-    private final ProductRepository productRepository;
+    private final IProductRepository productRepository;
     private final HashMap<Integer, Product> products; // Map of all products, keyed by catalog number
     private final HashMap<Integer, ItemDTO> purchased_items; // Map of purchased items, keyed by item ID
     private final HashMap<Integer, Branch> branches; // Map of all branches, keyed by branch ID
@@ -21,18 +28,20 @@ public class ProductController {
      * Constructs a ProductController with given maps of products and purchased items.
      *
      * @param products A map of all products, keyed by catalog number.
-     * @param purchased_items A map of all purchased items, keyed by catalog number.
+     * @param purchased_items A map of all purchased items, keyed by item ID.
      */
     public ProductController(HashMap<Integer, Product> products, HashMap<Integer, ItemDTO> purchased_items) {
         this.products = products;
         this.purchased_items = purchased_items;
         this.branches = new HashMap<>();
-        this.productRepository=new ProductRepositoryImpl();
+        this.productRepository = new ProductRepositoryImpl();
     }
 
     /**
-     * Injects the branches map (needed to properly calculate per-branch operations).
-     * This must be called once during system initialization.
+     * Sets the branch mapping for the system. This method clears the existing branches
+     * and replaces them with the provided mapping.
+     *
+     * @param branches a HashMap containing Branch objects, keyed by branch ID
      */
     public void setBranches(HashMap<Integer, Branch> branches) {
         this.branches.clear();
@@ -40,14 +49,15 @@ public class ProductController {
     }
 
     /**
-     * Updates the cost price of a product by its catalog number.
-     * Also recalculates the cost price after supplier discount and sale prices.
+     * Updates the cost price of a product identified by catalog number and recalculates
+     * all derived prices based on the product's supplier and store discounts.
      *
-     * @param catalog_number The catalog number of the product to update.
-     * @param new_price The new base cost price (before supplier discount).
-     * @return true if a matching product was found and updated, false otherwise.
+     * @param catalog_number the catalog number of the product to update
+     * @param new_price the new base cost price of the product
+     * @return true if the product was found and updated; false otherwise
+     * @throws SQLException if an error occurs while persisting changes to the database
      */
-    public boolean updateCostPriceByCatalogNumber(int catalog_number, double new_price) {
+    public boolean updateCostPriceByCatalogNumber(int catalog_number, double new_price) throws SQLException {
         boolean found = false;
         for (Product p : products.values()) {
             if (p.getCatalogNumber() == catalog_number) {
@@ -66,107 +76,102 @@ public class ProductController {
         return found;
     }
 
-    /**
-     * Updates the supply time and/or demand level for a specific product.
-     *
-     * @param catalog_number The catalog number of the product to update.
-     * @param supply_time The new supply time in days. If null, this value is not updated.
-     * @param demand The new demand level. If null, this value is not updated.
-     * @return true if the product was found and updated, false otherwise.
-     */
-    public boolean updateProductSupplyDetails(int catalog_number, Integer supply_time, Integer demand) {
+
+    public boolean updateProductSupplyDetails(int catalog_number, String supplyDaysInTheWeek, Integer demand) throws SQLException {
         Product product = products.get(catalog_number);
+        if (product == null) return false;
 
-
-
-
-        if (product == null) {
-            return false;
-        }
-
-        if (supply_time != null) {
-            product.setSupplyTime(supply_time);
-        }
-        if (demand != null) {
+        if (supplyDaysInTheWeek != null)
+            product.setSupplyDaysInTheWeek(supplyDaysInTheWeek);
+        if (demand != null)
             product.setProductDemandLevel(demand);
-        }
-        ProductDTO dto=new ProductDTO(product.getCatalogNumber(),product.getProductName(),product.getCategory(),product.getSubCategory(),product.getManufacturer(),product.getSize(),product.getCostPriceBeforeSupplierDiscount(),product.getSupplierDiscount());
-        dto.setSupplyTime(supply_time);
-        dto.setProductDemandLevel(demand);
-        ProductRepository a=new ProductRepositoryImpl();
-        a.UpdateProduct(dto);
+
+        ProductDTO dto = new ProductDTO(
+                product.getCatalogNumber(),
+                product.getProductName(),
+                product.getCategory(),
+                product.getSubCategory(),
+                product.getSupplierName(),
+                product.getSize(),
+                product.getCostPriceBeforeSupplierDiscount(),
+                product.getSupplierDiscount(),
+                product.getStoreDiscount(),
+                product.getSupplyDaysInTheWeek(),
+                product.getProductDemandLevel()
+        );
+
+        productRepository.updateProduct(dto);
         return true;
     }
 
     /**
-     * Checks if there is at least one product with the given category.
+     * Checks whether at least one product exists with the given category.
      *
-     * @param category The category name to search for.
-     * @return true if a product with the given category exists, false otherwise.
+     * @param category the category name to check
+     * @return true if a product with the specified category is found; false otherwise
      */
     public boolean hasCategory(String category) {
-        for (Product product : products.values()) {
-            if (product.getCategory().equalsIgnoreCase(category)) {
-                return true;
-            }
-        }
-        return false;
+        return products.values().stream()
+                .anyMatch(product -> product.getCategory().equalsIgnoreCase(category));
     }
 
     /**
-     * Checks if there is at least one product with the given subcategory.
+     * Checks whether at least one product exists with the given sub-category.
      *
-     * @param sub_category The subcategory name to search for.
-     * @return true if a product with the given subcategory exists, false otherwise.
+     * @param sub_category the sub-category name to check
+     * @return true if a product with the specified sub-category is found; false otherwise
      */
     public boolean hasSubCategory(String sub_category) {
-        for (Product product : products.values()) {
-            if (product.getSubCategory().equalsIgnoreCase(sub_category)) {
-                return true;
-            }
-        }
-        return false;
+        return products.values().stream()
+                .anyMatch(product -> product.getSubCategory().equalsIgnoreCase(sub_category));
     }
 
     /**
-     * Checks whether a given catalog number does not exist in the product inventory.
+     * Determines if a given catalog number does not exist in the product inventory.
      *
-     * @param catalog_number The catalog number to check.
-     * @return true if the catalog number is not found in the product list, false otherwise.
+     * @param catalog_number the catalog number to verify
+     * @return true if the catalog number is not found; false if the product exists
      */
     public boolean isUnknownCatalogNumber(int catalog_number) {
         return !products.containsKey(catalog_number);
     }
 
     /**
-     * Displays the quantities of a specific product in a given branch,
-     * separated by warehouse and store locations.
-     * If the product or branch doesn't exist, an appropriate message is returned.
-     * Ignores defective items when calculating quantities.
+     * Retrieves the count of non-defective items for a specific product in the specified branch,
+     * separated into warehouse and store quantities, using data from the database (via ItemRepository).
      *
-     * @param catalog_number the catalog number of the product
-     * @param branch_id the branch ID
-     * @return a formatted string showing warehouse and store quantities
+     * @param catalog_number the catalog number of the product to query
+     * @param branch_id      the ID of the branch in which to count items
+     * @return a formatted string indicating warehouse and store quantities,
+     *         or an error message if the product does not exist or no items are found
      */
     public String showProductQuantities(int catalog_number, int branch_id) {
-        Product product = products.get(catalog_number);
-        if (product == null) {
-            return "Invalid Product Catalog Number: " + catalog_number + ". This Product Catalog Number does not exist in Branch " + branch_id + ".";
+        ProductDTO productDTO;
+        try {
+            productDTO = productRepository.getProductByCatalogNumber(catalog_number);
+            if (productDTO == null) {
+                return "Invalid Product Catalog Number: " + catalog_number + ". This product does not exist.";
+            }
+        } catch (Exception e) {
+            return "❌ Failed to fetch product info from DB: " + e.getMessage();
         }
 
-        Branch branch = branches.get(branch_id);
-        if (branch == null) {
-            return "Branch ID " + branch_id + " not found.";
-        }
+        // Use ItemRepository to fetch items from DB
+        ItemRepositoryImpl itemRepository = new ItemRepositoryImpl();
+        List<ItemDTO> allItems = itemRepository.getAllItems();
 
         int warehouse_quantity = 0;
         int store_quantity = 0;
 
-        for (ItemDTO item : branch.getItems().values()) {
-            if (item.getCatalogNumber() == catalog_number && !item.IsDefective()) {
-                if (item.getStorageLocation().equalsIgnoreCase("Warehouse")) {
+        for (ItemDTO item : allItems) {
+            if (item.getCatalogNumber() == catalog_number &&
+                    item.getBranchId() == branch_id &&
+                    !item.IsDefective()) {
+
+                String location = item.getStorageLocation();
+                if ("Warehouse".equalsIgnoreCase(location)) {
                     warehouse_quantity++;
-                } else if (item.getStorageLocation().equalsIgnoreCase("InteriorStore")) {
+                } else if ("InteriorStore".equalsIgnoreCase(location)) {
                     store_quantity++;
                 }
             }
@@ -182,15 +187,6 @@ public class ProductController {
                 + "Store quantity: " + store_quantity;
     }
 
-    /**
-     * Displays the sale prices for a specific product purchased in a given branch.
-     * Each sale includes the price and the sale date.
-     * If no purchases are found, an appropriate message is returned.
-     *
-     * @param catalog_number the catalog number of the product
-     * @param currentBranchId the ID of the current branch
-     * @return a formatted string listing purchase prices and dates
-     */
     public String showProductPurchasesPrices(int catalog_number, int currentBranchId) {
         DecimalFormat df = new DecimalFormat("#.00");
         StringBuilder result = new StringBuilder();
@@ -223,18 +219,20 @@ public class ProductController {
     }
 
     /**
-     * Adds a new product to the inventory system.
+     * Adds a new product to the system's in-memory product collection.
      *
-     * @param product the Product object to add
+     * @param product the Product object to add, identified by its catalog number
      */
     public void addProduct(Product product) {
         products.put(product.getCatalogNumber(), product);
     }
 
+    public List<Product> getAllProducts() {
+        return new ArrayList<>(products.values());
+    }
 
-
-
-
-
+    public boolean productExists(int catalogNumber) {
+        return products.containsKey(catalogNumber);
+    }
 
 }

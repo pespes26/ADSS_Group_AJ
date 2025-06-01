@@ -20,10 +20,7 @@ public class Menu {
         System.out.println(" Welcome to Super-Li Inventory System ");
         System.out.println("------------------------------------------------------------");
 
-        // Initialize the inventory system from the database
-        InventoryController inventoryController = SystemInitializer.initializeSystemFromDatabase();
-        SystemInitializer.preloadProducts();
-        SystemInitializer.preloadItems();
+
 
         // Prompt user to select branch ID (1-10)
         System.out.println("------------------------------------------------------------");
@@ -41,6 +38,7 @@ public class Menu {
                 System.out.print("Invalid input. Please enter a number between 1 and 10: ");
             }
         }
+        InventoryController inventoryController = SystemInitializer.initializeSystemFromDatabase();
 
         // Confirm branch selection
         System.out.println("Branch " + branchId + " selected. All operations will now apply to this branch.");

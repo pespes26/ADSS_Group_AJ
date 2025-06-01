@@ -1,11 +1,13 @@
 package Inventory.Tests;
 
-import Inventory.Domain.Item;
 import Inventory.Domain.Product;
 import Inventory.Domain.ProductController;
+import Inventory.InventoryUtils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 import Inventory.DTO.ItemDTO;
+
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -32,8 +34,13 @@ public class ProductControllerTest {
         product.setCatalogNumber(101);
         product.setCategory("Dairy");
         product.setSubCategory("Cheese");
+
+        // חובה להגדיר קודם את supplyDaysInTheWeek
+        product.setSupplyDaysInTheWeek("MONDAY");
+
+        // ורק אחר כך את demand level, כיוון שהוא תלוי ב־supplyTime
         product.setProductDemandLevel(3);
-        product.setSupplyTime(5);
+
         product.setCostPriceBeforeSupplierDiscount(100.0);
         product.setSupplierDiscount(10.0);
         product.setStoreDiscount(20.0);
@@ -47,7 +54,7 @@ public class ProductControllerTest {
      * derived prices based on supplier and store discounts.
      */
     @Test
-    public void testUpdateCostPrice() {
+    public void testUpdateCostPrice() throws SQLException {
         boolean result = productController.updateCostPriceByCatalogNumber(101, 200.0);
 
         assertTrue("Expected update to succeed", result);
@@ -61,11 +68,14 @@ public class ProductControllerTest {
      * Verifies that supply time and product demand level can be updated for a product.
      */
     @Test
-    public void testUpdateProductSupplyDetails() {
-        boolean result = productController.updateProductSupplyDetails(101, 7, 4);
+    public void testUpdateProductSupplyDetails() throws SQLException {
+        product.setSupplyDaysInTheWeek("MONDAY"); // עדכון עקיף של supplyTime
+        boolean result = productController.updateProductSupplyDetails(101, null, 4); // supplyTime כבר מחושב
 
         assertTrue("Expected supply update to succeed", result);
-        assertEquals("Supply time should be updated to 7", 7, product.getSupplyTime());
+
+        int expectedSupplyTime = DateUtils.calculateNextSupplyDayOffset("MONDAY");
+        assertEquals("Supply time should match expected", expectedSupplyTime, product.getSupplyTime());
         assertEquals("Demand level should be updated to 4", 4, product.getProductDemandLevel());
     }
 

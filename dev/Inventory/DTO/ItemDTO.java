@@ -22,12 +22,10 @@ public class ItemDTO {
         this.item_id = 0;
         this.branch_id = branch_id;
         this.storage_location = storage_location;
-        // Add a new field for section_in_store in the class if not present
         this.section_in_store = section_in_store;
         this.is_defect = is_defect;
         this.item_expiring_date = item_expiring_date;
-        this.sale_date=item_sale_date;
-        // Add a new field for sale_date in the class if not present
+        this.sale_date = item_sale_date;
 
     }
 

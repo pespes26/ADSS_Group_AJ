@@ -1,6 +1,7 @@
 package Inventory.DAO;
 
 import Inventory.DTO.ItemDTO;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -51,4 +52,19 @@ public interface IItemsDAO {
      * @throws SQLException if a query error occurs
      */
     List<ItemDTO> getAllItems() throws SQLException;
+
+    /**
+     * Retrieves all ItemDTOs that match the given product catalog number.
+     * @param productId the product catalog number
+     * @return a list of matching ItemDTOs
+     */
+    List<ItemDTO> getItemsByProductId(int productId);
+
+    /**
+     * Retrieves all ItemDTOs that are marked as defective.
+     * @return a list of defective ItemDTOs
+     */
+    List<ItemDTO> findDefectiveItems();
+
+
 }

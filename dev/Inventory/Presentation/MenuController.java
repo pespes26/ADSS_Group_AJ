@@ -3,6 +3,7 @@ package Inventory.Presentation;
 import Inventory.Domain.Discount;
 import Inventory.Domain.InventoryController;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -10,12 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class MenuController {
     private final Scanner scan;
     private final InventoryController inventory_controller;
     private final int current_branch_id;
-
     public MenuController(InventoryController inventory_controller, int currentBranchId) {
+
         this.scan = new Scanner(System.in);
         this.inventory_controller = inventory_controller;
         this.current_branch_id = currentBranchId;
@@ -49,22 +51,22 @@ public class MenuController {
 
     private void printMenu() {
         System.out.println("""
-        Menu:
-        1. Show item details
-        2. Add item(s) to inventory (new or existing product)
-        3. Remove an item
-        4. Show the purchase prices of a product
-        5. Update the cost price of a product (before discounts)
-        6. Mark an item as defective
-        7. Generate inventory report
-        8. Generate a defective and expired items report
-        9. Apply supplier/store discount to a product group
-        10. Show product quantity in warehouse and store
-        11. Generate a shortage inventory report
-        12. Update product supply time and demand level
-        13. Update item storage location
-        14. Exit
-        """);
+    Menu:
+    1. Show item details
+    2. Add item(s) to inventory (new or existing product)
+    3. Remove an item
+    4. Show the purchase prices of a product
+    5. Update the cost price of a product (before discounts)
+    6. Mark an item as defective
+    7. Generate inventory report
+    8. Generate a defective and expired items report
+    9. Apply supplier/store discount to a product group
+    10. Show product quantity in warehouse and store
+    11. Generate a shortage inventory report
+    12. Update product supply days and demand level
+    13. Update item storage location
+    14. Exit
+    """);
     }
 
     private void handleChoice(int choice) {
@@ -82,7 +84,10 @@ public class MenuController {
             case 11 -> generateShortageInventoryReport();
             case 12 -> updateProductSupplyAndDemand();
             case 13 -> updateItemStorageLocation();
-            case 14 -> {} // exit
+            case 14 -> {
+                Inventory.Init.DatabaseCleaner.dropAllTables();
+                System.out.println("All database tables have been dropped. Exiting the system.");
+            }
             default -> System.out.println("Invalid option. Please try again.");
         }
     }
@@ -276,25 +281,30 @@ public class MenuController {
             return;
         }
 
-        // Attempt to update the cost price
-        boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, new_price);
+        try {
+            // Attempt to update the cost price
+            boolean success = inventory_controller.getProductController().updateCostPriceByCatalogNumber(catalog_number, new_price);
 
-        System.out.println("\n------------------------------------------------------");
-        if (success) {
-            // Successfully updated
-            System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + new_price + " ₪.");
-            System.out.println("The new cost price has been applied across all branches.");
-        } else {
-            // Shouldn't normally reach here because we already checked existence
-            System.out.println("Failed to update cost price. Please verify the catalog number and try again.");
+            System.out.println("\n------------------------------------------------------");
+            if (success) {
+                // Successfully updated
+                System.out.println("Cost price for Product Catalog Number " + catalog_number + " has been updated to " + new_price + " ₪.");
+                System.out.println("The new cost price has been applied across all branches.");
+            } else {
+                // Shouldn't normally reach here because we already checked existence
+                System.out.println("Failed to update cost price. Please verify the catalog number and try again.");
+            }
+            System.out.println("------------------------------------------------------");
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database error while updating product cost: " + e.getMessage());
+            System.out.println("Please try again later or contact support.");
         }
-        System.out.println("------------------------------------------------------");
     }
 
 
     /**
      * Marks an item as defective based on the provided item ID.
-     *
      * Prompts the user to enter the item ID, verifies its validity and existence,
      * and delegates the update to {@code markItemAsDefective} in the {@code ItemController}.
      * If the item exists, it is marked as defective and a confirmation message is shown.
@@ -483,37 +493,13 @@ public class MenuController {
 
 
 
-    /**
-     * Applies a discount (supplier or store) to a group of products based on user selection.
-     * <p>
-     * The user is prompted to choose the group to which the discount will apply:
-     * <ul>
-     *     <li>Category</li>
-     *     <li>Sub-Category</li>
-     *     <li>Specific Product (by catalog number)</li>
-     * </ul>
-     *
-     * Then, the user selects the discount type (supplier or store),
-     * enters a discount rate (0–100), and provides an end date (with today as the start).
-     * <p>
-     * The method validates all input:
-     * <ul>
-     *     <li>Ensures the selected group exists</li>
-     *     <li>Ensures discount rate is within valid bounds</li>
-     *     <li>Ensures the end date is after the current date</li>
-     * </ul>
-     *
-     * 🛈 The discount will be applied to **all branches across the network**.
-     * A {@link Discount} object is created and passed to the appropriate method
-     * in the {@code DiscountController}.
-     * A success or failure message is displayed accordingly.
-     */
+
 
     private void applyDiscount() {
         System.out.println("Apply Discount");
         System.out.println("Note: The discount you apply will affect ALL branches across the network.");
         System.out.println("Choose group to apply discount on:");
-        System.out.println("(1) Category\n(2) Sub-Category\n(3) Product Catalog Number");
+        System.out.println("(1) Category\n(2) Sub-Category\n(3) Product Size\n(4) Product Catalog Number");
 
         int type;
         try {
@@ -525,26 +511,48 @@ public class MenuController {
 
         String category = null, sub_category = null;
         int catalog = -1;
+        int size = -1;
 
         if (type == 1) {
             System.out.print("Enter category: ");
-            category = scan.nextLine();
+            category = scan.nextLine().trim();
             if (!inventory_controller.getProductController().hasCategory(category)) {
                 System.out.println("This category does not exist. Returning to menu.");
                 return;
             }
         } else if (type == 2) {
             System.out.print("Enter sub-category: ");
-            sub_category = scan.nextLine();
+            sub_category = scan.nextLine().trim();
             if (!inventory_controller.getProductController().hasSubCategory(sub_category)) {
                 System.out.println("This sub-category does not exist. Returning to menu.");
                 return;
             }
         } else if (type == 3) {
+            System.out.print("Enter product size (integer): ");
+            try {
+                size = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid product size. Returning to menu.");
+                return;
+            }
+
+            // הפוך את size ל-final לשימוש ב־lambda
+            final int finalSize = size;
+            boolean exists = inventory_controller.getProductController()
+                    .getAllProducts()
+                    .stream()
+                    .anyMatch(p -> p.getSize() == finalSize);
+
+            if (!exists) {
+                System.out.println("No products found with size " + size + ". Returning to menu.");
+                return;
+            }
+
+        } else if (type == 4) {
             System.out.print("Enter Product Catalog Number: ");
             try {
                 catalog = Integer.parseInt(scan.nextLine());
-                if (!inventory_controller.getProductController().isUnknownCatalogNumber(catalog)) {
+                if (!inventory_controller.getProductController().productExists(catalog)) {
                     System.out.println("Product Catalog Number not found. Returning to menu.");
                     return;
                 }
@@ -616,6 +624,10 @@ public class MenuController {
             success = is_supplier
                     ? inventory_controller.getDiscountController().setSupplierDiscountForSubCategory(sub_category, discount)
                     : inventory_controller.getDiscountController().setStoreDiscountForSubCategory(sub_category, discount);
+        } else if (type == 3) {
+            success = is_supplier
+                    ? inventory_controller.getDiscountController().setSupplierDiscountForSize(size, discount)
+                    : inventory_controller.getDiscountController().setStoreDiscountForSize(size, discount);
         } else {
             success = is_supplier
                     ? inventory_controller.getDiscountController().setSupplierDiscountForCatalogNumber(catalog, discount)
@@ -624,16 +636,22 @@ public class MenuController {
 
         System.out.println("\n-----------------------------------------");
         if (success) {
-            String target = (type == 1) ? category : (type == 2) ? sub_category : "Catalog #" + catalog;
+            String target = switch (type) {
+                case 1 -> category;
+                case 2 -> sub_category;
+                case 3 -> "Size " + size;
+                default -> "Catalog #" + catalog;
+            };
             String discountType = is_supplier ? "Supplier" : "Store";
             System.out.println(discountType + " discount of " + rate + "% was successfully applied to: " + target);
             System.out.println("Active from " + start + " to " + end);
-            System.out.println("Note: This discount has been applied to ALL branches in the network.");
+            System.out.println("Note: This discount has been applied to ALL matching products in the current branch.");
         } else {
             System.out.println("Failed to apply discount. Check if the group exists or if the discount is valid.");
         }
         System.out.println("-----------------------------------------");
     }
+
 
 
 
@@ -719,7 +737,7 @@ public class MenuController {
 
 
     /**
-     * Updates the supply time and/or demand level of a specific product across all branches.
+     * Updates the supply days in the week and/or demand level of a specific product across all branches.
      *
      * <p>
      * This method allows the user to:
@@ -727,9 +745,9 @@ public class MenuController {
      *     <li>Enter the product's catalog number.</li>
      *     <li>Choose which details to update:
      *         <ul>
-     *             <li>(1) Supply Time</li>
+     *             <li>(1) Supply Days in the Week</li>
      *             <li>(2) Demand Level</li>
-     *             <li>(3) Both Supply Time and Demand Level</li>
+     *             <li>(3) Both Supply Days and Demand Level</li>
      *         </ul>
      *     </li>
      *     <li>Enter new values for the selected fields.</li>
@@ -739,47 +757,49 @@ public class MenuController {
      * If the product does not exist, an error message is shown.
      */
     private void updateProductSupplyAndDemand() {
+        try {
+            System.out.println("Enter Product Catalog Number:");
+            int catalog = Integer.parseInt(scan.nextLine());
 
-        // Prompt user to enter the product catalog number
-        System.out.println("Enter Product Catalog Number:");
-        int catalog = Integer.parseInt(scan.nextLine());
+            System.out.println("What would you like to update?");
+            System.out.println("(1) Supply Days in the Week\n(2) Demand Level\n(3) Both");
+            int option = Integer.parseInt(scan.nextLine());
 
-        // Ask the user which details they want to update
-        System.out.println("What would you like to update?\n(1) Supply Time\n(2) Demand\n(3) Both");
-        int option = Integer.parseInt(scan.nextLine());
+            String supplyDays = null;
+            Integer demand = null;
 
-        // Initialize variables for supply time and demand level
-        Integer supply = null, demand = null;
-
-        // If the user chooses to update supply time or both
-        if (option == 1 || option == 3) {
-            System.out.println("Enter new supply time (in days):");
-            supply = Integer.parseInt(scan.nextLine());
-        }
-
-        // If the user chooses to update demand level or both
-        if (option == 2 || option == 3) {
-            System.out.println("Enter new demand level (1–5):");
-            demand = Integer.parseInt(scan.nextLine());
-        }
-
-        // Attempt to update the product supply and/or demand details
-        boolean updated = inventory_controller.getProductController().updateProductSupplyDetails(catalog, supply, demand);
-
-        // Check if the update was successful
-        if (updated) {
-            System.out.println("\n-----------------------------------------");
-            System.out.println("The supply details for the product with Catalog Number " + catalog + " have been updated across all branches.");
-            if (supply != null) {
-                System.out.println("New supply time: " + supply + " days");
+            if (option == 1 || option == 3) {
+                System.out.println("Enter supply days (e.g., Sunday,Wednesday,Friday):");
+                supplyDays = scan.nextLine().trim();
             }
-            if (demand != null) {
-                System.out.println("New demand level: " + demand);
+
+            if (option == 2 || option == 3) {
+                System.out.println("Enter new demand level (1–5):");
+                demand = Integer.parseInt(scan.nextLine());
             }
-            System.out.println("-----------------------------------------\n");
-        } else {
-            // If the product was not found, display an error message
-            System.out.println("Product with Catalog Number " + catalog + " not found in inventory.");
+
+            // Attempt to update the product supply and/or demand details
+            boolean updated = inventory_controller.getProductController().updateProductSupplyDetails(catalog, supplyDays, demand);
+
+            if (updated) {
+                System.out.println("\n-----------------------------------------");
+                System.out.println("The supply details for the product with Catalog Number " + catalog + " have been updated across all branches.");
+                if (supplyDays != null) {
+                    System.out.println("New supply days: " + supplyDays);
+                }
+                if (demand != null) {
+                    System.out.println("New demand level: " + demand);
+                }
+                System.out.println("-----------------------------------------\n");
+            } else {
+                System.out.println("Product with Catalog Number " + catalog + " not found in inventory.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database error while updating product supply/demand: " + e.getMessage());
+            System.out.println("Please try again or contact support.");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter numeric values where expected.");
         }
     }
 

@@ -163,7 +163,7 @@ public class JdbcItemDAO implements IItemsDAO {
             }
         }
 
-        return 0; // אם לא נמצאה שורה מתאימה
+        return 0;
     }
 
 
@@ -211,6 +211,71 @@ public class JdbcItemDAO implements IItemsDAO {
         } catch (SQLException e) {
             System.err.println("Error retrieving items from DB: " + e.getMessage());
             throw e;
+        }
+
+        return items;
+    }
+
+
+    @Override
+    public List<ItemDTO> getItemsByProductId(int productId) {
+        List<ItemDTO> items = new ArrayList<>();
+        String sql = "SELECT * FROM Items WHERE catalog_number = ?";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, productId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    ItemDTO item = new ItemDTO();
+                    item.setItemId(rs.getInt("item_id"));
+                    item.setCatalogNumber(rs.getInt("catalog_number"));
+                    item.setBranchId(rs.getInt("branch_id"));
+                    item.setLocation(rs.getString("storage_location"));
+                    item.setSection_in_store(rs.getString("section_in_store"));
+                    item.setIsDefective(rs.getBoolean("is_defect"));
+                    item.setExpirationDate(rs.getString("expiration_date"));
+                    Date saleDate = rs.getDate("sale_date");
+                    if (saleDate != null)
+                        item.setSaleDate(saleDate.toLocalDate());
+
+                    items.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving items by product ID: " + e.getMessage());
+        }
+
+        return items;
+    }
+
+    @Override
+    public List<ItemDTO> findDefectiveItems() {
+        List<ItemDTO> items = new ArrayList<>();
+        String sql = "SELECT * FROM Items WHERE is_defect = 1";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                ItemDTO item = new ItemDTO();
+                item.setItemId(rs.getInt("item_id"));
+                item.setCatalogNumber(rs.getInt("catalog_number"));
+                item.setBranchId(rs.getInt("branch_id"));
+                item.setLocation(rs.getString("storage_location"));
+                item.setSection_in_store(rs.getString("section_in_store"));
+                item.setIsDefective(rs.getBoolean("is_defect"));
+                item.setExpirationDate(rs.getString("expiration_date"));
+                Date saleDate = rs.getDate("sale_date");
+                if (saleDate != null)
+                    item.setSaleDate(saleDate.toLocalDate());
+
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving defective items: " + e.getMessage());
         }
 
         return items;

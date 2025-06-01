@@ -3,6 +3,8 @@ package Inventory.Domain;
 import Inventory.DAO.JdbcProductDAO;
 import Inventory.DTO.ProductDTO;
 
+import Inventory.InventoryUtils.DateUtils;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -375,7 +377,7 @@ public class ReportController {
 
 
 
-    
+
     public String generateShortageInventoryReport(int branch_id) {
         StringBuilder report = new StringBuilder();
         boolean found = false;
@@ -396,16 +398,24 @@ public class ReportController {
 
         report.append("Reorder Alert Report for Branch ").append(branch_id).append(":\n");
 
-        // Get all products from the database
-        JdbcProductDAO productDAO = null;
+        // Load products from the database using DTOs
+        JdbcProductDAO productDAO = new JdbcProductDAO();
         List<ProductDTO> dbProducts = productDAO.getAllProducts();
+
         for (ProductDTO productDTO : dbProducts) {
             int catalog_number = productDTO.getCatalogNumber();
             Product product = products.get(catalog_number);
-            if (product == null) continue; // skip if not in memory
+            if (product == null) continue;
 
             int inStock = stockCountMap.getOrDefault(catalog_number, 0);
-            int min_required = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * product.getSupplyTime()));
+
+            String days = product.getSupplyDaysInTheWeek();
+            if (days == null || days.trim().isEmpty()) {
+                continue; // Skip products without supply day info
+            }
+
+            int supplyTime = DateUtils.calculateNextSupplyDayOffset(days);
+            int min_required = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * supplyTime));
 
             if (inStock < min_required) {
                 found = true;

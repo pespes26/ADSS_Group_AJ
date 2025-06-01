@@ -1,40 +1,51 @@
 package Inventory.DTO;
 
+import Inventory.InventoryUtils.DateUtils;
+
 public class ProductDTO {
     private int catalogNumber;
     private String productName;
     private String category;
     private String subCategory;
-    private String subSubCategory;
-    private String manufacturer;
+    private String supplierName;
     private int size;
     private int productDemandLevel;
     private int supplyTime;
-
+    private String supplyDaysInWeek;
     private double costPriceBeforeSupplierDiscount;
     private double supplierDiscount;
     private double costPriceAfterSupplierDiscount;
     private double storeDiscount;
     private double salePriceBeforeStoreDiscount;
     private double salePriceAfterStoreDiscount;
-
     private int quantityInWarehouse;
     private int quantityInStore;
     private int minimumQuantityForAlert;
+    private int branchId;
+
 
     // Constructor with parameters
     public ProductDTO(int catalogNumber, String productName, String category, String subCategory,
-                      String manufacturer, int size, double costPriceBeforeSupplierDiscount,
-                      double supplierDiscount) {
+                      String supplierName, int size, double costPriceBeforeSupplierDiscount,
+                      double supplierDiscount, double storeDiscount,
+                      String supplyDaysInWeek, int productDemandLevel) {
         this.catalogNumber = catalogNumber;
         this.productName = productName;
         this.category = category;
         this.subCategory = subCategory;
-        this.manufacturer = manufacturer;
+        this.supplierName = supplierName;
         this.size = size;
         this.costPriceBeforeSupplierDiscount = costPriceBeforeSupplierDiscount;
         this.supplierDiscount = supplierDiscount;
+        this.storeDiscount = storeDiscount;
         this.costPriceAfterSupplierDiscount = costPriceBeforeSupplierDiscount * (1 - supplierDiscount / 100);
+        this.salePriceBeforeStoreDiscount = this.costPriceAfterSupplierDiscount * 2;
+        this.salePriceAfterStoreDiscount = this.salePriceBeforeStoreDiscount * (1 - storeDiscount / 100);
+
+        this.supplyDaysInWeek = supplyDaysInWeek;
+        this.supplyTime = DateUtils.calculateNextSupplyDayOffset(supplyDaysInWeek);
+        this.productDemandLevel = productDemandLevel;
+        this.minimumQuantityForAlert = (int) (0.5 * supplyTime + 0.5 * productDemandLevel);
     }
 
     // Default constructor
@@ -73,21 +84,11 @@ public class ProductDTO {
         this.subCategory = subCategory;
     }
 
-    public String getSubSubCategory() {
-        return subSubCategory;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public void setSubSubCategory(String subSubCategory) {
-        this.subSubCategory = subSubCategory;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
+    public void setSupplierName(String supplierName) {}
 
     public int getSize() {
         return size;
@@ -105,6 +106,21 @@ public class ProductDTO {
         this.productDemandLevel = productDemandLevel;
     }
 
+
+
+    public String getSupplyDaysInWeek() {
+        return supplyDaysInWeek;
+    }
+
+    public void setSupplyDaysInWeek(String supplyDaysInWeek) {
+        this.supplyDaysInWeek = supplyDaysInWeek;
+        if (supplyDaysInWeek != null) {
+            this.supplyTime = DateUtils.calculateNextSupplyDayOffset(supplyDaysInWeek);
+        } else {
+            this.supplyTime = 7; // ברירת מחדל אם לא הוגדר
+        }
+    }
+
     public int getSupplyTime() {
         return supplyTime;
     }
@@ -112,6 +128,8 @@ public class ProductDTO {
     public void setSupplyTime(int supplyTime) {
         this.supplyTime = supplyTime;
     }
+
+
 
     public double getCostPriceBeforeSupplierDiscount() {
         return costPriceBeforeSupplierDiscount;
@@ -183,5 +201,13 @@ public class ProductDTO {
 
     public void setMinimumQuantityForAlert(int minimumQuantityForAlert) {
         this.minimumQuantityForAlert = minimumQuantityForAlert;
+    }
+
+    public int getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(int branchId) {
+        this.branchId = branchId;
     }
 }

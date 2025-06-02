@@ -9,7 +9,7 @@ package Suppliers.DTO;
         String unitsOfMeasure;
 
 
-    public ProductSupplierDTO(int catalog_Number, int product_id,int supplierID, int  agreement_ID,  double price, String unitsOfMeasure) {
+    public ProductSupplierDTO(int product_id, int catalog_Number,int supplierID, int  agreement_ID,  double price, String unitsOfMeasure) {
         this.supplierID = supplierID;
         Catalog_Number = catalog_Number;
         this.product_id = product_id;

@@ -1,5 +1,7 @@
 package Inventory.Presentation;
 
+import Inventory.DTO.ItemDTO;
+import Inventory.DTO.ProductDTO;
 import Inventory.Domain.Discount;
 import Inventory.Domain.InventoryController;
 
@@ -27,7 +29,7 @@ public class MenuController {
         System.out.println("""
     =============================================
     |                                            |
-    |   Welcome to the Inventory Management!     |
+    |   Welcome to the Inventory Module!     |
     |                                            |
     =============================================""");
         System.out.println("        You are currently in Branch #" + current_branch_id);
@@ -51,7 +53,7 @@ public class MenuController {
 
     private void printMenu() {
         System.out.println("""
-    Menu:
+    Inventory Module Menu:
     1. Show item details
     2. Add item(s) to inventory (new or existing product)
     3. Remove an item
@@ -85,8 +87,7 @@ public class MenuController {
             case 12 -> updateProductSupplyAndDemand();
             case 13 -> updateItemStorageLocation();
             case 14 -> {
-                Inventory.Init.DatabaseCleaner.dropAllTables();
-                System.out.println("All database tables have been dropped. Exiting the system.");
+                System.out.println("Exiting the Inventory menu.");
             }
             default -> System.out.println("Invalid option. Please try again.");
         }
@@ -161,13 +162,29 @@ public class MenuController {
             return;
         }
 
+        // 🟡 שליפת הפריט לפני הסרה
+        ItemDTO item = inventory_controller.getItemController().getItem(item_Id, current_branch_id);
+        if (item == null) {
+            System.out.println("❌ Failed to retrieve item details before removal.");
+            return;
+        }
+
+        int catalog_number = item.getCatalogNumber();
+        String product_name = inventory_controller.getItemController().getItemName(item_Id, current_branch_id);
+        double sale_price = 0.0;
+
+        try {
+            ProductDTO productDTO = inventory_controller.getProductRepository().getProductByCatalogNumber(catalog_number);
+            if (productDTO != null) {
+                sale_price = productDTO.getSalePriceAfterStoreDiscount();
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Failed to retrieve product details: " + e.getMessage());
+        }
+
         System.out.println("What is the reason for removing the item?");
         System.out.println("(1) Purchase\n(2) Defect");
         int reason = Integer.parseInt(scan.nextLine());
-
-        int catalog_number = inventory_controller.getItemController().getCatalogNumber(item_Id, current_branch_id);
-        String product_name = inventory_controller.getItemController().getItemName(item_Id, current_branch_id);
-        double sale_price = inventory_controller.getItemController().getSalePriceAfterDiscount(item_Id);
 
         if (reason == 1) {
             inventory_controller.getItemController().removeItemByPurchase(item_Id, current_branch_id);
@@ -194,6 +211,7 @@ public class MenuController {
         }
         System.out.println("-----------------------------------------");
     }
+
 
 
     /**
@@ -303,13 +321,7 @@ public class MenuController {
     }
 
 
-    /**
-     * Marks an item as defective based on the provided item ID.
-     * Prompts the user to enter the item ID, verifies its validity and existence,
-     * and delegates the update to {@code markItemAsDefective} in the {@code ItemController}.
-     * If the item exists, it is marked as defective and a confirmation message is shown.
-     * Otherwise, an error message is displayed.
-     */
+
     private void markAsDefect() {
         System.out.print("Enter item ID: ");
         int itemId;
@@ -338,10 +350,7 @@ public class MenuController {
     }
 
 
-    /**
-     * Allows the user to choose how to generate the inventory report
-     * and filter by product size.
-     */
+
     private void generateInventoryReport() {
         System.out.println("\n===================================================");
         System.out.println("Inventory Report Options (Branch " + current_branch_id + ")");
@@ -362,9 +371,9 @@ public class MenuController {
         }
 
         System.out.println("\nFilter by Size:");
-        System.out.println("1. Big");
+        System.out.println("1. Small");
         System.out.println("2. Medium");
-        System.out.println("3. Small");
+        System.out.println("3. Big");
         System.out.println("4. All Sizes");
         System.out.print("Enter your size filter choice (1-4): ");
 
@@ -390,9 +399,7 @@ public class MenuController {
         }
     }
 
-    /**
-     * Generates a report based on categories with size filtering.
-     */
+
     private void generateReportByCategories(List<Integer> sizeFilters) {
         System.out.println("\n----------- Inventory Report by Categories -----------");
 
@@ -412,9 +419,7 @@ public class MenuController {
         }
     }
 
-    /**
-     * Generates a report based on sub-categories with size filtering.
-     */
+
     private void generateReportBySubCategories(List<Integer> sizeFilters) {
         System.out.println("\n----------- Inventory Report by Sub-Categories -----------");
 
@@ -434,9 +439,7 @@ public class MenuController {
         }
     }
 
-    /**
-     * Generates a report based on catalog numbers with size filtering.
-     */
+
     private void generateReportByCatalogNumber(List<Integer> sizeFilters) {
         System.out.println("\n----------- Inventory Report by Catalog Numbers -----------");
 
@@ -456,14 +459,12 @@ public class MenuController {
         }
     }
 
-    /**
-     * Maps the user's size choice to the actual size values.
-     */
+
     private List<Integer> getSizeFilters(int sizeChoice) {
         return switch (sizeChoice) {
-            case 1 -> List.of(3); // Big
+            case 1 -> List.of(1); // Small
             case 2 -> List.of(2); // Medium
-            case 3 -> List.of(1); // Small
+            case 3 -> List.of(3); // Big
             case 4 -> List.of(1, 2, 3); // All Sizes
             default -> List.of();
         };
@@ -600,7 +601,7 @@ public class MenuController {
 
         while (true) {
             try {
-                System.out.print("Enter end date (format: day.month.year, e.g., 30.5.2025): ");
+                System.out.print("Enter end date (format: day.month.year, e.g., 30.6.2026): ");
                 String endInput = scan.nextLine().replace("-", ".").replace("/", ".");
                 end = LocalDate.parse(endInput, formatter);
                 if (end.isBefore(start)) {
@@ -655,36 +656,32 @@ public class MenuController {
 
 
 
-
-    /**
-     * Displays the warehouse and store quantities for a specific product in the current branch.
-     * This method prompts the user to input a product catalog number, retrieves quantity details
-     * from the ProductController, and prints them.
-     * If the product is not found in the current branch, a clear and specific message is displayed,
-     * stating that the product does not exist in this branch.
-     */
     private void showProductQuantities() {
         System.out.print("Enter Product Catalog Number: ");
 
         int catalog;
         try {
-            // Read the catalog number input
             catalog = Integer.parseInt(scan.nextLine().trim());
         } catch (NumberFormatException e) {
-            // Handle invalid input
             System.out.println("Invalid input. Please enter a valid numeric Product Catalog Number.");
             return;
         }
 
-        // Retrieve the quantity details
+        // ✅ Update quantities in the database before displaying
+        try {
+            inventory_controller.getProductController().updateAllProductQuantities();
+        } catch (Exception e) {
+            System.err.println("❌ Failed to update product quantities in DB: " + e.getMessage());
+            return;
+        }
+
+        // ⬇ Continue as usual
         String result = inventory_controller.getProductController().showProductQuantities(catalog, current_branch_id);
 
-        // Check if the product does not exist or has no quantities
         if (result != null && !result.trim().isEmpty()) {
             if (result.contains("does not exist") || result.contains("No items found") || result.contains("Invalid Product Catalog Number")) {
                 System.out.println("The product with Catalog Number " + catalog + " does not exist in Branch " + current_branch_id + ".");
             } else {
-                // Valid quantity details found — display them
                 System.out.println("\n-----------------------------");
                 System.out.println("Product Quantities for Branch " + current_branch_id + ":");
                 System.out.println(result);
@@ -867,5 +864,7 @@ public class MenuController {
             System.out.println("Item with ID " + id + " was not found in Branch " + current_branch_id + ".");
         }
     }
+
+
 
 }

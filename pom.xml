@@ -74,7 +74,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>dev.ControllerInventorySupplier.InventorySupplierMainMenu</mainClass>
+                            <mainClass>dev.InventorySupplier.Presentation.InventorySupplierMainMenu</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

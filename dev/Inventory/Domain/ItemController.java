@@ -2,18 +2,23 @@ package Inventory.Domain;
 
 import Inventory.DTO.ItemDTO;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import Inventory.Repository.IItemRepository;
-import Inventory.Repository.ItemRepositoryImpl;
+import Inventory.DTO.ProductDTO;
+import Inventory.DTO.SoldItemDTO;
+import Inventory.Repository.*;
 
 /**
  * Controller responsible for managing individual items, their relation to products,
  * and handling item creation and storage logic.
  */
 public class ItemController {
+    private final IItemRepository itemRepository;
+    private final IProductRepository productRepository;
+    private final ISoldItemRepository soldItemRepository;
     private final HashMap<Integer, Branch> branches;
     private final HashMap<Integer, Product> products;
     private final HashMap<Integer, ItemDTO> purchased_items;
@@ -29,6 +34,9 @@ public class ItemController {
         this.branches = branches;
         this.products = products;
         this.purchased_items = purchased_items;
+        this.productRepository = new ProductRepositoryImpl();
+        this.itemRepository = new ItemRepositoryImpl();
+        this.soldItemRepository = new SoldItemRepositoryImpl();
     }
 
     /**
@@ -97,25 +105,75 @@ public class ItemController {
         if (branch != null && branch.getItems().containsKey(item_Id)) {
             ItemDTO item = branch.getItem(item_Id);
             if (item != null) {
-                item.setIsDefective(true);
-                branch.removeItem(item_Id);
+                try {
+                    itemRepository.markItemAsDefect(item_Id);
+
+                    itemRepository.deleteItem(item_Id);
+
+                    branch.removeItem(item_Id);
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to remove item as defective from DB: " + e.getMessage());
+                }
             }
         }
     }
 
-    public void removeItemByPurchase(int item_Id, int branchId) {
+    public void removeItemByPurchase(int itemId, int branchId) {
         Branch branch = branches.get(branchId);
-        if (branch != null && branch.getItems().containsKey(item_Id)) {
-            ItemDTO item = branch.getItem(item_Id);
-            branch.removeItem(item_Id);
+        if (branch == null || !branch.getItems().containsKey(itemId)) {
+            System.out.println("Item does not exist in Branch " + branchId + ".");
+            return;
+        }
 
-            if (item != null) {
-                item.setSaleDate(LocalDate.now());
+        ItemDTO item = branch.getItem(itemId);
+        if (item == null) return;
 
-                purchased_items.put(item_Id, item);
+        ProductDTO product = null;
+        try {
+            product = productRepository.getProductByCatalogNumber(item.getCatalogNumber());
+        } catch (Exception e) {
+            System.out.println("❌ Failed to retrieve product: " + e.getMessage());
+        }
+
+        if (product != null) {
+            double salePrice = product.getSalePriceAfterStoreDiscount();
+
+            // ✅ 1. שמור פרטי המכירה בטבלת sold_items
+            SoldItemDTO sold = new SoldItemDTO();
+            sold.setCatalogNumber(item.getCatalogNumber());
+            sold.setBranchId(branchId);
+            sold.setSaleDate(LocalDate.now());
+            sold.setSalePrice(salePrice);
+
+            try {
+                soldItemRepository.addSoldItem(sold);
+            } catch (Exception e) {
+                System.out.println("❌ Failed to record sale: " + e.getMessage());
+                return;
             }
+
+            // ✅ 2. מחק מה־items ב־DB
+            try {
+                itemRepository.deleteItem(itemId);
+            } catch (Exception e) {
+                System.out.println("❌ Failed to delete item from DB: " + e.getMessage());
+                return;
+            }
+
+            branch.removeItem(itemId);
+
+            // ✅ 4. הדפסה
+            System.out.println("\n-----------------------------------------");
+            System.out.println("The item \"" + product.getProductName() + "\" has been marked as purchased and removed from Branch " + branchId + ".");
+            System.out.printf("The item was sold for: %.2f ₪ (after store discount)%n", salePrice);
+            if (branch.isCriticalStockLevel(item.getCatalogNumber(), product.getMinimumQuantityForAlert())) {
+                System.out.println("ALERT: The product \"" + product.getProductName() + "\" in Branch " + branchId + " has reached a critical amount!");
+                System.out.println("Please consider reordering.");
+            }
+            System.out.println("-----------------------------------------");
         }
     }
+
 
     /**
      * Retrieves the sale price of a product after applying the store discount,
@@ -138,18 +196,19 @@ public class ItemController {
 
 
 
-    /**
-     * Marks a specific item as defective.
-     *
-     * @param item_Id The unique identifier of the item to mark as defective.
-     * @return true if the item exists and was marked as defective; false otherwise.
-     */
+
     public boolean markItemAsDefective(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
         if (branch != null) {
             ItemDTO item = branch.getItems().get(item_Id);
             if (item != null) {
-                item.setIsDefective(true);
+                item.setIsDefective(true);  // זיכרון
+                try {
+                    itemRepository.markItemAsDefective(item_Id, branch_id);  // DB
+                } catch (SQLException e) {
+                    System.err.println("❌ Failed to mark item as defective in DB: " + e.getMessage());
+                    return false;
+                }
                 return true;
             }
         }
@@ -193,35 +252,26 @@ public class ItemController {
         ItemDTO item = branch.getItems().get(item_Id);
         if (item != null) {
             if (location != null) item.setLocation(location);
-            if (section != null) item.setSection_in_store(section);
+            if (section != null) item.setSectionInStore(section);
 
-            ItemDTO dto = new ItemDTO(item.getCatalogNumber(),
+            ItemDTO dto = new ItemDTO(
+                    item.getItemId(),
+                    item.getCatalogNumber(),
                     item.getBranchId(),
                     item.getStorageLocation(),
                     item.getSectionInStore(),
                     item.IsDefective(),
-                    item.getItemExpiringDate(),
-                    item.getSale_date()
+                    item.getItemExpiringDate()
             );
-            dto.setItemId(item_Id);
-            IItemRepository a = new ItemRepositoryImpl();
-            a.updateItem(dto);
+
+            IItemRepository repository = new ItemRepositoryImpl();
+            repository.updateItem(dto);
+
             return true;
         }
         return false;
     }
 
-
-    /**
-     * Returns a detailed string with information about a specific item in a branch.
-     * <p>
-     * Displays product name, expiration date, location, catalog number, pricing details,
-     * discounts, supply time, and defect status.
-     *
-     * @param item_Id the ID of the item
-     * @param branch_id the ID of the branch where the item is located
-     * @return a formatted string with item and product details, or an error message if not found
-     */
 
     public String showItemDetails(int item_Id, int branch_id) {
         Branch branch = branches.get(branch_id);
@@ -229,17 +279,27 @@ public class ItemController {
             return "There is not item in branch id with ID " + branch_id + " does not exist.";
         }
 
-        ItemDTO item = branch.getItem(item_Id);
-        if (item == null) {
+        ItemDTO item = itemRepository.getItemById(item_Id);
+        if (item == null || item.getBranchId() != branch_id) {
             return "Item with ID " + item_Id + " not found in branch " + branch_id + ".";
         }
 
-        Product product = products.get(item.getCatalogNumber());
-        if (product == null) {
-            return "Product with catalog number " + item.getCatalogNumber() + " not found.";
+        ProductDTO product;
+        try {
+            product = productRepository.getProductByCatalogNumber(item.getCatalogNumber());
+            if (product == null) {
+                return "Product with catalog number " + item.getCatalogNumber() + " not found.";
+            }
+        } catch (SQLException e) {
+            return "❌ Error retrieving product from DB: " + e.getMessage();
         }
 
         DecimalFormat df = new DecimalFormat("#.00");
+
+        // Compute prices
+        double costAfter = product.getCostPriceBeforeSupplierDiscount() * (1 - product.getSupplierDiscount() / 100);
+        double saleBefore = costAfter * 2;
+        double saleAfter = saleBefore * (1 - product.getStoreDiscount() / 100);
 
         return "Item ID: " + item.getItemId() + "\n"
                 + "Product name: " + product.getProductName() + "\n"
@@ -250,12 +310,12 @@ public class ItemController {
                 + "Size: " + product.getSize() + "\n"
                 + "Supplier Discount: " + product.getSupplierDiscount() + "%\n"
                 + "Cost price before supplier discount: " + df.format(product.getCostPriceBeforeSupplierDiscount()) + "\n"
-                + "Cost price after supplier discount: " + df.format(product.getCostPriceAfterSupplierDiscount()) + "\n"
+                + "Cost price after supplier discount: " + df.format(costAfter) + "\n"
                 + "Store Discount: " + product.getStoreDiscount() + "%\n"
-                + "Sale price before store discount: " + df.format(product.getSalePriceBeforeStoreDiscount()) + "\n"
-                + "Sale price after store discount: " + df.format(product.getSalePriceAfterStoreDiscount()) + "\n"
+                + "Sale price before store discount: " + df.format(saleBefore) + "\n"
+                + "Sale price after store discount: " + df.format(saleAfter) + "\n"
                 + "Product demand: " + product.getProductDemandLevel() + "\n"
-                + "Supply time: " + product.getSupplyDaysInTheWeek() + " days\n"
+                + "Supply time: " + product.getSupplyDaysInWeek() + " days\n"
                 + "supplierName: " + product.getSupplierName() + "\n"
                 + "Defective: " + (item.IsDefective() ? "Yes" : "No") + "\n";
     }
@@ -273,6 +333,12 @@ public class ItemController {
         Branch branch = branches.get(branch_id);
         if (branch == null || !branch.getItems().containsKey(item_Id)) return -1;
         return branch.getItems().get(item_Id).getCatalogNumber();
+    }
+
+    public ItemDTO getItem(int item_Id, int branch_id) {
+        Branch branch = branches.get(branch_id);
+        if (branch == null) return null;
+        return branch.getItems().get(item_Id);
     }
 
 }

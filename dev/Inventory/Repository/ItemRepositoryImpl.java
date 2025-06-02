@@ -1,5 +1,6 @@
 package Inventory.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import Inventory.DTO.ItemDTO;
@@ -15,18 +16,12 @@ import java.sql.SQLException;
 public class ItemRepositoryImpl implements IItemRepository {
     private final IItemsDAO itemDAO;
 
-    /**
-     * Constructs a new ItemRepositoryImpl using a JdbcItemDAO.
-     */
+
     public ItemRepositoryImpl() {
         this.itemDAO = new JdbcItemDAO();
     }
 
-    /**
-     * Adds a new item to the database.
-     *
-     * @param item the item to be added
-     */
+
     @Override
     public void addItem(ItemDTO item) {
         try {
@@ -36,11 +31,7 @@ public class ItemRepositoryImpl implements IItemRepository {
         }
     }
 
-    /**
-     * Updates an existing item in the database.
-     *
-     * @param item the item with updated values
-     */
+
     @Override
     public void updateItem(ItemDTO item) {
         try {
@@ -50,11 +41,7 @@ public class ItemRepositoryImpl implements IItemRepository {
         }
     }
 
-    /**
-     * Deletes an item from the database by its ID.
-     *
-     * @param itemId the ID of the item to delete
-     */
+
     @Override
     public void deleteItem(int itemId) {
         try {
@@ -64,26 +51,17 @@ public class ItemRepositoryImpl implements IItemRepository {
         }
     }
 
-    /**
-     * Retrieves an item from the database by its ID.
-     *
-     * @param itemId the ID of the item to retrieve
-     * @return the matching ItemDTO, or null if not found
-     */
+
     @Override
     public ItemDTO getItemById(int itemId) {
         try {
-            return itemDAO.GetById(itemId);
+            return itemDAO.GetItemById(itemId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Retrieves all items from the database.
-     *
-     * @return a list of all ItemDTOs
-     */
+
     @Override
     public List<ItemDTO> getAllItems() {
         try {
@@ -99,11 +77,7 @@ public class ItemRepositoryImpl implements IItemRepository {
         return itemDAO.getItemsByProductId(productId);
     }
 
-    /**
-     * Marks an item as defective in the database by its ID.
-     *
-     * @param itemId the ID of the item to mark as defective
-     */
+
     @Override
     public void markItemAsDefect(int itemId) {
         try {
@@ -113,13 +87,31 @@ public class ItemRepositoryImpl implements IItemRepository {
         }
     }
 
-    /**
-     * Retrieves all items marked as defective from the database.
-     *
-     * @return a list of defective items
-     */
+
     @Override
     public List<ItemDTO> getDefectiveItems() {
         return itemDAO.findDefectiveItems();
     }
+
+    @Override
+    public List<ItemDTO> getItemsByBranchId(int branchId) {
+        return itemDAO.getItemsByBranchId(branchId);
+    }
+
+    @Override
+    public void markItemAsDefective(int itemId, int branchId) throws SQLException {
+        itemDAO.markItemAsDefective(itemId, branchId);
+    }
+
+    @Override
+    public List<ItemDTO> getItemsByBranch(int branchId) throws SQLException {
+        return itemDAO.getItemsByBranch(branchId);
+    }
+
+    @Override
+    public List<ItemDTO> getExpiredItemsByBranchId(int branchId, LocalDate today) throws SQLException {
+        return itemDAO.getExpiredItemsByBranchId(branchId, today);
+    }
+
+
 }

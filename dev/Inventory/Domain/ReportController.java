@@ -5,11 +5,16 @@ import Inventory.DTO.ProductDTO;
 
 import Inventory.InventoryUtils.DateUtils;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import Inventory.DTO.ItemDTO;
+import Inventory.Repository.IItemRepository;
+import Inventory.Repository.IProductRepository;
+import Inventory.Repository.ItemRepositoryImpl;
+import Inventory.Repository.ProductRepositoryImpl;
+
 /**
  * Controller class for generating inventory-related reports.
  * Manages reports for defective, expired, and low-stock items per branch.
@@ -17,6 +22,8 @@ import Inventory.DTO.ItemDTO;
 public class ReportController {
     private final HashMap<Integer, Branch> branches;
     private final HashMap<Integer, Product> products;
+    private final IItemRepository itemRepository;
+    private final IProductRepository productRepository;
 
     /**
      * Constructs a new ReportController.
@@ -27,81 +34,87 @@ public class ReportController {
     public ReportController(HashMap<Integer, Branch> branches, HashMap<Integer, Product> products) {
         this.branches = branches;
         this.products = products;
+        this.productRepository = new ProductRepositoryImpl();
+        this.itemRepository = new ItemRepositoryImpl();
     }
 
 
-    /**
-     * Generates a report of defective and expired items in a specific branch.
-     * Lists defective items first, followed by expired items sorted by expiration date.
-     * Handles parsing and ignores invalid expiration dates.
-     *
-     * @param current_branch_id the branch ID to generate the report for
-     * @return a formatted string containing defective and expired items, or messages if none exist
-     */
     public String defectAndExpiredReport(int current_branch_id) {
         StringBuilder report = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate today = LocalDate.now();
+
+        IItemRepository itemRepository = new ItemRepositoryImpl();
+        IProductRepository productRepository = new ProductRepositoryImpl();
+
+        Map<Integer, ProductDTO> productCache = new HashMap<>();
+
+        // Get all items in branch for defect check
+        List<ItemDTO> items;
+        items = itemRepository.getItemsByBranchId(current_branch_id);
+
+        if (items.isEmpty()) {
+            return "No items found for Branch " + current_branch_id + ".\n";
+        }
 
         report.append("Defective Items in Branch ").append(current_branch_id).append(":\n");
         int counter = 1;
-        boolean has_defects = false;
+        boolean hasDefects = false;
 
-        for (Branch branch : branches.values()) {
-            if (branch.getBranchId() != current_branch_id) continue;
-
-            for (ItemDTO item : branch.getItems().values()) {
-                if (item.IsDefective()) {
-                    Product product = products.get(item.getCatalogNumber());
-                    if (product != null) {
-                        has_defects = true;
-                        report.append(counter++).append(". Item ID: ").append(item.getItemId())
-                                .append(", Name: ").append(product.getProductName())
-                                .append(", Category: ").append(product.getCategory())
-                                .append(", Sub-Category: ").append(product.getSubCategory())
-                                .append(", Size: ").append(product.getSize())
-                                .append(", Location: ").append(item.getStorageLocation())
-                                .append(", Section: ").append(item.getSectionInStore())
-                                .append("\n");
+        for (ItemDTO item : items) {
+            if (item.IsDefective()) {
+                int catalogNumber = item.getCatalogNumber();
+                ProductDTO product = productCache.computeIfAbsent(catalogNumber, id -> {
+                    try {
+                        return productRepository.getProductByCatalogNumber(id);
+                    } catch (SQLException e) {
+                        System.err.println("❌ Failed to fetch product " + id + ": " + e.getMessage());
+                        return null;
                     }
+                });
+
+                if (product != null) {
+                    hasDefects = true;
+                    report.append(counter++).append(". Item ID: ").append(item.getItemId())
+                            .append(", Name: ").append(product.getProductName())
+                            .append(", Category: ").append(product.getCategory())
+                            .append(", Sub-Category: ").append(product.getSubCategory())
+                            .append(", Size: ").append(product.getSize())
+                            .append(", Location: ").append(item.getStorageLocation())
+                            .append(", Section: ").append(item.getSectionInStore())
+                            .append("\n");
                 }
             }
         }
 
-        if (!has_defects) {
+        if (!hasDefects) {
             report.append("No defective items found in Branch ").append(current_branch_id).append(".\n");
         }
 
         report.append("\nExpired Items in Branch ").append(current_branch_id).append(":\n");
-        List<ItemDTO> expired_items = new ArrayList<>();
 
-        for (Branch branch : branches.values()) {
-            if (branch.getBranchId() != current_branch_id) continue;
-
-            for (ItemDTO item : branch.getItems().values()) {
-                try {
-                    LocalDate expiring_date = LocalDate.parse(item.getItemExpiringDate(), formatter);
-                    if (expiring_date.isBefore(today)) {
-                        expired_items.add(item);
-                    }
-                } catch (DateTimeParseException ignored) {}
-            }
+        // Use the new optimized DB method
+        List<ItemDTO> expiredItems;
+        try {
+            expiredItems = itemRepository.getExpiredItemsByBranchId(current_branch_id, today);
+        } catch (SQLException e) {
+            return "❌ Failed to retrieve expired items: " + e.getMessage();
         }
 
-        expired_items.sort(Comparator.comparing(item -> {
-            try {
-                return LocalDate.parse(item.getItemExpiringDate(), formatter);
-            } catch (DateTimeParseException e) {
-                return LocalDate.MAX;
-            }
-        }));
-
-        if (expired_items.isEmpty()) {
+        if (expiredItems.isEmpty()) {
             report.append("No expired items found in Branch ").append(current_branch_id).append(".\n");
         } else {
             counter = 1;
-            for (ItemDTO item : expired_items) {
-                Product product = products.get(item.getCatalogNumber());
+            for (ItemDTO item : expiredItems) {
+                int catalogNumber = item.getCatalogNumber();
+                ProductDTO product = productCache.computeIfAbsent(catalogNumber, id -> {
+                    try {
+                        return productRepository.getProductByCatalogNumber(id);
+                    } catch (SQLException e) {
+                        System.err.println("❌ Failed to fetch product " + id + ": " + e.getMessage());
+                        return null;
+                    }
+                });
+
                 if (product != null) {
                     report.append(counter++).append(". Item ID: ").append(item.getItemId())
                             .append(", Name: ").append(product.getProductName())
@@ -121,259 +134,221 @@ public class ReportController {
 
 
 
-    /**
-     * Generates an inventory report filtered by categories and sizes.
-     *
-     * @param categories the categories to include
-     * @param branchId the branch ID
-     * @param sizeFilters list of sizes to include (1-small, 2-medium, 3-big)
-     * @return formatted report string
-     */
+
     public String inventoryReportByCategories(String[] categories, int branchId, List<Integer> sizeFilters) {
-        StringBuilder report = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        boolean anyCategoryFound = false;
+        try {
+            // שליפת כל הפריטים מהסניף הנוכחי
+            List<ItemDTO> items = itemRepository.getItemsByBranch(branchId);
 
-        Branch branch = branches.get(branchId);
-        if (branch == null) {
-            return "Branch with ID " + branchId + " does not exist.";
-        }
+            // שליפת כל המוצרים שרלוונטיים לפי הגודל המבוקש
+            List<ProductDTO> productList = productRepository.getProductsBySizes(sizeFilters);
+            Map<Integer, ProductDTO> productMap = new HashMap<>();
+            for (ProductDTO p : productList) {
+                productMap.put(p.getCatalogNumber(), p);
+            }
 
-        for (String categoryName : categories) {
-            report.append("Category: ").append(categoryName).append("\n");
+            Map<String, List<ItemDTO>> categoryMap = new HashMap<>();
 
-            Map<String, Map<Integer, List<ItemDTO>>> subCategoryMap = new TreeMap<>();
+            for (ItemDTO item : items) {
+                if (item.IsDefective()) continue;
 
-            for (ItemDTO item : branch.getItems().values()) {
-                Product product = products.get(item.getCatalogNumber());
-                if (product != null
-                        && product.getCategory().equalsIgnoreCase(categoryName)
-                        && sizeFilters.contains(product.getSize())) {
+                ProductDTO product = productMap.get(item.getCatalogNumber());
+                if (product == null) continue;
 
-                    String subCategory = product.getSubCategory();
-                    int size = product.getSize();
-                    subCategoryMap
-                            .computeIfAbsent(subCategory, k -> new TreeMap<>())
-                            .computeIfAbsent(size, k -> new ArrayList<>())
-                            .add(item);
+                for (String cat : categories) {
+                    if (product.getCategory().trim().equalsIgnoreCase(cat.trim())) {
+                        categoryMap.computeIfAbsent(cat.trim(), k -> new ArrayList<>()).add(item);
+                    }
                 }
             }
 
-            if (subCategoryMap.isEmpty()) {
-                report.append("  No matching items found for category.\n");
-            } else {
-                anyCategoryFound = true;
-                appendReportData(subCategoryMap, report, formatter);
+            if (categoryMap.isEmpty()) {
+                return "No matching categories found in Branch " + branchId + ".";
             }
 
-            report.append("------------------------------------------------------------\n");
-        }
+            StringBuilder report = new StringBuilder();
+            for (String category : categoryMap.keySet()) {
+                report.append("Category: ").append(category).append("\n");
+                for (ItemDTO item : categoryMap.get(category)) {
+                    ProductDTO product = productMap.get(item.getCatalogNumber());
+                    report.append("  Item ID: ").append(item.getItemId())
+                            .append(", Catalog: ").append(item.getCatalogNumber())
+                            .append(", Product Name: ").append(product.getProductName())
+                            .append(", Size: ").append(product.getSize()).append("\n");
+                }
+            }
 
-        if (!anyCategoryFound) {
-            return "No valid categories found or no items matching size filters.";
-        }
+            return report.toString();
 
-        return report.toString();
+        } catch (SQLException e) {
+            System.err.println("❌ DB error while generating report: " + e.getMessage());
+            return "Error generating report.";
+        }
     }
 
-    /**
-     * Generates an inventory report filtered by sub-categories and sizes.
-     *
-     * @param subCategories the sub-categories to include
-     * @param branchId the branch ID
-     * @param sizeFilters list of sizes to include
-     * @return formatted report string
-     */
+
     public String inventoryReportBySubCategories(String[] subCategories, int branchId, List<Integer> sizeFilters) {
-        StringBuilder report = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        boolean anySubCategoryFound = false;
+        try {
+            // שליפת כל הפריטים מהסניף
+            List<ItemDTO> items = itemRepository.getItemsByBranch(branchId);
 
-        Branch branch = branches.get(branchId);
-        if (branch == null) {
-            return "Branch with ID " + branchId + " does not exist.";
-        }
-
-        for (String subCategoryName : subCategories) {
-            report.append("Sub-Category: ").append(subCategoryName).append("\n");
-
-            Map<Integer, List<ItemDTO>> sizeMap = new TreeMap<>();
-
-            for (ItemDTO item : branch.getItems().values()) {
-                Product product = products.get(item.getCatalogNumber());
-                if (product != null
-                        && product.getSubCategory().equalsIgnoreCase(subCategoryName)
-                        && sizeFilters.contains(product.getSize())) {
-
-                    int size = product.getSize();
-                    sizeMap.computeIfAbsent(size, k -> new ArrayList<>()).add(item);
-                }
+            // שליפת כל המוצרים הרלוונטיים לפי גודל
+            List<ProductDTO> productList = productRepository.getProductsBySizes(sizeFilters);
+            Map<Integer, ProductDTO> productMap = new HashMap<>();
+            for (ProductDTO p : productList) {
+                productMap.put(p.getCatalogNumber(), p);
             }
 
-            if (sizeMap.isEmpty()) {
-                report.append("  No matching items found for sub-category.\n");
-            } else {
-                anySubCategoryFound = true;
-                appendReportDataSingleLevel(sizeMap, report, formatter);
-            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            StringBuilder report = new StringBuilder();
+            boolean anyMatch = false;
 
-            report.append("------------------------------------------------------------\n");
-        }
+            for (String subCategory : subCategories) {
+                List<ItemDTO> matchedItems = new ArrayList<>();
 
-        if (!anySubCategoryFound) {
-            return "No valid sub-categories found or no items matching size filters.";
-        }
+                for (ItemDTO item : items) {
+                    if (item.IsDefective()) continue;
+                    ProductDTO product = productMap.get(item.getCatalogNumber());
+                    if (product == null) continue;
 
-        return report.toString();
-    }
-
-    /**
-     * Generates an inventory report filtered by catalog numbers and sizes.
-     *
-     * @param catalogNumbers the catalog numbers to include
-     * @param branchId the branch ID
-     * @param sizeFilters list of sizes to include
-     * @return formatted report string
-     */
-    public String inventoryReportByCatalogNumbers(String[] catalogNumbers, int branchId, List<Integer> sizeFilters) {
-        StringBuilder report = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        boolean anyCatalogFound = false;
-
-        Branch branch = branches.get(branchId);
-        if (branch == null) {
-            return "Branch with ID " + branchId + " does not exist.";
-        }
-
-        Set<Integer> catalogSet = new HashSet<>();
-        for (String s : catalogNumbers) {
-            try {
-                catalogSet.add(Integer.parseInt(s.trim()));
-            } catch (NumberFormatException ignored) {}
-        }
-
-        for (Integer catalogNumber : catalogSet) {
-            report.append("Catalog Number: ").append(catalogNumber).append("\n");
-
-            List<ItemDTO> matchedItems = new ArrayList<>();
-
-            for (ItemDTO item : branch.getItems().values()) {
-                if (item.getCatalogNumber() == catalogNumber) {
-                    Product product = products.get(item.getCatalogNumber());
-                    if (product != null && sizeFilters.contains(product.getSize())) {
+                    if (product.getSubCategory().trim().equalsIgnoreCase(subCategory.trim())) {
                         matchedItems.add(item);
                     }
                 }
+
+                report.append("Sub-Category: ").append(subCategory.trim()).append("\n");
+
+                if (matchedItems.isEmpty()) {
+                    report.append("  No matching items found for sub-category.\n");
+                } else {
+                    anyMatch = true;
+                    matchedItems.sort(Comparator.comparing(i -> {
+                        try {
+                            return LocalDate.parse(i.getItemExpiringDate(), formatter);
+                        } catch (Exception e) {
+                            return LocalDate.MAX;
+                        }
+                    }));
+
+                    int count = 1;
+                    for (ItemDTO item : matchedItems) {
+                        ProductDTO product = productMap.get(item.getCatalogNumber());
+                        report.append("    ").append(count++).append(". ")
+                                .append("Item ID: ").append(item.getItemId())
+                                .append(", Name: ").append(product.getProductName())
+                                .append(", Size: ").append(product.getSize())
+                                .append(", Expiring date: ").append(item.getItemExpiringDate())
+                                .append("\n");
+                    }
+                }
+
+                report.append("------------------------------------------------------------\n");
             }
 
-            if (matchedItems.isEmpty()) {
-                report.append("  No matching items found for catalog number.\n");
-            } else {
-                anyCatalogFound = true;
-                matchedItems.sort(Comparator.comparing(item -> {
-                    try {
-                        return LocalDate.parse(item.getItemExpiringDate(), formatter);
-                    } catch (Exception e) {
-                        return LocalDate.MAX;
-                    }
-                }));
+            if (!anyMatch) {
+                return "No valid sub-categories found or no items matching size filters.";
+            }
 
-                int count = 1;
-                for (ItemDTO item : matchedItems) {
-                    Product product = products.get(item.getCatalogNumber());
-                    if (product != null) {
+            return report.toString();
+
+        } catch (SQLException e) {
+            return "Error accessing database: " + e.getMessage();
+        }
+    }
+
+
+
+    public String inventoryReportByCatalogNumbers(String[] catalogNumbers, int branchId, List<Integer> sizeFilters) {
+        try {
+            // שלב 1: הפיכת הקלט ל־Set של מספרי קטלוג
+            Set<Integer> catalogSet = new HashSet<>();
+            for (String s : catalogNumbers) {
+                try {
+                    catalogSet.add(Integer.parseInt(s.trim()));
+                } catch (NumberFormatException ignored) {}
+            }
+
+            if (catalogSet.isEmpty()) {
+                return "No valid catalog numbers entered.";
+            }
+
+            // שלב 2: שליפת פריטים מהסניף
+            List<ItemDTO> items = itemRepository.getItemsByBranch(branchId);
+
+            // שלב 3: שליפת מוצרים מתאימים לפי sizeFilters
+            List<ProductDTO> productList = productRepository.getProductsBySizes(sizeFilters);
+            Map<Integer, ProductDTO> productMap = new HashMap<>();
+            for (ProductDTO p : productList) {
+                if (catalogSet.contains(p.getCatalogNumber())) {
+                    productMap.put(p.getCatalogNumber(), p);
+                }
+            }
+
+            // שלב 4: יצירת הדוח
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            StringBuilder report = new StringBuilder();
+            boolean anyMatch = false;
+
+            for (Integer catalogNumber : catalogSet) {
+                report.append("Catalog Number: ").append(catalogNumber).append("\n");
+
+                ProductDTO product = productMap.get(catalogNumber);
+                if (product == null) {
+                    report.append("  No matching items found for catalog number.\n");
+                    report.append("------------------------------------------------------------\n");
+                    continue;
+                }
+
+                List<ItemDTO> matchedItems = new ArrayList<>();
+                for (ItemDTO item : items) {
+                    if (item.IsDefective()) continue;
+                    if (item.getCatalogNumber() == catalogNumber) {
+                        matchedItems.add(item);
+                    }
+                }
+
+                if (matchedItems.isEmpty()) {
+                    report.append("  No matching items found for catalog number.\n");
+                } else {
+                    anyMatch = true;
+                    matchedItems.sort(Comparator.comparing(i -> {
+                        try {
+                            return LocalDate.parse(i.getItemExpiringDate(), formatter);
+                        } catch (Exception e) {
+                            return LocalDate.MAX;
+                        }
+                    }));
+
+                    int count = 1;
+                    for (ItemDTO item : matchedItems) {
                         report.append("    ").append(count++).append(". ")
                                 .append("Item ID: ").append(item.getItemId())
                                 .append(", Name: ").append(product.getProductName())
                                 .append(", Location: ").append(item.getStorageLocation())
-                                .append(", Expiring: ").append(item.getItemExpiringDate())
+                                .append(", Expiring date: ").append(item.getItemExpiringDate())
                                 .append("\n");
                     }
                 }
+
+                report.append("------------------------------------------------------------\n");
             }
 
-            report.append("------------------------------------------------------------\n");
-        }
-
-        if (!anyCatalogFound) {
-            return "No valid catalog numbers found or no items matching size filters.";
-        }
-
-        return report.toString();
-    }
-
-    private void appendReportData(Map<String, Map<Integer, List<ItemDTO>>> subCategoryMap, StringBuilder report, DateTimeFormatter formatter) {
-        for (Map.Entry<String, Map<Integer, List<ItemDTO>>> subEntry : subCategoryMap.entrySet()) {
-            report.append("  Sub-Category: ").append(subEntry.getKey()).append("\n");
-            for (Map.Entry<Integer, List<ItemDTO>> sizeEntry : subEntry.getValue().entrySet()) {
-                int size = sizeEntry.getKey();
-                String sizeLabel = switch (size) {
-                    case 1 -> "Small";
-                    case 2 -> "Medium";
-                    case 3 -> "Big";
-                    default -> "Unknown Size";
-                };
-                report.append("    Size: ").append(sizeLabel).append("\n");
-
-                List<ItemDTO> sortedItems = sizeEntry.getValue();
-                sortedItems.sort(Comparator.comparing(item -> {
-                    try {
-                        return LocalDate.parse(item.getItemExpiringDate(), formatter);
-                    } catch (Exception e) {
-                        return LocalDate.MAX;
-                    }
-                }));
-
-                int count = 1;
-                for (ItemDTO item : sortedItems) {
-                    Product product = products.get(item.getCatalogNumber());
-                    if (product != null) {
-                        report.append("      ").append(count++).append(". ")
-                                .append("Item ID: ").append(item.getItemId())
-                                .append(", Name: ").append(product.getProductName())
-                                .append(", Location: ").append(item.getStorageLocation())
-                                .append(", Expiring: ").append(item.getItemExpiringDate())
-                                .append("\n");
-                    }
-                }
+            if (!anyMatch) {
+                return "No matching catalog numbers found or no items matching size filters.";
             }
+
+            return report.toString();
+
+        } catch (SQLException e) {
+            return "Error generating catalog report from DB: " + e.getMessage();
         }
     }
 
-    private void appendReportDataSingleLevel(Map<Integer, List<ItemDTO>> sizeMap, StringBuilder report, DateTimeFormatter formatter) {
-        for (Map.Entry<Integer, List<ItemDTO>> sizeEntry : sizeMap.entrySet()) {
-            int size = sizeEntry.getKey();
-            String sizeLabel = switch (size) {
-                case 1 -> "Small";
-                case 2 -> "Medium";
-                case 3 -> "Big";
-                default -> "Unknown Size";
-            };
-            report.append("  Size: ").append(sizeLabel).append("\n");
 
-            List<ItemDTO> sortedItems = sizeEntry.getValue();
-            sortedItems.sort(Comparator.comparing(item -> {
-                try {
-                    return LocalDate.parse(item.getItemExpiringDate(), formatter);
-                } catch (Exception e) {
-                    return LocalDate.MAX;
-                }
-            }));
 
-            int count = 1;
-            for (ItemDTO item : sortedItems) {
-                Product product = products.get(item.getCatalogNumber());
-                if (product != null) {
-                    report.append("    ").append(count++).append(". ")
-                            .append("Item ID: ").append(item.getItemId())
-                            .append(", Name: ").append(product.getProductName())
-                            .append(", Location: ").append(item.getStorageLocation())
-                            .append(", Expiring: ").append(item.getItemExpiringDate())
-                            .append("\n");
-                }
-            }
-        }
-    }
+
+
+
 
 
 

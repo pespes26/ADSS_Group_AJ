@@ -30,13 +30,13 @@ public class BranchTest {
         item1.setItemId(1);
         item1.setCatalogNumber(1234);
         item1.setLocation("Warehouse");
-        item1.setSection_in_store("A1");
+        item1.setSectionInStore("A1");
 
         item2 = new ItemDTO();
         item2.setItemId(2);
         item2.setCatalogNumber(5678);
         item2.setLocation("InteriorStore");
-        item2.setSection_in_store("B2");
+        item2.setSectionInStore("B2");
     }
 
     /**

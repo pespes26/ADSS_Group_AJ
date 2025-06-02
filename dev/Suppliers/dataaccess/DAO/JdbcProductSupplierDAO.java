@@ -295,4 +295,16 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
         return null; // אם לא נמצא מוצר מתאים
     }
 
+    public void clearTable() {
+        String sql = "DELETE FROM product_supplier";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("✅ Cleared all records from 'product_supplier' table.");
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to clear 'product_supplier' table: " + e.getMessage());
+        }
+    }
+
+
 }

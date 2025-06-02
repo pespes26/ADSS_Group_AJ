@@ -4,27 +4,31 @@ import Inventory.DataBase.DatabaseConnector;
 import Inventory.DTO.ItemDTO;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcItemDAO implements IItemsDAO {
+    private static final String DB_URL = "jdbc:sqlite:Inventory.db";
 
     static {
         try (Connection conn = DatabaseConnector.connect();
              Statement statement = conn.createStatement()) {
 
             String createTableSql = """
-                    CREATE TABLE IF NOT EXISTS Items (
-                     item_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                     catalog_number INTEGER NOT NULL,
-                     branch_id INTEGER NOT NULL,
-                     storage_location TEXT,
-                     section_in_store TEXT,
-                     is_defect BOOLEAN DEFAULT 0,
-                     expiration_date Text,
-                     sale_date Date,                     
-                     FOREIGN KEY (catalog_number) REFERENCES Products(catalog_number)
-                    );""";
+                CREATE TABLE IF NOT EXISTS Items (
+                 item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 catalog_number INTEGER NOT NULL,
+                 branch_id INTEGER NOT NULL,
+                 storage_location TEXT,
+                 section_in_store TEXT,
+                 is_defect BOOLEAN DEFAULT 0,
+                 item_expiring_date TEXT,
+                 FOREIGN KEY (catalog_number) REFERENCES Products(catalog_number)
+                );
+        """;
+
+
 
             statement.execute(createTableSql);
             System.out.println("The 'Items' table was created (if it did not already exist).");
@@ -37,24 +41,10 @@ public class JdbcItemDAO implements IItemsDAO {
 
     @Override
     public void Insert(ItemDTO dto) throws SQLException {
-        String sql = "INSERT INTO items (catalog_number, branch_id, storage_location, is_defect, expiration_date,sale_date) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnector.connect();
-             PreparedStatement pstatement = conn.prepareStatement(sql)) {
-
-            pstatement.setInt(1, dto.getCatalogNumber());
-            pstatement.setInt(2, dto.getBranchId());
-            pstatement.setString(3, dto.getStorageLocation());
-            pstatement.setBoolean(4, dto.IsDefective());
-            pstatement.setString(5, dto.getItemExpiringDate());
-            pstatement.setObject(6, dto.getSale_date(), Types.DATE);
-            pstatement.executeUpdate();
-        }
-    }
-
-    @Override
-    public void Update(ItemDTO dto) throws SQLException {
-        String sql = "UPDATE items SET catalog_number = ?, branch_id = ?, storage_location = ?,section_in_store = ?, is_defect = ?, expiration_date = ? WHERE item_id = ?";
+        String sql = "INSERT INTO items (" +
+                "catalog_number, branch_id, storage_location, section_in_store, " +
+                "is_defect, item_expiring_date" +
+                ") VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.connect();
              PreparedStatement pstatement = conn.prepareStatement(sql)) {
@@ -64,7 +54,24 @@ public class JdbcItemDAO implements IItemsDAO {
             pstatement.setString(3, dto.getStorageLocation());
             pstatement.setString(4, dto.getSectionInStore());
             pstatement.setBoolean(5, dto.IsDefective());
+            pstatement.setString(6, dto.getItemExpiringDate());
 
+            pstatement.executeUpdate();
+        }
+    }
+
+    @Override
+    public void Update(ItemDTO dto) throws SQLException {
+        String sql = "UPDATE items SET catalog_number = ?, branch_id = ?, storage_location = ?, section_in_store = ?, is_defect = ?, item_expiring_date = ? WHERE item_id = ?";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstatement = conn.prepareStatement(sql)) {
+
+            pstatement.setInt(1, dto.getCatalogNumber());
+            pstatement.setInt(2, dto.getBranchId());
+            pstatement.setString(3, dto.getStorageLocation());
+            pstatement.setString(4, dto.getSectionInStore());
+            pstatement.setBoolean(5, dto.IsDefective());
             pstatement.setString(6, dto.getItemExpiringDate());
             pstatement.setInt(7, dto.getItemId());
 
@@ -76,6 +83,7 @@ public class JdbcItemDAO implements IItemsDAO {
             }
         }
     }
+
 
 
     public void UpdateStorageLocation(ItemDTO dto) throws SQLException {
@@ -114,7 +122,7 @@ public class JdbcItemDAO implements IItemsDAO {
     }
 
     @Override
-    public ItemDTO GetById(int id) throws SQLException {
+    public ItemDTO GetItemById(int id) throws SQLException {
         String sql = "SELECT * FROM items WHERE item_id = ?";
 
         try (Connection conn = DatabaseConnector.connect();
@@ -128,8 +136,9 @@ public class JdbcItemDAO implements IItemsDAO {
                     dto.setCatalogNumber(rs.getInt("catalog_number"));
                     dto.setBranchId(rs.getInt("branch_id"));
                     dto.setLocation(rs.getString("storage_location"));
+                    dto.setSectionInStore(rs.getString("section_in_store"));
                     dto.setIsDefective(rs.getBoolean("is_defect"));
-                    dto.setExpirationDate(rs.getString("expiration_date"));
+                    dto.setExpirationDate(rs.getString("item_expiring_date"));
                     return dto;
                 }
             }
@@ -139,28 +148,36 @@ public class JdbcItemDAO implements IItemsDAO {
     }
 
 
-
-
-    public int GetId(ItemDTO item1) throws SQLException {
+    /**
+     * Checks if an identical item already exists in the database, based on key attributes.
+     * If found, returns its item_id. Otherwise, returns 0.
+     *
+     * @param item the item to search for
+     * @return the item_id if found, or 0 if not found
+     */
+    public int findExistingItemId(ItemDTO item) {
         String sql = "SELECT item_id FROM items " +
                 "WHERE catalog_number = ? AND branch_id = ? AND storage_location = ? " +
-                "AND is_defect = ? AND expiration_date = ? " +
+                "AND is_defect = ? AND item_expiring_date = ? " +
                 "ORDER BY item_id DESC LIMIT 1";
 
         try (Connection conn = DatabaseConnector.connect();
              PreparedStatement pstatement = conn.prepareStatement(sql)) {
 
-            pstatement.setInt(1, item1.getCatalogNumber());
-            pstatement.setInt(2, item1.getBranchId());
-            pstatement.setString(3, item1.getStorageLocation());
-            pstatement.setBoolean(4, item1.IsDefective());
-            pstatement.setString(5, item1.getItemExpiringDate());
+            pstatement.setInt(1, item.getCatalogNumber());
+            pstatement.setInt(2, item.getBranchId());
+            pstatement.setString(3, item.getStorageLocation());
+            pstatement.setBoolean(4, item.IsDefective());
+            pstatement.setString(5, item.getItemExpiringDate());
 
             try (ResultSet rs = pstatement.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("item_id");
                 }
             }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to find existing item ID: " + e.getMessage());
         }
 
         return 0;
@@ -205,7 +222,7 @@ public class JdbcItemDAO implements IItemsDAO {
                 dto.setBranchId(rs.getInt("branch_id"));
                 dto.setLocation(rs.getString("storage_location"));
                 dto.setIsDefective(rs.getBoolean("is_defect"));
-                dto.setExpirationDate(rs.getString("expiration_date"));
+                dto.setExpirationDate(rs.getString("item_expiring_date"));
                 items.add(dto);
             }
         } catch (SQLException e) {
@@ -233,12 +250,10 @@ public class JdbcItemDAO implements IItemsDAO {
                     item.setCatalogNumber(rs.getInt("catalog_number"));
                     item.setBranchId(rs.getInt("branch_id"));
                     item.setLocation(rs.getString("storage_location"));
-                    item.setSection_in_store(rs.getString("section_in_store"));
+                    item.setSectionInStore(rs.getString("section_in_store"));
                     item.setIsDefective(rs.getBoolean("is_defect"));
-                    item.setExpirationDate(rs.getString("expiration_date"));
-                    Date saleDate = rs.getDate("sale_date");
-                    if (saleDate != null)
-                        item.setSaleDate(saleDate.toLocalDate());
+                    item.setExpirationDate(rs.getString("item_expiring_date"));
+
 
                     items.add(item);
                 }
@@ -265,12 +280,10 @@ public class JdbcItemDAO implements IItemsDAO {
                 item.setCatalogNumber(rs.getInt("catalog_number"));
                 item.setBranchId(rs.getInt("branch_id"));
                 item.setLocation(rs.getString("storage_location"));
-                item.setSection_in_store(rs.getString("section_in_store"));
+                item.setSectionInStore(rs.getString("section_in_store"));
                 item.setIsDefective(rs.getBoolean("is_defect"));
-                item.setExpirationDate(rs.getString("expiration_date"));
-                Date saleDate = rs.getDate("sale_date");
-                if (saleDate != null)
-                    item.setSaleDate(saleDate.toLocalDate());
+                item.setExpirationDate(rs.getString("item_expiring_date"));
+
 
                 items.add(item);
             }
@@ -280,4 +293,112 @@ public class JdbcItemDAO implements IItemsDAO {
 
         return items;
     }
+
+
+    @Override
+    public List<ItemDTO> getItemsByBranchId(int branchId) {
+        List<ItemDTO> items = new ArrayList<>();
+        String sql = "SELECT * FROM items WHERE branch_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, branchId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ItemDTO item = mapResultSetToItemDTO(rs);
+                    items.add(item);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error retrieving items for branch " + branchId + ": " + e.getMessage());
+        }
+
+        return items;
+    }
+
+    private ItemDTO mapResultSetToItemDTO(ResultSet rs) throws SQLException {
+        ItemDTO item = new ItemDTO();
+        item.setItemId(rs.getInt("item_id"));
+        item.setCatalogNumber(rs.getInt("catalog_number"));
+        item.setBranchId(rs.getInt("branch_id"));
+        item.setExpirationDate(rs.getString("item_expiring_date"));
+        item.setLocation(rs.getString("storage_location"));
+        item.setSectionInStore(rs.getString("section_in_store"));
+        item.setIsDefective(rs.getBoolean("is_defect"));
+        return item;
+    }
+
+    @Override
+    public void markItemAsDefective(int itemId, int branchId) throws SQLException {
+        String sql = "UPDATE items SET is_defect = 1 WHERE item_id = ? AND branch_id = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, itemId);
+            stmt.setInt(2, branchId);
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public List<ItemDTO> getItemsByBranch(int branchId) throws SQLException {
+        List<ItemDTO> results = new ArrayList<>();
+
+        String sql = "SELECT * FROM items WHERE branch_id = ?";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inventory.db");
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, branchId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ItemDTO item = new ItemDTO(
+                        rs.getInt("item_id"),
+                        rs.getInt("catalog_number"),
+                        rs.getInt("branch_id"),
+                        rs.getString("storage_location"),
+                        rs.getString("section_in_store"),
+                        rs.getBoolean("is_defect"),
+                        rs.getString("item_expiring_date")
+                );
+                results.add(item);
+            }
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<ItemDTO> getExpiredItemsByBranchId(int branchId, LocalDate today) throws SQLException {
+        List<ItemDTO> results = new ArrayList<>();
+        String sql = "SELECT * FROM items WHERE branch_id = ? AND date(item_expiring_date) < date(?)";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inventory.db");
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, branchId);
+            stmt.setString(2, today.toString());
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ItemDTO item = new ItemDTO(
+                        rs.getInt("catalog_number"),
+                        rs.getInt("branch_id"),
+                        rs.getString("storage_location"),
+                        rs.getString("section_in_store"),
+                        rs.getBoolean("is_defect"),
+                        rs.getString("item_expiring_date")
+                );
+                item.setItemId(rs.getInt("item_id"));
+                results.add(item);
+            }
+        }
+
+        return results;
+    }
+
+
+
 }

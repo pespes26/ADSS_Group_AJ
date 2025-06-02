@@ -44,4 +44,11 @@ public interface IProductDAO {
      * @return a list of all ProductDTOs
      */
     List<ProductDTO> getAllProducts();
+
+    void UpdateCostPrice(int catalogNumber, double newCostPrice) throws SQLException;
+
+    void UpdateCalculatedPrices(ProductDTO product) throws SQLException;
+
+    public List<ProductDTO> getProductsBySizes(List<Integer> sizes) throws SQLException;
+
 }

@@ -88,7 +88,9 @@ public class ProductDTO {
         return supplierName;
     }
 
-    public void setSupplierName(String supplierName) {}
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 
     public int getSize() {
         return size;

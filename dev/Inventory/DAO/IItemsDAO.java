@@ -3,6 +3,7 @@ package Inventory.DAO;
 import Inventory.DTO.ItemDTO;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface IItemsDAO {
      * @return the item data, or null if not found
      * @throws SQLException if a query error occurs
      */
-    ItemDTO GetById(int Id) throws SQLException;
+    ItemDTO GetItemById(int Id) throws SQLException;
 
     /**
      * Marks an item as defective.
@@ -66,5 +67,12 @@ public interface IItemsDAO {
      */
     List<ItemDTO> findDefectiveItems();
 
+    List<ItemDTO> getItemsByBranchId(int branchId);
+
+    void markItemAsDefective(int itemId, int branchId) throws SQLException;
+
+    List<ItemDTO> getItemsByBranch(int branchId) throws SQLException;
+
+    List<ItemDTO> getExpiredItemsByBranchId(int branchId, LocalDate today) throws SQLException;
 
 }

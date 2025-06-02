@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcPeriodicOrdersDAO implements IPeriodicOrderDAO {
+public class JdbcPeriodicOrderDAO implements IPeriodicOrderDAO {
 
     static {
         try (Connection conn = DatabaseConnector.connect();

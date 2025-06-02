@@ -75,27 +75,27 @@ public class SuppliersInitializer {
         supplierIDAndAgreementsID.put(supplierID7, agreementID7);
         supplierIDAndAgreementsID.put(supplierID8, agreementID8);
 
-        productSupplierDAO.insert(new ProductSupplierDTO(0, 1004, 1, agreementID1, 6.5, "L"));
-        productSupplierDAO.insert(new ProductSupplierDTO(1, 1005, 2, agreementID2, 8.0, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(2, 1006, 3, agreementID3, 4.5, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(3, 1007, 1, agreementID4, 6, "L"));
-        productSupplierDAO.insert(new ProductSupplierDTO(4, 1008, 2, agreementID2, 9.5, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(5, 1009, 3, agreementID5, 20, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(6, 1010, 1, agreementID6, 5, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(7, 1011, 2, agreementID7, 3, "L"));
-        productSupplierDAO.insert(new ProductSupplierDTO(8, 1012, 3, agreementID5, 7.5, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(9, 1013, 1, agreementID8, 12, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1004,0, supplierID1, agreementID1, 6.5, "L"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1005,1, supplierID2, agreementID2, 8.0, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1006,2, supplierID3, agreementID3, 4.5, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1007, 3,supplierID4, agreementID4, 6, "L"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1008,4, supplierID5, agreementID5, 9.5, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1009,5, supplierID6, agreementID6, 20, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1010,6, supplierID7, agreementID7, 5, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1011, 7,supplierID8, agreementID8, 3, "L"));
+        productSupplierDAO.insert(new ProductSupplierDTO( 1012,8, supplierID8, agreementID8, 7.5, "g"));
+        productSupplierDAO.insert(new ProductSupplierDTO(1013,9, supplierID8, agreementID8, 12, "g"));
 
-        discountDAO.insert(new DiscountDTO(1004, 0, 1, 20, 10.0));
-        discountDAO.insert(new DiscountDTO(1005, 1, 2, 10, 5.0));
-        discountDAO.insert(new DiscountDTO(1006, 2, 3, 50, 15.0));
-        discountDAO.insert(new DiscountDTO(1007, 0, 4, 20, 8.0));
-        discountDAO.insert(new DiscountDTO(1008, 1, 2, 10, 12.0));
-        discountDAO.insert(new DiscountDTO(1009, 2, 5, 50, 20.0));
-        discountDAO.insert(new DiscountDTO(1010, 0, 6, 20, 7.5));
-        discountDAO.insert(new DiscountDTO(1011, 1, 7, 10, 5.0));
-        discountDAO.insert(new DiscountDTO(1012, 2, 5, 50, 10.0));
-        discountDAO.insert(new DiscountDTO(1013, 0, 8, 20, 18.0));
+        discountDAO.insert(new DiscountDTO(1004, supplierID1, agreementID1, 20, 10.0));
+        discountDAO.insert(new DiscountDTO(1005, supplierID2, agreementID2, 10, 5.0));
+        discountDAO.insert(new DiscountDTO(1006, supplierID3, agreementID3, 50, 15.0));
+        discountDAO.insert(new DiscountDTO(1007, supplierID4, agreementID4, 20, 8.0));
+        discountDAO.insert(new DiscountDTO(1008, supplierID5, agreementID5, 10, 12.0));
+        discountDAO.insert(new DiscountDTO(1009, supplierID6, agreementID6, 50, 20.0));
+        discountDAO.insert(new DiscountDTO(1010, supplierID7, agreementID7, 20, 7.5));
+        discountDAO.insert(new DiscountDTO(1011, supplierID8, agreementID8, 10, 5.0));
+        discountDAO.insert(new DiscountDTO(1012, supplierID8, agreementID8, 50, 10.0));
+        discountDAO.insert(new DiscountDTO(1013, supplierID8, agreementID8, 20, 18.0));
 
         return supplierIDAndAgreementsID;
     }

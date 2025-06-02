@@ -17,8 +17,7 @@ public class ShortageOrderService implements WakeUpListener {
     private final OrderByShortageController orderByShortageController;
     private final IShortageOrderRepository shortageOrderRepository;
 
-    public ShortageOrderService(IInventoryOrderRepository orderRepository,
-                                IShortageOrderRepository shortageOrderRepository) {
+    public ShortageOrderService(IInventoryOrderRepository orderRepository, IShortageOrderRepository shortageOrderRepository) {
         this.orderByShortageController = new OrderByShortageController(orderRepository);
         this.shortageOrderRepository = shortageOrderRepository;
     }

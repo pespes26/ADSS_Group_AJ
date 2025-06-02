@@ -2,7 +2,9 @@ package Suppliers.Test;
 
 import Suppliers.DTO.ProductSupplierDTO;
 import Suppliers.Domain.*;
-import Suppliers.dataaccess.DAO.*;
+import Suppliers.DAO.*;
+import Suppliers.Repository.IProductSupplierRepository;
+import Suppliers.Repository.ProductSupplierRepositoryImpl;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

@@ -42,22 +42,31 @@ public class JdbcOrderDAO implements IOrderDAO {
         String insertItemSql = "INSERT INTO order_items (order_id, product_id, quantity, supplier_id) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement orderStmt = conn.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement orderStmt = conn.prepareStatement(insertOrderSql);
              PreparedStatement itemStmt = conn.prepareStatement(insertItemSql)) {
 
             conn.setAutoCommit(false);
 
+            // הוספת ההזמנה
             orderStmt.setLong(1, dto.getPhoneNumber());
             orderStmt.setString(2, dto.getOrderDate().toString());
             orderStmt.executeUpdate();
 
-            ResultSet generatedKeys = orderStmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                dto.setOrderID(generatedKeys.getInt(1));
+            // קבלת ה-ID האחרון שנוצר
+            int orderId;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                if (rs.next()) {
+                    orderId = rs.getInt(1);
+                    dto.setOrderID(orderId);
+                } else {
+                    throw new SQLException("Failed to retrieve order ID.");
+                }
             }
 
+            // הוספת הפריטים
             for (OrderItemDTO item : dto.getItems()) {
-                itemStmt.setInt(1, dto.getOrderID());
+                itemStmt.setInt(1, orderId);
                 itemStmt.setInt(2, item.getProductId());
                 itemStmt.setInt(3, item.getQuantity());
                 itemStmt.setInt(4, item.getSupplierId());
@@ -68,6 +77,7 @@ public class JdbcOrderDAO implements IOrderDAO {
             conn.commit();
         }
     }
+
 
     @Override
     public void deleteById(int orderId) throws SQLException {

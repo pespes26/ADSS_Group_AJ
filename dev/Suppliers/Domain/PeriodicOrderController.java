@@ -34,7 +34,7 @@ public class PeriodicOrderController {
 
             //הנחה
             double discount = 0.0;
-            DiscountDTO discountDTO = orderRepository.getBestMatchingDiscount(supplierID, agreementID, productID, quantity);
+            DiscountDTO discountDTO = orderRepository.getBestMatchingDiscount(productID, supplierID, agreementID, quantity);
             if (discountDTO != null) {
                 discount = discountDTO.getDiscountPercentage();
             }
@@ -47,7 +47,9 @@ public class PeriodicOrderController {
 
              productDetails.add( new OrderProductDetails(supplierID, supplierName, deliveryDays, agreementID, productID, price, discount, quantity)
             );
+
         }
+        saveOrder(productDetails, phoneNumber);
         return productDetails;
     }
 

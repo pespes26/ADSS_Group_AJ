@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class OrderByShortageController {
+    public class OrderByShortageController {
     private final IInventoryOrderRepository orderRepository;
 
     public OrderByShortageController(IInventoryOrderRepository orderRepository) {
@@ -16,7 +16,7 @@ public class OrderByShortageController {
     }
 
 
-        public List<OrderProductDetails> getShortageOrderProductDetails(HashMap<Integer,Integer> inventoryProducts) throws SQLException {
+        public List<OrderProductDetails> getShortageOrderProductDetails(HashMap<Integer,Integer> inventoryProducts, long phoneNumber) throws SQLException {
         List<OrderProductDetails> productDetails = new ArrayList<>();
         for (int productId : inventoryProducts.keySet()) {
             int quantity = inventoryProducts.get(productId);
@@ -31,6 +31,7 @@ public class OrderByShortageController {
                 System.out.println("No product supplier found for product id " + productId);
             }
         }
+        saveOrder(productDetails, phoneNumber);
         return productDetails;
     }
 

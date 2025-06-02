@@ -184,4 +184,22 @@ public class JdbcSupplierDAO implements ISupplierDAO {
         }
     }
 
+    @Override
+    public int getIdByName(String name) throws SQLException {
+        String sql = "SELECT supplier_id FROM suppliers WHERE supplier_name = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("supplier_id");
+            }
+        }
+        return 0; // או תזרוק שגיאה אם לא נמצא
+    }
+
+
+
+
+
 }

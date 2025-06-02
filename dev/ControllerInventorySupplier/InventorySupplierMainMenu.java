@@ -3,6 +3,9 @@ package ControllerInventorySupplier;
 import Inventory.Init.SystemInitializer;
 import Inventory.Presentation.MenuController;
 import Inventory.Domain.InventoryController;
+import Suppliers.Domain.IInventoryOrderRepository;
+import SystemService.PeriodicOrderService;
+import SystemService.ShortageOrderService;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -10,8 +13,25 @@ import java.util.Scanner;
 public class InventorySupplierMainMenu {
 
     public static void main(String[] args) throws SQLException {
-        Scanner scanner = new Scanner(System.in);
 
+
+//==============================================================================================
+//        //add the data for Supplier
+//        Initializer initializer = new Initializer();
+//        IInventoryOrderRepository supplierRepository = initializer.getSupplierOrderRepository();
+//
+//        ShortageOrderService orderService = new ShortageOrderService(supplierRepository);
+//        //TODO pass this Service To Inventory This Class Implement WakeUPListener
+//
+//        PeriodicOrderService periodicOrderService = new PeriodicOrderService(supplierRepository);
+//        periodicOrderService.start(); //starting the periodic Order
+//======================================================================================================
+
+
+
+
+
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome! Would you like to manage Inventory or Supplier?");
         System.out.println("Type '1' for Inventory or '2' for Supplier:");
 

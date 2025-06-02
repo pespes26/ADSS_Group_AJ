@@ -17,5 +17,6 @@ public interface ISupplierDAO {
     SupplierDTO getById(int supplierId) throws SQLException;
 
     List<SupplierDTO> getAll() throws SQLException;
+    int getIdByName(String name) throws SQLException;
 
 }

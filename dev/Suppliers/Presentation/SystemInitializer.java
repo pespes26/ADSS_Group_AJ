@@ -51,6 +51,24 @@ public class SystemInitializer {
         }
     }
 
+    public void clearTestDatabase() throws SQLException {
+        String DB_URL = "jdbc:sqlite:suppliers.db";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+
+            // שמירה על הסדר הנכון של מחיקת טבלאות כדי למנוע שגיאות של מפתחות זרים
+            stmt.executeUpdate("DELETE FROM order_items");
+            stmt.executeUpdate("DELETE FROM orders");
+            stmt.executeUpdate("DELETE FROM product_supplier");
+            stmt.executeUpdate("DELETE FROM discounts");
+            stmt.executeUpdate("DELETE FROM agreements");
+            stmt.executeUpdate("DELETE FROM suppliers");
+        }
+    }
+
+
+
+
     private void insertSampleData() throws SQLException {
 
         int supplierID1 =  supplierDAO.insertAndGetID(new SupplierDTO("Prigat", 0123, 9987,"Cash","Prepaid",5551234, "data@mail.com" ));

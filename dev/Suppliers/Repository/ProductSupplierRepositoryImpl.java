@@ -1,9 +1,9 @@
-package Suppliers.Domain;
+package Suppliers.Repository;
 
 import Suppliers.DTO.DiscountDTO;
 import Suppliers.DTO.ProductSupplierDTO;
-import Suppliers.dataaccess.DAO.IDiscountDAO;
-import Suppliers.dataaccess.DAO.IProductSupplierDAO;
+import Suppliers.DAO.IDiscountDAO;
+import Suppliers.DAO.IProductSupplierDAO;
 
 import java.sql.SQLException;
 import java.util.*;

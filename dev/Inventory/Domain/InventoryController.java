@@ -2,10 +2,7 @@ package Inventory.Domain;
 
 
 
-import Inventory.DAO.IItemsDAO;
-import Inventory.DAO.IProductDAO;
-import Inventory.DAO.JdbcItemDAO;
-import Inventory.DAO.JdbcProductDAO;
+
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 import Inventory.InventoryUtils.DateUtils;
@@ -40,6 +37,11 @@ public class InventoryController {
         this.products = new HashMap<>();
         this.branches = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
+
+        // אתחול ברירת מחדל ל־10 סניפים
+        for (int i = 1; i <= 10; i++) {
+            branches.putIfAbsent(i, new Branch(i));
+        }
 
         HashMap<Integer, ItemDTO> purchased_items = new HashMap<>();
         this.item_controller = new ItemController(branches, products, purchased_items);
@@ -105,12 +107,12 @@ public class InventoryController {
 
 
     public void loadFromDatabase() {
-        System.out.println("Loading data from database using DAO and DTO...");
+        System.out.println("🔄 Loading data from database using Repositories and DTOs...");
 
         try {
-            // Load products from DB
-            IProductDAO productDAO = new JdbcProductDAO();
-            List<ProductDTO> productDTOs = productDAO.getAllProducts();
+            // --- Load products ---
+            List<ProductDTO> productDTOs = productRepository.getAllProducts();
+            System.out.println("✅ Retrieved " + productDTOs.size() + " products from database.");
 
             for (ProductDTO dto : productDTOs) {
                 Product product = new Product();
@@ -133,12 +135,12 @@ public class InventoryController {
                 product.setQuantityInStore(dto.getQuantityInStore());
                 product.setMinimumQuantityForAlert(dto.getMinimumQuantityForAlert());
 
-                products.put(product.getCatalogNumber(), product);
+                product_controller.addProduct(product); // מוסיף גם ל־products map
             }
 
-            // Load items from DB
-            IItemsDAO itemDAO = new JdbcItemDAO();
-            List<ItemDTO> itemDTOs = itemDAO.getAllItems();
+            // --- Load items ---
+            List<ItemDTO> itemDTOs = item_controller.getItemRepository().getAllItems();
+            System.out.println("✅ Retrieved " + itemDTOs.size() + " items from database.");
 
             for (ItemDTO dto : itemDTOs) {
                 ItemDTO item = new ItemDTO();
@@ -157,7 +159,7 @@ public class InventoryController {
                 branches.get(branchId).addItem(item);
 
                 if (!products.containsKey(catalogNumber)) {
-                    System.err.println("Warning: Item references missing Product (Catalog #" + catalogNumber + ")");
+                    System.err.println("⚠️ Warning: Item references missing Product (Catalog #" + catalogNumber + ")");
                     continue;
                 }
 
@@ -172,7 +174,7 @@ public class InventoryController {
                 );
             }
 
-            System.out.println("Data loaded successfully from SQLite via DAOs and DTOs.");
+            System.out.println("✅ Data loaded successfully using Repositories.");
 
         } catch (SQLException e) {
             System.err.println("❌ Failed to load data from database: " + e.getMessage());

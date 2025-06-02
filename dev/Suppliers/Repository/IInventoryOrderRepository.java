@@ -1,4 +1,4 @@
-package Suppliers.Domain;
+package Suppliers.Repository;
 
 import Suppliers.DTO.*;
 

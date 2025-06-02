@@ -1,7 +1,7 @@
-package Suppliers.Domain;
+package Suppliers.Repository;
 
+import Suppliers.DAO.*;
 import Suppliers.DTO.*;
-import Suppliers.dataaccess.DAO.*;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -46,11 +46,11 @@ package Suppliers.DTO;
         this.supplierID = supplierID;
     }
 
-    public void setCatalog_Number(int catalog_Number) {
+    public void setCatalogNumber(int catalog_Number) {
         Catalog_Number = catalog_Number;
     }
 
-    public void setProduct_id(int product_id) {
+    public void setProductId(int product_id) {
         this.product_id = product_id;
     }
 

@@ -1,5 +1,5 @@
 
-package Suppliers.dataaccess.DAO;
+package Suppliers.DAO;
 
 import Suppliers.DTO.AgreementDTO;
 

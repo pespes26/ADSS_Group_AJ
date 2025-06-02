@@ -1,6 +1,7 @@
 package Suppliers.Domain;
 
 import Suppliers.DTO.*;
+import Suppliers.Repository.IInventoryOrderRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -16,8 +17,8 @@ import java.util.List;
     }
 
 
-        public List<OrderProductDetails> getShortageOrderProductDetails(HashMap<Integer,Integer> inventoryProducts, long phoneNumber) throws SQLException {
-        List<OrderProductDetails> productDetails = new ArrayList<>();
+        public List<OrderProductDetailsDTO> getShortageOrderProductDetails(HashMap<Integer,Integer> inventoryProducts, long phoneNumber) throws SQLException {
+        List<OrderProductDetailsDTO> productDetails = new ArrayList<>();
         for (int productId : inventoryProducts.keySet()) {
             int quantity = inventoryProducts.get(productId);
             List<ProductSupplierDTO> productSuppliers = orderRepository.getProductsByProductID(productId); // V
@@ -35,7 +36,7 @@ import java.util.List;
         return productDetails;
     }
 
-    public OrderProductDetails getCheapestPriceWithoutDiscount(int productId, int quantity, List<ProductSupplierDTO> productSuppliers) throws SQLException {
+    public OrderProductDetailsDTO getCheapestPriceWithoutDiscount(int productId, int quantity, List<ProductSupplierDTO> productSuppliers) throws SQLException {
         ProductSupplierDTO productSupplierDTO = orderRepository.getCheapestProductSupplier(productId);// V
         if (productSupplierDTO != null) {
             // בניית אובייקט ההחזרה
@@ -50,7 +51,7 @@ import java.util.List;
             double price = productSupplierDTO.getPrice();
             double discount = 0.0;
 
-            return new OrderProductDetails(
+            return new OrderProductDetailsDTO(
                     supplierID,
                     supplierName,
                     deliveryDays,
@@ -64,7 +65,7 @@ import java.util.List;
         return null;
     }
 
-    public OrderProductDetails discountHandle(int productId, int quantity, List<DiscountDTO> discountDTOList, List<ProductSupplierDTO> productSuppliers) throws SQLException {
+    public OrderProductDetailsDTO discountHandle(int productId, int quantity, List<DiscountDTO> discountDTOList, List<ProductSupplierDTO> productSuppliers) throws SQLException {
         double minTotalCost = Double.MAX_VALUE;
         DiscountDTO bestDiscount = null;
         ProductSupplierDTO bestProductSupplier = null;
@@ -110,7 +111,7 @@ import java.util.List;
         double price = bestProductSupplier.getPrice();
         double discount = (bestDiscount != null) ? bestDiscount.getDiscountPercentage() : 0.0;
 
-        return new OrderProductDetails(
+        return new OrderProductDetailsDTO(
                 supplierID,
                 supplierName,
                 deliveryDays,
@@ -124,14 +125,14 @@ import java.util.List;
 
 
 
-    public void saveOrder(List<OrderProductDetails> productsDetails, long phoneNumber) throws SQLException {
+    public void saveOrder(List<OrderProductDetailsDTO> productsDetails, long phoneNumber) throws SQLException {
         if (productsDetails == null || productsDetails.isEmpty()) {
             throw new IllegalArgumentException("Cannot save order: no products provided.");
         }
 
         List<OrderItemDTO> orderItems = new ArrayList<>();
 
-        for (OrderProductDetails details : productsDetails) {
+        for (OrderProductDetailsDTO details : productsDetails) {
             int productID = details.getProductId();
             int supplierID = details.getSupplierId();
             int quantity = details.getQuantity();

@@ -1,8 +1,5 @@
 package Inventory.DTO;
 
-import java.sql.SQLException;
-import java.util.List;
-
 public class ShortageOrderDTO {
     private int orderId;
     private int productCatalogNumber;
@@ -10,17 +7,29 @@ public class ShortageOrderDTO {
     private double costPriceBeforeSupplierDiscount;
     private double supplierDiscount;
     private String orderDate;
+    private int branchId;
+    private String daysInTheWeek; // ✅ חדש
+    private int supplierId;       // ✅ חדש
+    private String supplierName;  // ✅ חדש
 
+    // ✅ בנאי מלא
     public ShortageOrderDTO(int orderId, int productCatalogNumber, int quantity,
-                            double costPriceBeforeSupplierDiscount, double supplierDiscount, String orderDate) {
+                            double costPriceBeforeSupplierDiscount, double supplierDiscount,
+                            String orderDate, int branchId, String daysInTheWeek,
+                            int supplierId, String supplierName) {
         this.orderId = orderId;
         this.productCatalogNumber = productCatalogNumber;
         this.quantity = quantity;
         this.costPriceBeforeSupplierDiscount = costPriceBeforeSupplierDiscount;
         this.supplierDiscount = supplierDiscount;
         this.orderDate = orderDate;
+        this.branchId = branchId;
+        this.daysInTheWeek = daysInTheWeek;
+        this.supplierId = supplierId;
+        this.supplierName = supplierName;
     }
 
+    // ✅ גטרים
     public int getOrderId() {
         return orderId;
     }
@@ -45,6 +54,23 @@ public class ShortageOrderDTO {
         return orderDate;
     }
 
+    public int getBranchId() {
+        return branchId;
+    }
+
+    public String getDaysInTheWeek() {
+        return daysInTheWeek;
+    }
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    // ✅ סטרים
     public void setOrderId(int orderId) {
         this.orderId = orderId;
     }
@@ -69,5 +95,19 @@ public class ShortageOrderDTO {
         this.orderDate = orderDate;
     }
 
+    public void setBranchId(int branchId) {
+        this.branchId = branchId;
+    }
 
+    public void setDaysInTheWeek(String daysInTheWeek) {
+        this.daysInTheWeek = daysInTheWeek;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 }

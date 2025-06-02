@@ -1,7 +1,11 @@
 package Suppliers.Presentation;
+import Suppliers.DAO.*;
 import Suppliers.DTO.AgreementDTO;
 import Suppliers.Domain.*;
-import Suppliers.dataaccess.DAO.*;
+import Suppliers.Repository.AgreementRepositoryImpl;
+import Suppliers.Repository.IAgreementRepository;
+import Suppliers.Repository.IProductSupplierRepository;
+import Suppliers.Repository.ProductSupplierRepositoryImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

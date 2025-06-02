@@ -1,4 +1,4 @@
-package ControllerInventorySupplier;
+package InventorySupplier.Presentation;
 
 import Inventory.Domain.InventoryController;
 import Inventory.Init.InventoryInitializer;

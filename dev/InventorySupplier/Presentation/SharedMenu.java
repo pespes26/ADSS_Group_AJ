@@ -1,6 +1,5 @@
-package ControllerInventorySupplier;
+package InventorySupplier.Presentation;
 
-import Inventory.DAO.IPeriodicOrderDAO;
 import Inventory.DTO.PeriodicOrderDTO;
 import Inventory.DTO.ShortageOrderDTO;
 import Inventory.Repository.IPeriodicOrderRepository;

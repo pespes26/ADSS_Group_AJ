@@ -1,6 +1,7 @@
 package Suppliers.Domain;
 
 import Suppliers.DTO.AgreementDTO;
+import Suppliers.Repository.IAgreementRepository;
 
 import java.util.List;
 

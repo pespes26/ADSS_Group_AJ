@@ -196,9 +196,12 @@
 
 package Suppliers.Test;
 
+import Suppliers.DAO.*;
+import Inventory.DTO.InventoryProductPeriodic;
 import Suppliers.DTO.*;
 import Suppliers.Domain.*;
-import Suppliers.dataaccess.DAO.*;
+import Suppliers.Repository.IInventoryOrderRepository;
+import Suppliers.Repository.InventoryOrderRepositoryImpl;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
@@ -265,10 +268,10 @@ public class OrderFromInventoryControllersTest {
         ctx.discountDAO.insert(new DiscountDTO(1204, supplierID, agreementID, 20, 10.0));
 
         InventoryProductPeriodic product = new InventoryProductPeriodic(supplierID, agreementID, 1204, 30);
-        List<OrderProductDetails> result = ctx.periodicOrderController.getPeriodicOrderProductDetails(List.of(product), 50222819);
+        List<OrderProductDetailsDTO> result = ctx.periodicOrderController.getPeriodicOrderProductDetails(List.of(product), 50222819);
 
         assertEquals(1, result.size());
-        OrderProductDetails detail = result.get(0);
+        OrderProductDetailsDTO detail = result.get(0);
         assertEquals(supplierID, detail.getSupplierId());
         assertEquals(6.5, detail.getPrice(), 0.0001);
         assertEquals("MAOR", detail.getSupplierName());
@@ -296,8 +299,8 @@ public class OrderFromInventoryControllersTest {
         HashMap<Integer, Integer> products = new HashMap<>();
         products.put(1204, 15);
 
-        List<OrderProductDetails> result = ctx.shortageController.getShortageOrderProductDetails(products, 50222819);
-        OrderProductDetails detail = result.get(0);
+        List<OrderProductDetailsDTO> result = ctx.shortageController.getShortageOrderProductDetails(products, 50222819);
+        OrderProductDetailsDTO detail = result.get(0);
         assertEquals(supplierID2, detail.getSupplierId());
         assertEquals(6.5, detail.getPrice(), 0.0001);
         assertEquals("S2", detail.getSupplierName());
@@ -323,7 +326,7 @@ public class OrderFromInventoryControllersTest {
         HashMap<Integer, Integer> products = new HashMap<>();
         products.put(1204, 5);
 
-        List<OrderProductDetails> result = ctx.shortageController.getShortageOrderProductDetails(products, 50222819);
+        List<OrderProductDetailsDTO> result = ctx.shortageController.getShortageOrderProductDetails(products, 50222819);
         assertEquals(supplierID2, result.get(0).getSupplierId());
         assertEquals(0.0, result.get(0).getDiscount());
     }

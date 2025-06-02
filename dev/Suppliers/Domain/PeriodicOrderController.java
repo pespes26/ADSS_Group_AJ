@@ -1,6 +1,8 @@
 package Suppliers.Domain;
 
+import Inventory.DTO.InventoryProductPeriodic;
 import Suppliers.DTO.*;
+import Suppliers.Repository.IInventoryOrderRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -14,8 +16,8 @@ public class PeriodicOrderController {
         this.orderRepository = orderRepository;
     }
 
-    public List<OrderProductDetails> getPeriodicOrderProductDetails(List<InventoryProductPeriodic> requestedProducts, long phoneNumber) throws SQLException {
-        List<OrderProductDetails> productDetails = new ArrayList<>();
+    public List<OrderProductDetailsDTO> getPeriodicOrderProductDetails(List<InventoryProductPeriodic> requestedProducts, long phoneNumber) throws SQLException {
+        List<OrderProductDetailsDTO> productDetails = new ArrayList<>();
         for (InventoryProductPeriodic requestedProduct : requestedProducts) {
             int supplierID = requestedProduct.getSupplierId();
             int agreementID = requestedProduct.getAgreementID();
@@ -44,7 +46,7 @@ public class PeriodicOrderController {
 
             double price = productSupplierDTO.getPrice();
 
-             productDetails.add( new OrderProductDetails(supplierID, supplierName, deliveryDays, agreementID, productID, price, discount, quantity)
+             productDetails.add( new OrderProductDetailsDTO(supplierID, supplierName, deliveryDays, agreementID, productID, price, discount, quantity)
             );
 
         }
@@ -52,14 +54,14 @@ public class PeriodicOrderController {
         return productDetails;
     }
 
-    public void saveOrder(List<OrderProductDetails>  productsDetails, long phoneNumber) throws SQLException {
+    public void saveOrder(List<OrderProductDetailsDTO>  productsDetails, long phoneNumber) throws SQLException {
         if (productsDetails == null || productsDetails.isEmpty()) {
             throw new IllegalArgumentException("Cannot save order: no products provided.");
         }
 
         List<OrderItemDTO> orderItems = new ArrayList<>();
 
-        for (OrderProductDetails details : productsDetails) {
+        for (OrderProductDetailsDTO details : productsDetails) {
             int productID = details.getProductId();
             int supplierID = details.getSupplierId();
             int quantity = details.getQuantity();

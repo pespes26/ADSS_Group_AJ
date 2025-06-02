@@ -2,13 +2,13 @@ package Suppliers.Presentation;
 
 import Suppliers.DTO.DiscountDTO;
 import Suppliers.DTO.ProductSupplierDTO;
-import Suppliers.Domain.IProductSupplierRepository;
+import Suppliers.Repository.IProductSupplierRepository;
 import Suppliers.Domain.ProductSupplierManagementController;
-import Suppliers.Domain.ProductSupplierRepositoryImpl;
-import Suppliers.dataaccess.DAO.IDiscountDAO;
-import Suppliers.dataaccess.DAO.IProductSupplierDAO;
-import Suppliers.dataaccess.DAO.JdbcDiscountDAO;
-import Suppliers.dataaccess.DAO.JdbcProductSupplierDAO;
+import Suppliers.Repository.ProductSupplierRepositoryImpl;
+import Suppliers.DAO.IDiscountDAO;
+import Suppliers.DAO.IProductSupplierDAO;
+import Suppliers.DAO.JdbcDiscountDAO;
+import Suppliers.DAO.JdbcProductSupplierDAO;
 
 import java.sql.SQLException;
 import java.util.List;

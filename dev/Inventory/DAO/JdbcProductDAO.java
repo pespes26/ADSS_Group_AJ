@@ -1,7 +1,6 @@
 package Inventory.DAO;
 
 import Inventory.DTO.ProductDTO;
-import Inventory.DataBase.DatabaseConnector;
 
 import java.sql.*;
 import java.util.ArrayList;

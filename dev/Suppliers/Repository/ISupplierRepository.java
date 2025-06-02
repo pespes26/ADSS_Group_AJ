@@ -1,6 +1,7 @@
-package Suppliers.Domain;
+package Suppliers.Repository;
 
 import Suppliers.DTO.SupplierDTO;
+import Suppliers.Domain.Supplier;
 
 import java.sql.SQLException;
 import java.util.List;

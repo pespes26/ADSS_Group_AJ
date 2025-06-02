@@ -1,6 +1,6 @@
 package Suppliers.DTO;
 
-public class OrderProductDetails {
+public class OrderProductDetailsDTO {
     private int supplierId;
     private String supplierName;
     private int agreementId;
@@ -10,7 +10,8 @@ public class OrderProductDetails {
     private int quantity;
     private String[] deliveryDays;
 
-    public OrderProductDetails(int supplierId, String supplierName, String[] deliveryDays, int agreementId, int productId, double price, double discount, int quantity) {
+
+    public OrderProductDetailsDTO(int supplierId, String supplierName, String[] deliveryDays, int agreementId, int productId, double price, double discount, int quantity) {
         this.supplierId = supplierId;
         this.supplierName = supplierName;
         this.deliveryDays = deliveryDays;

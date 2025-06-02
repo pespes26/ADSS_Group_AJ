@@ -43,4 +43,11 @@ public class PeriodicOrderRepositoryImpl implements IPeriodicOrderRepository {
     public void deletePeriodicOrderById(int orderId) throws SQLException {
         periodicOrderDAO.deletePeriodicOrderById(orderId);
     }
+
+    @Override
+    public void saveAll(List<PeriodicOrderDTO> orders) throws SQLException {
+        for (PeriodicOrderDTO order : orders) {
+            periodicOrderDAO.insertPeriodicOrder(order);
+        }
+    }
 }

@@ -1,6 +1,5 @@
-package Suppliers.dataaccess.DAO;
+package Suppliers.DAO;
 
-import Suppliers.DTO.AgreementDTO;
 import Suppliers.DTO.SupplierDTO;
 
 import java.sql.SQLException;

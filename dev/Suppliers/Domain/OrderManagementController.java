@@ -1,7 +1,7 @@
 package Suppliers.Domain;
 
 import Suppliers.DTO.OrderDTO;
-import Suppliers.dataaccess.DAO.IOrderDAO;
+import Suppliers.DAO.IOrderDAO;
 
 import java.sql.SQLException;
 import java.util.List;

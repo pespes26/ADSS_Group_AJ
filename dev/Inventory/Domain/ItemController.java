@@ -57,7 +57,9 @@ public class ItemController {
         return maxId + 1;
     }
 
-
+    public IItemRepository getItemRepository() {
+        return this.itemRepository;
+    }
 
 
     /**
@@ -339,6 +341,10 @@ public class ItemController {
         Branch branch = branches.get(branch_id);
         if (branch == null) return null;
         return branch.getItems().get(item_Id);
+    }
+
+    public List<ItemDTO> getAllItemsByBranchId(int branchId) throws SQLException {
+        return itemRepository.getItemsByBranch(branchId);
     }
 
 }

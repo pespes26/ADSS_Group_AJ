@@ -4,14 +4,12 @@ import Inventory.DAO.*;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.PeriodicOrderDTO;
 import Inventory.DTO.ProductDTO;
-import Inventory.DTO.ShortageOrderDTO;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class InventoryInitializer {
 
@@ -99,19 +97,34 @@ public class InventoryInitializer {
         }
     }
 
-    public static void preloadPeriodicOrders() {
+    public static void preloadPeriodicOrders(LinkedHashMap<Integer,Integer> supplierIdAndAgreementsID) {
         JdbcPeriodicOrderDAO dao = new JdbcPeriodicOrderDAO();
+
+        // שלב 1: חילוץ מזהים לפי הסדר
+        Iterator<Map.Entry<Integer, Integer>> iterator = supplierIdAndAgreementsID.entrySet().iterator();
+
+        int supplierID1 = 0, agreementID1 = 0;
+        int supplierID2 = 0, agreementID2 = 0;
+        int supplierID3 = 0, agreementID3 = 0;
+
+        if (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> entry = iterator.next();
+            supplierID1 = entry.getKey(); agreementID1 = entry.getValue();
+        }
+        if (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> entry = iterator.next();
+            supplierID2 = entry.getKey(); agreementID2 = entry.getValue();
+        }
+        if (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> entry = iterator.next();
+            supplierID3 = entry.getKey(); agreementID3 = entry.getValue();
+        }
+
+        // שלב 2: יצירת רשימת הזמנות תקופתיות עם שמות ספקים תואמים
         List<PeriodicOrderDTO> orders = Arrays.asList(
-                new PeriodicOrderDTO(0, 1004, 2, "2025-06-02", 0.65, 1, "MONDAY, WEDNESDAY, FRIDAY", 2),
-                new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, 2, "TUESDAY, THURSDAY", 2),
-                new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, 3, "SUNDAY, WEDNESDAY", 3),
-                new PeriodicOrderDTO(0, 1007, 5, "2025-06-02", 0.60, 1, "THURSDAY", 3),
-                new PeriodicOrderDTO(0, 1008, 6, "2025-06-02", 0.95, 2, "TUESDAY, THURSDAY", 4),
-                new PeriodicOrderDTO(0, 1009, 7, "2025-06-02", 2.00, 3, "MONDAY", 2),
-                new PeriodicOrderDTO(0, 1010, 8, "2025-06-02", 0.50, 1, "TUESDAY", 1),
-                new PeriodicOrderDTO(0, 1011, 9, "2025-06-02", 0.30, 2, "WEDNESDAY", 2),
-                new PeriodicOrderDTO(0, 1012, 10, "2025-06-02", 0.75, 3, "THURSDAY", 3),
-                new PeriodicOrderDTO(0, 1013, 11, "2025-06-02", 1.20, 1, "FRIDAY", 5)
+                new PeriodicOrderDTO(0, 1004, 2, "2025-06-02", 0.65, supplierID1, getSupplierNameById(supplierID1), "MONDAY, WEDNESDAY, FRIDAY", agreementID1, 1),
+                new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, supplierID2, getSupplierNameById(supplierID2), "TUESDAY, THURSDAY", agreementID2, 2),
+                new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, supplierID3, getSupplierNameById(supplierID3), "SUNDAY, WEDNESDAY", agreementID3, 3)
         );
 
         for (PeriodicOrderDTO dto : orders) {
@@ -126,32 +139,15 @@ public class InventoryInitializer {
         System.out.println("✅ Periodic orders preload completed.");
     }
 
-    public static void preloadShortageOrders() {
-        JdbcShortageOrderDAO dao = new JdbcShortageOrderDAO();
-        List<ShortageOrderDTO> orders = Arrays.asList(
-                new ShortageOrderDTO(0, 1004, 1, 6.5, 0.65, "2025-06-02"),
-                new ShortageOrderDTO(0, 1005, 2, 8.0, 0.80, "2025-06-02"),
-                new ShortageOrderDTO(0, 1006, 3, 4.5, 0.45, "2025-06-02"),
-                new ShortageOrderDTO(0, 1007, 4, 6.0, 0.60, "2025-06-02"),
-                new ShortageOrderDTO(0, 1008, 5, 9.5, 0.95, "2025-06-02"),
-                new ShortageOrderDTO(0, 1009, 6, 20.0, 2.00, "2025-06-02"),
-                new ShortageOrderDTO(0, 1010, 7, 5.0, 0.50, "2025-06-02"),
-                new ShortageOrderDTO(0, 1011, 8, 3.0, 0.30, "2025-06-02"),
-                new ShortageOrderDTO(0, 1012, 9, 7.5, 0.75, "2025-06-02"),
-                new ShortageOrderDTO(0, 1013, 10, 12.0, 1.20, "2025-06-02")
-        );
-
-        for (ShortageOrderDTO dto : orders) {
-            try {
-                dao.insertShortageOrder(dto);
-            } catch (SQLException e) {
-                System.err.println("❌ Failed to insert shortage order for product " + dto.getProductCatalogNumber());
-                e.printStackTrace();
-            }
-        }
-
-        System.out.println("✅ Shortage orders preload completed.");
+    private static String getSupplierNameById(int supplierId) {
+        return switch (supplierId) {
+            case 1 -> "Prigat";
+            case 2 -> "Tnuva";
+            case 3 -> "Osem";
+            default -> "Unknown";
+        };
     }
+
 
     public static void clearAllTables() {
         String url = "jdbc:sqlite:Inventory.db";
@@ -172,12 +168,11 @@ public class InventoryInitializer {
         }
     }
 
-    public static void preloadAllInitialData() {
+    public static void preloadAllInitialData(LinkedHashMap<Integer,Integer> supplierIdAndAgreementsID) {
         System.out.println("🔄 Preloading products and items...");
         preloadProducts();
         preloadItems();
-        preloadPeriodicOrders();
-        preloadShortageOrders();
+        preloadPeriodicOrders(supplierIdAndAgreementsID); //add SuppliersID and AgreementID
         System.out.println("✅ Preload completed.");
     }
 

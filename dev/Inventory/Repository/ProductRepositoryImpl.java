@@ -87,7 +87,7 @@ public class ProductRepositoryImpl implements IProductRepository {
         Map<Integer, Integer> warehouseQuantities = new HashMap<>();
 
         for (ItemDTO item : items) {
-            if (item.IsDefective()) continue; // דלג על פגומים
+            if (item.IsDefective()) continue;
             int catalog = item.getCatalogNumber();
             String location = item.getStorageLocation();
 
@@ -101,12 +101,28 @@ public class ProductRepositoryImpl implements IProductRepository {
         for (Integer catalogNumber : storeQuantities.keySet()) {
             int storeQty = storeQuantities.getOrDefault(catalogNumber, 0);
             int warehouseQty = warehouseQuantities.getOrDefault(catalogNumber, 0);
+
+            ProductDTO product = productdao.GetProductByCatalogNumber(catalogNumber);
+            if (product != null) {
+                System.out.printf("🔁 Updating Product [%s] (Catalog #%d)\n", product.getProductName(), catalogNumber);
+                System.out.printf("    📦 Before -> Store: %d | Warehouse: %d\n", product.getQuantityInStore(), product.getQuantityInWarehouse());
+                System.out.printf("    🆕 After  -> Store: %d | Warehouse: %d\n", storeQty, warehouseQty);
+            }
+
             updateQuantities(catalogNumber, storeQty, warehouseQty);
         }
 
         for (Integer catalogNumber : warehouseQuantities.keySet()) {
             if (!storeQuantities.containsKey(catalogNumber)) {
                 int warehouseQty = warehouseQuantities.get(catalogNumber);
+
+                ProductDTO product = productdao.GetProductByCatalogNumber(catalogNumber);
+                if (product != null) {
+                    System.out.printf("🔁 Updating Product [%s] (Catalog #%d)\n", product.getProductName(), catalogNumber);
+                    System.out.printf("    📦 Before -> Store: %d | Warehouse: %d\n", product.getQuantityInStore(), product.getQuantityInWarehouse());
+                    System.out.printf("    🆕 After  -> Store: 0 | Warehouse: %d\n", warehouseQty);
+                }
+
                 updateQuantities(catalogNumber, 0, warehouseQty);
             }
         }

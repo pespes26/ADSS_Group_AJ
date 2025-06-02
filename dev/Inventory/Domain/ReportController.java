@@ -347,12 +347,6 @@ public class ReportController {
 
 
 
-
-
-
-
-
-
     public String generateShortageInventoryReport(int branch_id) {
         StringBuilder report = new StringBuilder();
         boolean found = false;
@@ -368,6 +362,8 @@ public class ReportController {
             if (!item.IsDefective()) {
                 int catalog_number = item.getCatalogNumber();
                 stockCountMap.put(catalog_number, stockCountMap.getOrDefault(catalog_number, 0) + 1);
+            } else {
+                System.out.println("🟡 Skipping defective item ID " + item.getItemId());
             }
         }
 
@@ -380,17 +376,25 @@ public class ReportController {
         for (ProductDTO productDTO : dbProducts) {
             int catalog_number = productDTO.getCatalogNumber();
             Product product = products.get(catalog_number);
-            if (product == null) continue;
+
+            if (product == null) {
+                System.out.println("⚠️ Warning: product not found in memory for catalog " + catalog_number);
+                continue;
+            }
 
             int inStock = stockCountMap.getOrDefault(catalog_number, 0);
+            System.out.println("🔍 Checking catalog " + catalog_number + ": " + inStock + " in stock.");
 
             String days = product.getSupplyDaysInTheWeek();
             if (days == null || days.trim().isEmpty()) {
-                continue; // Skip products without supply day info
+                System.out.println("⚠️ Product " + catalog_number + " skipped due to missing supply days");
+                continue;
             }
 
             int supplyTime = DateUtils.calculateNextSupplyDayOffset(days);
             int min_required = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * supplyTime));
+
+            System.out.println("🧮 Product " + catalog_number + " requires min " + min_required + ", has " + inStock);
 
             if (inStock < min_required) {
                 found = true;
@@ -409,6 +413,8 @@ public class ReportController {
                 }
 
                 report.append("\n");
+            } else {
+                System.out.println("✅ Product " + catalog_number + " is above minimum. No shortage.");
             }
         }
 
@@ -443,6 +449,45 @@ public class ReportController {
         int min_required = product.getMinimumQuantityForAlert();
 
         return count < min_required;
+    }
+
+    public Map<Integer, Integer> getShortageProductsMap(int branchId) {
+        Map<Integer, Integer> shortages = new HashMap<>();
+
+        Branch branch = branches.get(branchId);
+        if (branch == null) {
+            System.err.println("⚠️ Branch not found: " + branchId);
+            return shortages;
+        }
+
+        // ספירת פריטים תקינים בלבד
+        Map<Integer, Integer> stockCount = new HashMap<>();
+        for (ItemDTO item : branch.getItems().values()) {
+            if (!item.IsDefective()) {
+                int catalog = item.getCatalogNumber();
+                stockCount.put(catalog, stockCount.getOrDefault(catalog, 0) + 1);
+            }
+        }
+
+        // בדיקת דרישות מינימום לכל מוצר
+        for (Map.Entry<Integer, Product> entry : products.entrySet()) {
+            int catalogNumber = entry.getKey();
+            Product product = entry.getValue();
+
+            String supplyDays = product.getSupplyDaysInTheWeek();
+            if (supplyDays == null || supplyDays.isEmpty()) continue;
+
+            int supplyOffset = DateUtils.calculateNextSupplyDayOffset(supplyDays);
+            int requiredMin = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * supplyOffset));
+            int inStock = stockCount.getOrDefault(catalogNumber, 0);
+
+            if (inStock < requiredMin) {
+                int shortage = requiredMin - inStock;
+                shortages.put(catalogNumber, shortage);
+            }
+        }
+
+        return shortages;
     }
 
 

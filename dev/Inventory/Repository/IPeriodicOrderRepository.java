@@ -19,4 +19,7 @@ public interface IPeriodicOrderRepository {
     void updatePeriodicOrder(PeriodicOrderDTO dto) throws SQLException;
 
     void deletePeriodicOrderById(int orderId) throws SQLException;
+
+    void saveAll(List<PeriodicOrderDTO> orders) throws SQLException;
+
 }

@@ -9,32 +9,37 @@ public class PeriodicOrderDTO {
     private int productCatalogNumber;
     private int quantity;
     private int supplierId;
-    //TO DO: add supplier name
+    private String supplierName; // ✅ חדש
     private String daysInTheWeek;
     private String orderDate;
     private double supplierDiscount;
     private int agreementId;
+    private int branchId;
 
     /**
      * Empty constructor for frameworks and manual mapping.
      */
     public PeriodicOrderDTO() {}
 
-
+    /**
+     * Full constructor
+     */
     public PeriodicOrderDTO(int orderId, int productCatalogNumber, int quantity, String orderDate,
-                            double supplierDiscount, int supplierId, String daysInTheWeek, int agreementId) {
+                            double supplierDiscount, int supplierId, String supplierName,
+                            String daysInTheWeek, int agreementId, int branchId) {
         this.orderId = orderId;
         this.productCatalogNumber = productCatalogNumber;
         this.quantity = quantity;
         this.orderDate = orderDate;
         this.supplierDiscount = supplierDiscount;
         this.supplierId = supplierId;
+        this.supplierName = supplierName;
         this.daysInTheWeek = daysInTheWeek;
         this.agreementId = agreementId;
+        this.branchId = branchId;
     }
 
     // Getters
-
     public int getOrderId() {
         return orderId;
     }
@@ -59,6 +64,10 @@ public class PeriodicOrderDTO {
         return supplierId;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
+
     public String getDaysInTheWeek() {
         return daysInTheWeek;
     }
@@ -67,8 +76,11 @@ public class PeriodicOrderDTO {
         return agreementId;
     }
 
-    // Setters
+    public int getBranchId() {
+        return branchId;
+    }
 
+    // Setters
     public void setOrderId(int orderId) {
         this.orderId = orderId;
     }
@@ -93,11 +105,19 @@ public class PeriodicOrderDTO {
         this.supplierId = supplierId;
     }
 
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public void setDaysInTheWeek(String daysInTheWeek) {
         this.daysInTheWeek = daysInTheWeek;
     }
 
     public void setAgreementId(int agreementId) {
         this.agreementId = agreementId;
+    }
+
+    public void setBranchId(int branchId) {
+        this.branchId = branchId;
     }
 }

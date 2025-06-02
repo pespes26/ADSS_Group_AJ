@@ -169,8 +169,8 @@ package Suppliers.Presentation;
 import Suppliers.DTO.OrderDTO;
 import Suppliers.DTO.OrderItemDTO;
 import Suppliers.Domain.OrderManagementController;
-import Suppliers.dataaccess.DAO.IOrderDAO;
-import Suppliers.dataaccess.DAO.JdbcOrderDAO;
+import Suppliers.DAO.IOrderDAO;
+import Suppliers.DAO.JdbcOrderDAO;
 
 import java.sql.SQLException;
 import java.util.List;

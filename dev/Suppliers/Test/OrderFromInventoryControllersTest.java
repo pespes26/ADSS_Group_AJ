@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 public class OrderFromInventoryControllersTest {
     private static PeriodicOrderController periodicOrderController;
     private static OrderByShortageController orderByShortageController;
@@ -46,7 +46,7 @@ public class OrderFromInventoryControllersTest {
             stmt.executeUpdate("DELETE FROM discounts");
             stmt.executeUpdate("DELETE FROM agreements");
             stmt.executeUpdate("DELETE FROM suppliers");
-            stmt.executeUpdate("DELETE FROM orders"); // אם יש לך טבלת הזמנות
+            stmt.executeUpdate("DELETE FROM orders");
         }
 
         IAgreementDAO agreementDAO = new JdbcAgreementDAO();
@@ -66,13 +66,19 @@ public class OrderFromInventoryControllersTest {
             supplierID3 = supplierDAO.getIdByName("YALI");
 
             List<AgreementDTO> list1 = agreementDAO.getBySupplierId(supplierID1);
-            for (AgreementDTO agreementDTO : list1) { agreementID1 = agreementDTO.getAgreement_ID();}
+            for (AgreementDTO agreementDTO : list1) {
+                agreementID1 = agreementDTO.getAgreement_ID();
+            }
 
             List<AgreementDTO> list2 = agreementDAO.getBySupplierId(supplierID2);
-            for (AgreementDTO agreementDTO : list2) { agreementID1 = agreementDTO.getAgreement_ID();}
+            for (AgreementDTO agreementDTO : list2) {
+                agreementID1 = agreementDTO.getAgreement_ID();
+            }
 
             List<AgreementDTO> list3 = agreementDAO.getBySupplierId(supplierID3);
-            for (AgreementDTO agreementDTO : list3) { agreementID1 = agreementDTO.getAgreement_ID();}
+            for (AgreementDTO agreementDTO : list3) {
+                agreementID1 = agreementDTO.getAgreement_ID();
+            }
 
         }
 
@@ -84,26 +90,29 @@ public class OrderFromInventoryControllersTest {
         agreementID2 = agreementDAO.insertAndGetID(new AgreementDTO(supplierID2, new String[]{"Tue", "Thu"}, true));
         agreementID3 = agreementDAO.insertAndGetID(new AgreementDTO(supplierID3, new String[]{"Sun", "Wed"}, false));
 
-        productSupplierDAO.insert(new ProductSupplierDTO(34, 1204, supplierID1, agreementID1, 6.5, "L"));
-        productSupplierDAO.insert(new ProductSupplierDTO(89, 1204, supplierID2, agreementID2, 6.5, "g"));
-        productSupplierDAO.insert(new ProductSupplierDTO(75, 1506, supplierID3, agreementID3, 4.5, "g"));
-
-        discountDAO.insert(new DiscountDTO(1204, supplierID1, agreementID1, 20, 10.0));//same discount
-        discountDAO.insert(new DiscountDTO(1204,  supplierID2, agreementID2, 25, 12.0));//same discount but biggest amount
-        discountDAO.insert(new DiscountDTO(1506, supplierID1, agreementID3, 50, 15.0));
-
+//        productSupplierDAO.insert(new ProductSupplierDTO(34, 1204, supplierID1, agreementID1, 6.5, "L"));
+//        productSupplierDAO.insert(new ProductSupplierDTO(89, 1204, supplierID2, agreementID2, 6.5, "g"));
+//        productSupplierDAO.insert(new ProductSupplierDTO(75, 1204, supplierID3, agreementID3, 0.5, "g"));
+//
+//        discountDAO.insert(new DiscountDTO(1204, supplierID1, agreementID1, 20, 10.0));//same discount
+//        discountDAO.insert(new DiscountDTO(1204, supplierID2, agreementID2, 25, 12.0));//same discount but biggest amount
+//        discountDAO.insert(new DiscountDTO(1506, supplierID1, agreementID3, 50, 15.0));
     }
 
     @Test
     public void givenValidData_whenGetPeriodicOrderProductDetails_thenReturnExpectedResults() throws SQLException {
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+        productSupplierDAO.insert(new ProductSupplierDTO(34, 1204, supplierID1, agreementID1, 6.5, "L"));
+        discountDAO.insert(new DiscountDTO(1204, supplierID1, agreementID1, 20, 10.0));//same discount
 
-        InventoryProductPeriodic productPeriodic1 = new InventoryProductPeriodic(supplierID1,agreementID1,1204,30);
+        InventoryProductPeriodic productPeriodic1 = new InventoryProductPeriodic(supplierID1, agreementID1, 1204, 30);
 
         List<InventoryProductPeriodic> productsPeriodic = new ArrayList<>();
         productsPeriodic.add(productPeriodic1);
 
         long phoneNumber = 50222819;
-        List<OrderProductDetails> orderProductDetails = periodicOrderController.getPeriodicOrderProductDetails(productsPeriodic,phoneNumber);
+        List<OrderProductDetails> orderProductDetails = periodicOrderController.getPeriodicOrderProductDetails(productsPeriodic, phoneNumber);
         for (OrderProductDetails orderProductDetail : orderProductDetails) {
             assertEquals(1204, orderProductDetail.getProductId());
             assertEquals(30, orderProductDetail.getQuantity());
@@ -116,10 +125,10 @@ public class OrderFromInventoryControllersTest {
     }
 
     @Test
-    public void givenValidData_whengetShortageOrderProductDetails_thenReturnExpectedResults() throws SQLException {
+    public void givenValidData_whenGetShortageOrderProductDetails_thenReturnExpectedResults() throws SQLException {
 
-        HashMap<Integer,Integer> products = new HashMap<>();
-        products.put(1204,20);
+        HashMap<Integer, Integer> products = new HashMap<>();
+        products.put(1204, 20);
 
         long phoneNumber = 50222819;
 
@@ -136,10 +145,15 @@ public class OrderFromInventoryControllersTest {
     }
 
     @Test
-    public void givenSameProductWithTwoDifferentDiscounts_whenGetShortageOrderProductDetails_thenReturnTheBestPrice()  throws SQLException {
+    public void givenSameProductWithTwoDifferentDiscounts_whenGetShortageOrderProductDetails_thenReturnTheBestPrice() throws SQLException {
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+        productSupplierDAO.insert(new ProductSupplierDTO(89, 1204, supplierID2, agreementID2, 6.5, "g"));
+        discountDAO.insert(new DiscountDTO(1204, supplierID2, agreementID2, 25, 12.0));//same discount but biggest amount
 
-        HashMap<Integer,Integer> products = new HashMap<>();
-        products.put(1204,30);
+
+        HashMap<Integer, Integer> products = new HashMap<>();
+        products.put(1204, 30);
 
         long phoneNumber = 50222819;
 
@@ -150,6 +164,29 @@ public class OrderFromInventoryControllersTest {
         }
     }
 
+    @Test
+    public void givenCheapestSupplierHasNoDiscount_whenGetShortageOrderProductDetails_thenReturnTheBestPrice() throws SQLException {
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+        productSupplierDAO.insert(new ProductSupplierDTO(75, 1204, supplierID3, agreementID3, 0.5, "g"));
+        discountDAO.insert(new DiscountDTO(1506, supplierID3, agreementID3, 50, 15.0));
 
+        HashMap<Integer, Integer> products = new HashMap<>();
+        products.put(1204, 30);
 
+        long phoneNumber = 50222819;
+
+        List<OrderProductDetails> orderProductDetails = orderByShortageController.getShortageOrderProductDetails(products, phoneNumber);
+        for (OrderProductDetails orderProductDetail : orderProductDetails) {
+            assertEquals(supplierID3, orderProductDetail.getSupplierId());
+            assertEquals(0.0, orderProductDetail.getDiscount());
+        }
+    }
 }
+
+
+
+
+
+
+

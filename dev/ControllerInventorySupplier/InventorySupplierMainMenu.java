@@ -15,20 +15,6 @@ public class InventorySupplierMainMenu {
     public static void main(String[] args) throws SQLException {
 
 
-//==============================================================================================
-//        //add the data for Supplier
-//        Initializer initializer = new Initializer();
-//        IInventoryOrderRepository supplierRepository = initializer.getSupplierOrderRepository();
-//
-//        ShortageOrderService orderService = new ShortageOrderService(supplierRepository);
-//        //TODO pass this Service To Inventory This Class Implement WakeUPListener
-//
-//        PeriodicOrderService periodicOrderService = new PeriodicOrderService(supplierRepository);
-//        periodicOrderService.start(); //starting the periodic Order
-//======================================================================================================
-
-
-
 
 
         Scanner scanner = new Scanner(System.in);

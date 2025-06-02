@@ -11,4 +11,6 @@ public interface IShortageOrderRepository {
     void deleteById(int id) throws SQLException;
     ShortageOrderDTO getById(int id) throws SQLException;
     List<ShortageOrderDTO> getAll() throws SQLException;
+    String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException;
+
 }

@@ -2,6 +2,7 @@ package Inventory.DTO;
 
 import Inventory.InventoryUtils.DateUtils;
 
+
 public class ProductDTO {
     private int catalogNumber;
     private String productName;
@@ -22,6 +23,8 @@ public class ProductDTO {
     private int quantityInStore;
     private int minimumQuantityForAlert;
     private int branchId;
+
+
 
 
     // Constructor with parameters
@@ -47,6 +50,8 @@ public class ProductDTO {
         this.productDemandLevel = productDemandLevel;
         this.minimumQuantityForAlert = (int) (0.5 * supplyTime + 0.5 * productDemandLevel);
     }
+
+
 
     // Default constructor
     public ProductDTO() {}

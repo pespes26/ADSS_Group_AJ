@@ -156,6 +156,7 @@ public class InventoryInitializer {
              Statement stmt = conn.createStatement()) {
 
             // סדר המחיקות חשוב
+            stmt.executeUpdate("DELETE FROM orders_on_the_way");
             stmt.executeUpdate("DELETE FROM items");
             stmt.executeUpdate("DELETE FROM sold_items");
             stmt.executeUpdate("DELETE FROM periodic_orders");

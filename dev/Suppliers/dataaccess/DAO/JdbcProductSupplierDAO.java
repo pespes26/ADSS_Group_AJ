@@ -140,7 +140,7 @@ public class JdbcProductSupplierDAO implements IProductSupplierDAO {
                             rs.getInt("catalog_number"),
                             rs.getInt("supplier_id"),
                             rs.getInt("agreement_id"),
-                            rs.getInt("price"),
+                            rs.getDouble("price"),
                             rs.getString("unit")
                     );
                 }

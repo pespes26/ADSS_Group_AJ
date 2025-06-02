@@ -1,5 +1,6 @@
 package Suppliers.Domain;
 
+import Inventory.DTO.InventoryProductPeriodic;
 import Suppliers.DTO.*;
 
 import java.sql.SQLException;

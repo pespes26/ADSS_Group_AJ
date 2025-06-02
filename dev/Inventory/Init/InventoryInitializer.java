@@ -110,8 +110,7 @@ public class InventoryInitializer {
                 new PeriodicOrderDTO(0, 1009, 7, "2025-06-02", 2.00, 3, "MONDAY", 2),
                 new PeriodicOrderDTO(0, 1010, 8, "2025-06-02", 0.50, 1, "TUESDAY", 1),
                 new PeriodicOrderDTO(0, 1011, 9, "2025-06-02", 0.30, 2, "WEDNESDAY", 2),
-                new PeriodicOrderDTO(0, 1012, 10, "2025-06-02", 0.75, 3, "THURSDAY", 3),
-                new PeriodicOrderDTO(0, 1013, 11, "2025-06-02", 1.20, 1, "FRIDAY", 5)
+                new PeriodicOrderDTO(0, 1012, 10, "2025-06-02", 0.75, 3, "THURSDAY", 3)
         );
 
         for (PeriodicOrderDTO dto : orders) {
@@ -137,8 +136,7 @@ public class InventoryInitializer {
                 new ShortageOrderDTO(0, 1009, 6, 20.0, 2.00, "2025-06-02"),
                 new ShortageOrderDTO(0, 1010, 7, 5.0, 0.50, "2025-06-02"),
                 new ShortageOrderDTO(0, 1011, 8, 3.0, 0.30, "2025-06-02"),
-                new ShortageOrderDTO(0, 1012, 9, 7.5, 0.75, "2025-06-02"),
-                new ShortageOrderDTO(0, 1013, 10, 12.0, 1.20, "2025-06-02")
+                new ShortageOrderDTO(0, 1012, 9, 7.5, 0.75, "2025-06-02")
         );
 
         for (ShortageOrderDTO dto : orders) {

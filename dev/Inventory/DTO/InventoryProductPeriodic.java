@@ -1,4 +1,4 @@
-package Suppliers.DTO;
+package Inventory.DTO;
 
 public class InventoryProductPeriodic {
     int supplierId;
@@ -6,7 +6,7 @@ public class InventoryProductPeriodic {
     int catalogNumber;
     int quantity;
 
-    public InventoryProductPeriodic(int supplierId,int agreementID, int catalogNumber, int quantity) {
+    public InventoryProductPeriodic(int supplierId, int agreementID, int catalogNumber, int quantity) {
         this.supplierId = supplierId;
         this.agreementID = agreementID;
         this.catalogNumber = catalogNumber;

@@ -1,52 +1,65 @@
 package InventorySupplier.Service;
 
+import Inventory.DTO.InventoryProductPeriodic;
+import Inventory.DTO.PeriodicOrderDTO;
+import Inventory.Repository.IPeriodicOrderRepository;
 import Suppliers.Domain.IInventoryOrderRepository;
 import Suppliers.Domain.PeriodicOrderController;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class PeriodicOrderService {
     private final PeriodicOrderController periodicOrderController;
+    private final IPeriodicOrderRepository periodicOrderRepository;
     private final ScheduledExecutorService scheduler;
 
-    public PeriodicOrderService( IInventoryOrderRepository orderRepository) {
+    public PeriodicOrderService(IInventoryOrderRepository orderRepository,
+                                IPeriodicOrderRepository periodicOrderRepository) {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         this.periodicOrderController = new PeriodicOrderController(orderRepository);
-        }
-
+        this.periodicOrderRepository = periodicOrderRepository;
+    }
 
     public void start() {
         Runnable periodicTask = () -> {
             try {
-                // בקשת פריטים להזמנה תקופתית
-                //TODO List<InventoryProductPeriodic> request = inventoryController.getPeriodicOrderData();
+                // שליפת ההזמנות התקופתיות מה־Repository
+                List<PeriodicOrderDTO> periodicOrders = periodicOrderRepository.getAllPeriodicOrders();
 
-                // ביצוע הזמנה
-                //TODO List<OrderProductDetails> supplierData = periodicOrderController.getPeriodicOrderProductDetails(request);
+                // המרה ל־InventoryProductPeriodic
+                List<InventoryProductPeriodic> inventoryData = convertToInventoryPeriodic(periodicOrders);
 
-                // עדכון המלאי שהוזמנה הזמנה
-                //TODO inventoryController.registerPendingOrder(supplierData);
+                // (בשלב מאוחר יותר) העברה לספקים + עדכון המלאי
+                for (InventoryProductPeriodic inv : inventoryData) {
+                    System.out.printf("SupplierID: %d | AgreementID: %d | Catalog: %d | Quantity: %d%n",
+                            inv.getSupplierId(), inv.getAgreementID(), inv.getCatalogNumber(), inv.getQuantity());
+                }
 
-                System.out.println("Periodic order was successfully completed.");
             } catch (Exception e) {
                 System.err.println("Error occurred during periodic order execution: " + e.getMessage());
             }
         };
 
-        // הפעלת המשימה כל שבוע (7 ימים = 7 * 24 * 60 * 60 שניות)
         long weekInSeconds = 7L * 24 * 60 * 60;
+        scheduler.scheduleAtFixedRate(periodicTask, 0, weekInSeconds, TimeUnit.SECONDS);
+    }
 
-        scheduler.scheduleAtFixedRate(
-                periodicTask,
-                0,                // התחלה מידית
-                weekInSeconds,    // מרווח של שבוע
-                TimeUnit.SECONDS
-        );
+    private List<InventoryProductPeriodic> convertToInventoryPeriodic(List<PeriodicOrderDTO> orders) {
+        List<InventoryProductPeriodic> result = new ArrayList<>();
+        for (PeriodicOrderDTO dto : orders) {
+            result.add(new InventoryProductPeriodic(
+                    dto.getSupplierId(),
+                    dto.getAgreementId(),
+                    dto.getProductCatalogNumber(),
+                    dto.getQuantity()
+            ));
+        }
+        return result;
     }
 
     public void stop() {
         scheduler.shutdown();
     }
-    }
+}

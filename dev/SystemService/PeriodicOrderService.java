@@ -29,6 +29,7 @@ public class PeriodicOrderService {
                 // בקשת פריטים להזמנה תקופתית
                 //TODO List<InventoryProductPeriodic> request = inventoryController.getPeriodicOrderData();
 
+
                 // ביצוע הזמנה
                 //TODO List<OrderProductDetails> supplierData = periodicOrderController.getPeriodicOrderProductDetails(request);
 

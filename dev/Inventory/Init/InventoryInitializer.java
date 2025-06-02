@@ -2,7 +2,9 @@ package Inventory.Init;
 
 import Inventory.DAO.*;
 import Inventory.DTO.ItemDTO;
+import Inventory.DTO.PeriodicOrderDTO;
 import Inventory.DTO.ProductDTO;
+import Inventory.DTO.ShortageOrderDTO;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,8 +20,8 @@ public class InventoryInitializer {
         System.out.println("Creating all necessary tables using DAO static initializers...");
         new JdbcProductDAO();
         new JdbcItemDAO();
-        new JdbcOrdersOnTheWayDAO();
-        new JdbcPeriodicOrdersDAO();
+        new JdbcShortageOrderDAO();
+        new JdbcPeriodicOrderDAO();
         System.out.println("✅ All DAO-related tables initialized successfully.");
     }
 
@@ -97,6 +99,60 @@ public class InventoryInitializer {
         }
     }
 
+    public static void preloadPeriodicOrders() {
+        JdbcPeriodicOrderDAO dao = new JdbcPeriodicOrderDAO();
+        List<PeriodicOrderDTO> orders = Arrays.asList(
+                new PeriodicOrderDTO(0, 1004, 2, "2025-06-02", 0.65, 1, "MONDAY, WEDNESDAY, FRIDAY", 2),
+                new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, 2, "TUESDAY, THURSDAY", 2),
+                new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, 3, "SUNDAY, WEDNESDAY", 3),
+                new PeriodicOrderDTO(0, 1007, 5, "2025-06-02", 0.60, 1, "THURSDAY", 3),
+                new PeriodicOrderDTO(0, 1008, 6, "2025-06-02", 0.95, 2, "TUESDAY, THURSDAY", 4),
+                new PeriodicOrderDTO(0, 1009, 7, "2025-06-02", 2.00, 3, "MONDAY", 2),
+                new PeriodicOrderDTO(0, 1010, 8, "2025-06-02", 0.50, 1, "TUESDAY", 1),
+                new PeriodicOrderDTO(0, 1011, 9, "2025-06-02", 0.30, 2, "WEDNESDAY", 2),
+                new PeriodicOrderDTO(0, 1012, 10, "2025-06-02", 0.75, 3, "THURSDAY", 3),
+                new PeriodicOrderDTO(0, 1013, 11, "2025-06-02", 1.20, 1, "FRIDAY", 5)
+        );
+
+        for (PeriodicOrderDTO dto : orders) {
+            try {
+                dao.insertPeriodicOrder(dto);
+            } catch (SQLException e) {
+                System.err.println("❌ Failed to insert periodic order for product " + dto.getProductCatalogNumber());
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("✅ Periodic orders preload completed.");
+    }
+
+    public static void preloadShortageOrders() {
+        JdbcShortageOrderDAO dao = new JdbcShortageOrderDAO();
+        List<ShortageOrderDTO> orders = Arrays.asList(
+                new ShortageOrderDTO(0, 1004, 1, 6.5, 0.65, "2025-06-02"),
+                new ShortageOrderDTO(0, 1005, 2, 8.0, 0.80, "2025-06-02"),
+                new ShortageOrderDTO(0, 1006, 3, 4.5, 0.45, "2025-06-02"),
+                new ShortageOrderDTO(0, 1007, 4, 6.0, 0.60, "2025-06-02"),
+                new ShortageOrderDTO(0, 1008, 5, 9.5, 0.95, "2025-06-02"),
+                new ShortageOrderDTO(0, 1009, 6, 20.0, 2.00, "2025-06-02"),
+                new ShortageOrderDTO(0, 1010, 7, 5.0, 0.50, "2025-06-02"),
+                new ShortageOrderDTO(0, 1011, 8, 3.0, 0.30, "2025-06-02"),
+                new ShortageOrderDTO(0, 1012, 9, 7.5, 0.75, "2025-06-02"),
+                new ShortageOrderDTO(0, 1013, 10, 12.0, 1.20, "2025-06-02")
+        );
+
+        for (ShortageOrderDTO dto : orders) {
+            try {
+                dao.insertShortageOrder(dto);
+            } catch (SQLException e) {
+                System.err.println("❌ Failed to insert shortage order for product " + dto.getProductCatalogNumber());
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("✅ Shortage orders preload completed.");
+    }
+
     public static void clearAllTables() {
         String url = "jdbc:sqlite:Inventory.db";
 
@@ -107,7 +163,7 @@ public class InventoryInitializer {
             stmt.executeUpdate("DELETE FROM items");
             stmt.executeUpdate("DELETE FROM sold_items");
             stmt.executeUpdate("DELETE FROM periodic_orders");
-            stmt.executeUpdate("DELETE FROM orders_on_the_way");
+            stmt.executeUpdate("DELETE FROM shortage_orders");
             stmt.executeUpdate("DELETE FROM products");
 
             System.out.println("🧹 All existing table data has been cleared.");
@@ -120,6 +176,8 @@ public class InventoryInitializer {
         System.out.println("🔄 Preloading products and items...");
         preloadProducts();
         preloadItems();
+        preloadPeriodicOrders();
+        preloadShortageOrders();
         System.out.println("✅ Preload completed.");
     }
 

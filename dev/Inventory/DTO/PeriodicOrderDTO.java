@@ -19,18 +19,7 @@ public class PeriodicOrderDTO {
      */
     public PeriodicOrderDTO() {}
 
-    /**
-     * Full constructor to create a periodic order DTO with all relevant fields.
-     *
-     * @param orderId              the ID of the periodic order
-     * @param productCatalogNumber the catalog number of the product
-     * @param quantity             the quantity of the product in the order
-     * @param orderDate            the date the order was placed
-     * @param supplierDiscount     the supplier discount for this order
-     * @param supplierId           the supplier ID
-     * @param daysInTheWeek        the days of the week this order recurs on
-     * @param agreementId          the ID of the agreement for this order
-     */
+
     public PeriodicOrderDTO(int orderId, int productCatalogNumber, int quantity, String orderDate,
                             double supplierDiscount, int supplierId, String daysInTheWeek, int agreementId) {
         this.orderId = orderId;

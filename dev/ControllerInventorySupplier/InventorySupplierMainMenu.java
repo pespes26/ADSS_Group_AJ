@@ -23,28 +23,35 @@ public class InventorySupplierMainMenu {
         while (!exitSystem) {
             System.out.println("\n==============================================");
             System.out.println("Welcome to the Inventory-Suppliers Menu! What would you like to manage?");
-            System.out.println("1. Inventory System");
-            System.out.println("2. Supplier System");
-            System.out.println("3. Exit the Inventory-Suppliers system");
-            System.out.print("Enter your choice (1-3): ");
+            System.out.println("1. Inventory-Suppliers System");
+            System.out.println("2. Inventory System");
+            System.out.println("3. Supplier System");
+            System.out.println("4. Exit the Inventory-Suppliers system");
+            System.out.print("Enter your choice (1-4): ");
 
             int choice = getValidatedInt(scanner);
 
             switch (choice) {
-                case 1 -> handleInventory(scanner);
-                case 2 -> handleSuppliers(scanner);
-                case 3 -> {
+                case 1 -> handleSharedSystem(scanner);
+                case 2 -> handleInventory(scanner);
+                case 3 -> handleSuppliers(scanner);
+                case 4 -> {
                     System.out.println("Exiting system and clearing all data...");
                     InventoryInitializer.clearAllTables();
                     new SuppliersInitializer().clearAllData();
                     System.out.println("✅ All data deleted. Goodbye!");
                     exitSystem = true;
                 }
-                default -> System.out.println("Invalid choice. Please enter 1, 2 or 3.");
+                default -> System.out.println("Invalid choice. Please enter 1 to 4.");
             }
         }
 
         scanner.close();
+    }
+
+    private static void handleSharedSystem(Scanner scanner) throws SQLException {
+        System.out.println("\nYou have selected the Inventory-Suppliers System.");
+        SharedMenu.run(scanner); // ← מחלקה חדשה שתכיל תפריט לפונקציות משותפות
     }
 
     private static void handleInventory(Scanner scanner) {
@@ -94,7 +101,7 @@ public class InventorySupplierMainMenu {
             scanner.next();
         }
         int result = scanner.nextInt();
-        scanner.nextLine(); // 🧹 מנקה את ה־newline
+        scanner.nextLine(); // מנקה את השורה כדי למנוע בעיות עם nextLine
         return result;
     }
 }

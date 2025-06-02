@@ -26,8 +26,6 @@ public class SuppliersInitializer {
 
     }
 
-    public static void SystemInitializer() {
-    }
 
     public static void initializeAllTables() {
         new JdbcSupplierDAO().createTableIfNotExists();

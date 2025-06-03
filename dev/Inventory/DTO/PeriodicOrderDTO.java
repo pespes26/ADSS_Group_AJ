@@ -15,6 +15,10 @@ public class PeriodicOrderDTO {
     private double supplierDiscount;
     private int agreementId;
     private int branchId;
+    private String supplyDays;
+    private String lastOrderDate;
+    private String nextOrderDate;
+    private int orderAmount;
 
     /**
      * Empty constructor for frameworks and manual mapping.
@@ -26,7 +30,8 @@ public class PeriodicOrderDTO {
      */
     public PeriodicOrderDTO(int orderId, int productCatalogNumber, int quantity, String orderDate,
                             double supplierDiscount, int supplierId, String supplierName,
-                            String daysInTheWeek, int agreementId, int branchId) {
+                            String daysInTheWeek, int agreementId, int branchId,
+                            String supplyDays, String lastOrderDate, String nextOrderDate, int orderAmount) {
         this.orderId = orderId;
         this.productCatalogNumber = productCatalogNumber;
         this.quantity = quantity;
@@ -37,6 +42,10 @@ public class PeriodicOrderDTO {
         this.daysInTheWeek = daysInTheWeek;
         this.agreementId = agreementId;
         this.branchId = branchId;
+        this.supplyDays = supplyDays;
+        this.lastOrderDate = lastOrderDate;
+        this.nextOrderDate = nextOrderDate;
+        this.orderAmount = orderAmount;
     }
 
     // Getters
@@ -80,6 +89,22 @@ public class PeriodicOrderDTO {
         return branchId;
     }
 
+    public String getSupplyDays() {
+        return supplyDays;
+    }
+
+    public String getLastOrderDate() {
+        return lastOrderDate;
+    }
+
+    public String getNextOrderDate() {
+        return nextOrderDate;
+    }
+
+    public int getOrderAmount() {
+        return orderAmount;
+    }
+
     // Setters
     public void setOrderId(int orderId) {
         this.orderId = orderId;
@@ -119,5 +144,21 @@ public class PeriodicOrderDTO {
 
     public void setBranchId(int branchId) {
         this.branchId = branchId;
+    }
+
+    public void setSupplyDays(String supplyDays) {
+        this.supplyDays = supplyDays;
+    }
+
+    public void setLastOrderDate(String lastOrderDate) {
+        this.lastOrderDate = lastOrderDate;
+    }
+
+    public void setNextOrderDate(String nextOrderDate) {
+        this.nextOrderDate = nextOrderDate;
+    }
+
+    public void setOrderAmount(int orderAmount) {
+        this.orderAmount = orderAmount;
     }
 }

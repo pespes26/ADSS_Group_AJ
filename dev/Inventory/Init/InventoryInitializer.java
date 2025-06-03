@@ -118,13 +118,14 @@ public class InventoryInitializer {
         if (iterator.hasNext()) {
             Map.Entry<Integer, Integer> entry = iterator.next();
             supplierID3 = entry.getKey(); agreementID3 = entry.getValue();
-        }
-
-        // שלב 2: יצירת רשימת הזמנות תקופתיות עם שמות ספקים תואמים
+        }        // שלב 2: יצירת רשימת הזמנות תקופתיות עם שמות ספקים תואמים
         List<PeriodicOrderDTO> orders = Arrays.asList(
-                new PeriodicOrderDTO(0, 1004, 2, "2025-06-02", 0.65, supplierID1, getSupplierNameById(supplierID1), "MONDAY, WEDNESDAY, FRIDAY", agreementID1, 1),
-                new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, supplierID2, getSupplierNameById(supplierID2), "TUESDAY, THURSDAY", agreementID2, 2),
-                new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, supplierID3, getSupplierNameById(supplierID3), "SUNDAY, WEDNESDAY", agreementID3, 3)
+                new PeriodicOrderDTO(0, 1004, 2, "2025-06-02", 0.65, supplierID1, getSupplierNameById(supplierID1), 
+                    "MONDAY, WEDNESDAY, FRIDAY", agreementID1, 1, "MONDAY, WEDNESDAY, FRIDAY", null, null, 0),
+                new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, supplierID2, getSupplierNameById(supplierID2), 
+                    "TUESDAY, THURSDAY", agreementID2, 2, "TUESDAY, THURSDAY", null, null, 0),
+                new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, supplierID3, getSupplierNameById(supplierID3), 
+                    "SUNDAY, WEDNESDAY", agreementID3, 3, "SUNDAY, WEDNESDAY", null, null, 0)
         );
 
         for (PeriodicOrderDTO dto : orders) {

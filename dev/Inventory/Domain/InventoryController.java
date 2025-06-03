@@ -1,15 +1,19 @@
 package Inventory.Domain;
 
 
-
-
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 import Inventory.InventoryUtils.DateUtils;
 import Inventory.Repository.IItemRepository;
 import Inventory.Repository.IProductRepository;
+import Inventory.Repository.IOrderOnTheWayRepository;
+import Inventory.Repository.IPeriodicOrderRepository;
+import Inventory.Repository.IShortageOrderRepository;
 import Inventory.Repository.ItemRepositoryImpl;
 import Inventory.Repository.ProductRepositoryImpl;
+import Inventory.Repository.OrderOnTheWayRepositoryImpl;
+import Inventory.Repository.PeriodicOrderRepositoryImpl;
+import Inventory.Repository.ShortageOrderRepositoryImpl;
 
 import java.util.List;
 import java.sql.SQLException;
@@ -31,12 +35,19 @@ public class InventoryController {
     private final DiscountController discount_controller;
     private final ReportController report_controller;
     private final IProductRepository productRepository;
+    private final IOrderOnTheWayRepository orderOnTheWayRepository;
+    private final IPeriodicOrderRepository periodicOrderRepository;
+    private final IShortageOrderRepository shortageOrderRepository;
 
 
     public InventoryController() {
         this.products = new HashMap<>();
         this.branches = new HashMap<>();
         this.products_amount_map_by_category = new HashMap<>();
+        this.productRepository = new ProductRepositoryImpl();
+        this.orderOnTheWayRepository = new OrderOnTheWayRepositoryImpl();
+        this.periodicOrderRepository = new PeriodicOrderRepositoryImpl();
+        this.shortageOrderRepository = new ShortageOrderRepositoryImpl();
 
         // אתחול ברירת מחדל ל־10 סניפים
         for (int i = 1; i <= 10; i++) {
@@ -51,7 +62,6 @@ public class InventoryController {
         this.discount_controller = new DiscountController(products);
 
         this.report_controller = new ReportController(branches, products);
-        this.productRepository = new ProductRepositoryImpl();
     }
 
 
@@ -184,8 +194,7 @@ public class InventoryController {
 
 
     /**
-     * Provides access to the internal ItemController instance.
-     *
+     * Gets the item controller instance.
      * @return The item controller.
      */
     public ItemController getItemController() {
@@ -193,8 +202,7 @@ public class InventoryController {
     }
 
     /**
-     * Provides access to the internal ProductController instance.
-     *
+     * Gets the product controller instance.
      * @return The product controller.
      */
     public ProductController getProductController() {
@@ -202,8 +210,7 @@ public class InventoryController {
     }
 
     /**
-     * Provides access to the internal DiscountController instance.
-     *
+     * Gets the discount controller instance.
      * @return The discount controller.
      */
     public DiscountController getDiscountController() {
@@ -211,12 +218,43 @@ public class InventoryController {
     }
 
     /**
-     * Provides access to the internal ReportController instance.
-     *
+     * Gets the report controller instance.
      * @return The report controller.
      */
     public ReportController getReportController() {
         return report_controller;
+    }
+
+    /**
+     * Gets the product repository instance.
+     * @return The product repository.
+     */
+    public IProductRepository getProductRepository() {
+        return productRepository;
+    }
+
+    /**
+     * Gets the order on the way repository instance.
+     * @return The order on the way repository.
+     */
+    public IOrderOnTheWayRepository getOrderOnTheWayRepository() {
+        return orderOnTheWayRepository;
+    }
+
+    /**
+     * Gets the periodic order repository instance.
+     * @return The periodic order repository.
+     */
+    public IPeriodicOrderRepository getPeriodicOrderRepository() {
+        return periodicOrderRepository;
+    }
+
+    /**
+     * Gets the shortage order repository instance.
+     * @return The shortage order repository.
+     */
+    public IShortageOrderRepository getShortageOrderRepository() {
+        return shortageOrderRepository;
     }
 
     public void addNewProductAndItems(int catalogNumber, int branchId, Scanner scan) {
@@ -324,12 +362,4 @@ public class InventoryController {
         int calculatedSupplyTime = DateUtils.calculateNextSupplyDayOffset(supplyDaysInWeek);
         int minRequired = (int) (0.5 * demandLevel + 0.5 * calculatedSupplyTime);
         product.setMinimumQuantityForAlert(minRequired);
-    }
-
-    public IProductRepository getProductRepository() {
-        return productRepository;
-    }
-
-
-
-}
+    }}

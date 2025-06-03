@@ -159,6 +159,48 @@ public class JdbcOrderDAO implements IOrderDAO {
         return filteredOrders;
     }
 
+    @Override
+    public List<OrderDTO> searchOrders(LocalDateTime startDate, LocalDateTime endDate, Integer supplierId) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT o.order_id FROM orders o");
+        List<Object> params = new ArrayList<>();
+
+        if (supplierId != null) {
+            sql.append(" JOIN order_items oi ON o.order_id = oi.order_id WHERE oi.supplier_id = ?");
+            params.add(supplierId);
+        }
+
+        if (startDate != null || endDate != null) {
+            sql.append(supplierId == null ? " WHERE" : " AND");
+            if (startDate != null) {
+                sql.append(" order_date >= ?");
+                params.add(startDate.toString());
+            }
+            if (endDate != null) {
+                if (startDate != null) sql.append(" AND");
+                sql.append(" order_date <= ?");
+                params.add(endDate.toString());
+            }
+        }
+
+        List<OrderDTO> orders = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                OrderDTO order = getById(rs.getInt("order_id"));
+                if (order != null) {
+                    orders.add(order);
+                }
+            }
+        }
+        return orders;
+    }
+
     public void clearTable() {
         String sql = "DELETE FROM orders";
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:suppliers.db");

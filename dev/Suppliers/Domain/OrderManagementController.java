@@ -4,6 +4,7 @@ import Suppliers.DTO.OrderDTO;
 import Suppliers.DAO.IOrderDAO;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderManagementController {
@@ -15,5 +16,17 @@ public class OrderManagementController {
 
     public List<OrderDTO> getAllOrders() throws SQLException {
         return orderDAO.getAll();
+    }
+
+    public List<OrderDTO> searchOrders(LocalDateTime startDate, LocalDateTime endDate, Integer supplierId) throws SQLException {
+        return orderDAO.searchOrders(startDate, endDate, supplierId);
+    }
+
+    public OrderDTO getOrderById(int orderId) throws SQLException {
+        return orderDAO.getById(orderId);
+    }
+
+    public List<OrderDTO> getOrdersBySupplierId(int supplierId) throws SQLException {
+        return orderDAO.getBySupplierId(supplierId);
     }
 }

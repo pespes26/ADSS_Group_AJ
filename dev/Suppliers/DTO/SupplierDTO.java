@@ -1,5 +1,8 @@
 package Suppliers.DTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SupplierDTO {
     String supplierName;
     int supplier_id;
@@ -9,8 +12,8 @@ public class SupplierDTO {
     String paymentCondition;
     long phoneNumber;
     String email;
-
-    public SupplierDTO(String supplierName,  int company_id, int bankAccount, String paymentMethod, String paymentCondition, long phoneNumber, String email) {
+    boolean isActive;
+    List<ContactDTO> contacts;    public SupplierDTO(String supplierName, int company_id, int bankAccount, String paymentMethod, String paymentCondition, long phoneNumber, String email) {
         this.supplierName = supplierName;
         this.supplier_id = 0;
         this.company_id = company_id;
@@ -19,6 +22,8 @@ public class SupplierDTO {
         this.paymentCondition = paymentCondition;
         this.phoneNumber = phoneNumber;
         this.email = email;
+        this.isActive = true; // New suppliers are active by default
+        this.contacts = new ArrayList<>();
     }
 
     public String getSupplierName() {
@@ -53,6 +58,14 @@ public class SupplierDTO {
         return email;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public List<ContactDTO> getContacts() {
+        return contacts;
+    }
+
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
     }
@@ -83,5 +96,27 @@ public class SupplierDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setContacts(List<ContactDTO> contacts) {
+        this.contacts = contacts;
+    }
+
+    public void addContact(ContactDTO contact) {
+        if (this.contacts == null) {
+            this.contacts = new ArrayList<>();
+        }
+        contact.setSupplierId(this.supplier_id);
+        this.contacts.add(contact);
+    }
+
+    public void removeContact(int contactId) {
+        if (this.contacts != null) {
+            this.contacts.removeIf(c -> c.getContactId() == contactId);
+        }
     }
 }

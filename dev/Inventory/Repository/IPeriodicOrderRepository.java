@@ -12,6 +12,8 @@ public interface IPeriodicOrderRepository {
 
     List<PeriodicOrderDTO> getAllPeriodicOrders() throws SQLException;
 
+    List<PeriodicOrderDTO> getPeriodicOrdersInTransit() throws SQLException;
+
     PeriodicOrderDTO getPeriodicOrderById(int orderId) throws SQLException;
 
     void insertPeriodicOrder(PeriodicOrderDTO dto) throws SQLException;

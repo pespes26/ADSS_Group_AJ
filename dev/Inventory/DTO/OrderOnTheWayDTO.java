@@ -10,6 +10,7 @@ public class OrderOnTheWayDTO {
     private String orderCreationDate;
     private int agreementId;
     private boolean isPeriodic;
+    private String status;
 
     public OrderOnTheWayDTO(int orderId, int productCatalogNumber, int quantity, int supplierId, int branchId,
                             String expectedDeliveryDate, String orderCreationDate, int agreementId, boolean isPeriodic) {
@@ -22,6 +23,7 @@ public class OrderOnTheWayDTO {
         this.orderCreationDate = orderCreationDate;
         this.agreementId = agreementId;
         this.isPeriodic = isPeriodic;
+        this.status = "IN_TRANSIT"; // Default status for new orders
     }
 
     public int getOrderId() { return orderId; }
@@ -33,4 +35,6 @@ public class OrderOnTheWayDTO {
     public String getOrderCreationDate() { return orderCreationDate; }
     public int getAgreementId() { return agreementId; }
     public boolean isPeriodic() { return isPeriodic; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

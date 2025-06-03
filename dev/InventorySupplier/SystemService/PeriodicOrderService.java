@@ -1,144 +1,168 @@
 package InventorySupplier.SystemService;
 
-import Inventory.DTO.InventoryProductPeriodic;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.OrderOnTheWayDTO;
 import Inventory.DTO.PeriodicOrderDTO;
 import Inventory.Repository.*;
-import Suppliers.DTO.OrderProductDetailsDTO;
 import Suppliers.Repository.IInventoryOrderRepository;
-import Suppliers.Domain.PeriodicOrderController;
+import Inventory.DataBase.DatabaseConnector;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.concurrent.*;
 
 public class PeriodicOrderService {
-    private final PeriodicOrderController periodicOrderController;
-    private final IPeriodicOrderRepository periodicOrderRepository;
     private final IOrderOnTheWayRepository onTheWayRepository;
+    private final IPeriodicOrderRepository periodicOrderRepository;
     private final IItemRepository itemRepository;
-    private final ScheduledExecutorService scheduler;
 
-    // קונסטרקטור רגיל
     public PeriodicOrderService(IInventoryOrderRepository orderRepository, IPeriodicOrderRepository periodicOrderRepository,
-                                IOrderOnTheWayRepository onTheWayRepository, IItemRepository itemRepository) {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        this.periodicOrderController = new PeriodicOrderController(orderRepository);
+            IOrderOnTheWayRepository onTheWayRepository, IItemRepository itemRepository) {
         this.periodicOrderRepository = periodicOrderRepository;
         this.onTheWayRepository = onTheWayRepository;
         this.itemRepository = itemRepository;
     }
 
-    // קונסטרקטור לטסטים
-    public PeriodicOrderService(PeriodicOrderController controller,
-                                IPeriodicOrderRepository periodicOrderRepository,
-                                IOrderOnTheWayRepository onTheWayRepository,
-                                IItemRepository itemRepository) {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        this.periodicOrderController = controller;
-        this.periodicOrderRepository = periodicOrderRepository;
-        this.onTheWayRepository = onTheWayRepository;
-        this.itemRepository = itemRepository;
-    }
-
+    /**
+     * Process both one-time orders and periodic orders.
+     * - One-time orders: Process orders due today and delete them after processing
+     * - Periodic orders: Process orders scheduled for today but keep them in the system
+     * 
+     * @param branchId The ID of the branch to process orders for
+     * @return true if any orders were processed, false otherwise
+     */
     public boolean start(int branchId) {
-        Runnable periodicTask = () -> {
-            try {
-                String tomorrow = LocalDate.now().plusDays(1).getDayOfWeek().name(); // לדוגמה: TUESDAY
-                List<PeriodicOrderDTO> periodicOrders = periodicOrderRepository.getAllPeriodicOrders()
-                        .stream()
-                        .filter(order -> order.getBranchId() == branchId &&
-                                order.getDaysInTheWeek().toUpperCase().contains(tomorrow))
-                        .toList();
+        Connection connection = null;
+        boolean ordersProcessed = false;
+        
+        try {
+            connection = DatabaseConnector.connect();
+            connection.setAutoCommit(false); // Start transaction
 
-                List<InventoryProductPeriodic> inventoryData = convertToInventoryPeriodic(periodicOrders);
-                List<OrderProductDetailsDTO> detailsList = periodicOrderController.getPeriodicOrderProductDetails(inventoryData, branchId);
+            String currentDay = LocalDate.now().getDayOfWeek().name();
+            LocalDate today = LocalDate.now();
 
-                List<PeriodicOrderDTO> newPeriodicOrders = convertToDTO(detailsList, branchId);
+            // First, process one-time orders that are due today
+            List<OrderOnTheWayDTO> ordersToProcess = onTheWayRepository.getAll().stream()
+                    .filter(order -> order.getBranchId() == branchId)
+                    .filter(order -> {
+                        try {
+                            LocalDate deliveryDate = LocalDate.parse(order.getExpectedDeliveryDate());
+                            return deliveryDate.equals(today);
+                        } catch (DateTimeParseException e) {
+                            System.err.println("❌ Invalid date format for order " + order.getOrderId() + ": " + order.getExpectedDeliveryDate());
+                            return false;
+                        }
+                    })
+                    .toList();
 
-                for (OrderProductDetailsDTO details : detailsList) {
-                    int catalogNumber = details.getProductId();
-                    int quantity = details.getQuantity();
-                    double costPrice = details.getPrice();
-                    double discount = details.getDiscount();
-                    double finalPrice = costPrice * (1 - discount);
-
-                    String expectedDeliveryDate = LocalDate.now().plusDays(1).toString();
-
-                    // שמירת כל הזמנה שנשלחה לטבלת orders_on_the_way
-                    OrderOnTheWayDTO newOrder = new OrderOnTheWayDTO(
-                            0,
-                            catalogNumber,
-                            quantity,
-                            details.getSupplierId(),
-                            branchId,
-                            expectedDeliveryDate,
-                            LocalDate.now().toString(),
-                            details.getAgreementId(),
-                            true
-                    );
-                    onTheWayRepository.insert(newOrder); // ✅ משתמש ב־mock
-
-                    // הכנסת פריטים חדשים למחסן
-                    for (int i = 0; i < quantity; i++) {
-                        ItemDTO item = new ItemDTO(
-                                catalogNumber,
-                                branchId,
-                                "Warehouse",
-                                null,
-                                false,
-                                null
-                        );
-                        itemRepository.addItem(item); // ✅ משתמש ב־mock
-                    }
+            // Process and delete one-time orders
+            for (OrderOnTheWayDTO order : ordersToProcess) {
+                try {
+                    processOneTimeOrder(order, branchId);
+                    ordersProcessed = true;
+                    System.out.println("✅ Processed one-time order #" + order.getOrderId() + 
+                                     " for product " + order.getProductCatalogNumber() +
+                                     " (Quantity: " + order.getQuantity() + ")");
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to process one-time order #" + order.getOrderId() + ": " + e.getMessage());
+                    throw e; // Propagate to trigger rollback
                 }
-
-            } catch (Exception e) {
-                System.err.println("❌ Error occurred during periodic order execution: " + e.getMessage());
-                e.printStackTrace();
             }
-        };
 
-        periodicTask.run(); // קריאה מיידית
-        return false;
-    }
+            // Second, process periodic orders (without deleting them)
+            List<PeriodicOrderDTO> periodicOrders = periodicOrderRepository.getAllPeriodicOrders()
+                    .stream()
+                    .filter(order -> 
+                        order.getBranchId() == branchId &&
+                        order.getDaysInTheWeek() != null &&
+                        order.getDaysInTheWeek().toUpperCase().contains(currentDay)
+                    )
+                    .toList();
 
-    private List<PeriodicOrderDTO> convertToDTO(List<OrderProductDetailsDTO> detailsList, int branchId) {
-        List<PeriodicOrderDTO> dtos = new ArrayList<>();
-        for (OrderProductDetailsDTO details : detailsList) {
-            dtos.add(new PeriodicOrderDTO(
-                    0,
-                    details.getProductId(),
-                    details.getQuantity(),
-                    LocalDateTime.now().toString(),
-                    details.getDiscount(),
-                    details.getSupplierId(),
-                    details.getSupplierName(),
-                    String.join(",", details.getDeliveryDays()),
-                    details.getAgreementId(),
-                    branchId
-            ));
+            // Process periodic orders
+            for (PeriodicOrderDTO order : periodicOrders) {
+                try {
+                    processPeriodicOrder(order, branchId);
+                    ordersProcessed = true;
+                    System.out.println("✅ Processed periodic order #" + order.getOrderId() + 
+                                     " for product " + order.getProductCatalogNumber() +
+                                     " (Quantity: " + order.getQuantity() + ")");
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to process periodic order #" + order.getOrderId() + ": " + e.getMessage());
+                    throw e; // Propagate to trigger rollback
+                }
+            }
+
+            connection.commit(); // Commit transaction
+            return ordersProcessed;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database error during order processing: " + e.getMessage());
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    System.err.println("⚠️ Transaction rolled back");
+                } catch (SQLException ex) {
+                    System.err.println("❌ Failed to rollback transaction: " + ex.getMessage());
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ Error during order processing: " + e.getMessage());
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    System.err.println("⚠️ Transaction rolled back");
+                } catch (SQLException ex) {
+                    System.err.println("❌ Failed to rollback transaction: " + ex.getMessage());
+                }
+            }
+            return false;
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    System.err.println("❌ Failed to close database connection: " + e.getMessage());
+                }
+            }
         }
-        return dtos;
     }
 
-    private List<InventoryProductPeriodic> convertToInventoryPeriodic(List<PeriodicOrderDTO> orders) {
-        List<InventoryProductPeriodic> result = new ArrayList<>();
-        for (PeriodicOrderDTO dto : orders) {
-            result.add(new InventoryProductPeriodic(
-                    dto.getSupplierId(),
-                    dto.getAgreementId(),
-                    dto.getProductCatalogNumber(),
-                    dto.getQuantity()
-            ));
+    private void processOneTimeOrder(OrderOnTheWayDTO order, int branchId) throws SQLException {
+        // Add items to inventory
+        for (int i = 0; i < order.getQuantity(); i++) {
+            ItemDTO item = new ItemDTO(
+                    order.getProductCatalogNumber(),
+                    branchId,
+                    "Warehouse",
+                    null,
+                    false,
+                    null
+            );
+            itemRepository.addItem(item);
         }
-        return result;
+        
+        // Delete the processed order
+        onTheWayRepository.deleteById(order.getOrderId());
     }
 
-    public void stop() {
-        scheduler.shutdown();
+    private void processPeriodicOrder(PeriodicOrderDTO order, int branchId) throws SQLException {
+        // Add items to inventory
+        for (int i = 0; i < order.getQuantity(); i++) {
+            ItemDTO item = new ItemDTO(
+                    order.getProductCatalogNumber(),
+                    branchId,
+                    "Warehouse",
+                    null,
+                    false,
+                    null
+            );
+            itemRepository.addItem(item);
+        }
     }
 }

@@ -57,34 +57,15 @@ public class SupplierRepositoryImpl implements ISupplierRepository {
             throw new RuntimeException("Failed to delete supplier with ID: " + supplier_ID, e);
         }
     }
-
+    @Override
+    public SupplierDTO getSupplierById(int id) throws SQLException {
+        return this.supplierDAO.getById(id);
+    }
 
     @Override
-    public Supplier getSupplierById(int id) {
-        Supplier supplier = cache.get(id);
-        if (supplier != null) return supplier;
-
-        try {
-            SupplierDTO dto = this.supplierDAO.getById(id);
-            if (dto == null) return null;
-
-            Supplier entity = new Supplier(
-                    dto.getSupplierName(),
-                    dto.getSupplier_id(),
-                    dto.getCompany_id(),
-                    dto.getBankAccount(),
-                    dto.getPaymentMethod(),
-                    dto.getPhoneNumber(),
-                    dto.getPaymentCondition(),
-                    dto.getEmail()
-            );
-
-            cache.put(id, entity);
-            return entity;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("DB error", e);
-        }
+    public void updateSupplier(SupplierDTO supplierDTO) throws SQLException {
+        this.supplierDAO.update(supplierDTO);
+        cache.remove(supplierDTO.getSupplier_id()); // Remove from cache since entity state changed
     }
 
 

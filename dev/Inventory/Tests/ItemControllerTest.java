@@ -1,7 +1,6 @@
 package Inventory.Tests;
 
 import Inventory.Domain.Branch;
-import Inventory.Domain.Item;
 import Inventory.Domain.ItemController;
 import Inventory.Domain.Product;
 import org.junit.Before;

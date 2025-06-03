@@ -1,7 +1,5 @@
 package Suppliers.Domain;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a product offered by a supplier.

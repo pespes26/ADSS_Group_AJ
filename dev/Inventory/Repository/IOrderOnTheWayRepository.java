@@ -10,4 +10,6 @@ public interface IOrderOnTheWayRepository {
     void deleteById(int id) throws SQLException;
     OrderOnTheWayDTO getById(int id) throws SQLException;
     List<OrderOnTheWayDTO> getAll() throws SQLException;
+    List<OrderOnTheWayDTO> getOrdersInTransit() throws SQLException;
+    List<OrderOnTheWayDTO> getPeriodicOrdersInTransit(int branchId) throws SQLException;
 }

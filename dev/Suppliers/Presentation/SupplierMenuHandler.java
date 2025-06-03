@@ -1,5 +1,6 @@
 package Suppliers.Presentation;
 import Suppliers.DAO.*;
+import Suppliers.DTO.ContactDTO;
 import Suppliers.DTO.SupplierDTO;
 import Suppliers.Domain.*;
 import Suppliers.Repository.ISupplierRepository;
@@ -245,6 +246,8 @@ public void DeleteSupplier(Scanner scanner, int supplierIdToDelete) throws SQLEx
                 System.out.println("\nWhat would you like to do next?");
                 System.out.println("1. Manage agreements for this supplier");
                 System.out.println("2. Delete this supplier");
+                System.out.println("3. Update supplier status");
+                System.out.println("4. Manage supplier contacts");
                 System.out.println("0. Return to main menu");
                 System.out.print("Enter your choice: ");
 
@@ -259,6 +262,12 @@ public void DeleteSupplier(Scanner scanner, int supplierIdToDelete) throws SQLEx
                         DeleteSupplier(scanner, supplierID);
                         System.out.println("Supplier deleted.");
                         return;
+                    case 3:
+                        updateSupplierStatus(scanner);
+                        break;
+                    case 4:
+                        manageSupplierContacts(scanner);
+                        break;
                     case 0:
                         System.out.println("Return to Main Menu. ");
                         break;
@@ -269,4 +278,122 @@ public void DeleteSupplier(Scanner scanner, int supplierIdToDelete) throws SQLEx
         }
     }
 
+    public static void manageSupplierContacts(Scanner scanner) throws SQLException {
+        System.out.println("=== Manage Supplier Contacts ===");
+        System.out.print("Enter Supplier ID: ");
+        int supplierId = scanner.nextInt();
+        scanner.nextLine(); // Clear scanner buffer
+
+        SupplierDTO supplier = supplierManagementController.getSupplierById(supplierId);
+        if (supplier == null) {
+            System.out.println("❌ Supplier not found!");
+            return;
+        }
+
+        while (true) {
+            System.out.println("\nContact Management Menu for " + supplier.getSupplierName());
+            System.out.println("1. List all contacts");
+            System.out.println("2. Add new contact");
+            System.out.println("3. Remove contact");
+            System.out.println("4. Back to main menu");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Clear scanner buffer
+            
+            switch (choice) {
+                case 1:
+                    listContacts(supplier);
+                    break;
+                case 2:
+                    addContact(scanner, supplier);
+                    break;
+                case 3:
+                    removeContact(scanner, supplier);
+                    break;
+                case 4:
+                    return;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+
+    private static void listContacts(SupplierDTO supplier) {
+        List<ContactDTO> contacts = supplier.getContacts();
+        if (contacts.isEmpty()) {
+            System.out.println("No contacts found for this supplier.");
+            return;
+        }
+
+        System.out.println("\nContacts for " + supplier.getSupplierName() + ":");
+        for (ContactDTO contact : contacts) {
+            System.out.println("ID: " + contact.getContactId());
+            System.out.println("Name: " + contact.getName());
+            System.out.println("Phone: " + contact.getPhoneNumber());
+            System.out.println("Email: " + contact.getEmail());
+            System.out.println("Role: " + contact.getRole());
+            System.out.println("-------------------");
+        }
+    }
+
+    private static void addContact(Scanner scanner, SupplierDTO supplier) throws SQLException {
+        System.out.println("\nAdd New Contact");
+        
+        System.out.print("Enter Contact Name: ");
+        String name = scanner.nextLine();
+        
+        System.out.print("Enter Contact Phone: ");
+        String phone = scanner.nextLine();
+        
+        System.out.print("Enter Contact Email: ");
+        String email = scanner.nextLine();
+        
+        System.out.print("Enter Contact Role: ");
+        String role = scanner.nextLine();
+
+        ContactDTO newContact = new ContactDTO(name, phone, email, role);
+        supplier.addContact(newContact);
+        supplierManagementController.updateSupplier(supplier);
+        
+        System.out.println("✅ Contact added successfully!");
+    }
+
+    private static void removeContact(Scanner scanner, SupplierDTO supplier) throws SQLException {
+        if (supplier.getContacts().isEmpty()) {
+            System.out.println("No contacts to remove!");
+            return;
+        }
+
+        listContacts(supplier);
+        System.out.print("Enter Contact ID to remove: ");
+        int contactId = scanner.nextInt();
+        scanner.nextLine(); // Clear scanner buffer
+        
+        supplier.removeContact(contactId);
+        supplierManagementController.updateSupplier(supplier);
+        
+        System.out.println("✅ Contact removed successfully!");
+    }
+
+    public static void updateSupplierStatus(Scanner scanner) throws SQLException {
+        System.out.println("=== Update Supplier Status ===");
+        System.out.print("Enter Supplier ID: ");
+        int supplierId = scanner.nextInt();
+        scanner.nextLine(); // Clear scanner buffer
+
+        SupplierDTO supplier = supplierManagementController.getSupplierById(supplierId);
+        if (supplier == null) {
+            System.out.println("❌ Supplier not found!");
+            return;
+        }
+
+        System.out.println("Current status: " + (supplier.isActive() ? "Active" : "Inactive"));
+        System.out.print("Set supplier as active? (y/n): ");
+        String response = scanner.nextLine().toLowerCase();
+        boolean newStatus = response.startsWith("y");
+
+        supplier.setActive(newStatus);
+        supplierManagementController.updateSupplier(supplier);
+        System.out.println("✅ Supplier status updated successfully!");
+    }
 }

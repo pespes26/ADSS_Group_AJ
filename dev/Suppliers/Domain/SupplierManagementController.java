@@ -27,4 +27,11 @@ public class SupplierManagementController {
         return supplierDTOList;
     }
 
+    public SupplierDTO getSupplierById(int supplierId) throws SQLException {
+        return supplierRepository.getSupplierById(supplierId);
+    }
+
+    public void updateSupplier(SupplierDTO supplierDTO) throws SQLException {
+        supplierRepository.updateSupplier(supplierDTO);
+    }
 }

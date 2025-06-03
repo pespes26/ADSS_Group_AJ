@@ -1,8 +1,6 @@
 package Suppliers.Domain;
 
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents a commercial agreement between a supplier and the supermarket.

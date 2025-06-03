@@ -53,11 +53,12 @@ public class ShortageOrderService implements WakeUpListener {
                         branchId,
                         String.join(", ", details.getDeliveryDays()), // daysInTheWeek
                         details.getSupplierId(),
-                        details.getSupplierName()
+                        details.getSupplierName(),
+                        details.getQuantity(), // quantityNeeded same as order quantity
+                        0, // currentStock starts at 0
+                        "PENDING" // initial status
                 );
-
-
-
+                
                 shortageOrderRepository.insert(dto);
             }
 

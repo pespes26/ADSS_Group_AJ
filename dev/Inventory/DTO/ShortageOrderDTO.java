@@ -8,15 +8,19 @@ public class ShortageOrderDTO {
     private double supplierDiscount;
     private String orderDate;
     private int branchId;
-    private String daysInTheWeek; // ✅ חדש
-    private int supplierId;       // ✅ חדש
-    private String supplierName;  // ✅ חדש
+    private String daysInTheWeek; 
+    private int supplierId;       
+    private String supplierName; 
+    private int quantityNeeded;
+    private int currentStock;
+    private String status;  // PENDING, ORDERED, DELIVERED
 
     // ✅ בנאי מלא
     public ShortageOrderDTO(int orderId, int productCatalogNumber, int quantity,
                             double costPriceBeforeSupplierDiscount, double supplierDiscount,
                             String orderDate, int branchId, String daysInTheWeek,
-                            int supplierId, String supplierName) {
+                            int supplierId, String supplierName,
+                            int quantityNeeded, int currentStock, String status) {
         this.orderId = orderId;
         this.productCatalogNumber = productCatalogNumber;
         this.quantity = quantity;
@@ -27,6 +31,9 @@ public class ShortageOrderDTO {
         this.daysInTheWeek = daysInTheWeek;
         this.supplierId = supplierId;
         this.supplierName = supplierName;
+        this.quantityNeeded = quantityNeeded;
+        this.currentStock = currentStock;
+        this.status = status;
     }
 
     // ✅ גטרים
@@ -70,6 +77,18 @@ public class ShortageOrderDTO {
         return supplierName;
     }
 
+    public int getQuantityNeeded() {
+        return quantityNeeded;
+    }
+
+    public int getCurrentStock() {
+        return currentStock;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
     // ✅ סטרים
     public void setOrderId(int orderId) {
         this.orderId = orderId;
@@ -109,5 +128,17 @@ public class ShortageOrderDTO {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public void setQuantityNeeded(int quantityNeeded) {
+        this.quantityNeeded = quantityNeeded;
+    }
+
+    public void setCurrentStock(int currentStock) {
+        this.currentStock = currentStock;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

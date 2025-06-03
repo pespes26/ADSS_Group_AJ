@@ -12,9 +12,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
 
     public void createTableIfNotExists() {
         try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
-
-            String sql = "CREATE TABLE IF NOT EXISTS suppliers (\n"
+             Statement stmt = conn.createStatement()) {            String sql = "CREATE TABLE IF NOT EXISTS suppliers (\n"
                     + " supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + " supplier_name TEXT NOT NULL,\n"
                     + " company_id INTEGER NOT NULL,\n"
@@ -22,7 +20,8 @@ public class JdbcSupplierDAO implements ISupplierDAO {
                     + " payment_method TEXT NOT NULL,\n"
                     + " payment_condition TEXT NOT NULL,\n"
                     + " phone_number INTEGER NOT NULL,\n"
-                    + " email TEXT NOT NULL\n"
+                    + " email TEXT NOT NULL,\n"
+                    + " is_active INTEGER DEFAULT 1\n"
                     + ");";
 
             stmt.execute(sql);
@@ -31,12 +30,10 @@ public class JdbcSupplierDAO implements ISupplierDAO {
             System.err.println("Error while creating suppliers table:");
             e.printStackTrace();
         }
-    }
-
-    @Override
+    }    @Override
     public void insert(SupplierDTO dto) throws SQLException {
-        String sql = "INSERT INTO suppliers (supplier_name, company_id, bank_account, payment_method, payment_condition, phone_number, email) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO suppliers (supplier_name, company_id, bank_account, payment_method, payment_condition, phone_number, email, is_active) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -48,6 +45,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
             pstmt.setString(5, dto.getPaymentCondition());
             pstmt.setLong(6, dto.getPhoneNumber());
             pstmt.setString(7, dto.getEmail());
+            pstmt.setInt(8, dto.isActive() ? 1 : 0);
 
             pstmt.executeUpdate();
         }
@@ -86,10 +84,9 @@ public class JdbcSupplierDAO implements ISupplierDAO {
     }
 
 
-    @Override
-    public void update(SupplierDTO dto) throws SQLException {
+    @Override    public void update(SupplierDTO dto) throws SQLException {
         String sql = "UPDATE suppliers SET supplier_name = ?, company_id = ?, bank_account = ?, payment_method = ?, " +
-                "payment_condition = ?, phone_number = ?, email = ? WHERE supplier_id = ?";
+                "payment_condition = ?, phone_number = ?, email = ?, is_active = ? WHERE supplier_id = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -101,7 +98,8 @@ public class JdbcSupplierDAO implements ISupplierDAO {
             pstmt.setString(5, dto.getPaymentCondition());
             pstmt.setLong(6, dto.getPhoneNumber());
             pstmt.setString(7, dto.getEmail());
-            pstmt.setInt(8, dto.getSupplier_id());
+            pstmt.setInt(8, dto.isActive() ? 1 : 0);
+            pstmt.setInt(9, dto.getSupplier_id());
 
             pstmt.executeUpdate();
         }
@@ -129,8 +127,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
             pstmt.setInt(1, supplierId);
             ResultSet rs = pstmt.executeQuery();
 
-            if (rs.next()) {
-                SupplierDTO supplierDTO = new SupplierDTO(
+            if (rs.next()) {                SupplierDTO supplierDTO = new SupplierDTO(
                         rs.getString("supplier_name"),
                         rs.getInt("company_id"),
                         rs.getInt("bank_account"),
@@ -139,6 +136,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
                         rs.getLong("phone_number"),
                         rs.getString("email")
                 );
+                supplierDTO.setActive(rs.getInt("is_active") == 1);
                 supplierDTO.setSupplier_id(rs.getInt("supplier_id"));
                 return supplierDTO;
             }
@@ -155,8 +153,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
-            while (rs.next()) {
-                SupplierDTO dto = new SupplierDTO(
+            while (rs.next()) {                SupplierDTO dto = new SupplierDTO(
                         rs.getString("supplier_name"),
                         rs.getInt("company_id"),
                         rs.getInt("bank_account"),
@@ -165,6 +162,7 @@ public class JdbcSupplierDAO implements ISupplierDAO {
                         rs.getLong("phone_number"),
                         rs.getString("email")
                 );
+                dto.setActive(rs.getInt("is_active") == 1);
                 dto.setSupplier_id(rs.getInt("supplier_id"));
                 suppliers.add(dto);
             }

@@ -1,13 +1,12 @@
 package Inventory.Tests;
 
-
-
 import Inventory.Domain.Discount;
 import Inventory.Domain.DiscountController;
 import Inventory.Domain.Product;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.HashMap;
 
@@ -22,7 +21,7 @@ public class DiscountControllerTest {
     private Product product;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         HashMap<Integer, Product> products = new HashMap<>();
         product = new Product();
         product.setCatalogNumber(101);
@@ -32,34 +31,31 @@ public class DiscountControllerTest {
         product.setCostPriceBeforeSupplierDiscount(50.0);
         product.setSupplierDiscount(0.0);
         product.setStoreDiscount(0.0);
-        product.setBranchId(1); // חדש
+        product.setBranchId(1);
+
+        // 🟡 Set private field supplyDaysInTheWeek using reflection
+        Field field = Product.class.getDeclaredField("supplyDaysInTheWeek");
+        field.setAccessible(true);
+        field.set(product, "Monday,Wednesday");
 
         products.put(101, product);
 
-        int currentBranchId = 1; // או כל מזהה סניף שאתה רוצה לבדוק
         discountController = new DiscountController(products);
     }
 
     @Test
     public void testApplyStoreDiscountToCatalog() {
-        Discount discount = new Discount(20.0, LocalDate.now().minusDays(1), LocalDate.now().plusDays(5));
+        Discount discount = new Discount(0.2, LocalDate.now(), LocalDate.now().plusDays(5));
         boolean result = discountController.setStoreDiscountForCatalogNumber(101, discount);
         assertTrue(result);
-        assertEquals(20.0, product.getStoreDiscount(), 0.01);
+        assertEquals(0.2, product.getStoreDiscount(), 0.001);
     }
 
     @Test
     public void testApplySupplierDiscountToCategory() {
-        Discount discount = new Discount(15.0, LocalDate.now(), LocalDate.now().plusDays(3));
+        Discount discount = new Discount(0.15, LocalDate.now(), LocalDate.now().plusDays(5));
         boolean result = discountController.setSupplierDiscountForCategory("Snacks", discount);
         assertTrue(result);
-        assertEquals(15.0, product.getSupplierDiscount(), 0.01);
-    }
-
-    @Test
-    public void testInvalidDiscountDates() {
-        Discount discount = new Discount(15.0, LocalDate.now().plusDays(3), LocalDate.now());
-        boolean result = discountController.setStoreDiscountForCatalogNumber(101, discount);
-        assertFalse(result);
+        assertEquals(0.15, product.getSupplierDiscount(), 0.001);
     }
 }

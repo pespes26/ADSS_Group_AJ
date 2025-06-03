@@ -22,10 +22,23 @@ public class PeriodicOrderService {
     private final IItemRepository itemRepository;
     private final ScheduledExecutorService scheduler;
 
+    // קונסטרקטור רגיל
     public PeriodicOrderService(IInventoryOrderRepository orderRepository, IPeriodicOrderRepository periodicOrderRepository,
-            IOrderOnTheWayRepository onTheWayRepository, IItemRepository itemRepository) {
+                                IOrderOnTheWayRepository onTheWayRepository, IItemRepository itemRepository) {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         this.periodicOrderController = new PeriodicOrderController(orderRepository);
+        this.periodicOrderRepository = periodicOrderRepository;
+        this.onTheWayRepository = onTheWayRepository;
+        this.itemRepository = itemRepository;
+    }
+
+    // קונסטרקטור לטסטים
+    public PeriodicOrderService(PeriodicOrderController controller,
+                                IPeriodicOrderRepository periodicOrderRepository,
+                                IOrderOnTheWayRepository onTheWayRepository,
+                                IItemRepository itemRepository) {
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.periodicOrderController = controller;
         this.periodicOrderRepository = periodicOrderRepository;
         this.onTheWayRepository = onTheWayRepository;
         this.itemRepository = itemRepository;
@@ -44,18 +57,14 @@ public class PeriodicOrderService {
                 List<InventoryProductPeriodic> inventoryData = convertToInventoryPeriodic(periodicOrders);
                 List<OrderProductDetailsDTO> detailsList = periodicOrderController.getPeriodicOrderProductDetails(inventoryData, branchId);
 
-                // ✅ הוספה – נוכל בעתיד לשמור את ההזמנות בטבלת periodic_orders
                 List<PeriodicOrderDTO> newPeriodicOrders = convertToDTO(detailsList, branchId);
-
-                IOrderOnTheWayRepository pendingRepo = new OrderOnTheWayRepositoryImpl();
 
                 for (OrderProductDetailsDTO details : detailsList) {
                     int catalogNumber = details.getProductId();
                     int quantity = details.getQuantity();
                     double costPrice = details.getPrice();
                     double discount = details.getDiscount();
-                    double finalPrice = costPrice * (1 - discount); // '/ 100.0'
-
+                    double finalPrice = costPrice * (1 - discount);
 
                     String expectedDeliveryDate = LocalDate.now().plusDays(1).toString();
 
@@ -71,10 +80,9 @@ public class PeriodicOrderService {
                             details.getAgreementId(),
                             true
                     );
-                    pendingRepo.insert(newOrder);
+                    onTheWayRepository.insert(newOrder); // ✅ משתמש ב־mock
 
                     // הכנסת פריטים חדשים למחסן
-                    IItemRepository itemRepo = new ItemRepositoryImpl();
                     for (int i = 0; i < quantity; i++) {
                         ItemDTO item = new ItemDTO(
                                 catalogNumber,
@@ -84,7 +92,7 @@ public class PeriodicOrderService {
                                 false,
                                 null
                         );
-                        itemRepo.addItem(item);
+                        itemRepository.addItem(item); // ✅ משתמש ב־mock
                     }
                 }
 
@@ -102,16 +110,16 @@ public class PeriodicOrderService {
         List<PeriodicOrderDTO> dtos = new ArrayList<>();
         for (OrderProductDetailsDTO details : detailsList) {
             dtos.add(new PeriodicOrderDTO(
-                    0, // orderId – יווצר אוטומטית במסד
+                    0,
                     details.getProductId(),
                     details.getQuantity(),
-                    LocalDateTime.now().toString(), // order_date
+                    LocalDateTime.now().toString(),
                     details.getDiscount(),
                     details.getSupplierId(),
-                    details.getSupplierName(),       // ← שם הספק
+                    details.getSupplierName(),
                     String.join(",", details.getDeliveryDays()),
                     details.getAgreementId(),
-                    branchId                         // ← שימוש בפרמטר שהועבר מבחוץ
+                    branchId
             ));
         }
         return dtos;

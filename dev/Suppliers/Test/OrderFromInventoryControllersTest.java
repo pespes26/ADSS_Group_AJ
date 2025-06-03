@@ -330,4 +330,32 @@ public class OrderFromInventoryControllersTest {
         assertEquals(supplierID2, result.get(0).getSupplierId());
         assertEquals(0.0, result.get(0).getDiscount());
     }
+
+
+    @Test
+    public void givenValidShortage_whenSavingShortageOrder_thenInsertSucceeds() throws SQLException {
+        TestContext ctx = setupContext();
+
+        // יצירת ספק, הסכם, מוצר, הנחה
+        int supplierId = ctx.supplierDAO.insertAndGetID(new SupplierDTO("SUP", 111, 0, "Cash", "Prepaid", 1234, "sup@mail.com"));
+        int agreementId = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierId, new String[]{"Mon", "Thu"}, false));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO(1204, 777, supplierId, agreementId, 5.0, "kg"));
+        ctx.discountDAO.insert(new DiscountDTO(1204, supplierId, agreementId, 10, 15.0));
+
+        // יצירת קלט להזמנה לפי חוסרים
+        HashMap<Integer, Integer> shortageProducts = new HashMap<>();
+        shortageProducts.put(1204, 12); // כמות מעל סף ההנחה
+
+        long phoneNumber = 500000000;
+
+        // קריאה לשירות שמחזיר פרטי הזמנה
+        List<OrderProductDetailsDTO> orderDetails = ctx.shortageController.getShortageOrderProductDetails(shortageProducts, phoneNumber);
+
+        // שליפת ההזמנות שנשמרו ובדיקת נכונות
+        List<OrderDTO> orders = new JdbcOrderDAO().getAll();
+        assertEquals(1, orders.size());
+        OrderDTO order = orders.get(0);
+        assertEquals(phoneNumber, order.getPhoneNumber());
+    }
+
 }

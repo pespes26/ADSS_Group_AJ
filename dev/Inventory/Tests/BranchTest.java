@@ -1,13 +1,13 @@
 package Inventory.Tests;
 
 import Inventory.Domain.Branch;
-import Inventory.Domain.Item;
+import Inventory.DTO.ItemDTO;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import Inventory.DTO.ItemDTO;
-import java.util.HashMap;
+
 import java.util.HashSet;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the Branch class using JUnit 4.
@@ -20,7 +20,7 @@ public class BranchTest {
     private ItemDTO item2;
 
     /**
-     * Initializes a new Branch and two Item instances before each test.
+     * Initializes a new Branch and two ItemDTO instances before each test.
      */
     @Before
     public void setUp() {
@@ -59,37 +59,46 @@ public class BranchTest {
     }
 
     /**
-     * Verifies that the branch returns all added items in its item map.
+     * Verifies that removing an item actually removes it from the branch.
      */
     @Test
-    public void testGetItems() {
+    public void testRemoveItem() {
         branch.addItem(item1);
-        branch.addItem(item2);
-        HashMap<Integer, ItemDTO> items = branch.getItems();
-        assertEquals("Two items should be stored", 2, items.size());
-        assertTrue(items.containsKey(1));
-        assertTrue(items.containsKey(2));
+        branch.removeItem(1);
+        assertNull("Item should be removed", branch.getItem(1));
     }
 
     /**
-     * Verifies that catalog numbers are tracked in the branch when items are added.
+     * Verifies that catalog numbers are tracked correctly when items are added.
      */
     @Test
-    public void testCatalogNumbersAdded() {
+    public void testCatalogNumbersTrackedCorrectly() {
         branch.addItem(item1);
         branch.addItem(item2);
         HashSet<Integer> catalogNumbers = branch.getCatalogNumbers();
-        assertEquals("Two catalog numbers should be tracked", 2, catalogNumbers.size());
-        assertTrue(catalogNumbers.contains(1234));
-        assertTrue(catalogNumbers.contains(5678));
+
+        assertTrue("Catalog number 1234 should be present", catalogNumbers.contains(1234));
+        assertTrue("Catalog number 5678 should be present", catalogNumbers.contains(5678));
+        assertEquals("Two unique catalog numbers expected", 2, catalogNumbers.size());
     }
 
     /**
-     * Verifies that retrieving a non-existent item returns null.
+     * Verifies that adding an item with a duplicate item ID replaces the old item.
      */
     @Test
-    public void testGetNonExistentItem() {
-        ItemDTO notFound = branch.getItem(999);
-        assertNull("Non-existent item should return null", notFound);
+    public void testDuplicateItemIdReplacesExisting() {
+        branch.addItem(item1);
+
+        ItemDTO duplicateItem = new ItemDTO();
+        duplicateItem.setItemId(1);
+        duplicateItem.setCatalogNumber(9999);
+        duplicateItem.setLocation("Backup");
+        duplicateItem.setSectionInStore("Z9");
+
+        branch.addItem(duplicateItem);
+        ItemDTO retrieved = branch.getItem(1);
+
+        assertEquals("Item ID should remain 1", 1, retrieved.getItemId());
+        assertEquals("Catalog number should be updated to 9999", 9999, retrieved.getCatalogNumber());
     }
 }

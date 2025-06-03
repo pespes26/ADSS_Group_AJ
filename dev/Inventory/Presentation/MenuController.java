@@ -1,7 +1,6 @@
 package Inventory.Presentation;
+import InventorySupplier.SystemService.PeriodicOrderService;
 import Suppliers.Init.SupplierRepositoryInitializer;
-
-import Inventory.DAO.JdbcShortageOrderDAO;
 import Inventory.DTO.ItemDTO;
 import Inventory.DTO.ProductDTO;
 import Inventory.Domain.Discount;
@@ -9,7 +8,6 @@ import Inventory.Domain.InventoryController;
 import Inventory.Repository.*;
 import InventorySupplier.SystemService.ShortageOrderService;
 import Suppliers.Repository.IInventoryOrderRepository;
-
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -118,13 +116,65 @@ public class MenuController {
     }
 
     private void placePeriodicSupplierOrder() {
-        // TODO: implement logic for placing periodic supplier order
+        try {
+            IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
+            IPeriodicOrderRepository periodicRepo = new PeriodicOrderRepositoryImpl();
+            IOrderOnTheWayRepository onTheWayRepo = new OrderOnTheWayRepositoryImpl();
+            IItemRepository itemRepo = new ItemRepositoryImpl();
+
+            PeriodicOrderService periodicOrderService = new PeriodicOrderService(
+                    supplierRepo,
+                    periodicRepo,
+                    onTheWayRepo,
+                    itemRepo
+            );
+
+            boolean success = periodicOrderService.start(current_branch_id);
+
+            if (success) {
+                System.out.println("""
+                        ✅ Periodic supplier order process completed successfully!
+                        
+                        The following actions were performed:
+                        ---------------------------------------------------------
+                        • All active periodic orders scheduled for tomorrow were processed.
+                        • For each such order:
+                            - An order was sent to the appropriate supplier.
+                            - The ordered items were added to the inventory (Warehouse).
+                            - The order details were saved in the database.
+                        ---------------------------------------------------------
+                        
+                        🗃️ Database Updates:
+                        - Table 'orders_on_the_way' was updated with all placed orders.
+                        - Table 'items' was updated with new items delivered to Branch #%d.
+                        - Table 'periodic_orders' remains unchanged (used for scheduling only).
+                        
+                        📦 Items were delivered to: Warehouse, Branch #%d.
+                        📅 Orders processed for delivery day: %s
+                        
+                        """.formatted(
+                        current_branch_id,
+                        current_branch_id,
+                        LocalDate.now().plusDays(1).getDayOfWeek().name()
+                ));
+            } else {
+                System.out.println("⚠️ No periodic orders were processed for tomorrow in Branch #" + current_branch_id + ".");
+            }
+
+        } catch (IllegalArgumentException ex) {
+            System.out.println("❌ Periodic supplier order failed: " + ex.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error occurred during periodic supplier order: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
 
     private void placeShortageBasedSupplierOrder() {
         try {
             IItemRepository itemRepository = new ItemRepositoryImpl();
             IProductRepository productRepository = new ProductRepositoryImpl();
+            IShortageOrderRepository shortageOrderRepository = new ShortageOrderRepositoryImpl();
 
             List<ItemDTO> items = itemRepository.getAllItems();
             Map<Integer, ProductDTO> productMap = new HashMap<>();
@@ -132,11 +182,8 @@ public class MenuController {
                 productMap.put(dto.getCatalogNumber(), dto);
             }
 
-            // מיפוי: Map<BranchId, Map<CatalogNumber, Quantity>>
             Map<Integer, Map<Integer, Integer>> shortageMap = new HashMap<>();
-            Map<Integer, Map<Integer, Boolean>> eligibleForTimeCondition = new HashMap<>();
 
-            // שלב 1: ספירת מלאי תקין לכל מוצר בכל סניף
             for (ItemDTO item : items) {
                 if (item.IsDefective()) continue;
 
@@ -152,68 +199,65 @@ public class MenuController {
                 shortageMap.get(branchId).put(catalog, currentQty + 1);
             }
 
-            // שלב 2: בדיקת אילו מוצרים באמת חסרים בכל סניף
-            Map<Integer, Map<Integer, Integer>> finalShortages = new HashMap<>();
-            JdbcShortageOrderDAO shortageOrderDAO = new JdbcShortageOrderDAO();
+            // ניתוח חוסרים + תנאי זמן
+            for (Map.Entry<Integer, Map<Integer, Integer>> branchEntry : shortageMap.entrySet()) {
+                int branchId = branchEntry.getKey();
+                Map<Integer, Integer> catalogQtyMap = branchEntry.getValue();
 
-            for (int branchId : shortageMap.keySet()) {
-                for (int catalog : shortageMap.get(branchId).keySet()) {
+                if (branchId != current_branch_id) continue; // רק לסניף הנוכחי
+
+                Map<Integer, Integer> shortages = new HashMap<>();
+                Map<Integer, Boolean> timeConditions = new HashMap<>();
+
+                for (Map.Entry<Integer, Integer> catalogEntry : catalogQtyMap.entrySet()) {
+                    int catalog = catalogEntry.getKey();
+                    int actualQty = catalogEntry.getValue();
+
                     ProductDTO product = productMap.get(catalog);
                     if (product == null) continue;
 
-                    int inStock = shortageMap.get(branchId).get(catalog);
-                    int minimumRequired = product.getMinimumQuantityForAlert();
+                    int minRequiredQty = Math.max(1, (product.getSupplyTime() + product.getProductDemandLevel()) / 2);
 
-                    if (inStock < minimumRequired) {
-                        int shortageAmount = minimumRequired - inStock + 10; // כולל 10 ספייר
+                    if (actualQty < minRequiredQty) {
+                        int shortageAmount = (minRequiredQty - actualQty) + 10; // ✅ חישוב חדש: כולל 10 ספייר
+                        shortages.put(catalog, shortageAmount);
 
-                        finalShortages
-                                .computeIfAbsent(branchId, b -> new HashMap<>())
-                                .put(catalog, shortageAmount);
-
-                        // שלב 3: בדיקת זמן מאז הזמנה אחרונה
-                        String lastOrderDateStr = shortageOrderDAO.getLastOrderDateForProduct(catalog, branchId);
-                        boolean shouldOrderByTime = false;
-
-                        if (lastOrderDateStr == null) {
-                            shouldOrderByTime = true;
-                        } else {
-                            LocalDate lastOrderDate = LocalDate.parse(lastOrderDateStr.substring(0, 10)); // yyyy-MM-dd
-                            long daysSince = ChronoUnit.DAYS.between(lastOrderDate, LocalDate.now());
-                            shouldOrderByTime = daysSince >= 2;
+                        // בדיקת תאריך ההזמנה האחרון
+                        LocalDate lastOrderDate = null;
+                        try {
+                            String dateStr = shortageOrderRepository.getLastOrderDateForProduct(catalog, branchId);
+                            if (dateStr != null) {
+                                lastOrderDate = LocalDate.parse(dateStr.substring(0, 10));
+                            }
+                        } catch (Exception e) {
+                            System.err.println("⚠️ Failed to fetch last order date for product " + catalog);
                         }
 
-                        eligibleForTimeCondition
-                                .computeIfAbsent(branchId, b -> new HashMap<>())
-                                .put(catalog, shouldOrderByTime);
+                        boolean over2Days = lastOrderDate == null || ChronoUnit.DAYS.between(lastOrderDate, LocalDate.now()) >= 2;
+                        timeConditions.put(catalog, over2Days);
                     }
                 }
-            }
 
-            // שלב 4: שליחת הזמנות לפי התנאים (לפחות 5 חוסרים או שעברו יומיים)
-            for (int branchId : finalShortages.keySet()) {
-                Map<Integer, Integer> shortages = finalShortages.get(branchId);
-                Map<Integer, Boolean> timeFlags = eligibleForTimeCondition.get(branchId);
+                if (!shortages.isEmpty()) {
+                    boolean enoughShortages = shortages.size() >= 2;
+                    boolean anyOlderThan2Days = timeConditions.values().stream().anyMatch(v -> v);
 
-                boolean enoughShortages = shortages.size() >= 5;
-                boolean anyOlderThan2Days = timeFlags.values().stream().anyMatch(v -> v);
+                    if (enoughShortages || anyOlderThan2Days) {
+                        IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
+                        ShortageOrderService shortageOrderService = new ShortageOrderService(supplierRepo, shortageOrderRepository);
 
-                if (enoughShortages || anyOlderThan2Days) {
-                    // יצירת repositories לשני המודולים
-                    IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
-                    IShortageOrderRepository shortageRepo = new ShortageOrderRepositoryImpl();
-                    ShortageOrderService shortageOrderService = new ShortageOrderService(supplierRepo, shortageRepo);
-
-                    // ממירים את הנתונים לצורה שנדרשת על ידי ספקים
-                    HashMap<Integer, Integer> invMap = new HashMap<>();
-                    for (Map.Entry<Integer, Integer> entry : shortages.entrySet()) {
-                        invMap.put(entry.getKey(), entry.getValue());
+                        shortageOrderService.onWakeUp(new HashMap<>(shortages), current_branch_id);
+                        System.out.println("✅ Shortage-based order sent for branch " + current_branch_id);
+                    } else {
+                        System.out.println("ℹ️ No order placed for branch " + current_branch_id + ":");
+                        System.out.println("    • Total shortages: " + shortages.size() + " (need at least 2)");
+                        System.out.println("    • Days passed condition met for any product? " + false);
+                        System.out.println("    • Missing products:");
+                        for (Map.Entry<Integer, Integer> entry : shortages.entrySet()) {
+                            boolean isOld = timeConditions.getOrDefault(entry.getKey(), false);
+                            System.out.println("      - Catalog #" + entry.getKey() + ": shortage " + entry.getValue() + (isOld ? " ✅ 2+ days passed" : " ❌ recent order"));
+                        }
                     }
-
-                    shortageOrderService.onWakeUp(invMap, branchId);
-                    System.out.println("✅ Shortage-based order sent for branch " + branchId);
-                } else {
-                    System.out.println("ℹ️ No order placed for branch " + branchId + ": not enough shortages or time passed.");
                 }
             }
 
@@ -222,6 +266,7 @@ public class MenuController {
             e.printStackTrace();
         }
     }
+
 
 
     private void runPart1InventoryMenu() {
@@ -272,9 +317,7 @@ public class MenuController {
             case 11 -> generateShortageInventoryReport();
             case 12 -> updateProductSupplyAndDemand();
             case 13 -> updateItemStorageLocation();
-            case 14 -> {
-                System.out.println("Exiting the Inventory menu.");
-            }
+            case 14 -> System.out.println("Exiting the Inventory menu.");
             default -> System.out.println("Invalid option. Please try again.");
         }
     }

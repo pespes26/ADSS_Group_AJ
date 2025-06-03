@@ -29,75 +29,70 @@ Make sure the following are installed on your system:
 
 1. **Clone or download** this project.
 2. Open the project in your Java IDE (e.g., IntelliJ).
-3. Run the main class: ControllerInventorySupplier.InventorySupplierMainMenu
+3. Run the main class: `InventorySupplier.Presentation.InventorySupplierMainMenu`
 
 ---
 
 ## 🧭 Main Menu Navigation
 
-After launching, you'll see:
+When the system starts, you'll first be prompted:
 
-Welcome to the Inventory-Suppliers Menu! What would you like to manage?
+**"Do you want to load data to database?"**
 
-    1.Inventory System
-    2.Supplier System
-    3.Exit the Inventory-Suppliers system
+- `1` → Load sample data into the database and memory
+- `2` → Start with an empty system (no sample data)
 
-Choose one of the options:
+Then you'll see the main options:
+
+    Welcome to the Inventory-Suppliers Menu! What would you like to manage?
+
+    1. Inventory System  
+    2. Supplier System  
+    3. Exit the Inventory-Suppliers system
 
 ---
 
-### 🏪 Option 1: Inventory System
+## 🏪 Inventory Module
 
-1. You'll be asked: Do you want to load existing data from the database?
+1. Enter your **Branch ID** (1–10).
+2. Access the Inventory Menu, which includes:
 
-    -Load existing data
-
-    -Start with an empty system
-
-2. Then enter a **Branch ID** (from 1 to 10).
-
-3. The inventory menu will open with 14 options, including:
 - Show item details
 - Add/remove items
 - Mark item as defective
 - Update cost prices
 - Apply supplier/store discounts
-- Generate inventory and shortage reports
-- Update supply days & demand level
+- Inventory & shortage reports
+- Update demand/supply parameters
 - Change storage location
 - Exit inventory menu
 
-Each action is interactive and includes instructions.
+Data is retrieved using DAOs and Repository patterns. Branch-specific operations are respected.
 
 ---
 
-### 🧾 Option 2: Supplier System
+## 📦 Supplier Module
 
-1. You'll be prompted:
+When selected:
 
-Do you want to initialize the system with sample data? (yes/no)
+- A sample dataset of **8 suppliers**, **agreements**, **products supplied**, and **discounts** is optionally loaded.
+- You can:
 
-- Type `yes` to load demo suppliers and agreements.
-- Type `no` to work with an empty supplier DB.
+   - Search supplier
+   - Create supplier + agreement + product
+   - View past supplier orders
+   - Return to the main menu
 
-2. The Suppliers Module menu includes:
-
-- Search supplier
-- Create new supplier (and agreements/products)
-- Search for past orders
-- Return to the main menu
+All related tables are initialized via DAOs.
 
 ---
 
-### ❌ Option 3: Exit The Inventory-Suppliers System
+## ❌ Exit Option
 
-- All data from both modules will be **cleared** from the database.
-- Console will display:
-
-
-
-
+- Selecting `3` will **clear all data**:
+   - Inventory: products, items, orders, discounts
+   - Supplier: suppliers, agreements, discounts, etc.
+- Console confirms deletion.
 
 ---
 
@@ -105,73 +100,101 @@ Do you want to initialize the system with sample data? (yes/no)
 
 | Tool / Library        | Purpose                                  |
 |-----------------------|------------------------------------------|
-| Java (17+)            | Main programming language                |
-| SQLite                | Embedded relational database             |
-| sqlite-jdbc           | JDBC driver to connect Java with SQLite |
-| Maven                 | Dependency management & build tool       |
+| Java (17+)            | Core language                            |
+| SQLite                | Embedded database                        |
+| sqlite-jdbc           | JDBC bridge                              |
+| Maven                 | Dependency/build tool                    |
 
 ---
 
 ## 🗃️ Database Schema Overview
 
-When the system is first launched, all necessary tables are created automatically (if they don’t already exist). Sample data is loaded optionally depending on user selection.
+All tables are created **dynamically** at runtime using the DAO layer.  
+Data is inserted through DTO-based preloaders if chosen during startup.
 
 ---
 
 ### 🏪 Inventory Tables
 
-| Table Name             | Description                                                            | Example Data Loaded                                           |
-|------------------------|------------------------------------------------------------------------|---------------------------------------------------------------|
-| `products`             | Holds all product definitions and metadata                             | `Orange Juice`, `White Rice`, `Dish Soap`, etc.              |
-| `items`                | Physical instances of products (per branch, location, expiration)      | Warehouse/Store locations for each product                   |
-| `sold_items`           | Records sale history of deleted/sold items                             | Item with catalog `1005`, sold on `2025-07-15`               |
-| `discounts`            | Store discounts per product, per branch                                | 20% off `1004` in branch 1                                    |
-| `product_discounts`    | Mapping of products to discounts                                        | Auto-generated from `discounts`                              |
-| `branches`             | Information about the 10 available branches                            | Branches 1 to 10                                              |
-| `orders_on_the_way`    | Supplier orders already placed and awaiting arrival                    | Empty on init                                                 |
-| `periodic_orders`      | Supplier orders made on a weekly schedule                              | Empty on init                                                 |
-| `defective_items`      | Tracks items marked defective                                           | Not preloaded                                                 |
+| Table Name             | Description                                                          |
+|------------------------|----------------------------------------------------------------------|
+| `products`             | All products across the system                                       |
+| `items`                | Instances of products in branches (Warehouse/Store)                  |
+| `sold_items`           | Tracks when items were removed/sold                                  |
+| `discounts`            | Store discounts per product per branch                               |
+| `product_discounts`    | Mapping table for product → discount                                 |
+| `branches`             | Represents 10 branch IDs                                             |
+| `orders_on_the_way`    | Placed supplier orders awaiting delivery                             |
+| `periodic_orders`      | Scheduled supplier orders (weekly)                                   |
+| `shortage_orders`      | Orders triggered by shortages                                        |
 
 ---
 
 ### 📦 Supplier Tables
 
-| Table Name             | Description                                                        | Example Data Loaded                                           |
-|------------------------|--------------------------------------------------------------------|---------------------------------------------------------------|
-| `suppliers`            | Supplier information                                               | `Prigat`, `Tnuva`, `Osem`, `Heinz`, `Sano`, etc.              |
-| `agreements`           | Delivery terms per supplier, including delivery days              | e.g., `Prigat` → Monday, Wednesday, Friday                    |
-| `products_supplied`    | Which supplier supplies which product, with size & cost info       | `Orange Juice 1L` supplied by `Prigat` at 6.5₪ per unit       |
-| `orders`               | Purchase orders (empty by default)                                | Created during system usage                                  |
-| `order_items`          | Line items in orders (empty by default)                           | Populated upon order creation                                |
-| `delivery_terms`       | Tracks delivery schedules by supplier                             | Derived from `agreements`                                    |
+| Table Name             | Description                                                            |
+|------------------------|------------------------------------------------------------------------|
+| `suppliers`            | Name, contact, payment method, etc.                                   |
+| `agreements`           | Days of delivery & standing order status                              |
+| `products_supplied`    | Supplier's products, sizes, prices, agreements                        |
+| `discounts`            | Tiered discounts from suppliers based on quantity                     |
+| `orders`               | Actual purchase orders made to suppliers                              |
+| `order_items`          | Items within each supplier order                                      |
+| `delivery_terms`       | Derived from `agreements` – not physically stored                     |
 
 ---
 
-### 📦 Sample Product Data (preloaded if selected)
+## 🔁 Preloaded Sample Data (Optional)
 
-| Catalog Number | Product Name           | Category    | Subcategory | Supplier | Delivery Days              |
-|----------------|------------------------|-------------|-------------|----------|----------------------------|
-| 1004           | Orange Juice 1L        | Beverages   | Juices      | Prigat   | MONDAY, WEDNESDAY, FRIDAY |
-| 1006           | White Rice 1kg         | Grocery     | Rice        | Osem     | SUNDAY, WEDNESDAY          |
-| 1012           | Dish Soap 750ml        | Cleaning    | Detergents  | Sano     | THURSDAY                   |
+### Products (via `preloadProducts()`)
+
+10+ sample products inserted if not already present, each with:
+
+- Unique catalog number
+- Name, category, subcategory
+- Supplier name
+- Prices (base, retail, discount)
+- Delivery days
+- Associated agreement ID
+
+### Items (via `preloadItems()`)
+
+Each product has instances in various branches:
+
+- Branch ID (1–10)
+- Storage location: `Warehouse` or `Store`
+- Expiration dates vary per item
+- Unique shelf & location identifiers
+
+### Periodic Orders (via `preloadPeriodicOrders()`)
+
+- 3 sample orders created using top 3 supplier-agreement pairs
+- Repeats on specific weekdays
+- Tracked by DAO in `periodic_orders` table
+
+### Suppliers & Agreements
+
+Loaded using:
+
+- `insertSampleData()` from `SuppliersInitializer`
+- 8 sample suppliers
+- 8 linked agreements (with different delivery schedules)
+- Mapping `supplier_id → agreement_id` stored via `LinkedHashMap`
+
+### Discounts & Product Mapping
+
+Each product is:
+
+- Supplied by one supplier
+- Has a size, price, and discount tier
+- Linked via `products_supplied` and `discounts` tables
 
 ---
 
-### 🧾 Sample Supplier Data (preloaded if selected)
+## 💡 Notes
 
-| Supplier Name | Contact | Payment Method     | Delivery Days             |
-|---------------|---------|--------------------|----------------------------|
-| Prigat        | 0123    | Cash, Prepaid      | MONDAY, WEDNESDAY, FRIDAY |
-| Tnuva         | 0124    | Bank Transfer      | TUESDAY, THURSDAY         |
-| Osem          | 0125    | Bank Transfer      | SUNDAY, WEDNESDAY         |
-| Heinz         | 0126    | Cash, Prepaid      | THURSDAY                   |
-| Sano          | 0127    | Bank Transfer      | MONDAY                     |
+- DAO classes are responsible for table creation (`createTableIfNotExists`) and insertion.
+- Data preloaders avoid duplication: check if product/item already exists before inserting.
+- Periodic orders and shortage orders work alongside inventory & supplier systems.
+- When exiting, all tables are cleared in proper dependency order.
 
-
----
-
-### 💡 Notes
-
-- Preloaded items are spread across **10 different branches** and locations (Warehouse/Store).
-- Discount entries are applied to select products across multiple branches.
-- All tables are **created and populated automatically** during system startup.

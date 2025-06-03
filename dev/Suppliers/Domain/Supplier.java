@@ -48,4 +48,9 @@ public class Supplier {
         return supplier_id;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+
 }

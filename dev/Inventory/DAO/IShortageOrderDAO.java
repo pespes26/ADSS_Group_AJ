@@ -11,4 +11,6 @@ public interface IShortageOrderDAO {
     void deleteShortageOrderById(int id) throws SQLException;
     ShortageOrderDTO getShortageOrderById(int id) throws SQLException;
     List<ShortageOrderDTO> getAllShortageOrders() throws SQLException;
+    String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException;
+
 }

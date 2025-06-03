@@ -5,7 +5,6 @@ import Inventory.DAO.JdbcShortageOrderDAO;
 import Inventory.DTO.ShortageOrderDTO;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShortageOrderRepositoryImpl implements IShortageOrderRepository {
@@ -39,5 +38,10 @@ public class ShortageOrderRepositoryImpl implements IShortageOrderRepository {
     @Override
     public List<ShortageOrderDTO> getAll() throws SQLException {
         return dao.getAllShortageOrders();
+    }
+
+    @Override
+    public String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException {
+        return dao.getLastOrderDateForProduct(catalogNumber, branchId);
     }
 }

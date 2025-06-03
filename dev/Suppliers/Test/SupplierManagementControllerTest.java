@@ -101,7 +101,7 @@ public class SupplierManagementControllerTest {
 
         int supplierID = ctx.supplierDAO.insertAndGetID(new SupplierDTO("MAOR", 1234, 0, "Cash", "Prepaid", 5551234, "mail@a.com"));
         int agreementID = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID, new String[]{"Mon", "Wed", "Fri"}, false));
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(34, 1204, supplierID, agreementID, 6.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO( 1204,34, supplierID, agreementID, 6.5, "L"));
 
         ctx.supplierManagementController.deleteSupplier(supplierID);
 

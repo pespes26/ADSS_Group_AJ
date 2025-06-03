@@ -264,7 +264,7 @@ public class OrderFromInventoryControllersTest {
 
         int supplierID = ctx.supplierDAO.insertAndGetID(new SupplierDTO("MAOR", 1234, 0, "Cash", "Prepaid", 5551234, "mail@a.com"));
         int agreementID = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID, new String[]{"Mon", "Wed", "Fri"}, false));
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(34, 1204, supplierID, agreementID, 6.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO(1204,34, supplierID, agreementID, 6.5, "L"));
         ctx.discountDAO.insert(new DiscountDTO(1204, supplierID, agreementID, 20, 10.0));
 
         InventoryProductPeriodic product = new InventoryProductPeriodic(supplierID, agreementID, 1204, 30);
@@ -290,8 +290,8 @@ public class OrderFromInventoryControllersTest {
         int agreement1 = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID1, new String[]{"Mon"}, false));
         int agreement2 = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID2, new String[]{"Tue"}, false));
 
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(11, 1204, supplierID1, agreement1, 6.5, "L"));
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(22, 1204, supplierID2, agreement2, 6.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO( 1204,11, supplierID1, agreement1, 6.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO( 1204,22, supplierID2, agreement2, 6.5, "L"));
 
         ctx.discountDAO.insert(new DiscountDTO(1204, supplierID1, agreement1, 10, 8.0));
         ctx.discountDAO.insert(new DiscountDTO(1204, supplierID2, agreement2, 10, 12.0));
@@ -318,8 +318,8 @@ public class OrderFromInventoryControllersTest {
         int agreement1 = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID1, new String[]{"Mon"}, false));
         int agreement2 = ctx.agreementDAO.insertAndGetID(new AgreementDTO(supplierID2, new String[]{"Tue"}, false));
 
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(11, 1204, supplierID1, agreement1, 6.5, "L"));
-        ctx.productSupplierDAO.insert(new ProductSupplierDTO(22, 1204, supplierID2, agreement2, 0.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO( 1204,11, supplierID1, agreement1, 6.5, "L"));
+        ctx.productSupplierDAO.insert(new ProductSupplierDTO( 1204,22, supplierID2, agreement2, 0.5, "L"));
 
         ctx.discountDAO.insert(new DiscountDTO(1204, supplierID1, agreement1, 10, 10.0));
 

@@ -58,7 +58,7 @@ public class ProductSupplierManagementControllerTest {
     public void givenValidProductSupplier_whenAddAndGet_thenProductSupplierExists() throws SQLException {
         TestContext ctx = setupContext();
 
-        ProductSupplierDTO dto = new ProductSupplierDTO(1, 1001, 1, 1, 5.5, "Unit");
+        ProductSupplierDTO dto = new ProductSupplierDTO( 1001,1, 1, 1, 5.5, "Unit");
         ctx.productSupplierManagementController.createProductSupplier(dto);
 
         ProductSupplierDTO retrieved = ctx.productSupplierDAO.getOneProduct(1001, 1, 1);
@@ -73,7 +73,7 @@ public class ProductSupplierManagementControllerTest {
         TestContext ctx = setupContext();
 
         // הוספת מוצר ספק חדש
-        ProductSupplierDTO dto = new ProductSupplierDTO(2, 1002, 2, 2, 4.75, "Box");
+        ProductSupplierDTO dto = new ProductSupplierDTO( 1002, 2,2, 2, 4.75, "Box");
         ctx.productSupplierManagementController.createProductSupplier(dto);
 
         // עדכון היחידה

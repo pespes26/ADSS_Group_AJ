@@ -33,4 +33,6 @@ public interface IProductSupplierDAO {
 
     List<ProductSupplierDTO> getProductsByProductID(int productID) throws SQLException;
     ProductSupplierDTO getOneProductByProductIDAgreementIDSupplierID(int productId, int supplierId, int agreementId) throws SQLException;
+
+    void clearTable();
 }

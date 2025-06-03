@@ -56,7 +56,7 @@ public class Inputs {
                 break;
             } else {
                 System.out.println("Invalid choice. Please enter a valid number again:");
-                scanner.next(); // מדלג על הקלט הבעייתי (כדי שלא ניתקע בלולאה)
+                scanner.next(); // Skip invalid input (to avoid infinite loop)
             }
         }
         return value;

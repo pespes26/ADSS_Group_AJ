@@ -12,6 +12,23 @@ import java.util.LinkedHashMap;
 /**
  * DataInitializer is responsible for populating the system with sample data.
  * This includes suppliers, agreements, products (with discount rules), and orders.
+ *
+ * Sample Data Strategy:
+ * 1. Supplier Structure:
+ *    - Multiple suppliers (Prigat, Tnuva, Osem, etc.) with different payment terms
+ *    - Various delivery schedules (different days of the week)
+ *    - Mix of cash and bank transfer payment methods
+ *
+ * 2. Product Pricing Strategy:
+ *    - Same products available from multiple suppliers at different price points
+ *    - Base price variations reflect supplier size and service quality
+ *    - Discount structures encourage bulk ordering
+ *    - Example: Product 1204 available from multiple suppliers with different prices
+ *
+ * 3. Discount Structure:
+ *    - Volume-based discounts (higher discounts for larger quantities)
+ *    - Different discount thresholds per supplier
+ *    - Discount percentages range from 5% to 20%
  */
 public class SuppliersInitializer {
     private final JdbcSupplierDAO supplierDAO;

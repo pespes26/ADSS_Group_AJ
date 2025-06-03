@@ -16,7 +16,7 @@ import java.util.List;
 public class SupplierRepositoryImpl implements ISupplierRepository {
 
     private static final int MAX_CACHE_SIZE = 500;
-    /** Identity Map: מפתח = ID, ערך = Entity */
+    /** Identity Map: key = ID, value = Entity */
     private final HashMap<Integer, Supplier> cache = new LinkedHashMap<>() {
         @Override
         protected boolean removeEldestEntry(HashMap.Entry<Integer, Supplier> eldest) {
@@ -45,12 +45,12 @@ public class SupplierRepositoryImpl implements ISupplierRepository {
     @Override
     public void deleteSupplier(int supplier_ID) {
         try {
-            // מחיקת התלויות תחילה
+            // Delete dependencies first
             discountDAO.deleteBySupplier(supplier_ID);
             productSupplierDAO.deleteAllProductsFromSupplier(supplier_ID);
             agreementDAO.deleteBySupplierID(supplier_ID);
 
-            // לבסוף מחיקת הספק עצמו
+            // Finally delete the supplier itself
             supplierDAO.deleteById(supplier_ID);
             cache.remove(supplier_ID);
         } catch (SQLException e) {
@@ -96,7 +96,7 @@ public class SupplierRepositoryImpl implements ISupplierRepository {
                             dto.getPaymentCondition(),
                             dto.getEmail()
                     );
-                    cache.put(id, supplier); // מוסיף לקאש אם לא קיים
+                    cache.put(id, supplier); // Add to cache if not exists
                 }
 
                 suppliers.add(supplier);

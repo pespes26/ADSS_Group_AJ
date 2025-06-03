@@ -9,7 +9,7 @@ public class PeriodicOrderDTO {
     private int productCatalogNumber;
     private int quantity;
     private int supplierId;
-    private String supplierName; // ✅ חדש
+    private String supplierName; // Added supplier name field
     private String daysInTheWeek;
     private String orderDate;
     private double supplierDiscount;

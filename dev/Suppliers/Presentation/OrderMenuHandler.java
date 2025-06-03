@@ -156,5 +156,11 @@ public class OrderMenuHandler {
             System.out.println("----------------------------------------");
         }
     }
+
+    public void printPastOrder() throws SQLException {
+        List<OrderDTO> orders = orderManagementController.getAllOrders();
+        
+        displayOrders(orders);
+    }
 }
 

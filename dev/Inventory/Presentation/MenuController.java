@@ -246,7 +246,7 @@ public class MenuController {
                     int minRequiredQty = Math.max(1, (product.getSupplyTime() + product.getProductDemandLevel()) / 2);
 
                     if (actualQty < minRequiredQty) {
-                        int shortageAmount = (minRequiredQty - actualQty) + 10; // ✅ חישוב חדש: כולל 10 ספייר
+                        int shortageAmount = (minRequiredQty - actualQty) + 10; // New calculation: includes 10 spare units
                         shortages.put(catalog, shortageAmount);
 
                         // בדיקת תאריך ההזמנה האחרון
@@ -418,10 +418,8 @@ public class MenuController {
         if (!inventory_controller.getItemController().itemExistsInBranch(item_Id, current_branch_id)) {
             System.out.println("Item does not exist in Branch " + current_branch_id + ".");
             return;
-        }
-
-        // 🟡 שליפת הפריט לפני הסרה
-        ItemDTO item = inventory_controller.getItemController().getItem(item_Id, current_branch_id);
+        }                // Get item details before removal
+                ItemDTO item = inventory_controller.getItemController().getItem(item_Id, current_branch_id);
         if (item == null) {
             System.out.println("❌ Failed to retrieve item details before removal.");
             return;
@@ -793,10 +791,8 @@ public class MenuController {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid product size. Returning to menu.");
                 return;
-            }
-
-            // הפוך את size ל-final לשימוש ב־lambda
-            final int finalSize = size;
+            }        // Convert size to final for use in lambda
+        final int finalSize = size;
             boolean exists = inventory_controller.getProductController()
                     .getAllProducts()
                     .stream()

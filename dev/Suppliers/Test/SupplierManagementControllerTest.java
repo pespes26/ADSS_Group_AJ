@@ -7,7 +7,6 @@ import Suppliers.DTO.SupplierDTO;
 import Suppliers.Domain.*;
 import Suppliers.Repository.ISupplierRepository;
 import Suppliers.Repository.SupplierRepositoryImpl;
-import Suppliers.DAO.*;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

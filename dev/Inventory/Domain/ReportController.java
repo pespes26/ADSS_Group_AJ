@@ -136,11 +136,10 @@ public class ReportController {
 
 
     public String inventoryReportByCategories(String[] categories, int branchId, List<Integer> sizeFilters) {
-        try {
-            // שליפת כל הפריטים מהסניף הנוכחי
+        try {        // Get all items from current branch
             List<ItemDTO> items = itemRepository.getItemsByBranch(branchId);
 
-            // שליפת כל המוצרים שרלוונטיים לפי הגודל המבוקש
+            // Get all products relevant to requested size
             List<ProductDTO> productList = productRepository.getProductsBySizes(sizeFilters);
             Map<Integer, ProductDTO> productMap = new HashMap<>();
             for (ProductDTO p : productList) {
@@ -259,8 +258,7 @@ public class ReportController {
 
 
     public String inventoryReportByCatalogNumbers(String[] catalogNumbers, int branchId, List<Integer> sizeFilters) {
-        try {
-            // שלב 1: הפיכת הקלט ל־Set של מספרי קטלוג
+        try {            // Step 1: Convert input to a Set of catalog numbers
             Set<Integer> catalogSet = new HashSet<>();
             for (String s : catalogNumbers) {
                 try {
@@ -460,7 +458,7 @@ public class ReportController {
             return shortages;
         }
 
-        // ספירת פריטים תקינים בלבד
+        // Count only non-defective items
         Map<Integer, Integer> stockCount = new HashMap<>();
         for (ItemDTO item : branch.getItems().values()) {
             if (!item.IsDefective()) {

@@ -18,4 +18,8 @@ public interface ISupplierDAO {
     List<SupplierDTO> getAll() throws SQLException;
     int getIdByName(String name) throws SQLException;
 
+    /**
+     * Clears all records from the suppliers table
+     */
+    void clearTable();
 }

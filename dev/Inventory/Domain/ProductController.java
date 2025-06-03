@@ -27,23 +27,19 @@ public class ProductController {
     private final IProductRepository productRepository;
     private final ISoldItemRepository soldItemRepository;
     private final HashMap<Integer, Product> products; // Map of all products, keyed by catalog number
-    private final HashMap<Integer, ItemDTO> purchased_items; // Map of purchased items, keyed by item ID
     private final HashMap<Integer, Branch> branches; // Map of all branches, keyed by branch ID
 
     /**
-     * Constructs a ProductController with given maps of products and purchased items.
+     * Constructs a ProductController with a given map of products.
      *
      * @param products A map of all products, keyed by catalog number.
-     * @param purchased_items A map of all purchased items, keyed by item ID.
      */
-    public ProductController(HashMap<Integer, Product> products, HashMap<Integer, ItemDTO> purchased_items) {
+    public ProductController(HashMap<Integer, Product> products) {
         this.products = products;
-        this.purchased_items = purchased_items;
         this.branches = new HashMap<>();
         this.productRepository = new ProductRepositoryImpl();
         this.itemRepository = new ItemRepositoryImpl();
         this.soldItemRepository = new SoldItemRepositoryImpl();
-
     }
 
     /**
@@ -76,9 +72,8 @@ public class ProductController {
         product.setSalePriceBeforeStoreDiscount(saleBefore);
         product.setSalePriceAfterStoreDiscount(saleAfter);
 
-        // Update the database
-        productRepository.UpdateCostPrice(catalog_number, new_price);  // רק מחיר העלות
-        productRepository.UpdateCalculatedPrices(product);             // כל השאר (נוכל גם לאחד אותם)
+        // Update the database        productRepository.UpdateCostPrice(catalog_number, new_price);  // Update cost price only
+        productRepository.UpdateCalculatedPrices(product);             // Update all derived prices
 
         return true;
     }
@@ -232,11 +227,10 @@ public class ProductController {
     }
 
     public void updateAllProductQuantities() {
-        try {
-            // שלוף את כל הפריטים מה־DB
-            List<ItemDTO> items = itemRepository.getAllItems();
+        try {        // Fetch all items from DB
+        List<ItemDTO> items = itemRepository.getAllItems();
 
-            // שלח את הרשימה לרפוזיטורי כדי שיחשב ויעדכן כמויות בטבלת products
+        // Send the list to repository to calculate and update quantities in products table
             productRepository.updateQuantitiesFromItems(items);
 
             System.out.println("✅ Product quantities updated in database.");

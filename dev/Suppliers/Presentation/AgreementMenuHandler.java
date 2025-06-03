@@ -17,15 +17,15 @@ public class AgreementMenuHandler {
 //    public static ProductSupplierManagementController productSupplierManagementController;
 
     public AgreementMenuHandler() {
-        // אתחול DAO-ים
+        // Initialize DAOs
         IAgreementDAO agreementDAO = new JdbcAgreementDAO();
         IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
         IDiscountDAO discountDAO = new JdbcDiscountDAO();
 
-        // יצירת Repository
+        // Create Repository
         IAgreementRepository agreementRepository = new AgreementRepositoryImpl(agreementDAO, productSupplierDAO, discountDAO);
         IProductSupplierRepository productSupplierRepository = new ProductSupplierRepositoryImpl(productSupplierDAO,discountDAO);
-        // יצירת קונטרולרים
+        // Create Controllers
         agreementManagementController = new AgreementManagementController(agreementRepository);
 //        productSupplierManagementController = new ProductSupplierManagementController(productSupplierRepository);
     }
@@ -51,7 +51,7 @@ public class AgreementMenuHandler {
         }
 
         System.out.print("Choose the number of the agreement you want to delete (1 to " + agreementDTOList.size() + "): ");
-        scanner.nextLine(); // ניקוי התו מהקריאה הקודמת
+        scanner.nextLine(); // Clear character from previous read
         int selectedIndex;
         try {
             selectedIndex = Integer.parseInt(scanner.nextLine());
@@ -72,9 +72,7 @@ public class AgreementMenuHandler {
     }
 
     public static void createNewAgreement(Scanner scanner, int supplierID) throws SQLException {
-        System.out.println("Let's create a new agreement...");
-
-        // קבלת ימי אספקה מהמשתמש
+        System.out.println("Let's create a new agreement...");        // Get delivery days from user
         String[] deliveryDays = getDeliveryDays(scanner);
 
         System.out.print("Self Pickup? (Y/N): ");
@@ -103,11 +101,9 @@ public class AgreementMenuHandler {
         for (int i = 0; i < weekDays.length; i++) {
             System.out.printf("%d. %s%n", i + 1, weekDays[i]);
         }
-        System.out.print("Your choices (e.g., 1 3 5): ");
-
-        // כאן אנחנו מבטיחים שהשורה לא תיבלע
+        System.out.print("Your choices (e.g., 1 3 5): ");        // Make sure we don't lose the line
         scanner.nextLine();
-        String input = scanner.nextLine(); // עכשיו יקלוט את הבחירה
+        String input = scanner.nextLine(); // Now capture the selection
 
         String[] parts = input.trim().split("\\s+");
 
@@ -163,7 +159,7 @@ public class AgreementMenuHandler {
             System.out.println("   Supplier ID: " + agreementDTO.getSupplier_ID());
             System.out.println("   Self Pickup: " + (agreementDTO.isSelfPickup() ? "Yes" : "No"));
 
-            // הדפסת ימי אספקה בצורה נוחה
+            // Print delivery days in a readable format
             String[] daysArray = agreementDTO.getDeliveryDays();
             String daysFormatted = (daysArray != null) ? String.join(", ", daysArray) : "None";
             System.out.println("   Delivery Days: " + daysFormatted);

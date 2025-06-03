@@ -47,20 +47,13 @@ public class InventoryController {
         this.productRepository = new ProductRepositoryImpl();
         this.orderOnTheWayRepository = new OrderOnTheWayRepositoryImpl();
         this.periodicOrderRepository = new PeriodicOrderRepositoryImpl();
-        this.shortageOrderRepository = new ShortageOrderRepositoryImpl();
-
-        // אתחול ברירת מחדל ל־10 סניפים
+        this.shortageOrderRepository = new ShortageOrderRepositoryImpl();        // Initialize default 10 branches
         for (int i = 1; i <= 10; i++) {
             branches.putIfAbsent(i, new Branch(i));
-        }
-
-        HashMap<Integer, ItemDTO> purchased_items = new HashMap<>();
+        }        HashMap<Integer, ItemDTO> purchased_items = new HashMap<>();
         this.item_controller = new ItemController(branches, products, purchased_items);
-        this.product_controller = new ProductController(products, purchased_items);
-
-        int defaultBranchId = 1; // אם אין לך branchId דינאמי עדיין
+        this.product_controller = new ProductController(products);
         this.discount_controller = new DiscountController(products);
-
         this.report_controller = new ReportController(branches, products);
     }
 
@@ -145,7 +138,7 @@ public class InventoryController {
                 product.setQuantityInStore(dto.getQuantityInStore());
                 product.setMinimumQuantityForAlert(dto.getMinimumQuantityForAlert());
 
-                product_controller.addProduct(product); // מוסיף גם ל־products map
+                product_controller.addProduct(product); // Also adds to products map
             }
 
             // --- Load items ---

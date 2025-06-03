@@ -27,5 +27,8 @@ public interface IAgreementDAO {
 
     void deleteBySupplierID(int supplier_ID) throws SQLException;
 
-//    List<Integer> getAgreementsIDBySupplierId(int supplierId) throws SQLException;
+    /**
+     * Clears all records from the agreements table
+     */
+    void clearTable();
 }

@@ -154,12 +154,10 @@ public class InventoryInitializer {
         String url = "jdbc:sqlite:Inventory.db";
 
         try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement()) {
-
-            // סדר המחיקות חשוב
-            stmt.executeUpdate("DELETE FROM orders_on_the_way");
-            stmt.executeUpdate("DELETE FROM items");
-            stmt.executeUpdate("DELETE FROM sold_items");
+             Statement stmt = conn.createStatement()) {        // Order of deletion is important due to foreign key constraints
+        stmt.executeUpdate("DELETE FROM orders_on_the_way");
+        stmt.executeUpdate("DELETE FROM items");
+        stmt.executeUpdate("DELETE FROM sold_items");
             stmt.executeUpdate("DELETE FROM periodic_orders");
             stmt.executeUpdate("DELETE FROM shortage_orders");
             stmt.executeUpdate("DELETE FROM products");

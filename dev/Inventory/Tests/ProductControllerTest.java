@@ -1,7 +1,6 @@
 package Inventory.Tests;
 
 import Inventory.Domain.ProductController;
-import Inventory.DTO.ItemDTO;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,13 +13,10 @@ import static org.junit.Assert.*;
  */
 public class ProductControllerTest {
 
-    private ProductController productController;
-
-    @Before
+    private ProductController productController;    @Before
     public void setUp() {
         HashMap<Integer, Inventory.Domain.Product> products = new HashMap<>();
-        HashMap<Integer, ItemDTO> purchasedItems = new HashMap<>();
-        productController = new ProductController(products, purchasedItems);
+        productController = new ProductController(products);
     }
 
     @Test

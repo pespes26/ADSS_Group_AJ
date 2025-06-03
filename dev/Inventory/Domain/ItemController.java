@@ -138,9 +138,7 @@ public class ItemController {
         }
 
         if (product != null) {
-            double salePrice = product.getSalePriceAfterStoreDiscount();
-
-            // ✅ 1. שמור פרטי המכירה בטבלת sold_items
+            double salePrice = product.getSalePriceAfterStoreDiscount();                // 1. Save sale details in sold_items table
             SoldItemDTO sold = new SoldItemDTO();
             sold.setCatalogNumber(item.getCatalogNumber());
             sold.setBranchId(branchId);
@@ -154,7 +152,7 @@ public class ItemController {
                 return;
             }
 
-            // ✅ 2. מחק מה־items ב־DB
+            // ✅ 2. Delete from items in DB
             try {
                 itemRepository.deleteItem(itemId);
             } catch (Exception e) {
@@ -164,7 +162,7 @@ public class ItemController {
 
             branch.removeItem(itemId);
 
-            // ✅ 4. הדפסה
+            // ✅ 4. Print
             System.out.println("\n-----------------------------------------");
             System.out.println("The item \"" + product.getProductName() + "\" has been marked as purchased and removed from Branch " + branchId + ".");
             System.out.printf("The item was sold for: %.2f ₪ (after store discount)%n", salePrice);
@@ -204,9 +202,9 @@ public class ItemController {
         if (branch != null) {
             ItemDTO item = branch.getItems().get(item_Id);
             if (item != null) {
-                item.setIsDefective(true);  // זיכרון
-                try {
-                    itemRepository.markItemAsDefective(item_Id, branch_id);  // DB
+        item.setIsDefective(true);  // Update in memory
+        try {
+            itemRepository.markItemAsDefective(item_Id, branch_id);  // Update in database
                 } catch (SQLException e) {
                     System.err.println("❌ Failed to mark item as defective in DB: " + e.getMessage());
                     return false;

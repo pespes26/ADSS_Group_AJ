@@ -15,14 +15,11 @@ public class SupplierMenuHandler {
     public static SupplierManagementController supplierManagementController;
 
 
-    public SupplierMenuHandler() {
-        // אתחול DAO-ים
+    public SupplierMenuHandler() {        // Initialize DAOs
         ISupplierDAO supplierDAO = new JdbcSupplierDAO();
         IAgreementDAO agreementDAO = new JdbcAgreementDAO();
         IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
-        IDiscountDAO discountDAO = new JdbcDiscountDAO();
-
-        // יצירת Repository
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();        // Create Repository
         ISupplierRepository supplierRepository = new SupplierRepositoryImpl(supplierDAO,agreementDAO,productSupplierDAO,discountDAO);
          this.supplierManagementController = new SupplierManagementController(supplierRepository);
 
@@ -83,9 +80,8 @@ public class SupplierMenuHandler {
 
         switch (choice) {
             case 1: return "Check";
-            case 2: return "Cash";
-            case 3: return "Bank Transfer";
-            default: return "Unknown"; // זה לא אמור לקרות בגלל הלולאה
+            case 2: return "Cash";            case 3: return "Bank Transfer";
+            default: return "Unknown"; // This shouldn't happen due to the loop
         }
     }
 

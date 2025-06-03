@@ -13,13 +13,11 @@ import java.util.Scanner;
 public class InventorySupplierMainMenu {
 
     public static void main(String[] args) throws SQLException {
-        Scanner scanner = new Scanner(System.in);
-
-        // יצירת טבלאות של שני המודולים מראש
+        Scanner scanner = new Scanner(System.in);        // Initialize tables for both modules upfront
         InventoryInitializer.initializeAllTables();
         SuppliersInitializer.initializeAllTables();
 
-        // יצירת InventoryController מראש (ולא רק בתוך handleInventory)
+        // Create InventoryController upfront (not just inside handleInventory)
         InventoryController inventoryController = new InventoryController();
 
         System.out.println("Welcome to the Inventory-Suppliers Menu! Do you want to load data to database?");
@@ -82,7 +80,7 @@ public class InventorySupplierMainMenu {
         int branchId = getValidatedInt(scanner);
 
         MenuController inventoryMenu = new MenuController(inventoryController, branchId);
-        inventoryMenu.runMenu(); // חוזר לתפריט הראשי
+        inventoryMenu.runMenu(); // Returns to main menu
     }
 
     private static void handleSuppliers(Scanner scanner) throws SQLException {
@@ -96,7 +94,7 @@ public class InventorySupplierMainMenu {
             scanner.next();
         }
         int result = scanner.nextInt();
-        scanner.nextLine(); // מנקה את השורה כדי למנוע בעיות עם nextLine
+        scanner.nextLine(); // Clear buffer to avoid issues with nextLine
         return result;
     }
 }

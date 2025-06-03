@@ -3,13 +3,12 @@ package Suppliers.DTO;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class OrderDTO {
-    private int orderID; // מזהה ייחודי להזמנה
-    private long phoneNumber; // טלפון של הלקוח
-    private LocalDateTime orderDate; // תאריך ביצוע ההזמנה
-    private List<OrderItemDTO> items; // רשימת מוצרים בהזמנה
+public class OrderDTO {    private int orderID; // unique order identifier
+    private long phoneNumber; // customer phone number
+    private LocalDateTime orderDate; // order creation date
+    private List<OrderItemDTO> items; // list of ordered products
 
-    // בנאי חדש
+        // New constructor
 
     public OrderDTO(long phoneNumber, LocalDateTime orderDate, List<OrderItemDTO> items) {
         orderID = 0;

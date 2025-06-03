@@ -53,4 +53,9 @@ public interface IOrderDAO {
      * @throws SQLException if database error occurs
      */
     List<OrderDTO> searchOrders(LocalDateTime startDate, LocalDateTime endDate, Integer supplierId) throws SQLException;
+
+    /**
+     * Clears all records from the orders table
+     */
+    void clearTable() throws SQLException;
 }

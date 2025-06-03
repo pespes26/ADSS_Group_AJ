@@ -15,7 +15,7 @@ import java.util.List;
 public class AgreementRepositoryImpl implements IAgreementRepository {
 
     private static final int MAX_CACHE_SIZE = 500;
-    /** Identity Map: מפתח = ID, ערך = Entity */
+    /** Identity Map: key = ID, value = Entity */
     private final HashMap<Integer, Agreement> cache = new LinkedHashMap<>() {
         @Override
         protected boolean removeEldestEntry(HashMap.Entry<Integer, Agreement> eldest) {
@@ -46,16 +46,16 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
 
     @Override
     public Agreement getAgreementByID(int id) {
-        // 1. קודם מחפש במטמון
+        // 1. First search in cache
         Agreement cached = cache.get(id);
         if (cached != null) return cached;
 
-        // 2. לא קיים? מביא מה-DB דרך DAO
+        // 2. Not found? Get from DB via DAO
         try {
             AgreementDTO dto = this.agreementDao.getById(id);
-            if (dto == null) return null;                    // לא נמצא ב-DB
+            if (dto == null) return null;                    // Not found in DB
             Agreement entity = new Agreement(dto.getAgreement_ID(), dto.getSupplier_ID(), dto.getDeliveryDays(), dto.isSelfPickup());
-            cache.put(id, entity);                           // מוסיף למטמון
+            cache.put(id, entity);                           // Add to cache
             return entity;
         } catch (SQLException e) {
             throw new RuntimeException("DB error", e);
@@ -65,16 +65,16 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
     @Override
     public void deleteAgreementWithSupplier(int agreementId) {
         try {
-            // מחיקת כל ההנחות שמקושרות להסכם
+            // Delete all discounts associated with the agreement
             discountDao.deleteByAgreement(agreementId);
 
-            // מחיקת כל מוצרי הספק שמקושרים להסכם
+            // Delete all supplier products associated with the agreement
             productSupplierDao.deleteAllProductsFromAgreement(agreementId);
 
-            // מחיקת ההסכם עצמו
+            // Delete the agreement itself
             agreementDao.deleteById(agreementId);
 
-            // ניקוי מה-cache
+            // Clear from cache
             cache.remove(agreementId);
         } catch (SQLException e) {
             throw new RuntimeException(" Failed to delete agreement with ID: " + agreementId, e);
@@ -128,7 +128,7 @@ public class AgreementRepositoryImpl implements IAgreementRepository {
                 Agreement agreement = new Agreement(dto.getAgreement_ID(), dto.getSupplier_ID(), dto.getDeliveryDays(), dto.isSelfPickup());
                 agreements.add(agreement);
 
-                // שמירה ב-Cache
+                // Save in Cache
                 cache.put(agreement.getAgreement_ID(), agreement);
             }
 

@@ -57,6 +57,13 @@ public class Order {
         return orderDate.format(formatter);
     }
 
-
+    /**
+     * Returns the supplier's ID associated with this order.
+     *
+     * @return the supplier ID
+     */
+    public int getSupplierID() {
+        return supplierID;
+    }
 
 }

@@ -13,9 +13,7 @@ public class ShortageOrderDTO {
     private String supplierName; 
     private int quantityNeeded;
     private int currentStock;
-    private String status;  // PENDING, ORDERED, DELIVERED
-
-    // ✅ בנאי מלא
+    private String status;  // PENDING, ORDERED, DELIVERED    // Full constructor
     public ShortageOrderDTO(int orderId, int productCatalogNumber, int quantity,
                             double costPriceBeforeSupplierDiscount, double supplierDiscount,
                             String orderDate, int branchId, String daysInTheWeek,
@@ -34,9 +32,7 @@ public class ShortageOrderDTO {
         this.quantityNeeded = quantityNeeded;
         this.currentStock = currentStock;
         this.status = status;
-    }
-
-    // ✅ גטרים
+    }    // Getters
     public int getOrderId() {
         return orderId;
     }
@@ -87,9 +83,7 @@ public class ShortageOrderDTO {
 
     public String getStatus() {
         return status;
-    }
-
-    // ✅ סטרים
+    }    // Setters
     public void setOrderId(int orderId) {
         this.orderId = orderId;
     }

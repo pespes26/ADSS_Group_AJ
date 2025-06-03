@@ -23,7 +23,7 @@ public class ItemDTO {
         this.section_in_store = section_in_store;
         this.is_defect = is_defect;
         this.item_expiring_date = item_expiring_date;
-        this.item_id = 0; // ← מייצג שאין ID עדיין, יווצר אוטומטית
+        this.item_id = 0; // Represents no ID yet, will be auto-generated
     }
 
     public ItemDTO(int item_id, int catalog_number, int branch_id, String storage_location,

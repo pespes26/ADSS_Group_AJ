@@ -8,11 +8,9 @@ import java.util.Scanner;
 public class MainMenu {
 
     public static void run(Scanner scanner, boolean withSampleData) throws SQLException {
-        SupplierMenuHandler supplierMenuHandler = new SupplierMenuHandler();
         OrderMenuHandler orderMenuHandler = new OrderMenuHandler();
-        ProductMenuHandler productMenuHandler = new ProductMenuHandler();
-        AgreementMenuHandler agreementMenuHandler = new AgreementMenuHandler();
-
+        SupplierMenuHandler supplierMenuHandler = new SupplierMenuHandler();
+        
         SuppliersInitializer initializer = new SuppliersInitializer();
         SuppliersInitializer.initializeAllTables();
 
@@ -46,8 +44,8 @@ public class MainMenu {
             switch (choice) {
                 case 1 -> supplierMenuHandler.searchSupplierMenu(scanner);
                 case 2 -> {
-                    int supplier_ID = supplierMenuHandler.createSupplier(scanner);
-                    supplierMenuHandler.afterSupplierCreatedMenu(scanner, supplier_ID);
+                    int supplier_ID = SupplierMenuHandler.createSupplier(scanner);
+                    SupplierMenuHandler.afterSupplierCreatedMenu(scanner, supplier_ID);
                 }
                 case 3 -> orderMenuHandler.printPastOrder();
                 case 4 -> System.out.println("Returning to the main Inventory-Supplier menu...");

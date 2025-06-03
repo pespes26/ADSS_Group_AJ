@@ -46,8 +46,8 @@ Then you'll see the main options:
 
     Welcome to the Inventory-Suppliers Menu! What would you like to manage?
 
-    1. Inventory System  
-    2. Supplier System  
+    1. Inventory System
+    2. Supplier System
     3. Exit the Inventory-Suppliers system
 
 ---
@@ -78,10 +78,10 @@ When selected:
 - A sample dataset of **8 suppliers**, **agreements**, **products supplied**, and **discounts** is optionally loaded.
 - You can:
 
-   - Search supplier
-   - Create supplier + agreement + product
-   - View past supplier orders
-   - Return to the main menu
+  - Search supplier
+  - Create supplier + agreement + product
+  - View past supplier orders
+  - Return to the main menu
 
 All related tables are initialized via DAOs.
 
@@ -90,15 +90,129 @@ All related tables are initialized via DAOs.
 ## ❌ Exit Option
 
 - Selecting `3` will **clear all data**:
-   - Inventory: products, items, orders, discounts
-   - Supplier: suppliers, agreements, discounts, etc.
+  - Inventory: products, items, orders, discounts
+  - Supplier: suppliers, agreements, discounts, etc.
 - Console confirms deletion.
 
 ---
 
+## 🏷️ Project Tags
+
+- `#inventory-management`
+- `#supplier-management`
+- `#java-application`
+- `#sqlite-database`
+- `#maven-project`
+- `#unit-testing`
+- `#integration-testing`
+- `#dao-pattern`
+- `#repository-pattern`
+- `#multi-module`
+
 ## 📚 Libraries & Tools Used
 
-| Tool / Library        | Purpose                                  |
+| Tool / Library | Purpose                         | Version  |
+| -------------- | ------------------------------- | -------- |
+| Java           | Core programming language       | 23       |
+| Maven          | Project management & build tool | 3.11.0   |
+| JUnit          | Unit & integration testing      | 4.13.2   |
+| JUnit Jupiter  | Extended testing framework      | 5.8.1    |
+| SQLite JDBC    | Database connectivity           | 3.44.1.0 |
+| Mockito        | Mocking framework for testing   | 5.12.0   |
+| SLF4J          | Logging facade                  | 1.7.36   |
+| SnakeYAML      | YAML file processing            | 2.0      |
+
+## 🗄️ Database Structure
+
+The system uses two SQLite databases:
+
+### 1. Inventory.db
+
+- Products
+- Items
+- Orders
+- Discounts
+- Sales records
+- Periodic orders
+- Shortage orders
+
+### 2. suppliers.db
+
+- Suppliers
+- Agreements
+- Product-supplier relationships
+- Supplier discounts
+- Orders
+
+## 🏗️ Project Structure
+
+```plaintext
+dev/
+├── Integration_And_Unit_Tests/  # Integration & comprehensive tests
+├── Inventory/                   # Inventory management module
+│   ├── DAO/                    # Data Access Objects
+│   ├── Domain/                 # Business logic
+│   ├── DTO/                    # Data Transfer Objects
+│   ├── Init/                   # Initialization code
+│   ├── Repository/             # Repository implementations
+│   └── Tests/                  # Unit tests
+├── InventorySupplier/          # Integration layer
+└── Suppliers/                  # Supplier management module
+    ├── DAO/
+    ├── Domain/
+    ├── DTO/
+    └── Repository/
+
+## 🔍 Key Features
+
+1. **Multi-Branch Inventory Management**
+   - Track items across 10 branches
+   - Warehouse and store location tracking
+   - Defective item marking
+   - Stock level monitoring
+
+2. **Dynamic Pricing System**
+   - Supplier price tracking
+   - Multiple discount types
+   - Automatic price calculations
+   - Bulk purchase discounts
+
+3. **Supplier Management**
+   - Multiple suppliers per product
+   - Supplier agreements
+   - Delivery schedules
+   - Payment terms
+
+4. **Order Processing**
+   - Periodic orders
+   - Shortage-triggered orders
+   - Order history tracking
+   - Delivery scheduling
+
+5. **Reporting System**
+   - Inventory reports
+   - Sales tracking
+   - Shortage alerts
+   - Price history
+
+## 🧪 Testing
+
+The project includes extensive testing:
+
+1. **Unit Tests**
+   - Domain logic testing
+   - DAO testing
+   - Controller testing
+
+2. **Integration Tests**
+   - Cross-module functionality
+   - Database operations
+   - End-to-end workflows
+
+3. **Price Comparison Tests**
+   - Multiple supplier scenarios
+   - Discount calculations
+   - Bulk order optimizations
 |-----------------------|------------------------------------------|
 | Java (17+)            | Core language                            |
 | SQLite                | Embedded database                        |
@@ -109,7 +223,7 @@ All related tables are initialized via DAOs.
 
 ## 🗃️ Database Schema Overview
 
-All tables are created **dynamically** at runtime using the DAO layer.  
+All tables are created **dynamically** at runtime using the DAO layer.
 Data is inserted through DTO-based preloaders if chosen during startup.
 
 ---
@@ -400,7 +514,7 @@ Welcome to the Inventory-Suppliers Menu! What would you like to manage?
 4. Exit the Inventory-Suppliers system
    Enter your choice (1-4): (come back to the same stage)
 
-   
+
 ---
 
 Example Inventory:
@@ -577,3 +691,4 @@ Supplier & Periodic Orders Menu:
 - Periodic orders and shortage orders work alongside inventory & supplier systems.
 - When exiting, all tables are cleared in proper dependency order.
 
+```

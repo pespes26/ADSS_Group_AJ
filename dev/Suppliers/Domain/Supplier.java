@@ -1,6 +1,5 @@
 package Suppliers.Domain;
 
-import java.util.HashMap;
 
 /**
  * Represents a supplier in the system.

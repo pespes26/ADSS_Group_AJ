@@ -25,4 +25,6 @@ public interface IDiscountDAO {
     List<DiscountDTO> getDiscountsForProductByID(int productId, int quantity) throws SQLException;
 
     DiscountDTO getBestMatchingDiscount(int productId, int supplierId, int agreementId, int quantity) throws SQLException;
+
+    void clearTable();
 }

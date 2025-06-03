@@ -31,14 +31,14 @@ public class ProductMenuHandler {
         System.out.println("\nLet's add a new product...");
         int catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
 //      int catalog_Number = scanner.nextInt();
-//----------בדיקת מספר קטלוגי ייחודי
+//----------Check for unique catalog number
 
 //        int catalog_Number;
 //        while (true) {
 //            catalog_Number = Inputs.read_int(scanner, "Enter Catalog Number: ");
 //            boolean isCatalogUnique = validateUniqueCatalogNumber(controller, catalog_Number, supplierID);
 //            if (isCatalogUnique) {
-//                break; // המספר הקטלוגי ייחודי → אפשר לצאת מהלולאה
+//                break; // Catalog number is unique -> can exit loop
 //            }
 //            // אחרת נחזור לראש הלולאה ונבקש שוב
 //        }
@@ -50,7 +50,7 @@ public class ProductMenuHandler {
 //            product_id = Inputs.read_int(scanner, "Enter Product ID: ");
 //            boolean isProductIDUnique = validateUniqueProductIDNumber(controller, product_id, supplierID);
 //            if (isProductIDUnique) {
-//                break; // רק אם ה-ID ייחודי → נצא מהלולאה
+//                break; // Only exit loop if ID is unique
 //            }
 //        }
 

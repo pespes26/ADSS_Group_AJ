@@ -124,7 +124,7 @@ public class ProductDTO {
         if (supplyDaysInWeek != null) {
             this.supplyTime = DateUtils.calculateNextSupplyDayOffset(supplyDaysInWeek);
         } else {
-            this.supplyTime = 7; // ברירת מחדל אם לא הוגדר
+            this.supplyTime = 7; // Default supply time if not defined
         }
     }
 

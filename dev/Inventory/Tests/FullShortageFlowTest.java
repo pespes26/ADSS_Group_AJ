@@ -11,10 +11,7 @@ import Inventory.Repository.ShortageOrderRepositoryImpl;
 import InventorySupplier.SystemService.ShortageOrderService;
 import Suppliers.Repository.InventoryOrderRepositoryImpl;
 import Suppliers.Repository.ProductSupplierRepositoryImpl;
-import Suppliers.Repository.SupplierRepositoryImpl;
 import Suppliers.DAO.*;
-import Suppliers.Domain.SupplierManagementController;
-import Suppliers.Domain.ProductSupplierManagementController;
 import Suppliers.DTO.SupplierDTO;
 import Suppliers.DTO.AgreementDTO;
 import Suppliers.DTO.ProductSupplierDTO;
@@ -79,9 +76,7 @@ public class FullShortageFlowTest {
         System.out.println("✅ Agreement inserted for supplier.");
 
 
-        //
-
-        // יצירת קשר בין מוצר לספק
+        //                // Create product-supplier relationship
         ProductSupplierRepositoryImpl productSupplierRepo = new ProductSupplierRepositoryImpl(
                 sharedProductSupplierDAO, sharedDiscountDAO);
         ProductSupplierDTO productSupplierDTO = new ProductSupplierDTO(1004, 1004, supplierDTO.getSupplier_id(), agreementDTO.getAgreement_ID(), 1.5, "unit");

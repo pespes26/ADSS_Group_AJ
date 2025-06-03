@@ -91,7 +91,7 @@ public class Product {
 
     public int getSupplyTime() {
         if (supplyDaysInTheWeek == null) {
-            return 7; // ברירת מחדל – נניח זמן אספקה של שבוע
+            return 7; // Default - assume one week delivery time
         }
         return DateUtils.calculateNextSupplyDayOffset(supplyDaysInTheWeek);
     }

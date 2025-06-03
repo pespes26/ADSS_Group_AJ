@@ -3,6 +3,7 @@ package Inventory.Presentation;
 import Inventory.DTO.*;
 import Inventory.Domain.*;
 import InventorySupplier.SystemService.PeriodicOrderService;
+import Suppliers.Domain.PeriodicOrderController;
 import Suppliers.Init.SupplierRepositoryInitializer;
 import Inventory.Repository.*;
 import InventorySupplier.SystemService.ShortageOrderService;
@@ -113,7 +114,8 @@ public class MenuController {
                     supplierRepo,
                     periodicRepo,
                     onTheWayRepo,
-                    itemRepo
+                    itemRepo,
+                    new PeriodicOrderController(supplierRepo)
             );
 
             // Process orders for current day
@@ -153,7 +155,8 @@ public class MenuController {
                     supplierRepo,
                     periodicRepo,
                     onTheWayRepo,
-                    itemRepo
+                    itemRepo,
+                    new PeriodicOrderController(supplierRepo)
             );
 
             boolean success = periodicOrderService.start(current_branch_id);

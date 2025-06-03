@@ -4,6 +4,7 @@ import Inventory.DTO.ItemDTO;
 import Inventory.DTO.OrderOnTheWayDTO;
 import Inventory.DTO.PeriodicOrderDTO;
 import Inventory.Repository.*;
+import Suppliers.Domain.PeriodicOrderController;
 import Suppliers.Repository.IInventoryOrderRepository;
 import Inventory.DataBase.DatabaseConnector;
 
@@ -17,12 +18,19 @@ public class PeriodicOrderService {
     private final IOrderOnTheWayRepository onTheWayRepository;
     private final IPeriodicOrderRepository periodicOrderRepository;
     private final IItemRepository itemRepository;
+    private final PeriodicOrderController periodicOrderController;
 
-    public PeriodicOrderService(IInventoryOrderRepository orderRepository, IPeriodicOrderRepository periodicOrderRepository,
-            IOrderOnTheWayRepository onTheWayRepository, IItemRepository itemRepository) {
+    public PeriodicOrderService(
+            IInventoryOrderRepository orderRepository,
+            IPeriodicOrderRepository periodicOrderRepository,
+            IOrderOnTheWayRepository onTheWayRepository,
+            IItemRepository itemRepository,
+            PeriodicOrderController periodicOrderController // ✅ נוספה שורה זו
+    ) {
         this.periodicOrderRepository = periodicOrderRepository;
         this.onTheWayRepository = onTheWayRepository;
         this.itemRepository = itemRepository;
+        this.periodicOrderController = periodicOrderController; // ✅ ושורה זו
     }
 
     /**
@@ -36,7 +44,7 @@ public class PeriodicOrderService {
     public boolean start(int branchId) {
         Connection connection = null;
         boolean ordersProcessed = false;
-        
+
         try {
             connection = DatabaseConnector.connect();
             connection.setAutoCommit(false); // Start transaction
@@ -63,7 +71,7 @@ public class PeriodicOrderService {
                 try {
                     processOneTimeOrder(order, branchId);
                     ordersProcessed = true;
-                    System.out.println("✅ Processed one-time order #" + order.getOrderId() + 
+                    System.out.println("✅ Processed one-time order #" + order.getOrderId() +
                                      " for product " + order.getProductCatalogNumber() +
                                      " (Quantity: " + order.getQuantity() + ")");
                 } catch (Exception e) {
@@ -75,7 +83,7 @@ public class PeriodicOrderService {
             // Second, process periodic orders (without deleting them)
             List<PeriodicOrderDTO> periodicOrders = periodicOrderRepository.getAllPeriodicOrders()
                     .stream()
-                    .filter(order -> 
+                    .filter(order ->
                         order.getBranchId() == branchId &&
                         order.getDaysInTheWeek() != null &&
                         order.getDaysInTheWeek().toUpperCase().contains(currentDay)
@@ -87,7 +95,7 @@ public class PeriodicOrderService {
                 try {
                     processPeriodicOrder(order, branchId);
                     ordersProcessed = true;
-                    System.out.println("✅ Processed periodic order #" + order.getOrderId() + 
+                    System.out.println("✅ Processed periodic order #" + order.getOrderId() +
                                      " for product " + order.getProductCatalogNumber() +
                                      " (Quantity: " + order.getQuantity() + ")");
                 } catch (Exception e) {

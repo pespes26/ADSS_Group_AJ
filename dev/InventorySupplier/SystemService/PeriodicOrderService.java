@@ -54,7 +54,8 @@ public class PeriodicOrderService {
                     int quantity = details.getQuantity();
                     double costPrice = details.getPrice();
                     double discount = details.getDiscount();
-                    double finalPrice = costPrice * (1 - discount);
+                    double finalPrice = costPrice * (1 - discount); // '/ 100.0'
+
 
                     String expectedDeliveryDate = LocalDate.now().plusDays(1).toString();
 

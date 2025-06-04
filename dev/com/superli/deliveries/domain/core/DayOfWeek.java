@@ -1,41 +1,30 @@
 package com.superli.deliveries.domain.core;
 
+
 /**
  * Represents days of the week.
  */
 public enum DayOfWeek {
-    /**
-     * Monday
-     */
-    MONDAY,
+    SUNDAY("Sunday"),
+    MONDAY("Monday"),
+    TUESDAY("Tuesday"),
+    WEDNESDAY("Wednesday"),
+    THURSDAY("Thursday"),
+    FRIDAY("Friday"),
+    SATURDAY("Saturday");
 
-    /**
-     * Tuesday
-     */
-    TUESDAY,
+    private final String value;
 
-    /**
-     * Wednesday
-     */
-    WEDNESDAY,
+    DayOfWeek(String value) {
+        this.value = value;
+    }
 
-    /**
-     * Thursday
-     */
-    THURSDAY,
+    public String getValue() {
+        return value;
+    }
 
-    /**
-     * Friday
-     */
-    FRIDAY,
-
-    /**
-     * Saturday
-     */
-    SATURDAY,
-
-    /**
-     * Sunday
-     */
-    SUNDAY
-} 
+    @Override
+    public String toString() {
+        return value;
+    }
+}

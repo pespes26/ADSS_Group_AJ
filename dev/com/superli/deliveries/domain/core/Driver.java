@@ -2,6 +2,9 @@ package com.superli.deliveries.domain.core;
 
 import com.superli.deliveries.domain.core.Employee;
 import com.superli.deliveries.domain.core.Role;
+
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -19,21 +22,15 @@ public class Driver extends Employee {
 
     /**
      * Constructs a new Driver object.
-     *
-     * @param employeeId  Unique employee ID. Cannot be null or blank.
-     * @param name        Driver's name. Cannot be null or blank.
-     * @param licenseType Type of license. Cannot be null.
-     * @param available   Whether the driver is available for assignment.
      */
-    public Driver(String employeeId, String name, LicenseType licenseType, boolean available) {
-        super(Role.DRIVER); // Call parent constructor
-        
+    public Driver(String id, String fullName, String bankAccount, double salary, String employeeTerms,
+                  Date employeeStartDate, List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole) {
+        super(id, fullName, bankAccount, salary, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole); // Call parent constructor
+        this.addRoleQualification((Role)"Driver");
         if (licenseType == null) {
             throw new IllegalArgumentException("License type cannot be null.");
         }
-
         this.licenseType = licenseType;
-        this.available = available;
     }
 
     /**
@@ -102,6 +99,6 @@ public class Driver extends Employee {
 
     @Override
     public int hashCode() {
-        return Objects.hash(get());
+        return Objects.hash(getId());
     }
 }

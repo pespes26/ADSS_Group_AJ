@@ -1,6 +1,10 @@
 package com.superli.deliveries.application.services;
 
+import com.superli.deliveries.domain.core.AvailableShifts;
+import com.superli.deliveries.domain.core.Employee;
 import com.superli.deliveries.domain.core.Employee.*;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.domain.ports.IEmployeeRepository;
 
 import java.time.DayOfWeek;
@@ -35,9 +39,9 @@ public class EmployeeService {
      * @return The created employee
      */
     public Employee createEmployee(String id, String fullName, String bankAccount, double salary,
-                                 String employeeTerms, Date employeeStartDate,
-                                 List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints,
-                                 EmployeeType type, LicenseType licenseType) {
+                                   String employeeTerms, Date employeeStartDate,
+                                   List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints,
+                                   EmployeeType type, LicenseType licenseType) {
         Employee employee = new Employee(id, fullName, bankAccount, salary, employeeTerms,
                 employeeStartDate, roleQualifications, availabilityConstraints, type, licenseType);
         return employeeRepository.save(employee);
@@ -65,11 +69,11 @@ public class EmployeeService {
     /**
      * Finds all employees of a specific type.
      *
-     * @param type The employee type to filter by
+     * @param employeeType The employee type to filter by
      * @return List of employees of the specified type
      */
-    public List<Employee> findEmployeesByType(EmployeeType type) {
-        return employeeRepository.findByType(type);
+    public List<Employee> findEmployeesByType(String employeeType) {
+        return employeeRepository.findByType(employeeType);
     }
 
     /**

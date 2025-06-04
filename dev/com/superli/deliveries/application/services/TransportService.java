@@ -1,6 +1,6 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.*;
+import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.domain.ports.ITransportRepository;
 import com.superli.deliveries.presentation.*;
 

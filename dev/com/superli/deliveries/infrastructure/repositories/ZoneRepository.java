@@ -1,14 +1,9 @@
 package com.superli.deliveries.infrastructure.repositories;
 
-import com.superli.deliveries.domain.Zone;
+import com.superli.deliveries.domain.core.Zone;
 import com.superli.deliveries.domain.ports.IZoneRepository;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Manages the in-memory storage for Zone objects using a HashMap.

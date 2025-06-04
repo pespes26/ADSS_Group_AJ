@@ -1,8 +1,7 @@
 package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.*;
-import com.superli.deliveries.presentation.TransportDetailsView;
-import com.superli.deliveries.presentation.TransportSummaryView;
+import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.presentation.*;
 import com.superli.deliveries.application.services.*;
 
 import java.time.LocalDateTime;
@@ -196,7 +195,7 @@ public class TransportController {
                 CompatiblePair pair = compatiblePairs.get(i);
                 System.out.printf("%d. Driver: %s (%s) - Truck: %s (%s, max: %.1f kg)\n",
                         i + 1,
-                        pair.driver.getName(),
+                        pair.driver.getFullName(),
                         pair.driver.getLicenseType(),
                         pair.truck.getPlateNum(),
                         pair.truck.getModel(),
@@ -267,7 +266,7 @@ public class TransportController {
                 Driver driver = compatibleDrivers.get(i);
                 System.out.printf("%d. %s (ID: %s, License: %s)\n",
                         i + 1,
-                        driver.getName(),
+                        driver.getFullName(),
                         driver.getDriverId(),
                         driver.getLicenseType());
             }
@@ -299,7 +298,7 @@ public class TransportController {
         System.out.println("\n╔════════════════════════════════════╗");
         System.out.println("║       SELECTED DRIVER & TRUCK      ║");
         System.out.println("╚════════════════════════════════════╝");
-        System.out.println("Driver: " + selectedPair.driver.getName() + " (ID: " + selectedPair.driver.getDriverId() + ")");
+        System.out.println("Driver: " + selectedPair.driver.getFullName() + " (ID: " + selectedPair.driver.getDriverId() + ")");
         System.out.println("License: " + selectedPair.driver.getLicenseType());
         System.out.println("Truck: " + selectedPair.truck.getPlateNum() + " (" + selectedPair.truck.getModel() + ")");
         System.out.println("Capacity: " + (selectedPair.truck.getMaxWeight() - selectedPair.truck.getNetWeight()) + " kg");

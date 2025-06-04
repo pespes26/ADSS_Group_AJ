@@ -1,6 +1,6 @@
 package com.superli.deliveries.infrastructure.repositories;
 
-import com.superli.deliveries.domain.DestinationDoc;
+import com.superli.deliveries.domain.core.DestinationDoc;
 import com.superli.deliveries.domain.ports.IDestinationDocRepository;
 
 import java.util.*;

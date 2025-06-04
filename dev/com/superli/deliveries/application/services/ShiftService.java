@@ -31,7 +31,7 @@ public class ShiftService {
      * @throws IllegalArgumentException if any parameter is null
      */
     public Shift createShift(Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay,
-                           Set<Role> requiredRoles, Employee manager) {
+                           List<Role> requiredRoles, Map<Employee, Role> shiftEmployees, Employee manager) {
         if (shiftDate == null) {
             throw new IllegalArgumentException("Shift date cannot be null");
         }
@@ -48,10 +48,9 @@ public class ShiftService {
             throw new IllegalArgumentException("Manager cannot be null");
         }
 
-        Shift shift = new Shift(shiftDate, shiftType, shiftDay, requiredRoles, manager);
+        Shift shift = new Shift(shiftDate, shiftType, shiftDay, requiredRoles, shiftEmployees, manager);
         return shiftRepository.save(shift);
     }
-
     /**
      * Finds a shift by its ID.
      *

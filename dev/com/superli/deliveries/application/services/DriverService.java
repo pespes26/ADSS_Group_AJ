@@ -96,27 +96,6 @@ public class DriverService {
     }
 
     /**
-     * Updates a driver's name.
-     * @param driverId The ID of the driver to update.
-     * @param newName The new name for the driver.
-     * @return true if the update was successful, false otherwise.
-     */
-    public boolean updateDriverName(String driverId, String newName) {
-        if (newName == null || newName.trim().isEmpty()) {
-            return false; // Invalid name
-        }
-
-        Optional<Driver> driverOpt = driverRepository.findById(driverId);
-        if (driverOpt.isPresent()) {
-            Driver driver = driverOpt.get();
-            driver.setName(newName);
-            driverRepository.save(driver);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Updates a driver's license type.
      * @param driverId The ID of the driver to update.
      * @param newLicenseType The new license type for the driver.

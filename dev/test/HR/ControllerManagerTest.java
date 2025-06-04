@@ -97,7 +97,7 @@ public class ControllerManagerTest {
         LocalDate upcomingSunday = LocalDate.now().with(java.time.temporal.TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY));
         for (int i = 0; i < 7; i++) {
             LocalDate day = upcomingSunday.plusDays(i);
-            DomainLayer.DayOfWeek dayEnum = DomainLayer.DayOfWeek.valueOf(day.getDayOfWeek().toString());
+            DayOfWeek dayEnum = DayOfWeek.valueOf(day.getDayOfWeek().toString());
             Date date = java.sql.Date.valueOf(day);
             hrManager.addShift(new Shift(date, ShiftType.MORNING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
             hrManager.addShift(new Shift(date, ShiftType.EVENING, dayEnum, new ArrayList<>(), new HashMap<>(), null));

@@ -1,15 +1,8 @@
 package com.superli.deliveries.infrastructure.repositories;
 
-// --- ייבואים ---
-import com.superli.deliveries.domain.Driver;
-// ודא שה-import הזה מצביע על המיקום הנכון של הממשק אצלך
-import com.superli.deliveries.domain.ports.IDriverRepository; // או com.superli.deliveries.domain.*
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.HashMap; // <--- שינוי ייבוא ל-HashMap
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.ports.IDriverRepository;
+import java.util.*;
 
 /**
  * Manages the in-memory storage for Driver objects using a HashMap.

@@ -1,15 +1,8 @@
 package com.superli.deliveries;
 
 import com.superli.deliveries.application.controllers.*;
-import com.superli.deliveries.infrastructure.repositories.DestinationDocRepository;
-import com.superli.deliveries.infrastructure.repositories.DriverRepository;
-import com.superli.deliveries.infrastructure.repositories.ProductRepository;
-import com.superli.deliveries.infrastructure.repositories.SiteRepository;
-import com.superli.deliveries.infrastructure.repositories.TransportRepository;
-import com.superli.deliveries.infrastructure.repositories.TruckRepository;
-import com.superli.deliveries.infrastructure.repositories.ZoneRepository;
-import com.superli.deliveries.service.*;
-import com.superli.deliveries.storage.*;
+import com.superli.deliveries.infrastructure.repositories.*;
+import com.superli.deliveries.application.services.*;
 
 import java.util.Scanner;
 

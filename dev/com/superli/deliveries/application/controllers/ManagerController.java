@@ -1,6 +1,7 @@
 package com.superli.deliveries.application.controllers;
 
-import java.sql.SQLOutput;
+import com.superli.deliveries.domain.core.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -382,7 +383,7 @@ public class ManagerController {
 
             for (int i = 0; i < 7; i++) {
                 LocalDate shiftDate = upcomingSunday.plusDays(i);
-                DomainLayer.DayOfWeek day = DomainLayer.DayOfWeek.valueOf(shiftDate.getDayOfWeek().toString());
+                DayOfWeek day = DayOfWeek.valueOf(shiftDate.getDayOfWeek().toString());
 
                 Date date = java.sql.Date.valueOf(shiftDate);
 
@@ -706,4 +707,3 @@ public class ManagerController {
         }
     }
 }
-

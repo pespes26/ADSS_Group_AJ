@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import com.superli.deliveries.domain.core.Employee;
 
-/**
- * Manages human resources in the system, including employees, shifts, and roles.
- */
 public class HRManager {
-    private final List<Employee> employees;
-    private final List<Shift> shifts;
-    private final List<Role> allRoles;
-    private final ArchivedEmployee archivedEmployee;
-    private final ArchivedShifts archivedShifts;
+    private List<Employee> employees;
+    private List<Shift> shifts;
+    private List<Role> allRoles;
+    private ArchivedEmployee archivedEmployee;
+    private ArchivedShifts archivedShifts;
 
-    /**
-     * Constructs a new HRManager with empty lists.
-     */
     public HRManager() {
         this.employees = new ArrayList<>();
         this.shifts = new ArrayList<>();
@@ -26,62 +20,37 @@ public class HRManager {
     }
 
     /**
-     * Gets all roles in the system.
-     *
-     * @return A copy of the list of all roles.
+     * @return A list of all roles in the system.
      */
     public List<Role> getAllRoles() {
-        return List.copyOf(allRoles);
+        return allRoles;
     }
 
     /**
-     * Gets all shifts in the system.
-     *
-     * @return A copy of the list of all shifts.
+     * @return A list of all shifts in the system.
      */
     public List<Shift> getAllShifts() {
-        return List.copyOf(shifts);
+        return shifts;
     }
 
-    /**
-     * Gets all employees in the system.
-     *
-     * @return A copy of the list of all employees.
-     */
-    public List<Employee> getEmployees() {
-        return List.copyOf(employees);
-    }
+    public List<Employee> getEmployees(){return employees;}
 
-    /**
-     * Gets the archived employee manager.
-     *
-     * @return The archived employee manager.
-     */
     public ArchivedEmployee getArchivedEmployee() {
         return archivedEmployee;
     }
 
-    /**
-     * Gets the archived shifts manager.
-     *
-     * @return The archived shifts manager.
-     */
     public ArchivedShifts getArchivedShifts() {
         return archivedShifts;
     }
 
+
     // ----------------------------------- Employee Management -----------------------------------
     /**
-     * Adds a new employee to the system.
-     *
-     * @param employee The employee to add.
-     * @return true if the employee was added successfully, false if an employee with the same ID already exists.
+     * Adds a new employee to the employees list.
+     * @param employee - the employee to add.
      */
     public boolean addEmployee(Employee employee) {
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee cannot be null.");
-        }
-        if (findEmployeeByID(employee.getId()) != null) {
+        if (FindEmployeeByID(employee.getId()) != null) {
             System.out.println("Employee with this ID already exists. Cannot add duplicate.");
             return false;
         }
@@ -90,28 +59,21 @@ public class HRManager {
     }
 
     /**
-     * Removes an employee from the system.
+     * Removes the given employee from the employee list if they exist.
      *
-     * @param employee The employee to remove.
-     * @return true if the employee was removed, false if they weren't in the system.
+     * @param employee The employee object to remove.
      */
-    public boolean removeEmployee(Employee employee) {
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee cannot be null.");
-        }
-        return employees.remove(employee);
+    public void removeEmployee(Employee employee) {
+        employees.remove(employee);
     }
 
     /**
-     * Finds an employee by their ID.
-     *
-     * @param id The ID to search for.
-     * @return The employee with the given ID, or null if not found.
+     * Searches for an employee by ID in the employees list.
+     * @param id - the ID of the employee to search for.
+     * @return if the employee was found - The matching employee
+     *         otherwise - null.
      */
-    public Employee findEmployeeByID(String id) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("ID cannot be null or empty.");
-        }
+    public Employee FindEmployeeByID(String id) {
         for (Employee e : employees) {
             if (e.getId().equals(id)) {
                 return e;
@@ -121,174 +83,125 @@ public class HRManager {
     }
 
     /**
-     * Removes an employee from the active list and archives them.
+     * Removes the given employee from the active list, marks them as inactive, and archives them.
      *
-     * @param employee The employee to archive.
-     * @return true if the employee was archived successfully, false if they weren't in the system.
+     * @param employee - the employee to archive and remove.
      */
-    public boolean removeAndArchiveEmployee(Employee employee) {
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee cannot be null.");
-        }
+    public void removeAndArchiveEmployee(Employee employee) {
+        Employee toRemove = FindEmployeeByID(employee.getId());
 
-        Employee toRemove = findEmployeeByID(employee.getId());
         if (toRemove == null) {
             System.out.println("Employee with ID " + employee.getId() + " not found.");
-            return false;
+            return;
         }
 
         employees.remove(toRemove);
         archivedEmployee.addArchivedEmployee(toRemove);
+
         System.out.println("Employee with ID " + employee.getId() + " has been removed and archived.");
-        return true;
     }
+    // ----------------------------------- End Employee Management -----------------------------------
 
     // ----------------------------------- Role and Shift Management -----------------------------------
     /**
-     * Adds a new role to the system.
-     *
-     * @param role The role to add.
-     * @return true if the role was added, false if it already exists.
+     * Adds a new role if the role don't exist in the system.
+     * @param role - the role to add.
      */
-    public boolean addRole(Role role) {
-        if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
-        }
-        if (!allRoles.contains(role)) {
+    public void addRole(Role role){
+        if(!allRoles.contains(role)){
             allRoles.add(role);
-            return true;
         }
-        return false;
     }
 
     /**
-     * Adds a new shift to the system.
-     *
-     * @param shift The shift to add.
-     * @return true if the shift was added, false if it already exists.
+     * Creates a new shift and adds it to the system if the shift don't exist.
+     * @param shift - the shift to add.
      */
-    public boolean addShift(Shift shift) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
-        }
-        if (!shifts.contains(shift)) {
+    public void addShift(Shift shift) {
+        if(!shifts.contains(shift)) {
             shifts.add(shift);
-            return true;
         }
-        return false;
     }
 
     /**
-     * Sets the required roles for a shift.
+     * Sets the required roles for a given shift.
      *
-     * @param shift The shift to update.
-     * @param requiredRoles The list of required roles.
+     * @param shift - the shift to update.
+     * @param requiredRoles - the list of roles required for this shift.
      */
     public void defineRequiredRolesForShift(Shift shift, List<Role> requiredRoles) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
-        }
-        if (requiredRoles == null) {
-            throw new IllegalArgumentException("Required roles cannot be null.");
-        }
         shift.getShiftRequiredRoles().clear();
         shift.getShiftRequiredRoles().addAll(requiredRoles);
     }
 
     /**
-     * Adds a required role to a shift.
-     *
-     * @param shift The shift to update.
-     * @param role The role to add.
-     * @return true if the role was added, false if it was already required.
+     * Add one role for the given shift.
+     * @param shift - the shift to update.
+     * @param role - the role to add for this shift.
      */
-    public boolean addRequiredRoleForShift(Shift shift, Role role) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
-        }
-        if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
-        }
-        if (!shift.getShiftRequiredRoles().contains(role)) {
-            shift.getShiftRequiredRoles().add(role);
-            return true;
-        }
-        return false;
+    public void addRequiredRolesForShift(Shift shift, Role role) {
+        shift.getShiftRequiredRoles().add(role);
     }
+
+    /**
+     * Ends the given shift and archives it the shift date has already passed.
+     * Once archived, the shift is removed from the active shift list.
+     *
+     * @param shift - the shift to be ended and archived.
+     * @param archive - The ArchivedShifts instance where the shift will be stored.
+     */
+   /* public void endShift(ArchivedShifts archive) {
+        for ()
+        if (shift.isPastShift()) {
+            archive.archiveShift(shift);
+            shifts.remove(shift);
+        }
+    }*/
+
+    // ----------------------------------- End Role and Shift Management -----------------------------------
 
     // ----------------------------------- Shift Assignment -----------------------------------
-    /**
-     * Assigns an employee to a shift.
-     *
-     * @param shift The shift to assign to.
-     * @param employee The employee to assign.
-     * @return true if the employee was assigned successfully, false otherwise.
-     */
-    public boolean addEmployeeToShift(Shift shift, Employee employee) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
-        }
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee cannot be null.");
-        }
-
+    public void addEmployeeToShift(Shift shift,Employee employee){
         for (Role role : shift.getShiftRequiredRoles()) {
-            if (employee.isQualified(role) && employee.isAvailable(shift.getShiftDay(), shift.getShiftType())) {
-                return shift.addEmployeeToShift(employee, role);
+            if (employee.isQualified(role) && employee.isAvailable(shift.getShiftDay(),shift.getShiftType())){
+                shift.addEmployeeToShift(employee,role);
+                return;
+
             }
         }
-        return false;
     }
 
     /**
-     * Removes an employee from a shift.
+     * Removes the employee from given shift if they were assigned.
      *
-     * @param shift The shift to remove from.
-     * @param employee The employee to remove.
-     * @return true if the employee was removed successfully, false if they weren't assigned to the shift.
+     * @param shift - the shift to remove the employee from.
+     * @param employee - the employee to remove from the shift.
      */
-    public boolean removeEmployeeFromShift(Shift shift, Employee employee) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
+    public void removeEmployeeFromShift(Shift shift,Employee employee){
+        if (shift.getShiftEmployees().containsKey(employee)){
+            shift.removeEmployeeFromShift(employee);
         }
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee cannot be null.");
-        }
-        return shift.removeEmployeeFromShift(employee);
+
     }
 
-    /**
-     * Prints information about all employees to the console.
-     */
-    public void printEmployees() {
-        for (Employee e : employees) {
-            System.out.println("Employee full name:" + e.getFullName() + ", Employee ID: " + e.getId());
+    // ----------------------------------- End Shift Assignment -----------------------------------
+
+    public void printEmployees(){
+        for (Employee e: employees) {
+            System.out.println("Employee full name:" + e.getFullName() +", Employee ID: "+ e.getId());
         }
     }
 
-    /**
-     * Prints information about all roles to the console.
-     */
-    public void printRoles() {
+    public void printRoles(){
         System.out.print("Roles: [");
-        for (int i = 0; i < allRoles.size(); i++) {
-            if (i < allRoles.size() - 1) {
+        for (int i=0; i<allRoles.size();i++) {
+            if(i<allRoles.size()-1) {
                 System.out.print(allRoles.get(i).getRoleName() + ", ");
-            } else {
+            }
+            else {
                 System.out.print(allRoles.get(i).getRoleName());
             }
         }
         System.out.println("]");
-    }
-
-    @Override
-    public String toString() {
-        return "HRManager{" +
-                "employees=" + employees +
-                ", shifts=" + shifts +
-                ", allRoles=" + allRoles +
-                ", archivedEmployee=" + archivedEmployee +
-                ", archivedShifts=" + archivedShifts +
-                '}';
     }
 }

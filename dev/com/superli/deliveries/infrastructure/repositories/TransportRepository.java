@@ -1,6 +1,6 @@
 package com.superli.deliveries.infrastructure.repositories;
 
-import com.superli.deliveries.domain.Transport;
+import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.ports.ITransportRepository;
 
 import java.util.Collection;

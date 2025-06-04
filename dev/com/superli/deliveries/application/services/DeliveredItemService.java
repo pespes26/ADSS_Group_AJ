@@ -8,7 +8,7 @@ import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.domain.ports.IDestinationDocRepository;
-
+import com.superli.deliveries.domain.core.DeliveredItem;
 /**
  * Service responsible for managing delivered items within destination documents.
  * Also handles weight calculation and validation.

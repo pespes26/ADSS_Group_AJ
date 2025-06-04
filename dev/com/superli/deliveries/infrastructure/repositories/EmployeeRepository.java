@@ -1,7 +1,7 @@
 package com.superli.deliveries.infrastructure.repositories;
 
-import com.superli.deliveries.domain.core.employee.*;
-import com.superli.deliveries.domain.ports.employee.IEmployeeRepository;
+import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.domain.ports.IEmployeeRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

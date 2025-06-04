@@ -2,12 +2,10 @@ package Inventory.Repository;
 
 import Inventory.DAO.IPeriodicOrderDAO;
 import Inventory.DAO.JdbcPeriodicOrderDAO;
-import Inventory.DTO.OrderOnTheWayDTO;
 import Inventory.DTO.PeriodicOrderDTO;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Concrete implementation of the IPeriodicOrderRepository interface,
@@ -16,28 +14,9 @@ import java.util.stream.Collectors;
 public class PeriodicOrderRepositoryImpl implements IPeriodicOrderRepository {
 
     private final IPeriodicOrderDAO periodicOrderDAO;
-    private final IOrderOnTheWayRepository orderOnTheWayRepository;
 
     public PeriodicOrderRepositoryImpl() {
         this.periodicOrderDAO = new JdbcPeriodicOrderDAO();
-        this.orderOnTheWayRepository = new OrderOnTheWayRepositoryImpl();
-    }
-
-    @Override
-    public List<PeriodicOrderDTO> getPeriodicOrdersInTransit() throws SQLException {
-        List<OrderOnTheWayDTO> ordersInTransit = orderOnTheWayRepository.getOrdersInTransit();
-        return ordersInTransit.stream()
-                .filter(OrderOnTheWayDTO::isPeriodic)
-                .map(order -> {
-                    try {
-                        return periodicOrderDAO.getPeriodicOrderById(order.getOrderId());
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .filter(order -> order != null)
-                .collect(Collectors.toList());
     }
 
     @Override

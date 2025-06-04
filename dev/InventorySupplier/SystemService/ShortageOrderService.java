@@ -40,9 +40,14 @@ public class ShortageOrderService implements WakeUpListener {
             List<OrderProductDetailsDTO> orderDetails = orderByShortageController.getShortageOrderProductDetails(shortageHashMap, fakePhoneNumber);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String orderDate = LocalDateTime.now().format(formatter);
+            String orderDate = LocalDateTime.now().format(formatter);            for (OrderProductDetailsDTO details : orderDetails) {
+                // Check if there's already a pending order for this product and branch
+                if (shortageOrderRepository.hasPendingOrderForProduct(details.getProductId(), branchId)) {
+                    System.out.println("⚠️ Skipping duplicate order for product " + details.getProductId() + 
+                                     " at branch " + branchId + " - pending order already exists");
+                    continue;
+                }
 
-            for (OrderProductDetailsDTO details : orderDetails) {
                 ShortageOrderDTO dto = new ShortageOrderDTO(
                         0, // Auto-incremented order_id
                         details.getProductId(),
@@ -60,6 +65,8 @@ public class ShortageOrderService implements WakeUpListener {
                 );
                 
                 shortageOrderRepository.insert(dto);
+                System.out.println("✅ Created new shortage order for product " + details.getProductId() + 
+                                 " at branch " + branchId);
             }
 
             System.out.println("✅ Shortage order saved to DB successfully for branch " + branchId);

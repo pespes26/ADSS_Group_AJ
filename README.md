@@ -55,17 +55,28 @@ Then you'll see the main options:
 ## 🏪 Inventory Module
 
 1. Enter your **Branch ID** (1–10).
-2. Access the Inventory Menu, which includes:
+2. Access the Inventory Menu with two main sections:
+
+### Part 1: Core Inventory Functions
 
 - Show item details
 - Add/remove items
 - Mark item as defective
 - Update cost prices
 - Apply supplier/store discounts
-- Inventory & shortage reports
+- Generate inventory & shortage reports
 - Update demand/supply parameters
 - Change storage location
-- Exit inventory menu
+
+### Part 2: Order Management & Tracking
+
+- **Show Shortage Alerts for this branch** - View current shortages without updating inventory
+- Update Periodic Order - Modify recurring supplier orders
+- **Place Supplier Order Due to Shortage** - Process existing orders and detect new shortages
+- View All Periodic Orders - Display all recurring orders for the branch
+- View Pending Shortage Orders - Show orders awaiting delivery
+
+**Note:** The "View Current Periodic Orders In Transit" functionality has been removed for streamlined operation.
 
 Data is retrieved using DAOs and Repository patterns. Branch-specific operations are respected.
 
@@ -183,17 +194,25 @@ dev/
    - Delivery schedules
    - Payment terms
 
-4. **Order Processing**
-   - Periodic orders
-   - Shortage-triggered orders
+5. **Enhanced Order Processing**
+   - Periodic orders (recurring supplier orders)
+   - Shortage-triggered orders (automatic detection and creation)
+   - Improved shortage order processing that handles both existing pending orders and new shortage detection
    - Order history tracking
    - Delivery scheduling
+   - Streamlined order management with removed redundant transit tracking
 
-5. **Reporting System**
-   - Inventory reports
+6. **Enhanced Reporting System**
+   - Branch-specific shortage alerts (without inventory updates)
    - Sales tracking
-   - Shortage alerts
    - Price history
+   - Inventory reports by category/subcategory/catalog
+   - Defective and expired items reports
+   - Simplified alert system for better performance
+   - Sales tracking
+   - Price history
+   - Inventory reports by category/subcategory/catalog
+   - Defective and expired items reports
 
 ## 🧪 Testing
 
@@ -238,9 +257,8 @@ Data is inserted through DTO-based preloaders if chosen during startup.
 | `discounts`            | Store discounts per product per branch                               |
 | `product_discounts`    | Mapping table for product → discount                                 |
 | `branches`             | Represents 10 branch IDs                                             |
-| `orders_on_the_way`    | Placed supplier orders awaiting delivery                             |
 | `periodic_orders`      | Scheduled supplier orders (weekly)                                   |
-| `shortage_orders`      | Orders triggered by shortages                                        |
+| `shortage_orders`      | Orders triggered by shortages (enhanced processing)                 |
 
 ---
 
@@ -632,38 +650,16 @@ Main Menu:
 3. Exit
 
 2
-Supplier & Periodic Orders Menu:
-1. Update Inventory and Show Shortage Alerts
-2. Place Periodic Order from Supplier
+Order Management & Tracking Menu:
+1. Show Shortage Alerts for this branch
+2. Update Periodic Order
 3. Place Supplier Order Due to Shortage
-4. Back to Main Menu
+4. View All Periodic Orders
+5. View Pending Shortage Orders
+6. Back to Main Menu
 
 1
-🔁 Updating Product [Yellow Cheese 200g] (Catalog #1008)
-    📦 Before -> Store: 5 | Warehouse: 4
-    🆕 After  -> Store: 2 | Warehouse: 1
-The product was updated successfully
-🔁 Updating Product [Toilet Paper 12-pack] (Catalog #1009)
-    📦 Before -> Store: 6 | Warehouse: 3
-    🆕 After  -> Store: 3 | Warehouse: 0
-The product was updated successfully
-🔁 Updating Product [Tomato Sauce 500ml] (Catalog #1007)
-    📦 Before -> Store: 6 | Warehouse: 3
-    🆕 After  -> Store: 0 | Warehouse: 3
-The product was updated successfully
-✅ Inventory updated successfully for Branch #2
-🔍 Checking catalog 1004: 0 in stock.
-🧮 Product 1004 requires min 1, has 0
-🔍 Checking catalog 1005: 0 in stock.
-🧮 Product 1005 requires min 2, has 0
-🔍 Checking catalog 1006: 0 in stock.
-🧮 Product 1006 requires min 2, has 0
-🔍 Checking catalog 1007: 3 in stock.
-🧮 Product 1007 requires min 2, has 3
-✅ Product 1007 is above minimum. No shortage.
-...
-
------------ Shortage Report -----------
+----------- Shortage Alert Report for Branch #2 -----------
 Reorder Alert Report for Branch 2:
 Product Catalog Number: 1004, Name: Orange Juice 1L, Total in stock: 0, Minimum required: 1, Missing: 1
 Product Catalog Number: 1005, Name: Butter 200g, Total in stock: 0, Minimum required: 2, Missing: 2
@@ -673,14 +669,15 @@ Product Catalog Number: 1010, Name: Chocolate Bar 100g, Total in stock: 0, Minim
 Product Catalog Number: 1011, Name: Mineral Water 1.5L, Total in stock: 0, Minimum required: 1, Missing: 1
 Product Catalog Number: 1012, Name: Dish Soap 750ml, Total in stock: 0, Minimum required: 2, Missing: 2
 Product Catalog Number: 1013, Name: Cornflakes 750g, Total in stock: 0, Minimum required: 4, Missing: 4
-
 ----------------------------------------
 
-Supplier & Periodic Orders Menu:
-1. Update Inventory and Show Shortage Alerts
-2. Place Periodic Order from Supplier
+Order Management & Tracking Menu:
+1. Show Shortage Alerts for this branch
+2. Update Periodic Order
 3. Place Supplier Order Due to Shortage
-4. Back to Main Menu
+4. View All Periodic Orders
+5. View Pending Shortage Orders
+6. Back to Main Menu
 
 ----------------------------------------
 
@@ -689,6 +686,9 @@ Supplier & Periodic Orders Menu:
 - DAO classes are responsible for table creation (`createTableIfNotExists`) and insertion.
 - Data preloaders avoid duplication: check if product/item already exists before inserting.
 - Periodic orders and shortage orders work alongside inventory & supplier systems.
+- **Enhanced shortage processing**: Function 3 now always processes existing orders AND detects new shortages.
+- **Simplified alerts**: Function 1 now focuses solely on displaying shortage alerts without inventory updates.
+- **Streamlined menu**: Removed redundant "View Current Periodic Orders In Transit" functionality.
 - When exiting, all tables are cleared in proper dependency order.
 
 ```

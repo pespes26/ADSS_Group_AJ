@@ -2,8 +2,6 @@ package Inventory.Presentation;
 
 import Inventory.DTO.*;
 import Inventory.Domain.*;
-import InventorySupplier.SystemService.PeriodicOrderService;
-import Suppliers.Domain.PeriodicOrderController;
 import Suppliers.Init.SupplierRepositoryInitializer;
 import Inventory.Repository.*;
 import InventorySupplier.SystemService.ShortageOrderService;
@@ -12,7 +10,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,21 +62,16 @@ public class MenuController {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
-    }
-
-    private void runPart2InventoryMenu() {
+    }    private void runPart2InventoryMenu() {
         int choice = 0;
-        while (choice != 8) {
-            System.out.println("""
+        while (choice != 6) {            System.out.println("""
                 Order Management & Tracking Menu:
-                1. Update Inventory and Show Shortage Alerts
-                2. Place Periodic Order from Supplier
+                1. Show Shortage Alerts for this branch
+                2. Update Periodic Order
                 3. Place Supplier Order Due to Shortage
-                4. View Orders Currently In Transit
-                5. View Current Periodic Orders In Transit
-                6. View All Periodic Orders
-                7. View Pending Shortage Orders
-                8. Back to Main Menu
+                4. View All Periodic Orders
+                5. View Pending Shortage Orders
+                6. Back to Main Menu
                 """);
 
             try {
@@ -87,125 +79,210 @@ public class MenuController {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
                 continue;
-            }
-
-            switch (choice) {
-                case 1 -> updateInventoryAndCheckShortages();
-                case 2 -> placePeriodicSupplierOrder();
+            }            switch (choice) {
+                case 1 -> showShortageAlertsForBranch();
+                case 2 -> updatePeriodicOrder();
                 case 3 -> placeShortageBasedSupplierOrder();
-                case 4 -> viewOrdersInTransit();
-                case 5 -> viewPeriodicOrdersInTransit();
-                case 6 -> viewAllPeriodicOrders();
-                case 7 -> viewPendingShortageOrders();
-                case 8 -> System.out.println("Returning to Main Menu...");
+                case 4 -> viewAllPeriodicOrders();
+                case 5 -> viewPendingShortageOrders();
+                case 6 -> System.out.println("Returning to Main Menu...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
-    }    private void updateInventoryAndCheckShortages() {
+    }    private void showShortageAlertsForBranch() {
         try {
-            // Initialize repositories
-            IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
-            IPeriodicOrderRepository periodicRepo = new PeriodicOrderRepositoryImpl();
-            IOrderOnTheWayRepository onTheWayRepo = new OrderOnTheWayRepositoryImpl();
-            IItemRepository itemRepo = new ItemRepositoryImpl();
-
-            // Create periodic order service to process orders
-            PeriodicOrderService periodicOrderService = new PeriodicOrderService(
-                    supplierRepo,
-                    periodicRepo,
-                    onTheWayRepo,
-                    itemRepo,
-                    new PeriodicOrderController(supplierRepo)
-            );
-
-            // Process orders for current day
-            boolean ordersProcessed = periodicOrderService.start(current_branch_id);
-
-            if (ordersProcessed) {
-                System.out.println("✅ Orders for today have been processed successfully!");
-                System.out.println("   • One-time orders have been processed and deleted");
-                System.out.println("   • Periodic orders have been processed (and retained for future use)");
-            }
-
-            // Update quantities in ProductRepository
-            List<ItemDTO> items = inventory_controller.getItemController().getAllItemsByBranchId(current_branch_id);
-            inventory_controller.getProductRepository().updateQuantitiesFromItems(items);
-            System.out.println("\n✅ Inventory quantities updated successfully for Branch #" + current_branch_id);
-
             // Generate and show shortage report
             String report = inventory_controller.getReportController().generateShortageInventoryReport(current_branch_id);
-            System.out.println("\n----------- Shortage Report -----------");
+            System.out.println("\n----------- Shortage Alert Report for Branch #" + current_branch_id + " -----------");
             System.out.println(report);
             System.out.println("----------------------------------------\n");
 
         } catch (Exception e) {
-            System.out.println("❌ Failed to update inventory or generate shortage report: " + e.getMessage());
+            System.out.println("❌ Failed to generate shortage report: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void placePeriodicSupplierOrder() {
+    private void updatePeriodicOrder() {
         try {
-            IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
-            IPeriodicOrderRepository periodicRepo = new PeriodicOrderRepositoryImpl();
-            IOrderOnTheWayRepository onTheWayRepo = new OrderOnTheWayRepositoryImpl();
-            IItemRepository itemRepo = new ItemRepositoryImpl();
+            List<PeriodicOrderDTO> orders = inventory_controller.getPeriodicOrderRepository()
+                .getAllPeriodicOrders()
+                .stream()
+                .filter(order -> order.getBranchId() == current_branch_id)
+                .collect(Collectors.toList());
 
-            PeriodicOrderService periodicOrderService = new PeriodicOrderService(
-                    supplierRepo,
-                    periodicRepo,
-                    onTheWayRepo,
-                    itemRepo,
-                    new PeriodicOrderController(supplierRepo)
-            );
-
-            boolean success = periodicOrderService.start(current_branch_id);
-
-            if (success) {
-                System.out.println("""
-                        ✅ Periodic supplier order process completed successfully!
-                        
-                        The following actions were performed:
-                        ---------------------------------------------------------
-                        • All active periodic orders scheduled for tomorrow were processed.
-                        • For each such order:
-                            - An order was sent to the appropriate supplier.
-                            - The ordered items were added to the inventory (Warehouse).
-                            - The order details were saved in the database.
-                        ---------------------------------------------------------
-                        
-                        🗃️ Database Updates:
-                        - Table 'orders_on_the_way' was updated with all placed orders.
-                        - Table 'items' was updated with new items delivered to Branch #%d.
-                        - Table 'periodic_orders' remains unchanged (used for scheduling only).
-                        
-                        📦 Items were delivered to: Warehouse, Branch #%d.
-                        📅 Orders processed for delivery day: %s
-                        
-                        """.formatted(
-                        current_branch_id,
-                        current_branch_id,
-                        LocalDate.now().plusDays(1).getDayOfWeek().name()
-                ));
-            } else {
-                System.out.println("⚠️ No periodic orders were processed for tomorrow in Branch #" + current_branch_id + ".");
+            if (orders.isEmpty()) {
+                System.out.println("\nNo periodic orders found for Branch #" + current_branch_id);
+                return;
             }
 
-        } catch (IllegalArgumentException ex) {
-            System.out.println("❌ Periodic supplier order failed: " + ex.getMessage());
+            // Display all periodic orders
+            System.out.println("\n----------- Existing Periodic Orders -----------");
+            for (PeriodicOrderDTO order : orders) {
+                ProductDTO product = inventory_controller.getProductRepository().getProductByCatalogNumber(order.getProductCatalogNumber());
+                String productName = product != null ? product.getProductName() : "Unknown Product";
+
+                System.out.println("Order #" + order.getOrderId());
+                System.out.println("Product: " + productName + " (Catalog #" + order.getProductCatalogNumber() + ")");
+                System.out.println("Supply Days: " + order.getDaysInTheWeek());
+                System.out.println("Quantity: " + order.getQuantity());
+                System.out.println("Order Date: " + order.getOrderDate());
+                System.out.println("Supplier: " + order.getSupplierName() + " (ID: " + order.getSupplierId() + ")");
+                System.out.println("----------------------------------------");
+            }
+
+            // Get order selection from user
+            System.out.print("\nEnter the Order # you want to update: ");
+            int selectedOrderId = Integer.parseInt(scan.nextLine().trim());
+
+            // Find the selected order
+            PeriodicOrderDTO selectedOrder = orders.stream()
+                .filter(o -> o.getOrderId() == selectedOrderId)
+                .findFirst()
+                .orElse(null);
+
+            if (selectedOrder == null) {
+                System.out.println("❌ Invalid Order #. Please try again.");
+                return;
+            }
+
+            // Check if order is scheduled for today or tomorrow
+            String[] orderDays = selectedOrder.getDaysInTheWeek().toUpperCase().split("[,\\s]+");
+            String today = LocalDate.now().getDayOfWeek().name().toUpperCase();
+            String tomorrow = LocalDate.now().plusDays(1).getDayOfWeek().name().toUpperCase();
+
+            for (String day : orderDays) {
+                if (day.equals(today) || day.equals(tomorrow)) {
+                    System.out.println("❌ Cannot update this order - it is scheduled for delivery today/tomorrow.");
+                    return;
+                }
+            }
+
+            // Show update options
+            System.out.println("\nWhat would you like to update?");
+            System.out.println("1. Supply Days");
+            System.out.println("2. Order Quantity");
+            System.out.println("3. Both");
+            System.out.print("Enter your choice: ");
+            
+            int updateChoice = Integer.parseInt(scan.nextLine().trim());
+            String newDays = null;
+            Integer newQuantity = null;
+
+            if (updateChoice == 1 || updateChoice == 3) {
+                System.out.println("\nCurrent supply days: " + selectedOrder.getDaysInTheWeek());
+                System.out.println("Enter new supply days (e.g., SUNDAY, WEDNESDAY, FRIDAY): ");
+                newDays = scan.nextLine().trim().toUpperCase();
+            }
+
+            if (updateChoice == 2 || updateChoice == 3) {
+                System.out.println("\nCurrent quantity: " + selectedOrder.getQuantity());
+                System.out.print("Enter new quantity: ");
+                newQuantity = Integer.parseInt(scan.nextLine().trim());
+            }
+
+            // Update the order
+            if (newDays != null) {
+                selectedOrder.setDaysInTheWeek(newDays);
+            }
+            if (newQuantity != null) {
+                selectedOrder.setQuantity(newQuantity);
+            }
+
+            // Save updates to database
+            inventory_controller.getPeriodicOrderRepository().updatePeriodicOrder(selectedOrder);
+
+            System.out.println("\n✅ Periodic order #" + selectedOrderId + " updated successfully!");
+            System.out.println("----------------------------------------");
+            if (newDays != null) {
+                System.out.println("New supply days: " + newDays);
+            }
+            if (newQuantity != null) {
+                System.out.println("New quantity: " + newQuantity);
+            }
+            System.out.println("----------------------------------------");
+
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid input. Please enter valid numbers.");
+        } catch (SQLException e) {
+            System.out.println("❌ Database error: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("❌ Unexpected error occurred during periodic supplier order: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("❌ An error occurred: " + e.getMessage());
         }
     }
-
-
     private void placeShortageBasedSupplierOrder() {
         try {
+            // Initialize repositories
             IItemRepository itemRepository = new ItemRepositoryImpl();
             IProductRepository productRepository = new ProductRepositoryImpl();
             IShortageOrderRepository shortageOrderRepository = new ShortageOrderRepositoryImpl();
 
+            // Get today's date and day of week
+            LocalDate today = LocalDate.now();
+            String currentDay = today.getDayOfWeek().name().toUpperCase();
+
+            // Check today's processed orders to avoid duplicate processing
+            if (shortageOrderRepository.hasBeenProcessedToday(current_branch_id)) {
+                System.out.println("\n❌ Shortage orders for branch " + current_branch_id + " have already been processed today.");
+                System.out.println("Please try again tomorrow to process new shortage orders.");
+                return;
+            }            // Get all pending shortage orders for current branch
+            List<ShortageOrderDTO> shortageOrders = shortageOrderRepository.getAll().stream()
+                .filter(order -> order.getBranchId() == current_branch_id && "PENDING".equals(order.getStatus()))
+                .collect(Collectors.toList());
+
+            boolean anyOrdersProcessed = false;
+
+            if (!shortageOrders.isEmpty()) {
+                System.out.println("\n----------- Processing Existing Shortage Orders -----------");
+
+                // Process each shortage order
+                for (ShortageOrderDTO order : shortageOrders) {
+                // Get product details
+                ProductDTO product = productRepository.getProductByCatalogNumber(order.getProductCatalogNumber());
+                if (product == null) continue;
+
+                // Get current inventory level
+                int currentStock = itemRepository.countItemsByCatalogNumber(order.getProductCatalogNumber(), current_branch_id);
+
+                // Check if this order should be processed today
+                if (order.getDaysInTheWeek() != null && order.getDaysInTheWeek().toUpperCase().contains(currentDay)) {
+                    // Add new items to inventory
+                    for (int i = 0; i < order.getQuantity(); i++) {                        ItemDTO newItem = new ItemDTO(
+                            order.getProductCatalogNumber(), 
+                            current_branch_id,
+                            "Warehouse", // storage_location
+                            "A1", // section_in_store (using default section)
+                            false, // is_defect
+                            LocalDate.now().plusYears(2).toString() // item_expiring_date (setting default 2 years expiry)
+                        );
+                        itemRepository.addItem(newItem);
+                    }                    // Update order status
+                    order.setStatus("DELIVERED");
+                    shortageOrderRepository.update(order);
+
+                    // Get updated inventory level
+                    int newStock = itemRepository.countItemsByCatalogNumber(order.getProductCatalogNumber(), current_branch_id);
+
+                    System.out.println("\n✅ Processed shortage order #" + order.getOrderId() + ":");
+                    System.out.println("Product: " + product.getProductName() + " (Catalog #" + product.getCatalogNumber() + ")");
+                    System.out.println("Previous stock level: " + currentStock);
+                    System.out.println("Added quantity: " + order.getQuantity());
+                    System.out.println("New stock level: " + newStock);
+                    System.out.println("----------------------------------------");                    anyOrdersProcessed = true;
+                }
+            }
+            } else {
+                System.out.println("\nℹ️ No pending shortage orders found for branch " + current_branch_id);
+            }            if (anyOrdersProcessed) {
+                // Mark orders as processed for today
+                shortageOrderRepository.markProcessedForToday(current_branch_id);
+                System.out.println("\n✅ Successfully processed existing shortage orders for branch " + current_branch_id);
+            }
+
+            System.out.println("\n----------- Checking for New Shortages -----------");
+
+            // Continue with new shortage detection
             List<ItemDTO> items = itemRepository.getAllItems();
             Map<Integer, ProductDTO> productMap = new HashMap<>();
             for (ProductDTO dto : productRepository.getAllProducts()) {
@@ -227,17 +304,13 @@ public class MenuController {
                         .computeIfAbsent(branchId, b -> new HashMap<>())
                         .getOrDefault(catalog, 0);
                 shortageMap.get(branchId).put(catalog, currentQty + 1);
-            }
-
-            // ניתוח חוסרים + תנאי זמן
+            }            // ניתוח חוסרים + תנאי זמן
+            boolean newShortagesFound = false;
             for (Map.Entry<Integer, Map<Integer, Integer>> branchEntry : shortageMap.entrySet()) {
                 int branchId = branchEntry.getKey();
-                Map<Integer, Integer> catalogQtyMap = branchEntry.getValue();
-
-                if (branchId != current_branch_id) continue; // רק לסניף הנוכחי
+                Map<Integer, Integer> catalogQtyMap = branchEntry.getValue();                if (branchId != current_branch_id) continue; // רק לסניף הנוכחי
 
                 Map<Integer, Integer> shortages = new HashMap<>();
-                Map<Integer, Boolean> timeConditions = new HashMap<>();
 
                 for (Map.Entry<Integer, Integer> catalogEntry : catalogQtyMap.entrySet()) {
                     int catalog = catalogEntry.getKey();
@@ -246,49 +319,27 @@ public class MenuController {
                     ProductDTO product = productMap.get(catalog);
                     if (product == null) continue;
 
-                    int minRequiredQty = Math.max(1, (product.getSupplyTime() + product.getProductDemandLevel()) / 2);
-
-                    if (actualQty < minRequiredQty) {
+                    int minRequiredQty = Math.max(1, (product.getSupplyTime() + product.getProductDemandLevel()) / 2);                    if (actualQty < minRequiredQty) {
                         int shortageAmount = (minRequiredQty - actualQty) + 10; // New calculation: includes 10 spare units
                         shortages.put(catalog, shortageAmount);
-
-                        // בדיקת תאריך ההזמנה האחרון
-                        LocalDate lastOrderDate = null;
-                        try {
-                            String dateStr = shortageOrderRepository.getLastOrderDateForProduct(catalog, branchId);
-                            if (dateStr != null) {
-                                lastOrderDate = LocalDate.parse(dateStr.substring(0, 10));
-                            }
-                        } catch (Exception e) {
-                            System.err.println("⚠️ Failed to fetch last order date for product " + catalog);
-                        }
-
-                        boolean over2Days = lastOrderDate == null || ChronoUnit.DAYS.between(lastOrderDate, LocalDate.now()) >= 2;
-                        timeConditions.put(catalog, over2Days);
                     }
-                }
+                }                if (!shortages.isEmpty()) {
+                    // Order immediately when any shortage is detected - conditions removed
+                    IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
+                    ShortageOrderService shortageOrderService = new ShortageOrderService(supplierRepo, shortageOrderRepository);
 
-                if (!shortages.isEmpty()) {
-                    boolean enoughShortages = shortages.size() >= 2;
-                    boolean anyOlderThan2Days = timeConditions.values().stream().anyMatch(v -> v);
-
-                    if (enoughShortages || anyOlderThan2Days) {
-                        IInventoryOrderRepository supplierRepo = new SupplierRepositoryInitializer().getSupplierOrderRepository();
-                        ShortageOrderService shortageOrderService = new ShortageOrderService(supplierRepo, shortageOrderRepository);
-
-                        shortageOrderService.onWakeUp(new HashMap<>(shortages), current_branch_id);
-                        System.out.println("✅ Shortage-based order sent for branch " + current_branch_id);
-                    } else {
-                        System.out.println("ℹ️ No order placed for branch " + current_branch_id + ":");
-                        System.out.println("    • Total shortages: " + shortages.size() + " (need at least 2)");
-                        System.out.println("    • Days passed condition met for any product? " + false);
-                        System.out.println("    • Missing products:");
-                        for (Map.Entry<Integer, Integer> entry : shortages.entrySet()) {
-                            boolean isOld = timeConditions.getOrDefault(entry.getKey(), false);
-                            System.out.println("      - Catalog #" + entry.getKey() + ": shortage " + entry.getValue() + (isOld ? " ✅ 2+ days passed" : " ❌ recent order"));
-                        }
+                    shortageOrderService.onWakeUp(new HashMap<>(shortages), current_branch_id);
+                    System.out.println("✅ New shortage-based orders created for branch " + current_branch_id);
+                    System.out.println("    • Total shortages detected: " + shortages.size());                    System.out.println("    • Products with shortages:");
+                    for (Map.Entry<Integer, Integer> entry : shortages.entrySet()) {
+                        System.out.println("      - Catalog #" + entry.getKey() + ": needs " + entry.getValue() + " units");
                     }
+                    newShortagesFound = true;
                 }
+            }
+
+            if (!newShortagesFound) {
+                System.out.println("ℹ️ No current shortages detected for branch " + current_branch_id + ". All products are adequately stocked.");
             }
 
         } catch (Exception e) {
@@ -1119,70 +1170,7 @@ public class MenuController {
             // Item not found in the current branch
             System.out.println("Item with ID " + id + " was not found in Branch " + current_branch_id + ".");
         }
-    }
-
-
-
-    private void viewOrdersInTransit() {
-        try {
-            List<OrderOnTheWayDTO> orders = inventory_controller.getOrderOnTheWayRepository()
-                .getOrdersInTransit();
-
-            // Filter for current branch
-            orders = orders.stream()
-                .filter(order -> order.getBranchId() == current_branch_id)
-                .collect(Collectors.toList());
-            
-            if (orders.isEmpty()) {
-                System.out.println("\nNo orders currently in transit for Branch #" + current_branch_id);
-                return;
-            }
-
-            System.out.println("\n----------- Orders In Transit -----------");
-            for (OrderOnTheWayDTO order : orders) {
-                ProductDTO product = inventory_controller.getProductRepository().getProductByCatalogNumber(order.getProductCatalogNumber());
-                String productName = product != null ? product.getProductName() : "Unknown Product";
-                
-                System.out.println("Order #" + order.getOrderId());
-                System.out.println("Product: " + productName + " (Catalog #" + order.getProductCatalogNumber() + ")");
-                System.out.println("Quantity: " + order.getQuantity());
-                System.out.println("Expected Delivery: " + order.getExpectedDeliveryDate());
-                System.out.println("Order Created: " + order.getOrderCreationDate());
-                System.out.println("----------------------------------------");
-            }
-        } catch (SQLException e) {
-            System.out.println("❌ Failed to retrieve orders in transit: " + e.getMessage());
-        }
-    }
-
-    private void viewPeriodicOrdersInTransit() {
-        try {
-            List<OrderOnTheWayDTO> orders = inventory_controller.getOrderOnTheWayRepository()
-                .getPeriodicOrdersInTransit(current_branch_id);
-            
-            if (orders.isEmpty()) {
-                System.out.println("\nNo periodic orders currently in transit for Branch #" + current_branch_id);
-                return;
-            }
-
-            System.out.println("\n----------- Periodic Orders In Transit -----------");
-            for (OrderOnTheWayDTO order : orders) {
-                ProductDTO product = inventory_controller.getProductRepository().getProductByCatalogNumber(order.getProductCatalogNumber());
-                String productName = product != null ? product.getProductName() : "Unknown Product";
-                
-                System.out.println("Order #" + order.getOrderId());
-                System.out.println("Product: " + productName + " (Catalog #" + order.getProductCatalogNumber() + ")");
-                System.out.println("Quantity: " + order.getQuantity());
-                System.out.println("Expected Delivery: " + order.getExpectedDeliveryDate());
-                System.out.println("Order Created: " + order.getOrderCreationDate());
-                System.out.println("----------------------------------------");
-            }
-        } catch (SQLException e) {
-            System.out.println("❌ Failed to retrieve periodic orders in transit: " + e.getMessage());
-        }
-    }
-
-    private void viewAllPeriodicOrders() {
+    }    private void viewAllPeriodicOrders() {
         try {
             List<PeriodicOrderDTO> orders = inventory_controller.getPeriodicOrderRepository()
                 .getAllPeriodicOrders();

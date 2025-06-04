@@ -8,11 +8,7 @@ import java.util.List;
 /**
  * Repository interface for handling periodic order business logic operations.
  */
-public interface IPeriodicOrderRepository {
-
-    List<PeriodicOrderDTO> getAllPeriodicOrders() throws SQLException;
-
-    List<PeriodicOrderDTO> getPeriodicOrdersInTransit() throws SQLException;
+public interface IPeriodicOrderRepository {    List<PeriodicOrderDTO> getAllPeriodicOrders() throws SQLException;
 
     PeriodicOrderDTO getPeriodicOrderById(int orderId) throws SQLException;
 

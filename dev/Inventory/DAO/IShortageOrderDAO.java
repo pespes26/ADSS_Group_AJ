@@ -10,7 +10,8 @@ public interface IShortageOrderDAO {
     void updateShortageOrder(ShortageOrderDTO dto) throws SQLException;
     void deleteShortageOrderById(int id) throws SQLException;
     ShortageOrderDTO getShortageOrderById(int id) throws SQLException;
-    List<ShortageOrderDTO> getAllShortageOrders() throws SQLException;
-    String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException;
-
+    List<ShortageOrderDTO> getAllShortageOrders() throws SQLException;    String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException;
+    boolean hasBeenProcessedToday(int branchId) throws SQLException;
+    void markProcessedForToday(int branchId) throws SQLException;
+    boolean hasPendingOrderForProduct(int catalogNumber, int branchId) throws SQLException;
 }

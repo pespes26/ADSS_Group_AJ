@@ -378,21 +378,15 @@ public class ReportController {
             if (product == null) {
                 System.out.println("⚠️ Warning: product not found in memory for catalog " + catalog_number);
                 continue;
-            }
-
-            int inStock = stockCountMap.getOrDefault(catalog_number, 0);
-            System.out.println("🔍 Checking catalog " + catalog_number + ": " + inStock + " in stock.");
+            }            int inStock = stockCountMap.getOrDefault(catalog_number, 0);
 
             String days = product.getSupplyDaysInTheWeek();
             if (days == null || days.trim().isEmpty()) {
-                System.out.println("⚠️ Product " + catalog_number + " skipped due to missing supply days");
                 continue;
             }
 
             int supplyTime = DateUtils.calculateNextSupplyDayOffset(days);
             int min_required = Math.max(1, (int) (0.5 * product.getProductDemandLevel() + 0.5 * supplyTime));
-
-            System.out.println("🧮 Product " + catalog_number + " requires min " + min_required + ", has " + inStock);
 
             if (inStock < min_required) {
                 found = true;
@@ -408,11 +402,7 @@ public class ReportController {
                 if (discount != null && discount.isActive()) {
                     report.append(", Active Discount: ").append(discount.getDiscountRate()).append("%")
                             .append(" (").append(discount.getStartDate()).append(" to ").append(discount.getEndDate()).append(")");
-                }
-
-                report.append("\n");
-            } else {
-                System.out.println("✅ Product " + catalog_number + " is above minimum. No shortage.");
+                }                report.append("\n");
             }
         }
 

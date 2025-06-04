@@ -68,5 +68,19 @@ public interface IItemRepository {
 
     List<ItemDTO> getExpiredItemsByBranchId(int branchId, LocalDate today) throws SQLException;
 
+    /**
+     * Count the number of items with a specific catalog number in a specific branch
+     * @param catalogNumber the catalog number of the product
+     * @param branchId the branch ID
+     * @return the number of items found
+     * @throws SQLException if a database error occurs
+     */
+    int countItemsByCatalogNumber(int catalogNumber, int branchId) throws SQLException;
 
+    /**
+     * Gets the next available item ID for new items
+     * @return the next available item ID
+     * @throws SQLException if a database error occurs
+     */
+    int getNextAvailableItemId() throws SQLException;
 }

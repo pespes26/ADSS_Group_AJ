@@ -79,10 +79,8 @@ public class ItemDTO {
 
     public void setExpirationDate(String item_expiring_date) {
         this.item_expiring_date = item_expiring_date;
-    }
-
-    public void setIsDefective(boolean is_defective) {
-        this.is_defect = is_defective;
+    }    public void setIsDefective(boolean is_defect) {
+        this.is_defect = is_defect;
     }
 
     public void setLocation(String location) {

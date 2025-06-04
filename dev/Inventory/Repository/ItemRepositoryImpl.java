@@ -6,7 +6,11 @@ import java.util.List;
 import Inventory.DTO.ItemDTO;
 import Inventory.DAO.IItemsDAO;
 import Inventory.DAO.JdbcItemDAO;
+import Inventory.DataBase.DatabaseConnector;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -113,5 +117,31 @@ public class ItemRepositoryImpl implements IItemRepository {
         return itemDAO.getExpiredItemsByBranchId(branchId, today);
     }
 
+    @Override    public int countItemsByCatalogNumber(int catalogNumber, int branchId) throws SQLException {
+        String sql = "SELECT COUNT(*) as total FROM items WHERE catalog_number = ? AND branch_id = ? AND is_defect = 0";
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, catalogNumber);
+            stmt.setInt(2, branchId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        }
+        return 0;
+    }
 
+    @Override
+    public int getNextAvailableItemId() throws SQLException {
+        String sql = "SELECT COALESCE(MAX(item_id) + 1, 1) as next_id FROM items";
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("next_id");
+            }
+        }
+        return 1; // If table is empty, start with ID 1
+    }
 }

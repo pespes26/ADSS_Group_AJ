@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcShortageOrderDAO implements IShortageOrderDAO {
-    private static final String DB_URL = "jdbc:sqlite:Inventory.db";
-
-    static {
+    private static final String DB_URL = "jdbc:sqlite:Inventory.db";    static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement statement = conn.createStatement()) {
             String createTableSql = """
@@ -23,7 +21,8 @@ public class JdbcShortageOrderDAO implements IShortageOrderDAO {
                     days_in_the_week TEXT NOT NULL,
                     supplier_id INTEGER NOT NULL,
                     supplier_name TEXT NOT NULL,
-                    status TEXT NOT NULL DEFAULT 'PENDING'
+                    status TEXT NOT NULL DEFAULT 'PENDING',
+                    completion_date TEXT
                 )
                 """;
             statement.execute(createTableSql);
@@ -70,7 +69,8 @@ public class JdbcShortageOrderDAO implements IShortageOrderDAO {
                 days_in_the_week = ?,
                 supplier_id = ?,
                 supplier_name = ?,
-                status = ?
+                status = ?,
+                completion_date = CASE WHEN ? = 'DELIVERED' THEN datetime('now') ELSE null END
             WHERE order_id = ?
             """;
 
@@ -85,7 +85,8 @@ public class JdbcShortageOrderDAO implements IShortageOrderDAO {
             pstmt.setInt(7, order.getSupplierId());
             pstmt.setString(8, order.getSupplierName());
             pstmt.setString(9, order.getStatus());
-            pstmt.setInt(10, order.getOrderId());
+            pstmt.setString(10, order.getStatus());
+            pstmt.setInt(11, order.getOrderId());
             pstmt.executeUpdate();
         }
     }
@@ -165,21 +166,55 @@ public class JdbcShortageOrderDAO implements IShortageOrderDAO {
     public String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException {
         String sql = """
             SELECT order_date FROM shortage_orders 
-            WHERE product_catalog_number = ? AND branch_id = ? 
-            ORDER BY order_date DESC LIMIT 1
-            """;
-
+            WHERE product_catalog_number = ? AND branch_id = ?
+            ORDER BY order_date DESC LIMIT 1""";
+        
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, catalogNumber);
             pstmt.setInt(2, branchId);
-
+            
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("order_date");
                 }
             }
         }
-        return null;
+        return null;    }    @Override
+    public boolean hasBeenProcessedToday(int branchId) throws SQLException {
+        String sql = "SELECT 1 FROM shortage_orders WHERE branch_id = ? AND DATE(completion_date) = DATE('now')";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, branchId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }    @Override
+    public void markProcessedForToday(int branchId) throws SQLException {
+        String sql = "UPDATE shortage_orders SET status = 'DELIVERED', completion_date = datetime('now') WHERE branch_id = ? AND status = 'PENDING'";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, branchId);
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public boolean hasPendingOrderForProduct(int catalogNumber, int branchId) throws SQLException {
+        String sql = """
+            SELECT 1 FROM shortage_orders 
+            WHERE product_catalog_number = ? AND branch_id = ? AND status = 'PENDING'
+            LIMIT 1""";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, catalogNumber);
+            pstmt.setInt(2, branchId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 }

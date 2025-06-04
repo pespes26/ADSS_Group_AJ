@@ -6,12 +6,10 @@ import Inventory.DTO.ProductDTO;
 import Inventory.InventoryUtils.DateUtils;
 import Inventory.Repository.IItemRepository;
 import Inventory.Repository.IProductRepository;
-import Inventory.Repository.IOrderOnTheWayRepository;
 import Inventory.Repository.IPeriodicOrderRepository;
 import Inventory.Repository.IShortageOrderRepository;
 import Inventory.Repository.ItemRepositoryImpl;
 import Inventory.Repository.ProductRepositoryImpl;
-import Inventory.Repository.OrderOnTheWayRepositoryImpl;
 import Inventory.Repository.PeriodicOrderRepositoryImpl;
 import Inventory.Repository.ShortageOrderRepositoryImpl;
 
@@ -32,22 +30,18 @@ public class InventoryController {
     private final HashMap<String, HashMap<String, HashMap<String, Integer>>> products_amount_map_by_category;
     private final ItemController item_controller;
     private final ProductController product_controller;
-    private final DiscountController discount_controller;
-    private final ReportController report_controller;
+    private final DiscountController discount_controller;    private final ReportController report_controller;
     private final IProductRepository productRepository;
-    private final IOrderOnTheWayRepository orderOnTheWayRepository;
     private final IPeriodicOrderRepository periodicOrderRepository;
     private final IShortageOrderRepository shortageOrderRepository;
 
 
     public InventoryController() {
         this.products = new HashMap<>();
-        this.branches = new HashMap<>();
-        this.products_amount_map_by_category = new HashMap<>();
+        this.branches = new HashMap<>();        this.products_amount_map_by_category = new HashMap<>();
         this.productRepository = new ProductRepositoryImpl();
-        this.orderOnTheWayRepository = new OrderOnTheWayRepositoryImpl();
         this.periodicOrderRepository = new PeriodicOrderRepositoryImpl();
-        this.shortageOrderRepository = new ShortageOrderRepositoryImpl();        // Initialize default 10 branches
+        this.shortageOrderRepository = new ShortageOrderRepositoryImpl();// Initialize default 10 branches
         for (int i = 1; i <= 10; i++) {
             branches.putIfAbsent(i, new Branch(i));
         }        HashMap<Integer, ItemDTO> purchased_items = new HashMap<>();
@@ -223,16 +217,7 @@ public class InventoryController {
      * @return The product repository.
      */
     public IProductRepository getProductRepository() {
-        return productRepository;
-    }
-
-    /**
-     * Gets the order on the way repository instance.
-     * @return The order on the way repository.
-     */
-    public IOrderOnTheWayRepository getOrderOnTheWayRepository() {
-        return orderOnTheWayRepository;
-    }
+        return productRepository;    }
 
     /**
      * Gets the periodic order repository instance.

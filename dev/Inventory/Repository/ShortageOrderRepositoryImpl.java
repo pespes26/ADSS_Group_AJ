@@ -44,4 +44,28 @@ public class ShortageOrderRepositoryImpl implements IShortageOrderRepository {
     public String getLastOrderDateForProduct(int catalogNumber, int branchId) throws SQLException {
         return dao.getLastOrderDateForProduct(catalogNumber, branchId);
     }
+
+    @Override
+    public boolean hasBeenProcessedToday(int branchId) throws SQLException {
+        return dao.hasBeenProcessedToday(branchId);
+    }    @Override
+    public void markProcessedForToday(int branchId) throws SQLException {
+        dao.markProcessedForToday(branchId);
+    }
+
+    @Override
+    public boolean hasPendingOrderForProduct(int catalogNumber, int branchId) throws SQLException {
+        return dao.hasPendingOrderForProduct(catalogNumber, branchId);
+    }
+
+    /**
+     * Updates a shortage order's status to DELIVERED and sets its completion date
+     * @param orderDTO The order to mark as completed
+     * @throws SQLException if a database error occurs
+     */
+    public void completeOrder(ShortageOrderDTO orderDTO) throws SQLException {
+        orderDTO.setStatus("DELIVERED");
+        // Current date will be set when updating in the database
+        update(orderDTO);
+    }
 }

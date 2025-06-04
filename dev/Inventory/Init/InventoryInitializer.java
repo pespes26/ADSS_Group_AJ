@@ -125,7 +125,9 @@ public class InventoryInitializer {
                 new PeriodicOrderDTO(0, 1005, 3, "2025-06-02", 0.80, supplierID2, getSupplierNameById(supplierID2), 
                     "TUESDAY, THURSDAY", agreementID2, 2, "TUESDAY, THURSDAY", null, null, 0),
                 new PeriodicOrderDTO(0, 1006, 4, "2025-06-02", 0.45, supplierID3, getSupplierNameById(supplierID3), 
-                    "SUNDAY, WEDNESDAY", agreementID3, 3, "SUNDAY, WEDNESDAY", null, null, 0)
+                    "SUNDAY, WEDNESDAY", agreementID3, 3, "SUNDAY, WEDNESDAY", null, null, 0),
+                new PeriodicOrderDTO(0, 1013, 5, "2025-06-02", 0.50, supplierID1, getSupplierNameById(supplierID1), 
+                    "FRIDAY", agreementID1, 1, "FRIDAY", null, null, 0)
         );
 
         for (PeriodicOrderDTO dto : orders) {
@@ -151,11 +153,8 @@ public class InventoryInitializer {
 
 
     public static void clearAllTables() {
-        String url = "jdbc:sqlite:Inventory.db";
-
-        try (Connection conn = DriverManager.getConnection(url);
+        String url = "jdbc:sqlite:Inventory.db";        try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {        // Order of deletion is important due to foreign key constraints
-        stmt.executeUpdate("DELETE FROM orders_on_the_way");
         stmt.executeUpdate("DELETE FROM items");
         stmt.executeUpdate("DELETE FROM sold_items");
             stmt.executeUpdate("DELETE FROM periodic_orders");

@@ -16,7 +16,6 @@ public class DatabaseCleaner {
             stmt.execute("DROP TABLE IF EXISTS items");
             stmt.execute("DROP TABLE IF EXISTS products");
             stmt.execute("DROP TABLE IF EXISTS periodic_orders");
-            stmt.execute("DROP TABLE IF EXISTS orders_on_the_way");
 
             System.out.println("✅ All tables dropped successfully.");
 

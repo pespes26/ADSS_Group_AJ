@@ -1,7 +1,7 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.Site;
-import com.superli.deliveries.domain.Zone;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Zone;
 import com.superli.deliveries.domain.ports.ISiteRepository;
 
 import java.util.ArrayList;

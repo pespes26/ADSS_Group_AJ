@@ -1,6 +1,6 @@
 package com.superli.deliveries.domain.ports;
 
-import com.superli.deliveries.domain.employee.Employee;
+import com.superli.deliveries.domain.core.Employee;
 import java.util.Collection;
 import java.util.Optional;
 

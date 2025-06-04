@@ -1,8 +1,8 @@
-package com.superli.deliveries.controllers;
+package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.LicenseType;
-import com.superli.deliveries.domain.Truck;
-import com.superli.deliveries.service.TruckService;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.application.services.TruckService;
 
 import java.util.List;
 import java.util.Optional;

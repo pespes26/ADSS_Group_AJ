@@ -1,4 +1,4 @@
-package application.controllers;
+package com.superli.deliveries.application.controllers;
 
 import java.sql.SQLOutput;
 import java.time.LocalDate;

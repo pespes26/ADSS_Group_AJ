@@ -1,4 +1,4 @@
-package domain.core.employee;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents the status of a delivery destination.

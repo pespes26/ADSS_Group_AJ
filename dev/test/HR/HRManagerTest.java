@@ -1,4 +1,6 @@
-import DomainLayer.*;
+package test.HR;
+
+import com.superli.deliveries.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

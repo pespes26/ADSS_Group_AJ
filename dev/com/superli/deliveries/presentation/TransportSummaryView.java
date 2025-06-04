@@ -1,6 +1,6 @@
 package com.superli.deliveries.presentation;
 
-import com.superli.deliveries.domain.TransportStatus;
+import com.superli.deliveries.domain.core.TransportStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

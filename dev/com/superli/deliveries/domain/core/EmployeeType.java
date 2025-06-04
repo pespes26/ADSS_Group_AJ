@@ -1,4 +1,4 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents the type of an employee in the system.

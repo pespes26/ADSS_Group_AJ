@@ -1,7 +1,9 @@
-package com.superli.deliveries.domain;
+package test.com.superli.deliveries;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Driver;
 
 /**
  * Unit tests for the Driver class.

@@ -1,4 +1,6 @@
-import DomainLayer.*;
+package test.HR;
+
+import com.superli.deliveries.domain.core.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,7 @@ public class ControllerManagerTest {
     @BeforeEach
     public void setUp() {
         hrManager = new HRManager();
-        ControllerManager.setHRManager(hrManager);
+        ManagerController.setHRManager(hrManager);
     }
 
     /**
@@ -24,8 +26,8 @@ public class ControllerManagerTest {
     @Test
     public void givenNewHRManager_whenSetAndGetHRManager_thenReturnSameInstance() {
         HRManager newManager = new HRManager();
-        ControllerManager.setHRManager(newManager);
-        assertSame(newManager, ControllerManager.getHRManager());
+        ManagerController.setHRManager(newManager);
+        assertSame(newManager, ManagerController.getHRManager());
     }
 
     /**
@@ -33,7 +35,7 @@ public class ControllerManagerTest {
      */
     @Test
     public void givenNumericString_whenCheckIsNumeric_thenReturnTrue() {
-        assertTrue(ControllerManager.isNumeric("123456789"));
+        assertTrue(ManagerController.isNumeric("123456789"));
     }
 
     /**
@@ -41,9 +43,9 @@ public class ControllerManagerTest {
      */
     @Test
     public void givenNonNumericString_whenCheckIsNumeric_thenReturnFalse() {
-        assertFalse(ControllerManager.isNumeric("abc123"));
-        assertFalse(ControllerManager.isNumeric(""));
-        assertFalse(ControllerManager.isNumeric(null));
+        assertFalse(ManagerController.isNumeric("abc123"));
+        assertFalse(ManagerController.isNumeric(""));
+        assertFalse(ManagerController.isNumeric(null));
     }
 
     /**

@@ -1,4 +1,4 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 import java.util.Objects;
 
 /**

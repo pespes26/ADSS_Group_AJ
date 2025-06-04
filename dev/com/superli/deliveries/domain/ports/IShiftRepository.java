@@ -1,6 +1,6 @@
-package domain.ports;
+package com.superli.deliveries.domain.ports;
 
-import domain.core.Shift;
+import com.superli.deliveries.domain.core.Shift;
 import java.util.Collection;
 import java.util.Optional;
 import java.time.LocalDate;

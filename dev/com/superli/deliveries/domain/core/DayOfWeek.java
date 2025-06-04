@@ -1,4 +1,4 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents days of the week.

@@ -1,6 +1,6 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.Zone;
+import com.superli.deliveries.domain.core.Zone;
 import com.superli.deliveries.domain.ports.IZoneRepository;
 
 import java.util.ArrayList;

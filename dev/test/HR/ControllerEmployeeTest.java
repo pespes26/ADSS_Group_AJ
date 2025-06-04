@@ -1,12 +1,14 @@
-package DomainLayer;
+package test.HR;
 
+import com.superli.deliveries.application.controllers.EmployeeController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
+
+import com.superli.deliveries.domain.core.*;
 
 public class ControllerEmployeeTest {
 
@@ -74,7 +76,7 @@ public class ControllerEmployeeTest {
         simulateUserInput(simulatedInput);
 
         Scanner sc = new Scanner(System.in);
-        ControllerEmployee.updateAvailability(employee, sc);
+        EmployeeController.updateAvailability(employee, sc);
 
         assertEquals(1, employee.getAvailabilityConstraints().size(), "Non-existing availability removal should not affect");
         assertEquals(DomainLayer.DayOfWeek.MONDAY, employee.getAvailabilityConstraints().get(0).getDay());

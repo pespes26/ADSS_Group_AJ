@@ -1,20 +1,17 @@
-package com.superli.deliveries.application.controllers.employee;
+package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.Employee;
-import com.superli.deliveries.domain.HRManager;
-import com.superli.deliveries.domain.Shift;
-import com.superli.deliveries.domain.Role;
-import com.superli.deliveries.domain.AvailableShifts;
-import com.superli.deliveries.domain.DayOfWeek;
-import com.superli.deliveries.domain.ShiftType;
-
-import java.util.List;
-import java.util.Scanner;
-
+import com.superli.deliveries.domain.core.Employee;
+import com.superli.deliveries.domain.core.HRManager;
+import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.domain.core.Role;
+import com.superli.deliveries.domain.core.AvailableShifts;
+import com.superli.deliveries.domain.core.DayOfWeek;
+import com.superli.deliveries.domain.core.ShiftType;
 
 import java.util.List;
 import java.util.Scanner;
-public class ControllerEmployee {
+
+public class EmployeeController {
     private static HRManager hrManager = new HRManager();
 
     public static void viewMyShifts(Employee employee, HRManager hr) {

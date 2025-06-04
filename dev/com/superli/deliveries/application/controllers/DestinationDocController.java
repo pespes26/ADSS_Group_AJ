@@ -1,13 +1,13 @@
-package com.superli.deliveries.controllers;
+package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.DeliveredItem;
-import com.superli.deliveries.domain.DestinationDoc;
-import com.superli.deliveries.domain.Site;
-import com.superli.deliveries.domain.Transport;
-import com.superli.deliveries.service.DeliveredItemService;
-import com.superli.deliveries.service.DestinationDocService;
-import com.superli.deliveries.service.SiteService;
-import com.superli.deliveries.service.TransportService;
+import com.superli.deliveries.domain.core.DeliveredItem;
+import com.superli.deliveries.domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Transport;
+import com.superli.deliveries.application.services.DeliveredItemService;
+import com.superli.deliveries.application.services.DestinationDocService;
+import com.superli.deliveries.application.services.SiteService;
+import com.superli.deliveries.application.services.TransportService;
 
 import java.util.List;
 import java.util.Optional;

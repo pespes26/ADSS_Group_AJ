@@ -1,9 +1,10 @@
-package com.superli.deliveries.domain; // Ensure this matches your Site class package
+package test.com.superli.deliveries; // Ensure this matches your Site class package
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+import com.superli.deliveries.domain.core.Zone;
+import com.superli.deliveries.domain.core.Site;
 
 /**
  * Unit tests for the Site class using realistic data examples.

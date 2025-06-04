@@ -1,7 +1,7 @@
-package application.services;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.enums.employee.*;
-import com.superli.deliveries.domain.ports.employee.IEmployeeRepository;
+import com.superli.deliveries.domain.core.Employee.*;
+import com.superli.deliveries.domain.ports.IEmployeeRepository;
 
 import java.time.DayOfWeek;
 import java.util.Date;

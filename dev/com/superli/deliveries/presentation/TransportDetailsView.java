@@ -1,9 +1,9 @@
-package presentation;
+package com.superli.deliveries.presentation;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import domain.core.*;
+import com.superli.deliveries.domain.core.*;
 
 public class TransportDetailsView {
     private final int transportId;

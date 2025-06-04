@@ -1,4 +1,4 @@
-package com.superli.deliveries.domain;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents a geographic zone used for delivery planning.

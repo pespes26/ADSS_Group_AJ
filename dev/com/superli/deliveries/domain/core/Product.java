@@ -1,4 +1,4 @@
-package com.superli.deliveries.domain;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents a product within the context of the deliveries module.

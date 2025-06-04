@@ -1,4 +1,4 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents the different types of shifts in the system.

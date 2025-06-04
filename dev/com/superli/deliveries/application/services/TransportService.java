@@ -1,4 +1,4 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
 import com.superli.deliveries.domain.*;
 import com.superli.deliveries.domain.ports.ITransportRepository;

@@ -1,8 +1,8 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import domain.core.Employee;
+import com.superli.deliveries.domain.core.Employee;
 
 /**
  * Manages human resources in the system, including employees, shifts, and roles.

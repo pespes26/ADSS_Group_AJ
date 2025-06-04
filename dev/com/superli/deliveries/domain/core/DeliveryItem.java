@@ -1,4 +1,4 @@
-package domain.core.employee;
+package com.superli.deliveries.domain.core;
 
 import java.util.Objects;
 

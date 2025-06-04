@@ -1,9 +1,7 @@
-package application.controllers;
+package com.superli.deliveries.application.controllers;
 
-import application.services.*;
-
-
-import domain.core.*;
+import com.superli.deliveries.application.services.*;
+import com.superli.deliveries.domain.core.*;
 
 import java.util.List;
 import java.util.Optional;

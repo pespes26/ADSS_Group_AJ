@@ -1,9 +1,9 @@
-package com.superli.deliveries.controllers;
+package com.superli.deliveries.application.controllers;
 
 import com.superli.deliveries.domain.*;
 import com.superli.deliveries.presentation.TransportDetailsView;
 import com.superli.deliveries.presentation.TransportSummaryView;
-import com.superli.deliveries.service.*;
+import com.superli.deliveries.application.services.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

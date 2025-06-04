@@ -1,7 +1,7 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.DestinationDoc;
-import com.superli.deliveries.domain.DeliveredItem;
+import com.superli.deliveries.domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.DeliveredItem;
 import com.superli.deliveries.domain.ports.IDestinationDocRepository;
 
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package com.superli.deliveries.presentation;
 import java.util.List;
 import java.util.Objects;
 
-import com.superli.deliveries.domain.TransportStatus;
+import com.superli.deliveries.domain.core.TransportStatus;
 
 /**
  * Represents a single destination document in a transport,

@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import domain.core.Driver;
-import domain.core.Site;
-import domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.DestinationDoc;
 
 /**
  * Represents a transport event containing truck, driver, origin, delivery list, and transport status.

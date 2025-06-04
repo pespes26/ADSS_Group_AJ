@@ -1,8 +1,8 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.Driver;
-import com.superli.deliveries.domain.LicenseType;
-import com.superli.deliveries.domain.Truck;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.domain.ports.IDriverRepository;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.Product;
+import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.domain.ports.IProductRepository;
 
 import java.util.ArrayList;

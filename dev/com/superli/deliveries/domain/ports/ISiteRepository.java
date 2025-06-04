@@ -1,6 +1,6 @@
 package com.superli.deliveries.domain.ports; // או .domain, בהתאם למיקום שבחרת
 
-import com.superli.deliveries.domain.Site;
+import com.superli.deliveries.domain.core.Site;
 import java.util.Collection;
 import java.util.Optional;
 

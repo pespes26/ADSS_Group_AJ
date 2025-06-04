@@ -1,9 +1,9 @@
-package com.superli.deliveries.controllers;
+package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.Site;
-import com.superli.deliveries.domain.Zone;
-import com.superli.deliveries.service.SiteService;
-import com.superli.deliveries.service.ZoneService;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Zone;
+import com.superli.deliveries.application.services.SiteService;
+import com.superli.deliveries.application.services.ZoneService;
 
 import java.util.List;
 import java.util.Optional;

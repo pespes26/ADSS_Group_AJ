@@ -1,8 +1,8 @@
 package com.superli.deliveries;
 
-import com.superli.deliveries.domain.*;
+import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.infrastructure.repositories.ProductRepository;
-import com.superli.deliveries.service.*;
+import com.superli.deliveries.application.services.*;
 
 /**
  * Utility class for initializing mock data for testing purposes.

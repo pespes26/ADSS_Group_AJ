@@ -2,6 +2,9 @@ package com.superli.deliveries.presentation;
 
 import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.application.controllers.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class HRDetailsView {
@@ -130,7 +133,87 @@ public class HRDetailsView {
         String empChoice = sc.nextLine();
         switch (empChoice) {
             case "1":
-                ManagerController.addNewEmployee(sc);
+                System.out.println("--- Add New Employee ---");
+
+                String id;
+                while (true) {
+                    System.out.print("Enter ID (9 digits): ");
+                    id = sc.nextLine().trim();
+                    if (!ManagerController.isNumeric(id) || id.length() != 9) {
+                        System.out.println("Invalid ID. Please enter a 9-digit numeric ID.");
+                    } else if (ManagerController.getHRManager().FindEmployeeByID(id) != null) {
+                        System.out.println("Employee with this ID already exists.");
+                    } else {
+                        break;
+                    }
+                }
+
+                System.out.print("Enter full name: ");
+                String fullName = sc.nextLine();
+
+                System.out.print("Enter bank account: ");
+                String bankAccount = sc.nextLine();
+
+                double salary;
+                while (true) {
+                    System.out.print("Enter salary: ");
+                    String salaryStr = sc.nextLine();
+                    if (ManagerController.isNumeric(salaryStr)) {
+                        salary = Double.parseDouble(salaryStr);
+                        break;
+                    } else {
+                        System.out.println("Invalid salary. Please enter a number.");
+                    }
+                }
+
+                System.out.print("Enter employment terms: ");
+                String employeeTerms = sc.nextLine();
+
+                List<Role> roleQualifications = new ArrayList<>();
+                System.out.println("Enter role qualifications (type 'done' to finish):");
+                while (true) {
+                    System.out.print("Role: ");
+                    String roleName = sc.nextLine().trim();
+                    if (roleName.equalsIgnoreCase("done")) break;
+
+                    Role existingRole = null;
+                    for (Role r : ManagerController.getHRManager().getAllRoles()) {
+                        if (r.getRoleName().equalsIgnoreCase(roleName)) {
+                            existingRole = r;
+                            break;
+                        }
+                    }
+
+                    if (existingRole != null) {
+                        roleQualifications.add(existingRole);
+                    } else {
+                        System.out.println("Invalid role.");
+                    }
+                }
+
+                boolean isDriver = roleQualifications.stream()
+                        .anyMatch(r -> r.getRoleName().equalsIgnoreCase("driver"));
+
+                LicenseType licenseTypeIfNeeded = null;
+
+                if (isDriver) {
+                    System.out.println("Enter license type for driver (B, C, C1, C2, E): ");
+                    while (true) {
+                        try {
+                            String licenseInput = sc.nextLine().trim().toUpperCase();
+                            licenseTypeIfNeeded = LicenseType.valueOf(licenseInput);
+                            break;
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Invalid license type. Please enter one of: B, C, C1, C2, E.");
+                        }
+                    }
+                }
+
+                String result = ManagerController.addNewEmployee(
+                        id, fullName, bankAccount, salary, employeeTerms,
+                        roleQualifications, licenseTypeIfNeeded);
+
+                System.out.println(result);
                 break;
             case "2":
                 ManagerController.removeEmployeeById(sc);

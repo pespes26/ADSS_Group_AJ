@@ -9,12 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)">
+    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="fixed tests&#10;left: extends for driver">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HRDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HRDetailsView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,53 +51,53 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Application.MainApp.executor": "Run",
-    "Downloaded.Files.Path.Enabled": "false",
-    "JUnit.DriverTest.constructor_EmptyName_ThrowsException.executor": "Run",
-    "JUnit.DriverTest.constructor_NullId_ThrowsException.executor": "Run",
-    "JUnit.DriverTest.constructor_ValidData_CreatesDriver.executor": "Run",
-    "JUnit.DriverTest.executor": "Run",
-    "JUnit.DriverTest.setLicenseType_ValidType_UpdatesLicenseType.executor": "Run",
-    "JUnit.ProductTest.executor": "Run",
-    "JUnit.ShipmentAreaTest.executor": "Run",
-    "JUnit.SiteTest.executor": "Run",
-    "JUnit.TransportTest.constructor_ValidData_CreatesTransport.executor": "Run",
-    "JUnit.TransportTest.executor": "Run",
-    "JUnit.TruckTest.executor": "Run",
-    "JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor": "Run",
-    "JUnit.ZoneTest.executor": "Run",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "208583781__318861820__318567914__315175554",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Pesso/Desktop/Projects/ADSS_Group_AJ",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "project.propCompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JUnit.DriverTest.constructor_EmptyName_ThrowsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.constructor_NullId_ThrowsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.constructor_ValidData_CreatesDriver.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.setLicenseType_ValidType_UpdatesLicenseType.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ShipmentAreaTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SiteTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TransportTest.constructor_ValidData_CreatesTransport.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TransportTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TruckTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ZoneTest.executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;208583781__318861820__318567914__315175554&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Pesso/Desktop/Projects/ADSS_Group_AJ&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_Group_AJ\release" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.Main" />
       <module name="adss-aj-project" />
@@ -176,14 +180,6 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
-      </set>
-    </attachedChunks>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -257,7 +253,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749229261228</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="fixed tests&#10;left: extends for driver">
+      <option name="closed" value="true" />
+      <created>1749230545973</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1749230545973</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,6 +283,7 @@
     <MESSAGE value="added licenseTypes" />
     <MESSAGE value="added presentation layer, fixed HR classes, and a few feliveries classes as well" />
     <MESSAGE value="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)" />
+    <MESSAGE value="fixed tests&#10;left: extends for driver" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed tests&#10;left: extends for driver" />
   </component>
 </project>

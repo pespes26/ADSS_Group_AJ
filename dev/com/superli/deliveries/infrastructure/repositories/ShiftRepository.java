@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Implementation of IShiftRepository that manages shifts in memory.
  */
 public class ShiftRepository implements IShiftRepository {
-    private final Map<String, Shift> shifts;
+    private final Map<Integer, Shift> shifts;
 
     public ShiftRepository() {
         this.shifts = new HashMap<>();
@@ -44,7 +44,8 @@ public class ShiftRepository implements IShiftRepository {
     @Override
     public List<Shift> findByDay(DayOfWeek day) {
         return shifts.values().stream()
-                .filter(shift -> shift.getShiftDay() == day)
+                .filter(shift -> shift.getShiftDay().toString().equals(day.toString()))
+
                 .collect(Collectors.toList());
     }
 

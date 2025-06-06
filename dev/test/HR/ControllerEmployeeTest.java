@@ -7,8 +7,12 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.time.DayOfWeek;
 
 import com.superli.deliveries.domain.core.*;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ControllerEmployeeTest {
 
@@ -37,7 +41,7 @@ public class ControllerEmployeeTest {
      */
     @Test
     public void givenEmployeeAssignedToShift_whenViewMyShifts_thenDisplayAssignedShift() {
-        Shift shift = createTestShift(DomainLayer.DayOfWeek.SUNDAY, ShiftType.MORNING);
+        Shift shift = createTestShift(DayOfWeek.SUNDAY, ShiftType.MORNING);
         Role cashier = new Role("Cashier");
 
         shift.getShiftRequiredRoles().add(cashier);
@@ -54,7 +58,7 @@ public class ControllerEmployeeTest {
      */
     @Test
     public void givenDuplicateAvailability_whenUpdateAvailability_thenDoNotAddAgain() {
-        AvailableShifts existing = new AvailableShifts(DomainLayer.DayOfWeek.SUNDAY, ShiftType.MORNING);
+        AvailableShifts existing = new AvailableShifts(DayOfWeek.SUNDAY, ShiftType.MORNING);
         employee.addAvailability(existing);
 
         String simulatedInput = "SUNDAY\nMORNING\ndone\n";
@@ -71,7 +75,7 @@ public class ControllerEmployeeTest {
      */
     @Test
     public void givenNonExistentAvailability_whenRemoveAvailability_thenNoChange() {
-        employee.addAvailability(new AvailableShifts(DomainLayer.DayOfWeek.MONDAY, ShiftType.MORNING));
+        employee.addAvailability(new AvailableShifts(DayOfWeek.MONDAY, ShiftType.MORNING));
 
         String simulatedInput = "2\nWEDNESDAY\nEVENING\n0\n";
         simulateUserInput(simulatedInput);
@@ -80,7 +84,7 @@ public class ControllerEmployeeTest {
         EmployeeController.updateAvailability(employee, sc);
 
         assertEquals(1, employee.getAvailabilityConstraints().size(), "Non-existing availability removal should not affect");
-        assertEquals(DomainLayer.DayOfWeek.MONDAY, employee.getAvailabilityConstraints().get(0).getDay());
+        assertEquals(DayOfWeek.MONDAY, employee.getAvailabilityConstraints().get(0).getDay());
     }
 
 
@@ -182,7 +186,8 @@ public class ControllerEmployeeTest {
 
     private Shift createTestShift(DayOfWeek day, ShiftType shiftType) {
         Date today = new Date();
-        return new Shift(today, shiftType, day, new ArrayList<>(), new HashMap<>(), null);
+        String shiftId = UUID.randomUUID().toString();
+        return new Shift(shiftId, today, shiftType, day, new ArrayList<>(), new HashMap<>(), null);
     }
 
     private void simulateUserInput(String input) {

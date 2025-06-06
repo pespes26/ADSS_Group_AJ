@@ -1,9 +1,10 @@
 package test.HR;
 
-import com.superli.deliveries.*;
+import com.superli.deliveries.domain.core.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.DayOfWeek;
 import java.util.*;
 
 public class HRManagerTest {
@@ -144,7 +145,8 @@ public class HRManagerTest {
     public void givenNewShift_whenAddShift_thenShiftAddedSuccessfully() {
         HRManager hr = new HRManager();
         Date today = new Date();
-        Shift shift = new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("123456789"));
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("123456789"));
 
         hr.addShift(shift);
 
@@ -159,7 +161,8 @@ public class HRManagerTest {
     public void givenShiftAndRoles_whenDefineRequiredRoles_thenRolesAssigned() {
         HRManager hr = new HRManager();
         Date today = new Date();
-        Shift shift = new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("111111111"));
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("111111111"));
         hr.addShift(shift);
 
         List<Role> requiredRoles = List.of(new Role("Cashier"), new Role("Stock Keeper"));
@@ -177,7 +180,8 @@ public class HRManagerTest {
     public void givenShift_whenAddRequiredRole_thenRoleAddedToShift() {
         HRManager hr = new HRManager();
         Date today = new Date();
-        Shift shift = new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("222222222"));
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("222222222"));
         hr.addShift(shift);
 
         Role newRole = new Role("Security");
@@ -197,7 +201,8 @@ public class HRManagerTest {
         List<Role> requiredRoles = List.of(new Role("Cashier"));
         Map<Employee, Role> shiftEmployees = new HashMap<>();
         Employee manager = createTestEmployee("111111111");
-        Shift shift = new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(requiredRoles), shiftEmployees, manager);
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(requiredRoles), shiftEmployees, manager);
 
         Employee employee = createTestEmployee("333333333");
         employee.addRoleQualification(requiredRoles.get(0));
@@ -224,7 +229,8 @@ public class HRManagerTest {
 
         Map<Employee, Role> shiftEmployees = new HashMap<>();
         Employee manager = createTestEmployee("111111111");
-        Shift shift = new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
 
         Employee employee = createTestEmployee("444444444");
         employee.addRoleQualification(cashierRole);

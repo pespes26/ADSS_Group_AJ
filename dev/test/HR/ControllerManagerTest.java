@@ -1,11 +1,13 @@
 package test.HR;
 
 import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.application.controllers.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.DayOfWeek;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,8 +101,9 @@ public class ControllerManagerTest {
             LocalDate day = upcomingSunday.plusDays(i);
             DayOfWeek dayEnum = DayOfWeek.valueOf(day.getDayOfWeek().toString());
             Date date = java.sql.Date.valueOf(day);
-            hrManager.addShift(new Shift(date, ShiftType.MORNING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
-            hrManager.addShift(new Shift(date, ShiftType.EVENING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
+            String shiftId = UUID.randomUUID().toString();
+            hrManager.addShift(new Shift(shiftId, date, ShiftType.MORNING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
+            hrManager.addShift(new Shift(shiftId, date, ShiftType.EVENING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
         }
 
         assertEquals(14, hrManager.getAllShifts().size());
@@ -116,11 +119,12 @@ public class ControllerManagerTest {
 
         Employee emp = createTestEmployee("123456789");
         emp.addRoleQualification(cashier);
-        emp.addAvailableShift(new AvailableShifts(DomainLayer.DayOfWeek.SUNDAY, ShiftType.MORNING));
+        emp.addAvailableShift(new AvailableShifts(DayOfWeek.SUNDAY, ShiftType.MORNING));
         hrManager.addEmployee(emp);
 
         Date today = new Date();
-        Shift shift = new Shift(today, ShiftType.MORNING, DomainLayer.DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
         hrManager.addShift(shift);
 
         hrManager.addEmployeeToShift(shift, emp);
@@ -138,11 +142,13 @@ public class ControllerManagerTest {
 
         Employee emp = createTestEmployee("123456789");
         emp.addRoleQualification(cashier);
-        emp.addAvailableShift(new AvailableShifts(DomainLayer.DayOfWeek.SUNDAY, ShiftType.MORNING));
+        emp.addAvailableShift(new AvailableShifts(DayOfWeek.SUNDAY, ShiftType.MORNING));
         hrManager.addEmployee(emp);
 
         Date today = new Date();
-        Shift shift = new Shift(today, ShiftType.MORNING, DomainLayer.DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
+
         hrManager.addShift(shift);
 
         hrManager.addEmployeeToShift(shift, emp);

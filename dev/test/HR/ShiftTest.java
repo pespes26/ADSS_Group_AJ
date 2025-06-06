@@ -4,6 +4,7 @@ import com.superli.deliveries.domain.core.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.time.DayOfWeek;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +32,8 @@ public class ShiftTest {
         requiredRoles.add(role);
         Map<Employee, Role> shiftEmployees = new HashMap<>();
         Employee manager = createTestEmployee("999999999");
-        return new Shift(today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
+        String shiftId = UUID.randomUUID().toString();
+        return new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
     }
 
     /**
@@ -140,7 +142,8 @@ public class ShiftTest {
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date yesterday = calendar.getTime();
 
-        Shift shift = new Shift(yesterday, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, yesterday, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
 
         assertTrue(shift.isPastShift());
     }
@@ -154,7 +157,8 @@ public class ShiftTest {
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
 
-        Shift shift = new Shift(tomorrow, ShiftType.MORNING, DayOfWeek.TUESDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
+        String shiftId = UUID.randomUUID().toString();
+        Shift shift = new Shift(shiftId, tomorrow, ShiftType.MORNING, DayOfWeek.TUESDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
 
         assertFalse(shift.isPastShift());
     }

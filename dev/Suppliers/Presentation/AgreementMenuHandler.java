@@ -16,6 +16,11 @@ public class AgreementMenuHandler {
     public static AgreementManagementController agreementManagementController;
 //    public static ProductSupplierManagementController productSupplierManagementController;
 
+    // Static initializer to ensure the controller is initialized before any static method is called
+    static {
+        initializeController();
+    }
+
     public AgreementMenuHandler() {
         // Initialize DAOs
         IAgreementDAO agreementDAO = new JdbcAgreementDAO();
@@ -28,10 +33,36 @@ public class AgreementMenuHandler {
         // Create Controllers
         agreementManagementController = new AgreementManagementController(agreementRepository);
 //        productSupplierManagementController = new ProductSupplierManagementController(productSupplierRepository);
+    }    private static void initializeController() {
+        try {
+            if (agreementManagementController == null) {
+                // Initialize DAOs
+                IAgreementDAO agreementDAO = new JdbcAgreementDAO();
+                IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+                IDiscountDAO discountDAO = new JdbcDiscountDAO();
+
+                // Create Repository
+                IAgreementRepository agreementRepository = new AgreementRepositoryImpl(agreementDAO, productSupplierDAO, discountDAO);
+                
+                // Create Controllers
+                agreementManagementController = new AgreementManagementController(agreementRepository);
+            }
+        } catch (Exception e) {
+            System.err.println("Error initializing AgreementMenuHandler controller: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-
-
     public static void deleteAgreement(Scanner scanner, int supplierId) {
+        // Ensure controller is initialized
+        if (agreementManagementController == null) {
+            initializeController();
+        }
+        
+        if (agreementManagementController == null) {
+            System.err.println("Error: Could not initialize agreement management controller.");
+            return;
+        }
+        
         List<AgreementDTO> agreementDTOList = agreementManagementController.getAgreementsBySupplierID(supplierId);
 
         if (agreementDTOList.isEmpty()) {
@@ -69,9 +100,17 @@ public class AgreementMenuHandler {
         agreementManagementController.deleteAgreementWithSupplier(selectedAgreement.getAgreement_ID(), supplierId);
 
         System.out.println("Agreement deleted.");
-    }
-
-    public static void createNewAgreement(Scanner scanner, int supplierID) throws SQLException {
+    }    public static void createNewAgreement(Scanner scanner, int supplierID) throws SQLException {
+        // Ensure controller is initialized
+        if (agreementManagementController == null) {
+            initializeController();
+        }
+        
+        if (agreementManagementController == null) {
+            System.err.println("Error: Could not initialize agreement management controller.");
+            return;
+        }
+        
         System.out.println("Let's create a new agreement...");        // Get delivery days from user
         String[] deliveryDays = getDeliveryDays(scanner);
 
@@ -141,9 +180,17 @@ public class AgreementMenuHandler {
 
         System.out.println("Finished adding products.\n");
     }
-
-
     public static AgreementDTO showAgreements(Scanner scanner, int supplierId) {
+        // Ensure controller is initialized
+        if (agreementManagementController == null) {
+            initializeController();
+        }
+        
+        if (agreementManagementController == null) {
+            System.err.println("Error: Could not initialize agreement management controller.");
+            return null;
+        }
+        
         List<AgreementDTO> agreementDTOList = agreementManagementController.getAgreementsBySupplierID(supplierId);
 
         if (agreementDTOList.isEmpty()) {
@@ -253,20 +300,37 @@ public class AgreementMenuHandler {
                 }
             }
         }
-    }
-    public static void editDeliveryDays(Scanner scanner,Integer agreementID) {
+    }    public static void editDeliveryDays(Scanner scanner,Integer agreementID) {
+        // Ensure controller is initialized
+        if (agreementManagementController == null) {
+            initializeController();
+        }
+        
+        if (agreementManagementController == null) {
+            System.err.println("Error: Could not initialize agreement management controller.");
+            return;
+        }
+        
         if (agreementID != null) {
             String[] newDays = getDeliveryDays(scanner); // שימוש בפונקציה האינטראקטיבית
             agreementManagementController.setDeliveryDays(agreementID,newDays);
             System.out.println("Delivery days updated to: " + String.join(", ", newDays));
         }
     }
-
-
     public static void toggleSelfPickup(Scanner scanner,int agreementID, boolean currentSelfPickup) {
-            boolean newStatus = ! currentSelfPickup;
-            agreementManagementController.setSelfPickup(agreementID,newStatus);
-            System.out.println("Self-pickup status updated. New status: " + (newStatus ? "Enabled" : "Disabled\n"));
+        // Ensure controller is initialized
+        if (agreementManagementController == null) {
+            initializeController();
+        }
+        
+        if (agreementManagementController == null) {
+            System.err.println("Error: Could not initialize agreement management controller.");
+            return;
+        }
+        
+        boolean newStatus = ! currentSelfPickup;
+        agreementManagementController.setSelfPickup(agreementID,newStatus);
+        System.out.println("Self-pickup status updated. New status: " + (newStatus ? "Enabled" : "Disabled\n"));
     }
 
 

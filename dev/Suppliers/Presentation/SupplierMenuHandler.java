@@ -182,15 +182,10 @@ public void DeleteSupplier(Scanner scanner, int supplierIdToDelete) throws SQLEx
 
     public static SupplierDTO showSuppliers(Scanner scanner) throws SQLException {
 
-        List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();
-
-        if (supplierDTOList.isEmpty()) {
+        List<SupplierDTO> supplierDTOList = supplierManagementController.getAllSuppliersDTOs();        if (supplierDTOList.isEmpty()) {
             System.out.println("No suppliers found.");
             return null;
         }
-
-        if (scanner.hasNextLine()) scanner.nextLine();
-
 
         System.out.println("List of suppliers:");
         for (int i = 0; i < supplierDTOList.size(); i++) {

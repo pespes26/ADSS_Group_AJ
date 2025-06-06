@@ -47,10 +47,7 @@ public class InventoryInitializer {
             } catch (SQLException e) {
                 System.err.println("❌ Failed to preload product: " + dto.getProductName());
                 e.printStackTrace();
-            }
-        }
-
-        System.out.println("✅ Product preload completed.");
+            }        }
     }
 
     public static void preloadItems() {
@@ -137,10 +134,7 @@ public class InventoryInitializer {
                 System.err.println("❌ Failed to insert periodic order for product " + dto.getProductCatalogNumber());
                 e.printStackTrace();
             }
-        }
-
-        System.out.println("✅ Periodic orders preload completed.");
-    }
+        }    }
 
     private static String getSupplierNameById(int supplierId) {
         return switch (supplierId) {
@@ -165,14 +159,10 @@ public class InventoryInitializer {
         } catch (SQLException e) {
             System.err.println("❌ Failed to clear table data: " + e.getMessage());
         }
-    }
-
-    public static void preloadAllInitialData(LinkedHashMap<Integer,Integer> supplierIdAndAgreementsID) {
-        System.out.println("🔄 Preloading products and items...");
+    }    public static void preloadAllInitialData(LinkedHashMap<Integer,Integer> supplierIdAndAgreementsID) {
         preloadProducts();
         preloadItems();
         preloadPeriodicOrders(supplierIdAndAgreementsID); //add SuppliersID and AgreementID
-        System.out.println("✅ Preload completed.");
     }
 
 

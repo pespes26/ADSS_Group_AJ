@@ -6,6 +6,36 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * A utility class for testing and inspecting database connections and structure.
+ * 
+ * <p>This diagnostic tool performs comprehensive testing of database connections
+ * to both the Inventory and Suppliers databases, which are critical components
+ * of the inventory management system. It validates that connections can be
+ * established and provides detailed information about the database structure.</p>
+ * 
+ * <p>The class offers the following functionality:</p>
+ * <ul>
+ *   <li>Establishing and verifying connections to both Inventory.db and suppliers.db</li>
+ *   <li>Displaying database metadata information (database type, version)</li>
+ *   <li>Listing all tables present in each database</li>
+ *   <li>Providing detailed schema information for each table, including column names,
+ *       data types, and nullability constraints</li>
+ * </ul>
+ * 
+ * <p>This tool is particularly useful during development, testing, and debugging
+ * to verify that database schemas match expectations and that connections are
+ * properly configured. It can help diagnose connectivity issues, schema
+ * discrepancies, and validate that table structures are correct after migrations
+ * or schema updates.</p>
+ * 
+ * <p>Usage: Run this class directly to perform database connection diagnostics
+ * and print database structure to the console.</p>
+ * 
+ * @author ADSS Group AJ
+ * @version 1.0
+ * @since 2025-06-06
+ */
 public class DatabaseTestRunner {
     public static void main(String[] args) {
         testInventoryDB();

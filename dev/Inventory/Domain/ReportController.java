@@ -343,25 +343,15 @@ public class ReportController {
     }
 
 
-
-
     public String generateShortageInventoryReport(int branch_id) {
         StringBuilder report = new StringBuilder();
-        boolean found = false;
-
-        Branch branch = branches.get(branch_id);
-        if (branch == null) {
-            return "Branch " + branch_id + " not found.";
-        }
-
-        // Count how many non-defective items exist for each catalog number in the branch
+        boolean found = false;        // Use database data instead of in-memory data to get current stock counts
         Map<Integer, Integer> stockCountMap = new HashMap<>();
-        for (ItemDTO item : branch.getItems().values()) {
+        List<ItemDTO> branchItems = itemRepository.getItemsByBranchId(branch_id);
+        for (ItemDTO item : branchItems) {
             if (!item.IsDefective()) {
                 int catalog_number = item.getCatalogNumber();
                 stockCountMap.put(catalog_number, stockCountMap.getOrDefault(catalog_number, 0) + 1);
-            } else {
-                System.out.println("🟡 Skipping defective item ID " + item.getItemId());
             }
         }
 
@@ -437,20 +427,11 @@ public class ReportController {
         int min_required = product.getMinimumQuantityForAlert();
 
         return count < min_required;
-    }
-
-    public Map<Integer, Integer> getShortageProductsMap(int branchId) {
-        Map<Integer, Integer> shortages = new HashMap<>();
-
-        Branch branch = branches.get(branchId);
-        if (branch == null) {
-            System.err.println("⚠️ Branch not found: " + branchId);
-            return shortages;
-        }
-
-        // Count only non-defective items
+    }    public Map<Integer, Integer> getShortageProductsMap(int branchId) {
+        Map<Integer, Integer> shortages = new HashMap<>();        // Use database data instead of in-memory data to get current stock counts
         Map<Integer, Integer> stockCount = new HashMap<>();
-        for (ItemDTO item : branch.getItems().values()) {
+        List<ItemDTO> branchItems = itemRepository.getItemsByBranchId(branchId);
+        for (ItemDTO item : branchItems) {
             if (!item.IsDefective()) {
                 int catalog = item.getCatalogNumber();
                 stockCount.put(catalog, stockCount.getOrDefault(catalog, 0) + 1);

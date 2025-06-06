@@ -96,18 +96,16 @@ public class PeriodicOrderService {
                 }
             }
         }
-    }
-
-    private void processPeriodicOrder(PeriodicOrderDTO order, int branchId) throws SQLException {
+    }    private void processPeriodicOrder(PeriodicOrderDTO order, int branchId) throws SQLException {
         // Add items to inventory
         for (int i = 0; i < order.getQuantity(); i++) {
             ItemDTO item = new ItemDTO(
                     order.getProductCatalogNumber(),
                     branchId,
                     "Warehouse",
-                    null,
+                    "A1", // section_in_store - default value
                     false,
-                    null
+                    LocalDate.now().plusWeeks(1).toString() // item_expiring - one week from today
             );
             itemRepository.addItem(item);
         }

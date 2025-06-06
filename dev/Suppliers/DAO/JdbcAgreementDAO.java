@@ -9,22 +9,115 @@ import java.util.List;
 
 public class JdbcAgreementDAO implements IAgreementDAO {
 
-    private static final String DB_URL = "jdbc:sqlite:suppliers.db";
-
-    public void createTableIfNotExists() {
+    private static final String DB_URL = "jdbc:sqlite:suppliers.db";    public void createTableIfNotExists() {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
+            
+            // First, check if the table exists and if it has the unique constraint
+            boolean needsRecreation = false;
+            try {
+                ResultSet rs = stmt.executeQuery("PRAGMA table_info(agreements)");
+                if (!rs.next()) {
+                    // Table doesn't exist, create it with unique constraint
+                    needsRecreation = false;
+                } else {
+                    // Table exists, check if unique constraint on supplier_id, self_pickup, delivery_days exists
+                    ResultSet indexRs = stmt.executeQuery("PRAGMA index_list(agreements)");
+                    boolean hasUniqueConstraint = false;
+                    while (indexRs.next()) {
+                        String indexName = indexRs.getString("name");
+                        boolean isUnique = indexRs.getBoolean("unique");
+                        if (isUnique) {
+                            // Check if this unique index covers all three columns
+                            ResultSet indexInfoRs = stmt.executeQuery("PRAGMA index_info(" + indexName + ")");
+                            int columnCount = 0;
+                            boolean hasSupplierID = false, hasSelfPickup = false, hasDeliveryDays = false;
+                            while (indexInfoRs.next()) {
+                                String columnName = indexInfoRs.getString("name");
+                                columnCount++;
+                                if ("supplier_id".equals(columnName)) hasSupplierID = true;
+                                if ("self_pickup".equals(columnName)) hasSelfPickup = true;
+                                if ("delivery_days".equals(columnName)) hasDeliveryDays = true;
+                            }
+                            indexInfoRs.close();
+                            if (columnCount == 3 && hasSupplierID && hasSelfPickup && hasDeliveryDays) {
+                                hasUniqueConstraint = true;
+                                break;
+                            }
+                        }
+                    }
+                    indexRs.close();
+                    
+                    if (!hasUniqueConstraint) {
+                        needsRecreation = true;
+                    }
+                }
+                rs.close();
+            } catch (SQLException e) {
+                // If we can't check, assume we need to create the table
+                needsRecreation = false;
+            }
+            
+            if (needsRecreation) {
+                // Backup existing data
+                List<AgreementDTO> existingAgreements = new ArrayList<>();
+                try {
+                    existingAgreements = getAllAgreement();
+                } catch (SQLException e) {
+                    System.err.println("Warning: Could not backup existing agreement data: " + e.getMessage());
+                }
+                
+                // Drop and recreate table
+                stmt.execute("DROP TABLE IF EXISTS agreements");
+                
+                String sql = "CREATE TABLE agreements (\n"
+                        + " agreement_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                        + " supplier_id INTEGER NOT NULL,\n"
+                        + " self_pickup BOOLEAN,\n"
+                        + " delivery_days TEXT,\n"
+                        + " UNIQUE(supplier_id, self_pickup, delivery_days)\n"
+                        + ");";
+                
+                stmt.execute(sql);
+                
+                // Restore data (removing duplicates by supplier_id, self_pickup, delivery_days combination)
+                if (!existingAgreements.isEmpty()) {
+                    // Use a set to track agreement combinations we've already added
+                    java.util.Set<String> addedCombinations = new java.util.HashSet<>();
+                    for (AgreementDTO agreement : existingAgreements) {
+                        String combination = agreement.getSupplier_ID() + "|" + 
+                                           agreement.isSelfPickup() + "|" + 
+                                           String.join(",", agreement.getDeliveryDays());
+                        if (!addedCombinations.contains(combination)) {
+                            try {
+                                insert(agreement);
+                                addedCombinations.add(combination);
+                            } catch (SQLException e) {
+                                System.err.println("Warning: Could not restore agreement for supplier " + 
+                                                 agreement.getSupplier_ID() + ": " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("Skipped duplicate agreement: Supplier ID " + 
+                                             agreement.getSupplier_ID() + " with same terms");
+                        }
+                    }
+                }
+                System.out.println("✅ Agreements table recreated with unique constraint on (supplier_id, self_pickup, delivery_days).");
+            } else {
+                // Create table normally if it doesn't exist
+                String sql = "CREATE TABLE IF NOT EXISTS agreements (\n"
+                        + " agreement_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                        + " supplier_id INTEGER NOT NULL,\n"
+                        + " self_pickup BOOLEAN,\n"
+                        + " delivery_days TEXT,\n"
+                        + " UNIQUE(supplier_id, self_pickup, delivery_days)\n"
+                        + ");";
 
-            String sql = "CREATE TABLE IF NOT EXISTS agreements (\n"
-                    + " agreement_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                    + " supplier_id INTEGER NOT NULL,\n"
-                    + " self_pickup BOOLEAN,\n"
-                    + " delivery_days TEXT\n"
-                    + ");";
+                stmt.execute(sql);
+            }
 
-            stmt.execute(sql);
         } catch (SQLException e) {
-            System.err.println(" שגיאה ביצירת טבלת agreements:");
+            System.err.println("Error while creating agreements table:");
             e.printStackTrace();
         }
     }

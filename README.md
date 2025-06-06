@@ -68,7 +68,7 @@ Then you'll see the main options:
 - Update demand/supply parameters
 - Change storage location
 
-### Part 2: Order Management & Tracking
+### Part 2: Order Management & Tracking Menu:
 
 - **Show Shortage Alerts for this branch** - View current shortages without updating inventory
 - Update Periodic Order - Modify recurring supplier orders
@@ -554,7 +554,7 @@ Enter your Branch ID (1-10): 2
 
 Main Menu:
 1. Inventory Functions (Part 1)
-2. Supplier & Periodic Orders (Part 2)
+2. Order Management & Tracking Menu: (Part 2)
 3. Exit
 
 1
@@ -563,16 +563,15 @@ Inventory Module Menu:
 2. Add item(s) to inventory (new or existing product)
 3. Remove an item
 4. Show the purchase prices of a product
-5. Update the cost price of a product (before discounts)
-6. Mark an item as defective
-7. Generate inventory report
-8. Generate a defective and expired items report
-9. Apply supplier/store discount to a product group
-10. Show product quantity in warehouse and store
-11. Generate a shortage inventory report
-12. Update product supply days and demand level
-13. Update item storage location
-14. Exit
+5. Mark an item as defective
+6. Generate inventory report
+7. Generate a defective and expired items report
+8. Apply supplier/store discount to a product group
+9. Show product quantity in warehouse and store
+10. Generate a shortage inventory report
+11. Update product demand level
+12. Update item storage location
+13. Exit
 
 13
 Enter item ID:

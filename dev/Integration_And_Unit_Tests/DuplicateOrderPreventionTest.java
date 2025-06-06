@@ -1,6 +1,5 @@
 package Integration_And_Unit_Tests;
 
-import Inventory.DAO.JdbcShortageOrderDAO;
 import Inventory.DTO.ShortageOrderDTO;
 import Inventory.Repository.IShortageOrderRepository;
 import Inventory.Repository.ShortageOrderRepositoryImpl;
@@ -10,10 +9,33 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Test class to verify duplicate order prevention functionality
+ * Test class to verify duplicate order prevention functionality in the shortage order system.
+ * 
+ * This class tests the system's ability to prevent duplicate shortage orders for the same product
+ * at the same branch, which is a critical business rule to prevent unnecessary inventory ordering.
+ * 
+ * The test follows these steps:
+ * 1. Verifies that initially there are no pending orders for a test product in a test branch
+ * 2. Creates a new shortage order for the test product in the test branch
+ * 3. Verifies that the system now correctly identifies a pending order exists
+ * 4. Tests that the system correctly differentiates between different products
+ * 5. Tests that the system correctly differentiates between different branches
+ * 6. Cleans up test data by marking orders as processed
+ * 
+ * This test validates both positive cases (detecting duplicates when they should be detected)
+ * and negative cases (not detecting duplicates when products or branches differ).
+ * 
+ * @author ADSS Group AJ
+ * @version 1.0
+ * @since 2025-06-06
  */
 public class DuplicateOrderPreventionTest {
-    
+      /**
+     * Main method to run the duplicate order prevention tests.
+     * Executes all test cases and reports success or failure.
+     * 
+     * @param args Command line arguments (not used)
+     */
     public static void main(String[] args) {
         System.out.println("🧪 Testing Duplicate Order Prevention...");
         
@@ -26,6 +48,21 @@ public class DuplicateOrderPreventionTest {
         }
     }
     
+    /**
+     * Core test method that validates the duplicate order prevention functionality.
+     * This method tests various scenarios to ensure the system correctly identifies
+     * duplicate orders and differentiates between different products and branches.
+     * 
+     * Test steps:
+     * 1. Verify no initial pending orders
+     * 2. Create a test shortage order
+     * 3. Verify system detects the pending order
+     * 4. Verify system doesn't detect pending orders for different products
+     * 5. Verify system doesn't detect pending orders for different branches
+     * 6. Clean up test data
+     * 
+     * @throws SQLException If a database access error occurs
+     */
     private static void testDuplicateOrderPrevention() throws SQLException {
         IShortageOrderRepository repository = new ShortageOrderRepositoryImpl();
         

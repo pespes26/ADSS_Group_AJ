@@ -243,33 +243,42 @@ public class ItemController {
      * @param location The new storage location (e.g., "Warehouse" or "InteriorStore"). If null, location remains unchanged.
      * @param section  The new section within the location (e.g., "A1"). If null, section remains unchanged.
      * @return true if the item exists in the specified branch and was updated; false otherwise.
-     */
-    public boolean updateItemLocation(int item_Id, int branch_Id, String location, String section) {
-        Branch branch = branches.get(branch_Id);
-        if (branch == null) {
+     */    public boolean updateItemLocation(int item_Id, int branch_Id, String location, String section) {
+        // Query the database directly to get the latest item data
+        ItemDTO item = itemRepository.getItemById(item_Id);
+        
+        // Check if item exists and belongs to the specified branch
+        if (item == null || item.getBranchId() != branch_Id) {
             return false;
         }
-        ItemDTO item = branch.getItems().get(item_Id);
-        if (item != null) {
-            if (location != null) item.setLocation(location);
-            if (section != null) item.setSectionInStore(section);
+        
+        // Update the item location and/or section
+        if (location != null) item.setLocation(location);
+        if (section != null) item.setSectionInStore(section);
 
-            ItemDTO dto = new ItemDTO(
-                    item.getItemId(),
-                    item.getCatalogNumber(),
-                    item.getBranchId(),
-                    item.getStorageLocation(),
-                    item.getSectionInStore(),
-                    item.IsDefective(),
-                    item.getItemExpiringDate()
-            );
+        // Create a new DTO with updated values
+        ItemDTO dto = new ItemDTO(
+                item.getItemId(),
+                item.getCatalogNumber(),
+                item.getBranchId(),
+                item.getStorageLocation(),
+                item.getSectionInStore(),
+                item.IsDefective(),
+                item.getItemExpiringDate()
+        );
 
-            IItemRepository repository = new ItemRepositoryImpl();
-            repository.updateItem(dto);
-
-            return true;
+        // Update in database
+        itemRepository.updateItem(dto);
+        
+        // Also update in-memory structure if the branch exists
+        Branch branch = branches.get(branch_Id);
+        if (branch != null && branch.getItems().containsKey(item_Id)) {
+            ItemDTO inMemoryItem = branch.getItems().get(item_Id);
+            if (location != null) inMemoryItem.setLocation(location);
+            if (section != null) inMemoryItem.setSectionInStore(section);
         }
-        return false;
+
+        return true;
     }
 
 

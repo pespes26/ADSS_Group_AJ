@@ -7,35 +7,175 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcProductDAO implements IProductDAO {
-    private static final String DB_URL = "jdbc:sqlite:Inventory.db";
-
-    static {
+    private static final String DB_URL = "jdbc:sqlite:Inventory.db";    static {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement statement = conn.createStatement()) {
 
-            String createTableSql = "CREATE TABLE IF NOT EXISTS products (\n"
-                    + " catalog_number INTEGER PRIMARY KEY,\n"
-                    + " product_name TEXT NOT NULL,\n"
-                    + " category TEXT,\n"
-                    + " sub_category TEXT,\n"
-                    + " supplier_name TEXT,\n"
-                    + " product_size INTEGER,\n"
-                    + " product_demand_level INTEGER,\n"
-                    + " supply_days_in_week TEXT,\n"
-                    + " supply_time INTEGER,\n"
-                    + " quantity_in_store INTEGER DEFAULT 0,\n"
-                    + " quantity_in_warehouse INTEGER DEFAULT 0,\n"
-                    + " minimum_quantity_for_alert INTEGER,\n"
-                    + " cost_price_before_supplier_discount REAL,\n"
-                    + " supplier_discount REAL DEFAULT 0.0,\n"
-                    + " store_discount REAL DEFAULT 0.0,\n"
-                    + " cost_price_after_supplier_discount REAL DEFAULT 0.0,\n"
-                    + " sale_price_before_store_discount REAL DEFAULT 0.0,\n"
-                    + " sale_price_after_store_discount REAL DEFAULT 0.0\n"
-                    + ");";
+            // Check if table exists and has unique constraint on product_name
+            boolean needsRecreation = false;
+            try {
+                ResultSet rs = statement.executeQuery("PRAGMA table_info(products)");
+                if (!rs.next()) {
+                    needsRecreation = false; // Table doesn't exist, create normally
+                } else {
+                    // Table exists, check if unique constraint on product_name exists
+                    ResultSet indexRs = statement.executeQuery("PRAGMA index_list(products)");
+                    boolean hasUniqueConstraint = false;
+                    while (indexRs.next()) {
+                        String indexName = indexRs.getString("name");
+                        boolean isUnique = indexRs.getBoolean("unique");
+                        if (isUnique) {
+                            // Check if this unique index is on product_name
+                            ResultSet indexInfoRs = statement.executeQuery("PRAGMA index_info(" + indexName + ")");
+                            while (indexInfoRs.next()) {
+                                String columnName = indexInfoRs.getString("name");
+                                if ("product_name".equals(columnName)) {
+                                    hasUniqueConstraint = true;
+                                    break;
+                                }
+                            }
+                            indexInfoRs.close();
+                        }
+                        if (hasUniqueConstraint) break;
+                    }
+                    indexRs.close();
+                    
+                    if (!hasUniqueConstraint) {
+                        needsRecreation = true;
+                    }
+                }
+                rs.close();
+            } catch (SQLException e) {
+                needsRecreation = false;
+            }            if (needsRecreation) {
+                // Backup existing data
+                List<ProductDTO> existingProducts = new ArrayList<>();
+                try {
+                    // Use a direct query instead of getAllProducts() to avoid static context issues
+                    String backupSql = "SELECT * FROM products";
+                    try (ResultSet rs = statement.executeQuery(backupSql)) {
+                        while (rs.next()) {
+                            ProductDTO dto = new ProductDTO();
+                            dto.setCatalogNumber(rs.getInt("catalog_number"));
+                            dto.setProductName(rs.getString("product_name"));
+                            dto.setCategory(rs.getString("category"));
+                            dto.setSubCategory(rs.getString("sub_category"));
+                            dto.setSupplierName(rs.getString("supplier_name"));
+                            dto.setSize(rs.getInt("product_size"));
+                            dto.setProductDemandLevel(rs.getInt("product_demand_level"));
+                            dto.setSupplyDaysInWeek(rs.getString("supply_days_in_week"));
+                            dto.setSupplyTime(rs.getInt("supply_time"));
+                            dto.setQuantityInStore(rs.getInt("quantity_in_store"));
+                            dto.setQuantityInWarehouse(rs.getInt("quantity_in_warehouse"));
+                            dto.setMinimumQuantityForAlert(rs.getInt("minimum_quantity_for_alert"));
+                            dto.setCostPriceBeforeSupplierDiscount(rs.getDouble("cost_price_before_supplier_discount"));
+                            dto.setSupplierDiscount(rs.getDouble("supplier_discount"));
+                            dto.setStoreDiscount(rs.getDouble("store_discount"));
+                            dto.setCostPriceAfterSupplierDiscount(rs.getDouble("cost_price_after_supplier_discount"));
+                            dto.setSalePriceBeforeStoreDiscount(rs.getDouble("sale_price_before_store_discount"));
+                            dto.setSalePriceAfterStoreDiscount(rs.getDouble("sale_price_after_store_discount"));
+                            existingProducts.add(dto);
+                        }
+                    }
+                } catch (SQLException e) {
+                    System.err.println("Warning: Could not backup existing product data: " + e.getMessage());
+                }
+                
+                // Drop and recreate table
+                statement.execute("DROP TABLE IF EXISTS products");
+                
+                String createTableSql = "CREATE TABLE products (\n"
+                        + " catalog_number INTEGER PRIMARY KEY,\n"
+                        + " product_name TEXT NOT NULL UNIQUE,\n"
+                        + " category TEXT,\n"
+                        + " sub_category TEXT,\n"
+                        + " supplier_name TEXT,\n"
+                        + " product_size INTEGER,\n"
+                        + " product_demand_level INTEGER,\n"
+                        + " supply_days_in_week TEXT,\n"
+                        + " supply_time INTEGER,\n"
+                        + " quantity_in_store INTEGER DEFAULT 0,\n"
+                        + " quantity_in_warehouse INTEGER DEFAULT 0,\n"
+                        + " minimum_quantity_for_alert INTEGER,\n"
+                        + " cost_price_before_supplier_discount REAL,\n"
+                        + " supplier_discount REAL DEFAULT 0.0,\n"
+                        + " store_discount REAL DEFAULT 0.0,\n"
+                        + " cost_price_after_supplier_discount REAL DEFAULT 0.0,\n"
+                        + " sale_price_before_store_discount REAL DEFAULT 0.0,\n"
+                        + " sale_price_after_store_discount REAL DEFAULT 0.0\n"
+                        + ");";
+                
+                statement.execute(createTableSql);
+                  // Restore data (removing duplicates by product_name)
+                if (!existingProducts.isEmpty()) {
+                    java.util.Set<String> addedNames = new java.util.HashSet<>();
+                    for (ProductDTO product : existingProducts) {
+                        if (!addedNames.contains(product.getProductName())) {
+                            try {
+                                String insertSql = "INSERT INTO products (" +
+                                        "catalog_number, product_name, category, sub_category, supplier_name, product_size, " +
+                                        "product_demand_level, supply_days_in_week, supply_time, quantity_in_store, quantity_in_warehouse, " +
+                                        "minimum_quantity_for_alert, cost_price_before_supplier_discount, " +
+                                        "supplier_discount, store_discount, " +
+                                        "cost_price_after_supplier_discount, sale_price_before_store_discount, sale_price_after_store_discount) " +
+                                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                
+                                try (PreparedStatement pstmt = statement.getConnection().prepareStatement(insertSql)) {
+                                    pstmt.setInt(1, product.getCatalogNumber());
+                                    pstmt.setString(2, product.getProductName());
+                                    pstmt.setString(3, product.getCategory());
+                                    pstmt.setString(4, product.getSubCategory());
+                                    pstmt.setString(5, product.getSupplierName());
+                                    pstmt.setInt(6, product.getSize());
+                                    pstmt.setInt(7, product.getProductDemandLevel());
+                                    pstmt.setString(8, product.getSupplyDaysInWeek());
+                                    pstmt.setInt(9, product.getSupplyTime());
+                                    pstmt.setInt(10, product.getQuantityInStore());
+                                    pstmt.setInt(11, product.getQuantityInWarehouse());
+                                    pstmt.setInt(12, product.getMinimumQuantityForAlert());
+                                    pstmt.setDouble(13, product.getCostPriceBeforeSupplierDiscount());
+                                    pstmt.setDouble(14, product.getSupplierDiscount());
+                                    pstmt.setDouble(15, product.getStoreDiscount());
+                                    pstmt.setDouble(16, product.getCostPriceAfterSupplierDiscount());
+                                    pstmt.setDouble(17, product.getSalePriceBeforeStoreDiscount());
+                                    pstmt.setDouble(18, product.getSalePriceAfterStoreDiscount());
+                                    pstmt.executeUpdate();
+                                }
+                                addedNames.add(product.getProductName());
+                            } catch (SQLException e) {
+                                System.err.println("Warning: Could not restore product " + product.getProductName() + ": " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("Skipped duplicate product name: " + product.getProductName());
+                        }
+                    }
+                }
+                System.out.println("✅ Products table recreated with unique product_name constraint.");
+            } else {
+                String createTableSql = "CREATE TABLE IF NOT EXISTS products (\n"
+                        + " catalog_number INTEGER PRIMARY KEY,\n"
+                        + " product_name TEXT NOT NULL UNIQUE,\n"
+                        + " category TEXT,\n"
+                        + " sub_category TEXT,\n"
+                        + " supplier_name TEXT,\n"
+                        + " product_size INTEGER,\n"
+                        + " product_demand_level INTEGER,\n"
+                        + " supply_days_in_week TEXT,\n"
+                        + " supply_time INTEGER,\n"
+                        + " quantity_in_store INTEGER DEFAULT 0,\n"
+                        + " quantity_in_warehouse INTEGER DEFAULT 0,\n"
+                        + " minimum_quantity_for_alert INTEGER,\n"
+                        + " cost_price_before_supplier_discount REAL,\n"
+                        + " supplier_discount REAL DEFAULT 0.0,\n"
+                        + " store_discount REAL DEFAULT 0.0,\n"
+                        + " cost_price_after_supplier_discount REAL DEFAULT 0.0,\n"
+                        + " sale_price_before_store_discount REAL DEFAULT 0.0,\n"
+                        + " sale_price_after_store_discount REAL DEFAULT 0.0\n"
+                        + ");";
 
-            statement.execute(createTableSql);
-            System.out.println("✅ The 'products' table was created or already exists.");
+                statement.execute(createTableSql);
+                System.out.println("✅ The 'products' table was created or already exists.");
+            }
 
         } catch (SQLException e) {
             System.err.println("❌ Error creating the 'products' table:");

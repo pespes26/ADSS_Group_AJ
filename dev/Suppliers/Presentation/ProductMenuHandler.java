@@ -17,8 +17,21 @@ import java.util.Scanner;
 public class ProductMenuHandler {
     public static ProductSupplierManagementController productSupplierManagementController;
 
+    // Static initializer to ensure the controller is initialized before any static method is called
+    static {
+        initializeController();
+    }
 
     public ProductMenuHandler() {
+        IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
+        IDiscountDAO discountDAO = new JdbcDiscountDAO();
+        // יצירת Repository
+        IProductSupplierRepository productSupplierRepository = new ProductSupplierRepositoryImpl(productSupplierDAO,discountDAO);
+        // יצירת קונטרולרים
+        productSupplierManagementController = new ProductSupplierManagementController(productSupplierRepository);
+    }
+
+    private static void initializeController() {
         IProductSupplierDAO productSupplierDAO = new JdbcProductSupplierDAO();
         IDiscountDAO discountDAO = new JdbcDiscountDAO();
         // יצירת Repository

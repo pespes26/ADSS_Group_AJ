@@ -81,7 +81,7 @@ public class Main {
 
         // --- Initialize Mock Data for Testing ---
         // NOTE: This should be removed before final submission
-        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
+        //MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
 
         // --- Controllers ---
         var driverController = new DriverController(driverService);

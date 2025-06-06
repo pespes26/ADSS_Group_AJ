@@ -146,10 +146,7 @@ public class HRManager {
     /**
      * Ends the given shift and archives it the shift date has already passed.
      * Once archived, the shift is removed from the active shift list.
-     *
-     * @param shift - the shift to be ended and archived.
-     * @param archive - The ArchivedShifts instance where the shift will be stored.
-     */
+     * **/
    /* public void endShift(ArchivedShifts archive) {
         for ()
         if (shift.isPastShift()) {
@@ -163,7 +160,7 @@ public class HRManager {
     // ----------------------------------- Shift Assignment -----------------------------------
     public void addEmployeeToShift(Shift shift,Employee employee){
         for (Role role : shift.getShiftRequiredRoles()) {
-            if (employee.isQualified(role) && employee.isAvailable(shift.getShiftDay(),shift.getShiftType())){
+            if (employee.isQualified(role) && employee.isAvailable(shift.getShiftDay(), shift.getShiftType())){
                 shift.addEmployeeToShift(employee,role);
                 return;
 

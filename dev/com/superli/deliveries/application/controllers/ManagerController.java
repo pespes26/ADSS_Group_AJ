@@ -344,8 +344,7 @@ public class ManagerController {
 
             for (int i = 0; i < 7; i++) {
                 LocalDate shiftDate = upcomingSunday.plusDays(i);
-                com.superli.deliveries.domain.core.DayOfWeek day =
-                        com.superli.deliveries.domain.core.DayOfWeek.valueOf(shiftDate.getDayOfWeek().name());
+                DayOfWeek day = DayOfWeek.valueOf(shiftDate.getDayOfWeek().name());
 
                 Date date = java.sql.Date.valueOf(shiftDate);
 

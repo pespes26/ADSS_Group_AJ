@@ -102,8 +102,8 @@ public class ControllerManagerTest {
             DayOfWeek dayEnum = DayOfWeek.valueOf(day.getDayOfWeek().toString());
             Date date = java.sql.Date.valueOf(day);
             String shiftId = UUID.randomUUID().toString();
-            hrManager.addShift(new Shift(shiftId, date, ShiftType.MORNING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
-            hrManager.addShift(new Shift(shiftId, date, ShiftType.EVENING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
+            hrManager.addShift(new Shift(0, date, ShiftType.MORNING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
+            hrManager.addShift(new Shift(1, date, ShiftType.EVENING, dayEnum, new ArrayList<>(), new HashMap<>(), null));
         }
 
         assertEquals(14, hrManager.getAllShifts().size());
@@ -124,7 +124,7 @@ public class ControllerManagerTest {
 
         Date today = new Date();
         String shiftId = UUID.randomUUID().toString();
-        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
+        Shift shift = new Shift(2, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
         hrManager.addShift(shift);
 
         hrManager.addEmployeeToShift(shift, emp);
@@ -147,7 +147,7 @@ public class ControllerManagerTest {
 
         Date today = new Date();
         String shiftId = UUID.randomUUID().toString();
-        Shift shift = new Shift(shiftId, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
+        Shift shift = new Shift(3, today, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(List.of(cashier)), new HashMap<>(), null);
 
         hrManager.addShift(shift);
 

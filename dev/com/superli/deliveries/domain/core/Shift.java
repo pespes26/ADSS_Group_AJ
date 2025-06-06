@@ -1,6 +1,7 @@
 package com.superli.deliveries.domain.core;
 
 
+import java.time.DayOfWeek;
 import java.util.*;
 
 public class Shift {
@@ -12,7 +13,7 @@ public class Shift {
     private Map<Employee, Role> shiftEmployees;
     private Employee shiftManager;
 
-    public Shift(int shiftId,Date shiftDate, ShiftType shiftType,DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
+    public Shift(int shiftId, Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
         this.shiftId = shiftId;
         this.shiftDate = shiftDate;
         this.shiftType = shiftType;

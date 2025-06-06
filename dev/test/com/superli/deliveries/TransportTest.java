@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +24,9 @@ class TransportTest {
     void setUp() {
         originSite = new Site("Site1", "Origin St 1", "123", "Contact", new Zone("Zone1", "Central"));
         truck = new Truck("TR-001", "Volvo", 8000f, 20000f, LicenseType.C);
-        driver = new Driver("DR-001", "Dan", LicenseType.C, true);
+        driver = new Driver("DR-001", "Dan", "000-000-000", 0.0,
+                "Standard Terms", new Date(), new ArrayList<>(), new ArrayList<>(),
+                new Role("Driver"), LicenseType.C);
     }
 
     // --- Constructor Tests ---

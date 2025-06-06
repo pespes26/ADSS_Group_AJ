@@ -44,9 +44,10 @@ public class ControllerEmployeeTest {
         shift.addEmployeeToShift(employee, cashier);
         hrManager.addShift(shift);
 
-        ControllerEmployee.viewMyShifts(employee, hrManager);
+        EmployeeController.viewMyShifts(employee, hrManager);
         assertTrue(shift.getShiftEmployees().containsKey(employee));
     }
+
 
     /**
      * Test preventing duplicate availability entries.
@@ -60,7 +61,7 @@ public class ControllerEmployeeTest {
         simulateUserInput(simulatedInput);
 
         Scanner sc = new Scanner(System.in);
-        ControllerEmployee.updateAvailability(employee, sc);
+        EmployeeController.updateAvailability(employee, sc);
 
         assertEquals(1, employee.getAvailabilityConstraints().size(), "Duplicate availability should not be added");
     }
@@ -179,7 +180,7 @@ public class ControllerEmployeeTest {
 
 
 
-    private Shift createTestShift(DomainLayer.DayOfWeek day, ShiftType shiftType) {
+    private Shift createTestShift(DayOfWeek day, ShiftType shiftType) {
         Date today = new Date();
         return new Shift(today, shiftType, day, new ArrayList<>(), new HashMap<>(), null);
     }

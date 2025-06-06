@@ -1,10 +1,13 @@
 package test.HR;
 
-import com.superli.deliveries.domain.*;
-
+import com.superli.deliveries.domain.core.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShiftTest {
 

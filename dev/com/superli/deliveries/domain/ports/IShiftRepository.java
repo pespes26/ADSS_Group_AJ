@@ -1,7 +1,14 @@
 package com.superli.deliveries.domain.ports;
 
+import com.superli.deliveries.domain.core.Employee;
+import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.domain.core.ShiftType;
+
+import java.time.DayOfWeek;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
@@ -61,4 +68,22 @@ public interface IShiftRepository {
      * @return A Collection of Shift objects assigned to the specified employee.
      */
     Collection<Shift> findByEmployeeId(String employeeId);
+
+    List<Shift> findByDay(DayOfWeek day);
+
+    List<Shift> findByDateRange(Date startDate, Date endDate);
+
+    List<Shift> findByType(ShiftType type);
+
+    List<Shift> findArchived();
+
+    List<Shift> findByAssignedEmployee(Employee employee);
+
+    List<Shift> findActive();
+
+    Shift update(Shift shift);
+
+    List<Shift> findByRequiredRole(Role role);
+
+    List<Shift> findByManager(Employee manager);
 }

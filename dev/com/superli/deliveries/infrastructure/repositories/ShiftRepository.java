@@ -4,6 +4,8 @@ import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.domain.ports.IShiftRepository;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,9 +20,8 @@ public class ShiftRepository implements IShiftRepository {
     }
 
     @Override
-    public Shift save(Shift shift) {
-        shifts.put(shift.getId(), shift);
-        return shift;
+    public void save(Shift shift) {
+        shifts.put(shift.getShiftId(), shift);
     }
 
     @Override
@@ -78,28 +79,45 @@ public class ShiftRepository implements IShiftRepository {
     @Override
     public List<Shift> findArchived() {
         return shifts.values().stream()
-                .filter(Shift::isArchived)
+                .filter(Shift::isPastShift)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Shift> findActive() {
         return shifts.values().stream()
-                .filter(shift -> !shift.isArchived())
+                .filter(shift -> !shift.isPastShift())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public boolean delete(String id) {
-        return shifts.remove(id) != null;
+    public Optional<Shift> deleteById(String id) {
+        return Optional.ofNullable(shifts.remove(id));
     }
 
     @Override
     public Shift update(Shift shift) {
-        if (!shifts.containsKey(shift.getId())) {
-            throw new IllegalArgumentException("Shift with ID " + shift.getId() + " does not exist");
+        if (!shifts.containsKey(shift.getShiftId())) {
+            throw new IllegalArgumentException("Shift with ID " + shift.getShiftId() + " does not exist");
         }
-        shifts.put(shift.getId(), shift);
+        shifts.put(shift.getShiftId(), shift);
         return shift;
     }
-} 
+
+    @Override
+    public void clearAll() {
+        shifts.clear();
+    }
+
+    @Override
+    public Collection<Shift> findByEmployeeId(String employeeId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Shift> findByDate(LocalDate date) {
+        return shifts.values().stream()
+                .filter(shift -> shift.getShiftDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().equals(date))
+                .collect(Collectors.toList());
+    }
+}

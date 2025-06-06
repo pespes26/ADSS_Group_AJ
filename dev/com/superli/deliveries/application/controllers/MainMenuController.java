@@ -2,6 +2,7 @@ package com.superli.deliveries.application.controllers;
 
 import com.superli.deliveries.application.services.*;
 import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.Main;
 import java.util.Scanner;
 
 public class MainMenuController {

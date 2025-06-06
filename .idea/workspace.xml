@@ -9,40 +9,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="added licenseTypes">
+    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="added presentation layer, fixed HR classes, and a few feliveries classes as well">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ADSS_AJ.iml" beforeDir="false" afterPath="$PROJECT_DIR$/ADSS_AJ.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeerController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TransportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TransportController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DeliveredItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DeliveredItemService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DriverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DriverService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/MainMenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/MainMenuController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TransportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TransportService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ArchivedEmployee.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ArchivedEmployee.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ArchivedShifts.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ArchivedShifts.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/AvailableShifts.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/AvailableShifts.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DayOfWeek.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DayOfWeek.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Employee.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/EmployeeType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/LicenseType.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/LicenseType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Role.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ShiftType.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/ShiftType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DestinationDocRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DestinationDocRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DriverRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DriverRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IEmployeeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IEmployeeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IShiftRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IShiftRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/EmployeeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/EmployeeRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ProductRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/SiteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/SiteRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TransportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TransportRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TruckRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TruckRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ZoneRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ZoneRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,9 +90,9 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "project.propCompiler",
     "vue.rearranger.settings.migration": "true"
   }
@@ -121,7 +102,7 @@
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_Group_AJ\release" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.DriverTest">
+  <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.Main" />
       <module name="adss-aj-project" />
@@ -253,7 +234,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749030770438</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added presentation layer, fixed HR classes, and a few feliveries classes as well">
+      <option name="closed" value="true" />
+      <created>1749039153336</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1749039153337</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added presentation layer, fixed HR classes, and a few feliveries classes as well">
+      <option name="closed" value="true" />
+      <created>1749039392131</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749039392131</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -273,6 +270,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fix imports to all classes" />
     <MESSAGE value="added licenseTypes" />
-    <option name="LAST_COMMIT_MESSAGE" value="added licenseTypes" />
+    <MESSAGE value="added presentation layer, fixed HR classes, and a few feliveries classes as well" />
+    <option name="LAST_COMMIT_MESSAGE" value="added presentation layer, fixed HR classes, and a few feliveries classes as well" />
   </component>
 </project>

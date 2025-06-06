@@ -1,6 +1,8 @@
 package com.superli.deliveries.domain.ports;
 
 import com.superli.deliveries.domain.core.Employee;
+import com.superli.deliveries.domain.core.Role;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -51,5 +53,7 @@ public interface IEmployeeRepository {
      * @param role The role to search for.
      * @return A Collection of Employee objects with the specified role.
      */
-    Collection<Employee> findByRole(String role);
+    Collection<Employee> findByRole(Role role);
+
+    void update(Employee employee);
 }

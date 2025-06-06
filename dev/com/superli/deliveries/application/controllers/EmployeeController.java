@@ -5,9 +5,10 @@ import com.superli.deliveries.domain.core.HRManager;
 import com.superli.deliveries.domain.core.Shift;
 import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.domain.core.AvailableShifts;
-import com.superli.deliveries.domain.core.DayOfWeek;
+//import com.superli.deliveries.domain.core.DayOfWeek;
 import com.superli.deliveries.domain.core.ShiftType;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Scanner;
 

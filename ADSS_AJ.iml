@@ -48,5 +48,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="slf4j.api" level="project" />
   </component>
 </module>

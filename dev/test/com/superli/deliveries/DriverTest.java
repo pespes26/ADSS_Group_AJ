@@ -24,7 +24,7 @@ class DriverTest {
         // Assert
         assertNotNull(driver, "Driver object should not be null");
         assertEquals(id, driver.getDriverId(), "Driver ID should match");
-        assertEquals(name, driver.getName(), "Driver name should match");
+        assertEquals(name, driver.getFullName(), "Driver name should match");
         assertEquals(license, driver.getLicenseType(), "License type should match");
         assertTrue(driver.isAvailable(), "Driver availability should match");
     }

@@ -1,6 +1,6 @@
 package com.superli.deliveries.domain.ports; // או .domain, בהתאם למיקום שבחרת
 
-import com.superli.deliveries.domain.Driver;
+import com.superli.deliveries.domain.core.Driver;
 import java.util.Collection;
 import java.util.Optional;
 

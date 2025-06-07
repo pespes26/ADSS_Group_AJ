@@ -1,6 +1,6 @@
 package com.superli.deliveries.domain.ports;
 
-import com.superli.deliveries.domain.DestinationDoc;
+import com.superli.deliveries.domain.core.DestinationDoc;
 
 import java.util.Collection;
 import java.util.Optional;

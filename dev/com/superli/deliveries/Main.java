@@ -1,8 +1,8 @@
 package com.superli.deliveries;
 
-import com.superli.deliveries.controllers.*;
-import com.superli.deliveries.service.*;
-import com.superli.deliveries.storage.*;
+import com.superli.deliveries.application.controllers.*;
+import com.superli.deliveries.infrastructure.repositories.*;
+import com.superli.deliveries.application.services.*;
 
 import java.util.Scanner;
 
@@ -81,7 +81,7 @@ public class Main {
 
         // --- Initialize Mock Data for Testing ---
         // NOTE: This should be removed before final submission
-        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
+        //MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
 
         // --- Controllers ---
         var driverController = new DriverController(driverService);

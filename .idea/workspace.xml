@@ -9,6 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main$Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main$Role.class" afterDir="false" />
@@ -64,6 +65,25 @@
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/TransportTest.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/TruckTest.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/ZoneTest.class" beforeDir="false" />
+=======
+    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="fixing some bugs">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/MockDataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/MockDataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DayOfWeek.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/WeekDays.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TransportTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TransportTest.java" afterDir="false" />
+>>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +109,7 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2vrdpoaPlQaBDMwZwoUvOSXgqZz" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -114,7 +134,10 @@
     &quot;JUnit.TruckTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ZoneTest.executor&quot;: &quot;Run&quot;,
+<<<<<<< HEAD
     &quot;JUnit.test in adss-aj-project.executor&quot;: &quot;Run&quot;,
+=======
+>>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
     &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
     &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
     &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
@@ -131,9 +154,15 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+<<<<<<< HEAD
     &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+=======
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+>>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
     &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -143,10 +172,14 @@
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_Group_AJ\release" />
     </key>
   </component>
+<<<<<<< HEAD
   <component name="RunManager" selected="Application.Main">
+=======
+  <component name="RunManager">
+>>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.Main" />
-      <module name="adss-aj-project" />
+      <module name="ADSS_AJ" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.superli.deliveries.*" />
@@ -211,20 +244,15 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
+<<<<<<< HEAD
         <item itemvalue="JUnit.test in adss-aj-project" />
+=======
+>>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
         <item itemvalue="JUnit.DriverTest" />
         <item itemvalue="JUnit.TruckTest" />
         <item itemvalue="Application.MainApp" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -255,6 +283,71 @@
       <workItem from="1749277292237" duration="711000" />
       <workItem from="1749299819645" duration="266000" />
     </task>
+    <task id="LOCAL-00001" summary="fix imports to all classes">
+      <option name="closed" value="true" />
+      <created>1749030606263</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1749030606263</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added licenseTypes">
+      <option name="closed" value="true" />
+      <created>1749030770438</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749030770438</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added presentation layer, fixed HR classes, and a few feliveries classes as well">
+      <option name="closed" value="true" />
+      <created>1749039153336</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1749039153337</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added presentation layer, fixed HR classes, and a few feliveries classes as well">
+      <option name="closed" value="true" />
+      <created>1749039392131</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749039392131</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)">
+      <option name="closed" value="true" />
+      <created>1749229233865</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1749229233865</updated>
+    </task>
+    <task id="LOCAL-00006" summary="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)">
+      <option name="closed" value="true" />
+      <created>1749229261228</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1749229261228</updated>
+    </task>
+    <task id="LOCAL-00007" summary="fixed tests&#10;left: extends for driver">
+      <option name="closed" value="true" />
+      <created>1749230545973</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1749230545973</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fixing some bugs">
+      <option name="closed" value="true" />
+      <created>1749245518279</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1749245518279</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,5 +363,14 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix imports to all classes" />
+    <MESSAGE value="added licenseTypes" />
+    <MESSAGE value="added presentation layer, fixed HR classes, and a few feliveries classes as well" />
+    <MESSAGE value="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)" />
+    <MESSAGE value="fixed tests&#10;left: extends for driver" />
+    <MESSAGE value="fixing some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing some bugs" />
   </component>
 </project>

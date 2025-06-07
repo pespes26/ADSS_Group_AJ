@@ -15,7 +15,7 @@ public class ArchivedShifts {
 
     /**
      * Adds a completed shift to the archive.
-     * @param shift - the shift to add to the archive.
+     * @param shifts - the shift to add to the archive.
      */
     public void archiveShift(List<Shift> shifts) {
         pastShifts.addAll(shifts);

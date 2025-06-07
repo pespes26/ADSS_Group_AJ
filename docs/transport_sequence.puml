@@ -1,0 +1,90 @@
+@startuml Transport Creation Sequence
+
+skinparam sequence {
+    ArrowColor Black
+    ActorBorderColor Black
+    LifeLineBorderColor Black
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor White
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontStyle Bold
+    ActorBackgroundColor White
+    ActorFontName Impact
+    ActorFontSize 17
+    ActorFontStyle Bold
+}
+
+title Transport Creation Sequence
+
+participant "TransportService" as TS
+participant "TransportRequest" as TR
+participant "TruckService" as TKS
+participant "DriverService" as DS
+participant "ShipmentAreaService" as SAS
+participant "TransportRepository" as TRP
+participant "ReportService" as RS
+participant "ReportRepository" as RRP
+
+== Resource Availability Check ==
+TS -> TKS: isTruckAvailable()
+activate TKS
+TKS --> TS: truckAvailable
+deactivate TKS
+
+TS -> DS: isDriverAvailable()
+activate DS
+DS --> TS: driverAvailable
+deactivate DS
+
+TS -> DS: hasValidLicense()
+activate DS
+DS --> TS: licenseValid
+deactivate DS
+
+TS -> SAS: areSitesInSameArea()
+activate SAS
+SAS --> TS: sitesInSameArea
+deactivate SAS
+
+== Weight Verification ==
+TS -> TR: getEstimatedWeight()
+activate TR
+TR --> TS: estimatedWeight
+deactivate TR
+
+TS -> TKS: getMaxWeight()
+activate TKS
+TKS --> TS: maxWeight
+deactivate TKS
+
+alt overweight
+    TS -> TS: applyCorrectionOption()
+    note right: Handle overweight situation
+end
+
+== Transport Creation ==
+TS -> TR: generateTransport()
+activate TR
+TR --> TS: transport
+deactivate TR
+
+TS -> TRP: save(transport)
+activate TRP
+TRP --> TS: savedTransport
+deactivate TRP
+
+== Report Generation ==
+TS -> RS: generateReport()
+activate RS
+RS --> TS: report
+deactivate RS
+
+TS -> RRP: save(report)
+activate RRP
+RRP --> TS: savedReport
+deactivate RRP
+
+TS --> TS: return success
+
+@enduml 

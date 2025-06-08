@@ -9,21 +9,23 @@ public class TruckMapper {
         if (dto == null || licenseType == null) return null;
 
         return new Truck(
-                dto.getLicensePlate(), // plateNum
+                dto.getlicensePlate(),
                 dto.getModel(),
                 0f, // netWeight (TODO)
                 0f, // maxWeight (TODO)
-                licenseType
+                dto.getRequiredLicenseType()
         );
     }
 
-    public static TruckDTO toDTO(Truck truck, int id) {
+    public static TruckDTO toDTO(Truck truck) {
         if (truck == null) return null;
 
         return new TruckDTO(
-                id,
+                truck.getPlateNum(),
                 truck.getModel(),
-                truck.getPlateNum()
+                truck.getNetWeight(),
+                truck.getMaxWeight(),
+                truck.getRequiredLicenseType()
         );
     }
 }

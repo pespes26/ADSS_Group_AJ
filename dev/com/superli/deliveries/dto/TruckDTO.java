@@ -1,24 +1,40 @@
 package com.superli.deliveries.dto;
 
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Truck;
+
 public class TruckDTO {
-    private int id;
-    private String model;
     private String licensePlate;
+    private String model;
+    private LicenseType requiredLicenseType;
+    private float netWeight;
+    private float maxWeight;
 
     public TruckDTO() {}
 
-    public TruckDTO(int id, String model, String licensePlate) {
-        this.id = id;
-        this.model = model;
+    public TruckDTO(String licensePlate, String model, float netWeight, float maxWeight, LicenseType requiredLicenseType) {
         this.licensePlate = licensePlate;
+        this.model = model;
+        this.requiredLicenseType = requiredLicenseType;
+        this.netWeight = netWeight;
+        this.maxWeight = maxWeight;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
+    public String getlicensePlate() { return licensePlate; }
     public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
+    public LicenseType getRequiredLicenseType() { return requiredLicenseType; }
+    public float getNetWeight() { return netWeight; }
+    public float getMaxWeight() { return maxWeight; }
 
-    public String getLicensePlate() { return licensePlate; }
-    public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
+    public static TruckDTO toDTO(Truck truck) {
+        if (truck == null) return null;
+
+        return new TruckDTO(
+                truck.getPlateNum(),
+                truck.getModel(),
+                truck.getNetWeight(),
+                truck.getMaxWeight(),
+                truck.getRequiredLicenseType()
+        );
+    }
 }

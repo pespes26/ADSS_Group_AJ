@@ -44,4 +44,13 @@ public interface ITruckRepository {
      * Clears all truck data. Mainly for testing purposes.
      */
     void clearAll();
+
+    /**
+     * Deletes a truck by its unique license plate number.
+     *
+     * @param plateNum The license plate number of the truck to check if exists.
+     * @return true if truck exists, otherwise false.
+     */
+    boolean existsByPlate(String plateNum);
+
 }

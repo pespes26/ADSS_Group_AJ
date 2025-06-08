@@ -6,13 +6,13 @@ import com.superli.deliveries.dto.DestinationDocDTO;
 
 public class DestinationDocMapper {
 
-    public static DestinationDoc fromDTO(DestinationDocDTO dto, Site site) {
-        if (dto == null || site == null) return null;
+    public static DestinationDoc fromDTO(DestinationDocDTO dto, Site destinationSite) {
+        if (dto == null || destinationSite == null) return null;
 
         return new DestinationDoc(
-                dto.getId(),
+                dto.getDestinationDocId(),
                 dto.getTransportId(),
-                site,
+                destinationSite,
                 dto.getStatus()
         );
     }

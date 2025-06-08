@@ -9,7 +9,7 @@ public class SiteMapper {
         if (dto == null || zone == null) return null;
 
         return new Site(
-                String.valueOf(dto.getId()),
+                String.valueOf(dto.getSiteId()),
                 dto.getAddress(),
                 null,
                 dto.getContact(),                    // contact → contactName
@@ -23,7 +23,8 @@ public class SiteMapper {
         return new SiteDTO(
                 Integer.parseInt(site.getSiteId()),
                 site.getAddress(),
-                site.getContactPersonName()
+                site.getContactPersonName(),
+                site.getZone().getZoneId()
         );
     }
 }

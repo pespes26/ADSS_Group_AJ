@@ -30,12 +30,12 @@ public class ShiftMapper {
 
         Map<Integer, Integer> assignedMap = new HashMap<>();
         for (Map.Entry<Employee, Role> entry : shift.getShiftEmployees().entrySet()) {
-            assignedMap.put(Integer.parseInt(entry.getKey().getId()), 0); // roleId placeholder
+            assignedMap.put(Integer.parseInt(entry.getKey().getId()), Integer.valueOf(entry.getValue().getRoleName()));
         }
 
         List<Integer> requiredIds = new ArrayList<>();
         for (Role role : shift.getShiftRequiredRoles()) {
-            requiredIds.add(0); // placeholder, אין ID במחלקת Role
+            requiredIds.add(Integer.valueOf(role.getRoleName())); // placeholder, אין ID במחלקת Role
         }
 
         return new ShiftDTO(

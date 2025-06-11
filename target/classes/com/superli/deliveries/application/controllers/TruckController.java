@@ -1,12 +1,15 @@
-package com.superli.deliveries.controllers;
+package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.LicenseType;
-import com.superli.deliveries.domain.Truck;
-import com.superli.deliveries.service.TruckService;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.application.services.TruckService;
+import com.superli.deliveries.Mappers.TruckMapper;
+import com.superli.deliveries.dto.TruckDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Controller for managing truck-related actions in a console-based UI.
@@ -61,11 +64,12 @@ public class TruckController {
 
             for (int i = 0; i < trucks.size(); i++) {
                 Truck truck = trucks.get(i);
-                System.out.println("\n[" + (i+1) + "] TRUCK: " + truck.getModel() + " (Plate: " + truck.getPlateNum() + ")");
-                System.out.println("    Required License: " + truck.getRequiredLicenseType());
-                System.out.println("    Weight Capacity: " + truck.getNetWeight() + " kg (net) / "
-                        + truck.getMaxWeight() + " kg (max)");
-                System.out.println("    Status: " + (truckService.isTruckAvailable(truck.getPlateNum()) ? "Available" : "Not Available"));
+                TruckDTO truckDTO = TruckMapper.toDTO(truck);
+                System.out.println("\n[" + (i+1) + "] TRUCK: " + truckDTO.getModel() + " (Plate: " + truckDTO.getlicensePlate() + ")");
+                System.out.println("    Required License: " + truckDTO.getRequiredLicenseType());
+                System.out.println("    Weight Capacity: " + truckDTO.getNetWeight() + " kg (net) / "
+                        + truckDTO.getMaxWeight() + " kg (max)");
+                System.out.println("    Status: " + (truckService.isTruckAvailable(truckDTO.getlicensePlate()) ? "Available" : "Not Available"));
                 System.out.println("    " + "-".repeat(40));
             }
         }
@@ -82,10 +86,11 @@ public class TruckController {
 
             for (int i = 0; i < available.size(); i++) {
                 Truck truck = available.get(i);
-                System.out.println("\n[" + (i+1) + "] TRUCK: " + truck.getModel() + " (Plate: " + truck.getPlateNum() + ")");
-                System.out.println("    Required License: " + truck.getRequiredLicenseType());
-                System.out.println("    Weight Capacity: " + truck.getNetWeight() + " kg (net) / "
-                        + truck.getMaxWeight() + " kg (max)");
+                TruckDTO truckDTO = TruckMapper.toDTO(truck);
+                System.out.println("\n[" + (i+1) + "] TRUCK: " + truckDTO.getModel() + " (Plate: " + truckDTO.getlicensePlate() + ")");
+                System.out.println("    Required License: " + truckDTO.getRequiredLicenseType());
+                System.out.println("    Weight Capacity: " + truckDTO.getNetWeight() + " kg (net) / "
+                        + truckDTO.getMaxWeight() + " kg (max)");
                 System.out.println("    " + "-".repeat(40));
             }
         }
@@ -133,7 +138,8 @@ public class TruckController {
                 }
             }
 
-            Truck truck = new Truck(plateNum, model, netWeight, maxWeight, selectedLicenseType);
+            TruckDTO truckDTO = new TruckDTO(plateNum, model, netWeight, maxWeight, selectedLicenseType);
+            Truck truck = TruckMapper.fromDTO(truckDTO);
             truckService.saveTruck(truck);
             System.out.println("Truck added successfully.");
         } catch (Exception e) {

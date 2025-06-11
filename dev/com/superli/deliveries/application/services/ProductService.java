@@ -1,50 +1,96 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.Mappers.ProductMapper;
-import com.superli.deliveries.domain.ports.IProductRepository;
+import com.superli.deliveries.dataaccess.dao.ProductDAO;
+import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.dto.ProductDTO;
-import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.Mappers.ProductMapper;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Service for managing products in the context of deliveries.
- * Provides access to product information using DTOs and Mappers.
+ * Provides access to product information.
  */
 public class ProductService {
 
-    private final IProductRepository productRepository;
+    private final ProductDAO productDAO;
 
-    public ProductService(IProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductService(ProductDAO productDAO) {
+        this.productDAO = productDAO;
     }
 
-    public List<ProductDTO> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Product> getAllProducts() {
+        try {
+            return productDAO.findAll().stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all products", e);
+        }
     }
 
-    public Optional<ProductDTO> getProductById(String productId) {
-        return productRepository.findById(productId)
-                .map(ProductMapper::toDTO);
+    public Optional<Product> getProductById(String id) {
+        try {
+            return productDAO.findById(id)
+                    .map(ProductMapper::fromDTO);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting product by id: " + id, e);
+        }
     }
 
-    public void saveProduct(ProductDTO productDTO) {
-        Product product = ProductMapper.fromDTO(productDTO);
-        productRepository.save(product);
+    public void saveProduct(Product product) {
+        try {
+            productDAO.save(ProductMapper.toDTO(product));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving product", e);
+        }
     }
 
-    public void deleteProduct(String productId) {
-        productRepository.deleteById(productId);
+    public void deleteProduct(String id) {
+        try {
+            productDAO.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting product: " + id, e);
+        }
     }
 
-    public List<ProductDTO> getAllProductsFilteredByName(String partialName) {
-        return productRepository.findAll().stream()
+    public List<Product> getProductsByCategory(String category) {
+        try {
+            return productDAO.findByCategory(category).stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting products by category: " + category, e);
+        }
+    }
+
+    public List<Product> getProductsByWeightRange(float minWeight, float maxWeight) {
+        try {
+            return productDAO.findByWeightRange(minWeight, maxWeight).stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting products by weight range", e);
+        }
+    }
+
+    public List<Product> getAvailableProducts() {
+        try {
+            return productDAO.findAvailableProducts().stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting available products", e);
+        }
+    }
+
+    public List<Product> getAllProductsFilteredByName(String partialName) {
+        return getAllProducts().stream()
                 .filter(product -> product.getName().toLowerCase().contains(partialName.toLowerCase()))
-                .map(ProductMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

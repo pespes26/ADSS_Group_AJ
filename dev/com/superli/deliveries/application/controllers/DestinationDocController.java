@@ -8,10 +8,17 @@ import com.superli.deliveries.application.services.DeliveredItemService;
 import com.superli.deliveries.application.services.DestinationDocService;
 import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.TransportService;
+import com.superli.deliveries.Mappers.DestinationDocMapper;
+import com.superli.deliveries.Mappers.SiteMapper;
+import com.superli.deliveries.Mappers.TransportMapper;
+import com.superli.deliveries.dto.DestinationDocDTO;
+import com.superli.deliveries.dto.SiteDTO;
+import com.superli.deliveries.dto.TransportDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Controller for managing DestinationDoc (delivery documents) via console UI.
@@ -46,10 +53,10 @@ public class DestinationDocController {
      * Initialize the next document ID counter based on existing documents
      */
     private void initializeNextDocId() {
-        List<DestinationDoc> existingDocs = destinationDocService.getAllDestinationDocs();
+        List<DestinationDoc> existingDocs = destinationDocService.getAllDocs();
         if (!existingDocs.isEmpty()) {
             nextDocId = existingDocs.stream()
-                    .mapToInt(DestinationDoc::getDestinationDocId)
+                    .mapToInt(doc -> Integer.parseInt(doc.getDestinationDocId()))
                     .max()
                     .orElse(0) + 1;
         }
@@ -58,8 +65,8 @@ public class DestinationDocController {
     /**
      * Generate a new unique document ID
      */
-    private int generateNextDocId() {
-        return nextDocId++;
+    private String generateNextDocId() {
+        return String.valueOf(nextDocId++);
     }
 
     public void runMenu() {
@@ -92,7 +99,7 @@ public class DestinationDocController {
     }
 
     private void showAllDestinationDocs() {
-        List<DestinationDoc> docs = destinationDocService.getAllDestinationDocs();
+        List<DestinationDoc> docs = destinationDocService.getAllDocs();
         if (docs.isEmpty()) {
             System.out.println("No destination documents found.");
         } else {
@@ -102,11 +109,11 @@ public class DestinationDocController {
 
             for (int i = 0; i < docs.size(); i++) {
                 DestinationDoc doc = docs.get(i);
-                System.out.println("\n[" + (i+1) + "] DOCUMENT #" + doc.getDestinationDocId());
-                System.out.println("    Transport ID: " + doc.getTransportId());
-                System.out.println("    Destination: " + doc.getDestinationId().getAddress());
-                System.out.println("    Status: " + doc.getStatus());
-                System.out.println("    Items: " + doc.getDeliveryItems().size());
+                DestinationDocDTO docDTO = DestinationDocMapper.toDTO(doc);
+                System.out.println("\n[" + (i+1) + "] DOCUMENT #" + docDTO.getDestinationDocId());
+                System.out.println("    Transport ID: " + docDTO.getTransportId());
+                System.out.println("    Site ID: " + docDTO.getSiteId());
+                System.out.println("    Status: " + docDTO.getStatus());
                 System.out.println("    " + "-".repeat(40));
             }
         }
@@ -114,15 +121,17 @@ public class DestinationDocController {
 
     private void showDestinationDocById() {
         System.out.print("Enter document ID: ");
-        try {
-            int docId = Integer.parseInt(scanner.nextLine().trim());
-            Optional<DestinationDoc> doc = destinationDocService.getById(docId);
-            doc.ifPresentOrElse(
-                    System.out::println,
-                    () -> System.out.println("Document not found.")
-            );
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID. Please enter a number.");
+        String docId = scanner.nextLine().trim();
+        Optional<DestinationDoc> docOpt = destinationDocService.getDocById(docId);
+        if (docOpt.isPresent()) {
+            DestinationDoc doc = docOpt.get();
+            DestinationDocDTO docDTO = DestinationDocMapper.toDTO(doc);
+            System.out.println("Document ID: " + docDTO.getDestinationDocId());
+            System.out.println("Transport ID: " + docDTO.getTransportId());
+            System.out.println("Site ID: " + docDTO.getSiteId());
+            System.out.println("Status: " + docDTO.getStatus());
+        } else {
+            System.out.println("Document not found.");
         }
     }
 
@@ -136,31 +145,32 @@ public class DestinationDocController {
 
         // Step 1: Select a transport
         System.out.print("Enter Transport ID: ");
+        String transportId = scanner.nextLine().trim();
+        Optional<Transport> transportOpt = transportService.getTransportById(transportId);
+
+        if (transportOpt.isEmpty()) {
+            System.out.println("Transport not found. Please create a transport first.");
+            return;
+        }
+
+        Transport transport = transportOpt.get();
+
+        // Step 2: Select a destination site
+        List<Site> sites = siteService.getAllSites();
+        if (sites.isEmpty()) {
+            System.out.println("No sites available. Please add sites first.");
+            return;
+        }
+
+        System.out.println("\nAvailable destination sites:");
+        for (int i = 0; i < sites.size(); i++) {
+            Site site = sites.get(i);
+            SiteDTO siteDTO = SiteMapper.toDTO(site);
+            System.out.println((i+1) + ". " + siteDTO.getSiteId() + " - " + siteDTO.getAddress());
+        }
+
+        System.out.print("Select destination site (number): ");
         try {
-            int transportId = Integer.parseInt(scanner.nextLine().trim());
-            Optional<Transport> transportOpt = transportService.getTransportById(transportId);
-
-            if (transportOpt.isEmpty()) {
-                System.out.println("Transport not found. Please create a transport first.");
-                return;
-            }
-
-            Transport transport = transportOpt.get();
-
-            // Step 2: Select a destination site
-            List<Site> sites = siteService.getAllSites();
-            if (sites.isEmpty()) {
-                System.out.println("No sites available. Please add sites first.");
-                return;
-            }
-
-            System.out.println("\nAvailable destination sites:");
-            for (int i = 0; i < sites.size(); i++) {
-                Site site = sites.get(i);
-                System.out.println((i+1) + ". " + site.getSiteId() + " - " + site.getAddress());
-            }
-
-            System.out.print("Select destination site (number): ");
             int siteChoice = Integer.parseInt(scanner.nextLine().trim());
 
             if (siteChoice < 1 || siteChoice > sites.size()) {
@@ -171,9 +181,10 @@ public class DestinationDocController {
             Site selectedSite = sites.get(siteChoice - 1);
 
             // Step 3: Create the document
-            int docId = generateNextDocId();
-            DestinationDoc newDoc = new DestinationDoc(docId, transportId, selectedSite, "PLANNED");
-            destinationDocService.saveDestinationDoc(newDoc);
+            String docId = generateNextDocId();
+            DestinationDocDTO docDTO = new DestinationDocDTO(docId, transportId, selectedSite.getSiteId(), "PLANNED");
+            DestinationDoc newDoc = DestinationDocMapper.fromDTO(docDTO, selectedSite);
+            destinationDocService.saveDoc(newDoc);
 
             // Step 4: Add to transport
             if (transportService.addDestinationDocToTransport(transportId, newDoc)) {
@@ -198,70 +209,66 @@ public class DestinationDocController {
 
         // Step 1: Select a document
         System.out.print("Enter destination document ID: ");
-        try {
-            int docId = Integer.parseInt(scanner.nextLine().trim());
-            Optional<DestinationDoc> docOpt = destinationDocService.getById(docId);
+        String docId = scanner.nextLine().trim();
+        Optional<DestinationDoc> docOpt = destinationDocService.getDocById(docId);
 
-            if (docOpt.isEmpty()) {
-                System.out.println("Document not found.");
-                return;
+        if (docOpt.isEmpty()) {
+            System.out.println("Document not found.");
+            return;
+        }
+
+        DestinationDoc doc = docOpt.get();
+        DestinationDocDTO docDTO = DestinationDocMapper.toDTO(doc);
+
+        // Show current items
+        List<DeliveredItem> currentItems = doc.getDeliveryItems();
+        if (!currentItems.isEmpty()) {
+            System.out.println("\nCurrent items in document:");
+            for (int i = 0; i < currentItems.size(); i++) {
+                DeliveredItem item = currentItems.get(i);
+                System.out.println((i+1) + ". Product: " + item.getProductId() + ", Quantity: " + item.getQuantity());
+            }
+        }
+
+        // Add new items
+        boolean addMore = true;
+        while (addMore) {
+            // Get product ID
+            System.out.print("\nEnter product ID: ");
+            String productId = scanner.nextLine().trim();
+
+            // Check if product ID already exists in document
+            boolean alreadyExists = currentItems.stream()
+                    .anyMatch(item -> item.getProductId().equals(productId));
+
+            if (alreadyExists) {
+                System.out.println("This product already exists in the document. Use update functionality instead.");
+                continue;
             }
 
-            DestinationDoc doc = docOpt.get();
+            // Get quantity
+            System.out.print("Enter quantity: ");
+            try {
+                int quantity = Integer.parseInt(scanner.nextLine().trim());
 
-            // Show current items
-            List<DeliveredItem> currentItems = doc.getDeliveryItems();
-            if (!currentItems.isEmpty()) {
-                System.out.println("\nCurrent items in document:");
-                for (int i = 0; i < currentItems.size(); i++) {
-                    DeliveredItem item = currentItems.get(i);
-                    System.out.println((i+1) + ". Product: " + item.getProductId() + ", Quantity: " + item.getQuantity());
+                // Create and add the item
+                DeliveredItem newItem = new DeliveredItem(productId, quantity);
+                boolean added = deliveredItemService.addDeliveredItem(docId, newItem);
+
+                if (added) {
+                    System.out.println("Item added successfully.");
+                } else {
+                    System.out.println("Failed to add item.");
                 }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid quantity. Please enter a number.");
             }
 
-            // Add new items
-            boolean addMore = true;
-            while (addMore) {
-                // Get product ID
-                System.out.print("\nEnter product ID: ");
-                String productId = scanner.nextLine().trim();
-
-                // Check if product ID already exists in document
-                boolean alreadyExists = currentItems.stream()
-                        .anyMatch(item -> item.getProductId().equals(productId));
-
-                if (alreadyExists) {
-                    System.out.println("This product already exists in the document. Use update functionality instead.");
-                    continue;
-                }
-
-                // Get quantity
-                System.out.print("Enter quantity: ");
-                try {
-                    int quantity = Integer.parseInt(scanner.nextLine().trim());
-
-                    // Create and add the item
-                    DeliveredItem newItem = new DeliveredItem(productId, quantity);
-                    boolean added = deliveredItemService.addDeliveredItem(docId, newItem);
-
-                    if (added) {
-                        System.out.println("Item added successfully.");
-                    } else {
-                        System.out.println("Failed to add item.");
-                    }
-
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid quantity. Please enter a number.");
-                }
-
-                // Ask if user wants to add more items
-                System.out.print("\nAdd another item? (y/n): ");
-                String choice = scanner.nextLine().trim().toLowerCase();
-                addMore = choice.equals("y") || choice.equals("yes");
-            }
-
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid document ID. Please enter a number.");
+            // Ask if user wants to add more items
+            System.out.print("\nAdd another item? (y/n): ");
+            String choice = scanner.nextLine().trim().toLowerCase();
+            addMore = choice.equals("y") || choice.equals("yes");
         }
     }
 
@@ -274,25 +281,26 @@ public class DestinationDocController {
         System.out.println("╚════════════════════════════════════╝");
 
         System.out.print("Enter document ID: ");
+        String docId = scanner.nextLine().trim();
+        Optional<DestinationDoc> docOpt = destinationDocService.getDocById(docId);
+
+        if (docOpt.isEmpty()) {
+            System.out.println("Document not found.");
+            return;
+        }
+
+        DestinationDoc doc = docOpt.get();
+        DestinationDocDTO docDTO = DestinationDocMapper.toDTO(doc);
+        System.out.println("Current status: " + docDTO.getStatus());
+
+        System.out.println("\nAvailable statuses:");
+        System.out.println("1. PLANNED");
+        System.out.println("2. IN_PROGRESS");
+        System.out.println("3. COMPLETED");
+        System.out.println("4. CANCELLED");
+
+        System.out.print("Select new status (number): ");
         try {
-            int docId = Integer.parseInt(scanner.nextLine().trim());
-            Optional<DestinationDoc> docOpt = destinationDocService.getById(docId);
-
-            if (docOpt.isEmpty()) {
-                System.out.println("Document not found.");
-                return;
-            }
-
-            DestinationDoc doc = docOpt.get();
-            System.out.println("Current status: " + doc.getStatus());
-
-            System.out.println("\nAvailable statuses:");
-            System.out.println("1. PLANNED");
-            System.out.println("2. IN_PROGRESS");
-            System.out.println("3. COMPLETED");
-            System.out.println("4. CANCELLED");
-
-            System.out.print("Select new status (number): ");
             int statusChoice = Integer.parseInt(scanner.nextLine().trim());
 
             String newStatus;
@@ -321,16 +329,8 @@ public class DestinationDocController {
 
     private void deleteDestinationDoc() {
         System.out.print("Enter document ID to delete: ");
-        try {
-            int docId = Integer.parseInt(scanner.nextLine().trim());
-            boolean deleted = destinationDocService.deleteDestinationDoc(docId);
-            if (deleted) {
-                System.out.println("Document deleted successfully.");
-            } else {
-                System.out.println("Document not found.");
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID. Please enter a number.");
-        }
+        String docId = scanner.nextLine().trim();
+        destinationDocService.deleteDoc(docId);
+        System.out.println("Document deleted successfully.");
     }
 }

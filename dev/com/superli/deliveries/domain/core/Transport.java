@@ -13,7 +13,7 @@ import com.superli.deliveries.domain.core.DestinationDoc;
  */
 public class Transport {
 
-    private final int transportId;
+    private final String transportId;
     private LocalDateTime departureDateTime;
     private final Truck truck;
     private final Driver driver;
@@ -26,31 +26,41 @@ public class Transport {
      * Constructs a new Transport.
      *
      * @param transportId Unique identifier of the transport.
-     * @param departureDateTime Planned departure date and time.
      * @param truck Assigned truck.
      * @param driver Assigned driver.
      * @param originSite Origin site of the transport.
-     * @param status Initial status of the transport.
+     * @param departureDateTime Planned departure date and time.
      */
-    public Transport(int transportId, LocalDateTime departureDateTime, Truck truck,
-                     Driver driver, Site originSite, TransportStatus status) {
-        if (truck == null || driver == null || originSite == null || status == null) {
-            throw new IllegalArgumentException("Truck, driver, origin site, and status cannot be null.");
+    public Transport(String transportId, Truck truck, Driver driver, Site originSite, LocalDateTime departureDateTime) {
+        if (truck == null || driver == null || originSite == null || departureDateTime == null) {
+            throw new IllegalArgumentException("Truck, driver, origin site, and departure date time cannot be null.");
         }
 
         this.transportId = transportId;
-        this.departureDateTime = departureDateTime;
         this.truck = truck;
         this.driver = driver;
         this.originSite = originSite;
-        this.status = status;
+        this.departureDateTime = departureDateTime;
+        this.status = TransportStatus.PLANNED;
         this.destinationList = new ArrayList<>();
         this.departureWeight = 0f;
     }
 
+    /**
+     * Constructs a new Transport with default departure time (tomorrow).
+     *
+     * @param transportId Unique identifier of the transport.
+     * @param truck Assigned truck.
+     * @param driver Assigned driver.
+     * @param originSite Origin site of the transport.
+     */
+    public Transport(String transportId, Truck truck, Driver driver, Site originSite) {
+        this(transportId, truck, driver, originSite, LocalDateTime.now().plusDays(1));
+    }
+
     // --- Getters ---
 
-    public int getTransportId() {
+    public String getTransportId() {
         return transportId;
     }
 
@@ -70,7 +80,7 @@ public class Transport {
         return originSite;
     }
 
-    public List<DestinationDoc> getDestinationList() {
+    public List<DestinationDoc> getDestinationDocs() {
         return List.copyOf(destinationList);
     }
 
@@ -85,6 +95,9 @@ public class Transport {
     // --- Setters ---
 
     public void setDepartureDateTime(LocalDateTime departureDateTime) {
+        if (departureDateTime == null) {
+            throw new IllegalArgumentException("Departure date time cannot be null.");
+        }
         this.departureDateTime = departureDateTime;
     }
 
@@ -102,24 +115,19 @@ public class Transport {
         this.status = status;
     }
 
-    public void setActualDepartureWeight(float actualDepartureWeight) {
-        if (actualDepartureWeight < 0) {
-            throw new IllegalArgumentException("Actual departure weight cannot be negative.");
-        }
-        this.departureWeight = actualDepartureWeight;
-    }
-
     // --- Composition ---
 
-    public void addDestination(DestinationDoc destination) {
+    public void addDestinationDoc(DestinationDoc destination) {
         if (destination == null) {
             throw new IllegalArgumentException("Destination cannot be null.");
         }
         destinationList.add(destination);
     }
 
-    public boolean removeDestination(DestinationDoc destination) {
-        return destination != null && destinationList.remove(destination);
+    public void removeDestinationDoc(DestinationDoc destination) {
+        if (destination != null) {
+            destinationList.remove(destination);
+        }
     }
 
     // --- Standard Methods ---
@@ -166,7 +174,7 @@ public class Transport {
         if (this == o) return true;
         if (!(o instanceof Transport)) return false;
         Transport that = (Transport) o;
-        return transportId == that.transportId;
+        return transportId.equals(that.transportId);
     }
 
     @Override

@@ -1,14 +1,10 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 import java.time.DayOfWeek;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represents an employee in the system, which can be either a regular employee or a driver.
- * This class unifies the functionality of both Employee and Driver classes.
- */
 public class Employee {
     private String id;
     private String fullName;
@@ -17,42 +13,14 @@ public class Employee {
     private List<Role> roleQualifications;
     private String employeeTerms;
     private Date employeeStartDate;
+
     private List<AvailableShifts> availabilityConstraints;
-    private EmployeeType type;
-    private LicenseType licenseType;  // Only for DRIVER type
-    private boolean available;
+    //private boolean activeWorker;
+    //private Role loginRole;
 
-    /**
-     * Constructs a new Employee object.
-     *
-     * @param id Unique employee ID
-     * @param fullName Employee's full name
-     * @param bankAccount Employee's bank account
-     * @param salary Employee's salary
-     * @param employeeTerms Employment terms
-     * @param employeeStartDate Start date of employment
-     * @param roleQualifications List of roles the employee is qualified for
-     * @param availabilityConstraints List of available shifts
-     * @param type Type of employee (DRIVER or STAFF)
-     * @param licenseType License type (only for DRIVER type)
-     */
     public Employee(String id, String fullName, String bankAccount, double salary,
-                   String employeeTerms, Date employeeStartDate,
-                   List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints,
-                   EmployeeType type, LicenseType licenseType) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("Employee ID cannot be null or empty");
-        }
-        if (fullName == null || fullName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Employee name cannot be null or empty");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Employee type cannot be null");
-        }
-        if (type == EmployeeType.DRIVER && licenseType == null) {
-            throw new IllegalArgumentException("License type is required for drivers");
-        }
-
+                    String employeeTerms, Date employeeStartDate,
+                    List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole) {
         this.id = id;
         this.fullName = fullName;
         this.bankAccount = bankAccount;
@@ -61,29 +29,51 @@ public class Employee {
         this.employeeStartDate = employeeStartDate;
         this.roleQualifications = roleQualifications;
         this.availabilityConstraints = availabilityConstraints;
-        this.type = type;
-        this.licenseType = licenseType;
-        this.available = true;
+        //this.activeWorker = activeWorker;
+        //this.loginRole = loginRole;
     }
 
-    // Getters
-    public String getId() { return id; }
-    public String getFullName() { return fullName; }
-    public String getBankAccount() { return bankAccount; }
-    public double getSalary() { return salary; }
-    public String getEmployeeTerms() { return employeeTerms; }
-    public Date getEmployeeStartDate() { return employeeStartDate; }
-    public List<Role> getRoleQualifications() { return roleQualifications; }
-    public List<AvailableShifts> getAvailabilityConstraints() { return availabilityConstraints; }
-    public EmployeeType getType() { return type; }
-    public LicenseType getLicenseType() { return licenseType; }
-    public boolean isAvailable() { return available; }
+    //Getter method - return employee's ID
+    public String getId() {
+        return id;
+    }
 
-    // Setters
+    //Getter method - return employee's full name
+    public String getFullName() {
+        return fullName;
+    }
+
+    //Getter method - return employee's bank account
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    //Getter method - return employee's salary
+    public double getSalary() {
+        return salary;
+    }
+
+    //Getter method - return employee's terms
+    public String getEmployeeTerms() {
+        return employeeTerms;
+    }
+
+    //Getter method - return employee's Date of start day of working
+    public Date getEmployeeStartDate() {
+        return employeeStartDate;
+    }
+
+    //Getter method - return employee's list of his role qualifications
+    public List<Role> getRoleQualifications() {
+        return roleQualifications;
+    }
+
+    //Getter method - return employee's list of his availability constraints
+    public List<AvailableShifts> getAvailabilityConstraints() {
+        return availabilityConstraints;
+    }
+
     public void setFullName(String fullName) {
-        if (fullName == null || fullName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Employee name cannot be null or empty");
-        }
         this.fullName = fullName;
     }
 
@@ -98,23 +88,13 @@ public class Employee {
     public void setRoleQualifications(List<Role> roleQualifications) {
         this.roleQualifications = roleQualifications;
     }
-
-    public void setLicenseType(LicenseType licenseType) {
-        if (type != EmployeeType.DRIVER) {
-            throw new IllegalStateException("Only drivers can have license types");
-        }
-        if (licenseType == null) {
-            throw new IllegalArgumentException("License type cannot be null");
-        }
-        this.licenseType = licenseType;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
-
+    // ---------------------------------- Checking methods ------------------------------------
     /**
      * Checks if the employee is available to work on a given day and shift type.
+     * @param day - day of the week to check if the employee is available.
+     * @param shiftType - the type of the shift to check if the employee is available.
+     * @return boolean value true - is the employee is available for this day and shift.
+     *         boolean value false - otherwise.
      */
     public boolean isAvailable(DayOfWeek day, ShiftType shiftType) {
         for (AvailableShifts option : availabilityConstraints) {
@@ -127,52 +107,91 @@ public class Employee {
 
     /**
      * Checks if the employee is qualified for a given role.
+     *
+     * @param role - the role to check if the employee is qualified for.
+     * @return the boolean value true - if the employee is qualified for the role.
+     *         the boolean value false - otherwise.
      */
     public boolean isQualified(Role role) {
         return roleQualifications.contains(role);
     }
+    // ---------------------------------- End Checking methods ------------------------------------
+
+
+    // ---------------------------------- Add methods ------------------------------------
 
     /**
-     * Adds an availability constraint for the employee.
+     * Add a new role to the employee qualification list if the employee is not qualified for the given role.
+     * @param role - the role to add to the employee qualification list
      */
+    public void addRoleQualification(Role role){
+        if (!roleQualifications.contains(role)){
+            roleQualifications.add(role);
+        }
+    }
+
+    /**
+     * Add a new available shift to the employee availabilityConstraints list if the shift is not in the list.
+     * @param shift - the shit to add to the employee availabilityConstraints list
+     */
+    public void addAvailableShift(AvailableShifts shift){
+        if (!availabilityConstraints.contains(shift)){
+            availabilityConstraints.add(shift);
+        }
+    }
+
+
+    // ---------------------------------- End Add methods ------------------------------------
+
+    public void printEmployee() {
+        System.out.println("Employee Info:");
+        System.out.println("Full name:" + fullName);
+        System.out.println("Id:" + id);
+        System.out.println("Bank account:" + bankAccount);
+        System.out.println("Salary:" + salary);
+        System.out.println("Terms:" + employeeTerms);
+        System.out.println("Start date:" + employeeStartDate);
+        System.out.print("Role Qualification :[");
+        for (int i = 0; i < roleQualifications.size(); i++) {
+            if (i < roleQualifications.size() - 1) {
+                System.out.print(roleQualifications.get(i).getRoleName() + ", ");
+            } else {
+                System.out.print(roleQualifications.get(i).getRoleName());
+            }
+        }
+        System.out.println("]");
+        System.out.print("Availability Constraints:[");
+        for (int i = 0; i < availabilityConstraints.size(); i++) {
+            if (i < availabilityConstraints.size() - 1) {
+                System.out.print(availabilityConstraints.get(i).getDay() + "-" + availabilityConstraints.get(i).getShift() + ", ");
+            } else {
+                System.out.print(availabilityConstraints.get(i).getDay() + "-" + availabilityConstraints.get(i).getShift());
+            }
+
+        }
+        System.out.println("]");
+    }
+
     public void addAvailability(AvailableShifts availability) {
         if (!availabilityConstraints.contains(availability)) {
             availabilityConstraints.add(availability);
         }
     }
 
-    /**
-     * Clears all availability constraints for the employee.
-     */
     public void clearAvailability() {
         availabilityConstraints.clear();
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Employee)) return false;
-        Employee employee = (Employee) o;
-        return id.equals(employee.id);
+        Employee e = (Employee) o;
+        return id.equals(e.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return id.hashCode();
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== EMPLOYEE DETAILS ===\n");
-        sb.append("ID: ").append(id).append("\n");
-        sb.append("Name: ").append(fullName).append("\n");
-        sb.append("Type: ").append(type).append("\n");
-        if (type == EmployeeType.DRIVER) {
-            sb.append("License Type: ").append(licenseType).append("\n");
-        }
-        sb.append("Status: ").append(available ? "Available" : "Not Available").append("\n");
-        sb.append("=====================");
-        return sb.toString();
-    }
-} 
+}

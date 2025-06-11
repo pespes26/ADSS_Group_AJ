@@ -1,21 +1,22 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents the type of driver's license.
  */
 public enum LicenseType {
-    /**
-     * License for light vehicles.
-     */
-    LIGHT,
+    B("B"),
+    C("C"),
+    C1("C1"),
+    C2("C2"),
+    E("E");
 
-    /**
-     * License for medium vehicles.
-     */
-    MEDIUM,
+    private final String value;
 
-    /**
-     * License for heavy vehicles.
-     */
-    HEAVY
-} 
+    LicenseType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+}

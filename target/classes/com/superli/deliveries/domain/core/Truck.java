@@ -1,8 +1,8 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 import java.util.Objects;
 
-import domain.core.LicenseType;
+import com.superli.deliveries.domain.core.LicenseType;
 
 /**
  * Represents a truck in the company's fleet.

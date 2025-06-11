@@ -1,4 +1,4 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 import java.util.Objects;
 
 /**
@@ -16,16 +16,13 @@ public class Site {
     /**
      * Constructs a new Site object.
      *
-     * @param siteId            Unique identifier. Cannot be null or empty.
+     * @param siteId            Unique identifier.
      * @param address           Address of the site. Cannot be null or empty.
      * @param phoneNumber       Phone number (optional).
      * @param contactPersonName Contact person's name (optional).
      * @param zone              Zone this site belongs to. Cannot be null.
      */
     public Site(String siteId, String address, String phoneNumber, String contactPersonName, Zone zone) {
-        if (siteId == null || siteId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Site ID cannot be null or empty.");
-        }
         if (address == null || address.trim().isEmpty()) {
             throw new IllegalArgumentException("Address cannot be null or empty.");
         }

@@ -24,8 +24,8 @@ public class Driver extends Employee {
      * Constructs a new Driver object.
      */
     public Driver(String id, String fullName, String bankAccount, double salary, String employeeTerms,
-                  Date employeeStartDate, List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole,LicenseType licenseType) {
-        super(id, fullName, bankAccount, salary, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole); // Call parent constructor
+                  Date employeeStartDate, List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole, LicenseType licenseType) {
+        super(id, fullName, bankAccount, salary, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
         Role r = new Role("Driver");
         this.addRoleQualification(r);
         if (licenseType == null) {
@@ -34,13 +34,12 @@ public class Driver extends Employee {
         this.licenseType = licenseType;
     }
 
-
     /**
      * Gets the driver ID (inherited from Employee as employeeId).
      * @return The driver's unique identifier.
      */
     public String getDriverId() {
-        return getId(); // Use inherited method
+        return getId();
     }
 
     /**
@@ -94,7 +93,7 @@ public class Driver extends Employee {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Driver)) return false;
-        if (!super.equals(o)) return false; // Call parent equals
+        if (!super.equals(o)) return false;
         Driver driver = (Driver) o;
         return getId().equals(driver.getId());
     }

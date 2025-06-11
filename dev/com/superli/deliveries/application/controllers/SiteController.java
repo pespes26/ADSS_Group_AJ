@@ -1,13 +1,15 @@
 package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.Mappers.SiteMapper;
 import com.superli.deliveries.domain.core.Zone;
 import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.ZoneService;
+import com.superli.deliveries.dto.SiteDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class SiteController {
 
@@ -49,27 +51,31 @@ public class SiteController {
     }
 
     private void showAllSites() {
-        List<Site> sites = siteService.getAllSites();
+        List<SiteDTO> sites = siteService.getAllSites().stream()
+                .map(SiteMapper::toDTO)
+                .collect(Collectors.toList());
+                
         if (sites.isEmpty()) {
             System.out.println("No sites found.");
-        } else {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║              ALL SITES             ║");
-            System.out.println("╚════════════════════════════════════╝");
+            return;
+        }
 
-            for (int i = 0; i < sites.size(); i++) {
-                Site site = sites.get(i);
-                System.out.println("\n[" + (i+1) + "] SITE: " + site.getSiteId());
-                System.out.println("    Address: " + site.getAddress());
-                if (site.getPhoneNumber() != null && !site.getPhoneNumber().isEmpty()) {
-                    System.out.println("    Phone: " + site.getPhoneNumber());
-                }
-                if (site.getContactPersonName() != null && !site.getContactPersonName().isEmpty()) {
-                    System.out.println("    Contact: " + site.getContactPersonName());
-                }
-                System.out.println("    Zone: " + site.getZone().getName() + " (" + site.getZone().getZoneId() + ")");
-                System.out.println("    " + "-".repeat(40));
+        System.out.println("\n╔════════════════════════════════════╗");
+        System.out.println("║              ALL SITES             ║");
+        System.out.println("╚════════════════════════════════════╝");
+
+        for (int i = 0; i < sites.size(); i++) {
+            SiteDTO site = sites.get(i);
+            System.out.println("\n[" + (i+1) + "] SITE: " + site.getSiteId());
+            System.out.println("    Address: " + site.getAddress());
+            if (site.getPhoneNumber() != null && !site.getPhoneNumber().isEmpty()) {
+                System.out.println("    Phone: " + site.getPhoneNumber());
             }
+            if (site.getContactPersonName() != null && !site.getContactPersonName().isEmpty()) {
+                System.out.println("    Contact: " + site.getContactPersonName());
+            }
+            System.out.println("    Zone ID: " + site.getZoneId());
+            System.out.println("    " + "-".repeat(40));
         }
     }
 
@@ -88,7 +94,6 @@ public class SiteController {
         String contact = scanner.nextLine().trim();
         contact = contact.isEmpty() ? null : contact;
 
-        // Show available zones to choose from
         List<Zone> zones = zoneService.getAllZones();
         if (zones.isEmpty()) {
             System.out.println("No zones available. Please create a zone first.");
@@ -103,11 +108,11 @@ public class SiteController {
 
         System.out.print("Enter Zone ID: ");
         String zoneId = scanner.nextLine().trim();
-        Optional<Zone> zoneOpt = zoneService.getZoneById(zoneId);
 
+        Optional<Zone> zoneOpt = zoneService.getZoneById(zoneId);
         if (zoneOpt.isPresent()) {
-            Site site = new Site(siteId, address, phone, contact, zoneOpt.get());
-            siteService.saveSite(site);
+            SiteDTO siteDTO = new SiteDTO(siteId, address, phone, contact, zoneId);
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
             System.out.println("Site added successfully.");
         } else {
             System.out.println("Zone not found. Cannot add site.");
@@ -115,33 +120,26 @@ public class SiteController {
     }
 
     private void editSite() {
-        System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║           EDIT SITE INFO           ║");
-        System.out.println("╚════════════════════════════════════╝");
-
-        // First, show all sites and ask for the ID to edit
         showAllSites();
-
         System.out.print("\nEnter the ID of the site you want to edit: ");
         String siteId = scanner.nextLine().trim();
 
-        Optional<Site> siteOpt = siteService.getSiteById(siteId);
+        Optional<SiteDTO> siteOpt = siteService.getSiteById(siteId)
+                .map(SiteMapper::toDTO);
+                
         if (siteOpt.isEmpty()) {
             System.out.println("Site not found. Please try again.");
             return;
         }
 
-        Site site = siteOpt.get();
-
-        // Display current info
+        SiteDTO siteDTO = siteOpt.get();
         System.out.println("\nCurrent Site Information:");
-        System.out.println("ID: " + site.getSiteId());
-        System.out.println("Address: " + site.getAddress());
-        System.out.println("Phone Number: " + (site.getPhoneNumber() != null ? site.getPhoneNumber() : "N/A"));
-        System.out.println("Contact Person: " + (site.getContactPersonName() != null ? site.getContactPersonName() : "N/A"));
-        System.out.println("Zone: " + site.getZone().getName() + " (" + site.getZone().getZoneId() + ")");
+        System.out.println("ID: " + siteDTO.getSiteId());
+        System.out.println("Address: " + siteDTO.getAddress());
+        System.out.println("Phone Number: " + (siteDTO.getPhoneNumber() != null ? siteDTO.getPhoneNumber() : "N/A"));
+        System.out.println("Contact Person: " + (siteDTO.getContactPersonName() != null ? siteDTO.getContactPersonName() : "N/A"));
+        System.out.println("Zone ID: " + siteDTO.getZoneId());
 
-        // Edit menu
         System.out.println("\nWhat would you like to edit?");
         System.out.println("1. Address");
         System.out.println("2. Phone Number");
@@ -153,17 +151,17 @@ public class SiteController {
         String choice = scanner.nextLine().trim();
 
         switch (choice) {
-            case "1" -> editSiteAddress(site);
-            case "2" -> editSitePhoneNumber(site);
-            case "3" -> editSiteContactPerson(site);
-            case "4" -> editSiteZone(site);
+            case "1" -> editSiteAddress(siteDTO);
+            case "2" -> editSitePhoneNumber(siteDTO);
+            case "3" -> editSiteContactPerson(siteDTO);
+            case "4" -> editSiteZone(siteDTO);
             case "0" -> System.out.println("Edit cancelled.");
             default -> System.out.println("Invalid choice. Edit cancelled.");
         }
     }
 
-    private void editSiteAddress(Site site) {
-        System.out.println("\nCurrent address: " + site.getAddress());
+    private void editSiteAddress(SiteDTO siteDTO) {
+        System.out.println("\nCurrent address: " + siteDTO.getAddress());
         System.out.print("Enter new address (or press Enter to keep current): ");
         String newAddress = scanner.nextLine().trim();
 
@@ -172,13 +170,18 @@ public class SiteController {
             return;
         }
 
-        site.setAddress(newAddress);
-        siteService.saveSite(site);
-        System.out.println("Address updated successfully to: " + newAddress);
+        siteDTO.setAddress(newAddress);
+        Optional<Zone> zoneOpt = zoneService.getZoneById(siteDTO.getZoneId());
+        if (zoneOpt.isPresent()) {
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
+            System.out.println("Address updated successfully to: " + newAddress);
+        } else {
+            System.out.println("Error: Zone not found. Update cancelled.");
+        }
     }
 
-    private void editSitePhoneNumber(Site site) {
-        System.out.println("\nCurrent phone number: " + (site.getPhoneNumber() != null ? site.getPhoneNumber() : "N/A"));
+    private void editSitePhoneNumber(SiteDTO siteDTO) {
+        System.out.println("\nCurrent phone number: " + (siteDTO.getPhoneNumber() != null ? siteDTO.getPhoneNumber() : "N/A"));
         System.out.print("Enter new phone number (or press Enter to keep current, 'clear' to remove): ");
         String newPhone = scanner.nextLine().trim();
 
@@ -188,18 +191,22 @@ public class SiteController {
         }
 
         if (newPhone.equalsIgnoreCase("clear")) {
-            site.setPhoneNumber(null);
-            siteService.saveSite(site);
-            System.out.println("Phone number cleared.");
+            siteDTO.setPhoneNumber(null);
         } else {
-            site.setPhoneNumber(newPhone);
-            siteService.saveSite(site);
-            System.out.println("Phone number updated successfully to: " + newPhone);
+            siteDTO.setPhoneNumber(newPhone);
+        }
+
+        Optional<Zone> zoneOpt = zoneService.getZoneById(siteDTO.getZoneId());
+        if (zoneOpt.isPresent()) {
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
+            System.out.println("Phone number updated successfully.");
+        } else {
+            System.out.println("Error: Zone not found. Update cancelled.");
         }
     }
 
-    private void editSiteContactPerson(Site site) {
-        System.out.println("\nCurrent contact person: " + (site.getContactPersonName() != null ? site.getContactPersonName() : "N/A"));
+    private void editSiteContactPerson(SiteDTO siteDTO) {
+        System.out.println("\nCurrent contact person: " + (siteDTO.getContactPersonName() != null ? siteDTO.getContactPersonName() : "N/A"));
         System.out.print("Enter new contact person (or press Enter to keep current, 'clear' to remove): ");
         String newContact = scanner.nextLine().trim();
 
@@ -209,70 +216,113 @@ public class SiteController {
         }
 
         if (newContact.equalsIgnoreCase("clear")) {
-            site.setContactPersonName(null);
-            siteService.saveSite(site);
-            System.out.println("Contact person cleared.");
+            siteDTO.setContactPersonName(null);
         } else {
-            site.setContactPersonName(newContact);
-            siteService.saveSite(site);
-            System.out.println("Contact person updated successfully to: " + newContact);
+            siteDTO.setContactPersonName(newContact);
+        }
+
+        Optional<Zone> zoneOpt = zoneService.getZoneById(siteDTO.getZoneId());
+        if (zoneOpt.isPresent()) {
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
+            System.out.println("Contact person updated successfully.");
+        } else {
+            System.out.println("Error: Zone not found. Update cancelled.");
         }
     }
 
-    private void editSiteZone(Site site) {
-        System.out.println("\nCurrent zone: " + site.getZone().getName() + " (" + site.getZone().getZoneId() + ")");
-
-        // Show available zones
+    private void editSiteZone(SiteDTO siteDTO) {
+        System.out.println("\nCurrent zone ID: " + siteDTO.getZoneId());
         List<Zone> zones = zoneService.getAllZones();
+        
+        if (zones.isEmpty()) {
+            System.out.println("No zones available. Cannot update zone.");
+            return;
+        }
+
         System.out.println("\nAvailable zones:");
         for (int i = 0; i < zones.size(); i++) {
             Zone zone = zones.get(i);
             System.out.println((i+1) + ". " + zone.getName() + " (" + zone.getZoneId() + ")");
         }
 
-        System.out.print("Enter zone ID (or press Enter to keep current): ");
-        String zoneId = scanner.nextLine().trim();
+        System.out.print("Enter new Zone ID (or press Enter to keep current): ");
+        String newZoneId = scanner.nextLine().trim();
 
-        if (zoneId.isEmpty()) {
+        if (newZoneId.isEmpty()) {
             System.out.println("Zone not changed.");
             return;
         }
 
-        Optional<Zone> zoneOpt = zoneService.getZoneById(zoneId);
+        Optional<Zone> zoneOpt = zoneService.getZoneById(newZoneId);
         if (zoneOpt.isPresent()) {
-            Zone newZone = zoneOpt.get();
-            site.setZone(newZone);
-            siteService.saveSite(site);
-            System.out.println("Zone updated successfully to: " + newZone.getName() + " (" + newZone.getZoneId() + ")");
+            siteDTO.setZoneId(newZoneId);
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
+            System.out.println("Zone updated successfully.");
         } else {
-            System.out.println("Zone not found. No changes made.");
+            System.out.println("Zone not found. Update cancelled.");
         }
     }
 
     private void deleteSite() {
-        System.out.print("Enter Site ID to delete: ");
+        showAllSites();
+        System.out.print("\nEnter the ID of the site you want to delete: ");
         String siteId = scanner.nextLine().trim();
-        siteService.deleteSite(siteId);
-        System.out.println("Site deleted.");
+
+        Optional<SiteDTO> siteOpt = siteService.getSiteById(siteId)
+                .map(SiteMapper::toDTO);
+
+        if (siteOpt.isEmpty()) {
+            System.out.println("Site not found. Please try again.");
+            return;
+        }
+
+        System.out.print("Are you sure you want to delete this site? (yes/no): ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (confirmation.equals("yes")) {
+            siteService.deleteSite(siteId);
+            System.out.println("Site deleted successfully.");
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
     }
 
     private void assignZoneToSite() {
-        System.out.print("Enter Site ID: ");
+        showAllSites();
+        System.out.print("\nEnter the ID of the site you want to assign a zone to: ");
         String siteId = scanner.nextLine().trim();
 
-        System.out.print("Enter Zone ID to assign: ");
+        Optional<SiteDTO> siteOpt = siteService.getSiteById(siteId)
+                .map(SiteMapper::toDTO);
+
+        if (siteOpt.isEmpty()) {
+            System.out.println("Site not found. Please try again.");
+            return;
+        }
+
+        List<Zone> zones = zoneService.getAllZones();
+        if (zones.isEmpty()) {
+            System.out.println("No zones available. Please create a zone first.");
+            return;
+        }
+
+        System.out.println("\nAvailable zones:");
+        for (int i = 0; i < zones.size(); i++) {
+            Zone zone = zones.get(i);
+            System.out.println((i+1) + ". " + zone.getName() + " (" + zone.getZoneId() + ")");
+        }
+
+        System.out.print("Enter Zone ID: ");
         String zoneId = scanner.nextLine().trim();
 
         Optional<Zone> zoneOpt = zoneService.getZoneById(zoneId);
         if (zoneOpt.isPresent()) {
-            boolean updated = siteService.updateZone(siteId, zoneOpt.get());
-            if (updated) {
-                System.out.println("Zone updated for site.");
-            } else {
-                System.out.println("Site not found.");
-            }
+            SiteDTO siteDTO = siteOpt.get();
+            siteDTO.setZoneId(zoneId);
+            siteService.saveSite(SiteMapper.fromDTO(siteDTO, zoneOpt.get()));
+            System.out.println("Zone assigned successfully.");
         } else {
-            System.out.println("Zone not found.");
+            System.out.println("Zone not found. Assignment cancelled.");
         }
     }
 }

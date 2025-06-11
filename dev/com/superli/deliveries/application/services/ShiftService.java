@@ -1,152 +1,128 @@
 package com.superli.deliveries.application.services;
 
 import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.domain.ports.IEmployeeRepository;
-import com.superli.deliveries.domain.ports.IShiftRepository;
+import com.superli.deliveries.dataaccess.dao.ShiftDAO;
+import com.superli.deliveries.dataaccess.dao.EmployeeDAO;
 import com.superli.deliveries.dto.ShiftDTO;
 import com.superli.deliveries.Mappers.ShiftMapper;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ShiftService {
 
-    private final IShiftRepository shiftRepository;
-    private final IEmployeeRepository employeeRepository;
+    private final ShiftDAO shiftDAO;
+    private final EmployeeDAO employeeDAO;
 
-    public ShiftService(IShiftRepository shiftRepository, IEmployeeRepository employeeRepository) {
-        this.shiftRepository = shiftRepository;
-        this.employeeRepository = employeeRepository;
+    public ShiftService(ShiftDAO shiftDAO, EmployeeDAO employeeDAO) {
+        this.shiftDAO = shiftDAO;
+        this.employeeDAO = employeeDAO;
     }
 
-    public List<ShiftDTO> getAllShifts() {
-        return shiftRepository.findAll().stream()
-                .map(ShiftMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public Optional<ShiftDTO> getShiftById(int shiftId) {
-        return shiftRepository.findById(String.valueOf(shiftId))
-                .map(ShiftMapper::toDTO);
-    }
-
-    public void saveShift(ShiftDTO shiftDTO, List<Role> requiredRoles,
-                          Map<Employee, Role> assignedEmployees, Employee manager) {
-        Shift shift = ShiftMapper.fromDTO(shiftDTO, requiredRoles, assignedEmployees, manager);
-        shiftRepository.save(shift);
-    }
-
-    public boolean deleteShift(int shiftId) {
-        Optional<Shift> shiftOpt = shiftRepository.findById(String.valueOf(shiftId));
-        if (shiftOpt.isPresent()) {
-            shiftRepository.deleteById(String.valueOf(shiftId));
-            return true;
+    public List<Shift> getAllShifts() {
+        try {
+            return shiftDAO.findAll().stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all shifts", e);
         }
-        return false;
     }
 
-    public boolean addEmployeeToShift(int shiftId, Employee employee, Role role) {
-        Optional<Shift> shiftOpt = shiftRepository.findById(String.valueOf(shiftId));
-        if (shiftOpt.isPresent()) {
-            Shift shift = shiftOpt.get();
-            shift.addEmployeeToShift(employee, role);
-            shiftRepository.save(shift);
-            return true;
+    public Optional<Shift> getShiftById(String shiftId) {
+        try {
+            return shiftDAO.findById(shiftId)
+                    .map(dto -> ShiftMapper.toDomain(dto));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shift by id: " + shiftId, e);
         }
-        return false;
     }
 
-    public boolean removeEmployeeFromShift(int shiftId, String employeeId) {
-        Optional<Shift> shiftOpt = shiftRepository.findById(String.valueOf(shiftId));
-        Optional<Employee> employeeOpt = employeeRepository.findById(employeeId);
-
-        if (shiftOpt.isPresent() && employeeOpt.isPresent()) {
-            Shift shift = shiftOpt.get();
-            Employee employee = employeeOpt.get();
-
-            shift.removeEmployeeFromShift(employee);
-            shiftRepository.save(shift);
-            return true;
+    public void saveShift(Shift shift) {
+        try {
+            ShiftDTO dto = ShiftMapper.toDTO(shift);
+            shiftDAO.save(dto);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving shift", e);
         }
-        return false;
     }
 
-    public List<ShiftDTO> getShiftsByDate(LocalDate date) {
-        return shiftRepository.findAll().stream()
-                .filter(s -> s.getShiftDate().equals(date))
-                .map(ShiftMapper::toDTO)
-                .collect(Collectors.toList());
+    public boolean deleteShift(String shiftId) {
+        try {
+            Optional<ShiftDTO> shiftOpt = shiftDAO.findById(shiftId);
+            if (shiftOpt.isPresent()) {
+                shiftDAO.deleteById(shiftId);
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting shift: " + shiftId, e);
+        }
     }
 
-    public List<ShiftDTO> getShiftsByDayOfWeek(DayOfWeek day) {
-        return shiftRepository.findAll().stream()
-                .filter(s -> s.getShiftDay().equals(day))
-                .map(ShiftMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Shift> getShiftsByDate(LocalDate date) {
+        try {
+            return shiftDAO.findByDate(date).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts by date: " + date, e);
+        }
     }
 
-    public List<ShiftDTO> getShiftsForEmployee(String employeeId) {
-        return shiftRepository.findAll().stream()
-                .filter(s -> s.getShiftEmployees().keySet().stream()
-                        .anyMatch(e -> e.getId().equals(employeeId)))
-                .map(ShiftMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Shift> getShiftsByDayOfWeek(DayOfWeek day) {
+        try {
+            return shiftDAO.findByDayOfWeek(day).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts by day: " + day, e);
+        }
+    }
+
+    public List<Shift> getShiftsForEmployee(String employeeId) {
+        try {
+            return shiftDAO.findByEmployeeId(employeeId).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts for employee: " + employeeId, e);
+        }
     }
 
     public boolean isShiftInPast(Shift shift) {
         if (shift == null || shift.getShiftDate() == null) return true;
-//        return shift.getShiftDate().isBefore(LocalDate.now()); // didn't work so i switched to this:
-        return shift.getShiftDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now());
-
+        return shift.getShiftDate().before(new Date());
     }
 
-    public Shift createShift(Date date, ShiftType type, DayOfWeek day,
-                             List<Role> requiredRoles,
-                             Map<Employee, Role> assignedEmployees,
-                             Employee manager) {
-        Shift shift = new Shift(
-                generateNewShiftId(),
-                date,
-                type,
-                day,
-                requiredRoles,
-                assignedEmployees,
-                manager
-        );
-        shiftRepository.save(shift);
-        return shift;
-    }
-    private int generateNewShiftId() {
-        return shiftRepository.findAll().stream()
-                .mapToInt(Shift::getShiftId)
-                .max()
-                .orElse(0) + 1;
+    public Shift createShift(LocalDate date, ShiftType type, DayOfWeek day, List<Role> requiredRoles, Map<Employee, Role> assignedEmployees, Employee manager) {
+        try {
+            Shift shift = new Shift(
+                    generateNewShiftId(),
+                    Date.from(date.atStartOfDay().toInstant(java.time.ZoneOffset.UTC)),
+                    type,
+                    day,
+                    requiredRoles,
+                    assignedEmployees,
+                    manager
+            );
+            saveShift(shift);
+            return shift;
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating shift", e);
+        }
     }
 
-    //    public boolean updateShiftManager(int shiftId, Employee newManager) { // isn't a demand
-//        Optional<Shift> shiftOpt = shiftRepository.findById(String.valueOf(shiftId));
-//        if (shiftOpt.isPresent()) {
-//            Shift shift = shiftOpt.get();
-//            shift.setShiftManager(newManager);
-//            shiftRepository.save(shift);
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    public boolean updateShiftRequiredRoles(int shiftId, List<Role> newRoles) { // isn't a demand
-//        Optional<Shift> shiftOpt = shiftRepository.findById(String.valueOf(shiftId));
-//        if (shiftOpt.isPresent()) {
-//            Shift shift = shiftOpt.get();
-//            shift.setShiftRequiredRoles(newRoles);
-//            shiftRepository.save(shift);
-//            return true;
-//        }
-//        return false;
-//    }
+    private String generateNewShiftId() {
+        try {
+            return UUID.randomUUID().toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating new shift ID", e);
+        }
+    }
 }
 
 //public class ShiftService {

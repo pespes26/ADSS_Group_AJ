@@ -1,14 +1,25 @@
-package com.superli.deliveries.service;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.*;
-import com.superli.deliveries.domain.ports.ITransportRepository;
-import com.superli.deliveries.presentation.*;
-
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.superli.deliveries.Mappers.TransportMapper;
+import com.superli.deliveries.dataaccess.dao.TransportDAO;
+import com.superli.deliveries.domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Transport;
+import com.superli.deliveries.domain.core.TransportStatus;
+import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.dto.TransportDTO;
+import com.superli.deliveries.presentation.DeliveredItemDetailsView;
+import com.superli.deliveries.presentation.DestinationDetailsView;
+import com.superli.deliveries.presentation.SiteDetailsView;
+import com.superli.deliveries.presentation.TransportDetailsView;
+import com.superli.deliveries.presentation.TransportSummaryView;
 
 /**
  * Service layer for managing Transport operations and business logic.
@@ -16,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class TransportService {
 
-    private final ITransportRepository transportRepository;
+    private final TransportDAO transportDAO;
     private final DriverService driverService;
     private final TruckService truckService;
     private final SiteService siteService;
@@ -27,16 +38,16 @@ public class TransportService {
     /**
      * Constructs a new TransportService with required dependencies.
      *
-     * @param transportRepository Repository for transports
+     * @param transportDAO DAO for transports
      * @param driverService Service for driver operations
      * @param truckService Service for truck operations
      * @param siteService Service for site operations
      */
-    public TransportService(ITransportRepository transportRepository,
+    public TransportService(TransportDAO transportDAO,
                             DriverService driverService,
                             TruckService truckService,
                             SiteService siteService) {
-        this.transportRepository = transportRepository;
+        this.transportDAO = transportDAO;
         this.driverService = driverService;
         this.truckService = truckService;
         this.siteService = siteService;
@@ -50,10 +61,14 @@ public class TransportService {
      * Sets it to one more than the highest existing ID, or 1 if no transports exist.
      */
     private void initializeNextTransportId() {
-        nextTransportId = transportRepository.findAll().stream()
-                .mapToInt(Transport::getTransportId)
-                .max()
-                .orElse(0) + 1;
+        try {
+            nextTransportId = transportDAO.findAll().stream()
+                    .mapToInt(dto -> Integer.parseInt(dto.getTransportId()))
+                    .max()
+                    .orElse(0) + 1;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error initializing next transport ID", e);
+        }
     }
 
     /**
@@ -61,8 +76,8 @@ public class TransportService {
      *
      * @return The next available transport ID
      */
-    private int generateTransportId() {
-        return nextTransportId++;
+    private String generateTransportId() {
+        return String.valueOf(nextTransportId++);
     }
 
     /**
@@ -71,7 +86,23 @@ public class TransportService {
      * @return List of all transports
      */
     public List<Transport> getAllTransports() {
-        return new ArrayList<>(transportRepository.findAll());
+        try {
+            return transportDAO.findAll().stream()
+                    .map(dto -> {
+                        Optional<Truck> truck = truckService.getTruckById(dto.getTruckId());
+                        Optional<Driver> driver = driverService.getDriverById(dto.getDriverId());
+                        Optional<Site> site = siteService.getSiteById(dto.getOriginSiteId());
+                        
+                        if (truck.isPresent() && driver.isPresent() && site.isPresent()) {
+                            return TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get());
+                        }
+                        return null;
+                    })
+                    .filter(t -> t != null)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all transports", e);
+        }
     }
 
     /**
@@ -80,8 +111,23 @@ public class TransportService {
      * @param transportId The ID of the transport to find
      * @return Optional containing the transport if found
      */
-    public Optional<Transport> getTransportById(int transportId) {
-        return transportRepository.findById(transportId);
+    public Optional<Transport> getTransportById(String transportId) {
+        try {
+            Optional<TransportDTO> dtoOpt = transportDAO.findById(transportId);
+            if (dtoOpt.isPresent()) {
+                TransportDTO dto = dtoOpt.get();
+                Optional<Truck> truck = truckService.getTruckById(dto.getTruckId());
+                Optional<Driver> driver = driverService.getDriverById(dto.getDriverId());
+                Optional<Site> site = siteService.getSiteById(dto.getOriginSiteId());
+                
+                if (truck.isPresent() && driver.isPresent() && site.isPresent()) {
+                    return Optional.of(TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get()));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting transport by id: " + transportId, e);
+        }
     }
 
     /**
@@ -90,7 +136,11 @@ public class TransportService {
      * @param transport The transport to save
      */
     public void saveTransport(Transport transport) {
-        transportRepository.save(transport);
+        try {
+            transportDAO.save(TransportMapper.toDTO(transport));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving transport", e);
+        }
     }
 
     /**
@@ -99,20 +149,24 @@ public class TransportService {
      * @param transportId The ID of the transport to delete
      * @return true if deleted successfully, false otherwise
      */
-    public boolean deleteTransport(int transportId) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean deleteTransport(String transportId) {
+        try {
+            Optional<Transport> transportOpt = getTransportById(transportId);
 
-        if (transportOpt.isPresent()) {
-            Transport transport = transportOpt.get();
+            if (transportOpt.isPresent()) {
+                Transport transport = transportOpt.get();
 
-            // Release driver and truck resources
-            releaseTransportResources(transport);
+                // Release driver and truck resources
+                releaseTransportResources(transport);
 
-            // Now delete the transport
-            return transportRepository.deleteById(transportId).isPresent();
+                // Now delete the transport
+                transportDAO.deleteById(transportId);
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting transport: " + transportId, e);
         }
-
-        return false;
     }
 
     /**
@@ -121,7 +175,6 @@ public class TransportService {
      * @return Optional containing the created transport if successful
      */
     public Optional<Transport> createTransportAuto() {
-        // Get available trucks and drivers
         List<Truck> availableTrucks = truckService.getAvailableTrucks();
         List<Driver> availableDrivers = driverService.getAvailableDrivers();
 
@@ -129,23 +182,19 @@ public class TransportService {
             return Optional.empty();
         }
 
-        // Find a compatible pair
         for (Truck truck : availableTrucks) {
             for (Driver driver : availableDrivers) {
                 if (driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
-                    // Found a match, get a default origin site
                     Optional<Site> originSiteOpt = getDefaultOriginSite();
                     if (originSiteOpt.isEmpty()) {
                         return Optional.empty();
                     }
 
-                    // Create transport
                     return createTransportWithTruckDriverAndSite(truck, driver, originSiteOpt.get());
                 }
             }
         }
 
-        // No compatible pair found
         return Optional.empty();
     }
 
@@ -157,17 +206,6 @@ public class TransportService {
      * @return Optional containing the created transport if successful
      */
     public Optional<Transport> createTransportManual(Truck truck, Driver driver) {
-        // Check if truck and driver are available
-        if (!truck.isAvailable() || !driver.isAvailable()) {
-            return Optional.empty();
-        }
-
-        // Check license compatibility
-        if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
-            return Optional.empty();
-        }
-
-        // Get a default origin site
         Optional<Site> originSiteOpt = getDefaultOriginSite();
         if (originSiteOpt.isEmpty()) {
             return Optional.empty();
@@ -177,114 +215,68 @@ public class TransportService {
     }
 
     /**
-     * Creates a transport manually with the given truck, driver, and specific site.
+     * Creates a transport manually with the given truck, driver, and site.
      *
      * @param truck The truck to use
      * @param driver The driver to assign
-     * @param originSite The origin site for the transport
+     * @param site The origin site
+     * @param departureDateTime The scheduled departure time
      * @return Optional containing the created transport if successful
      */
-    public Optional<Transport> createTransportManualWithSite(Truck truck, Driver driver, Site originSite,
-                                                             LocalDateTime departureDateTime) {
-        // Check if truck and driver are available
-        if (!truck.isAvailable() || !driver.isAvailable()) {
-            return Optional.empty();
-        }
-
-        // Check license compatibility
+    public Optional<Transport> createTransportManualWithSite(Truck truck, Driver driver, 
+            Site site, LocalDateTime departureDateTime) {
         if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
             return Optional.empty();
         }
 
-        // Create transport with specified parameters
-        int transportId = generateTransportId();
-
-        Transport transport = new Transport(
-                transportId,
-                departureDateTime,
-                truck,
-                driver,
-                originSite,
-                TransportStatus.PLANNED
-        );
-
-        // Save to repository
+        String transportId = generateTransportId();
+        Transport transport = new Transport(transportId, truck, driver, site, departureDateTime);
         saveTransport(transport);
-
-        // Mark truck and driver as unavailable
-        truck.setAvailable(false);
-        truckService.markTruckAsUnavailable(truck.getPlateNum());
-
-        driver.setAvailable(false);
-        driverService.markDriverAsUnavailable(driver.getDriverId());
-
         return Optional.of(transport);
     }
 
     /**
-     * Helper method to create a transport with the given truck and driver.
+     * Creates a transport with the given truck, driver, and site.
      *
      * @param truck The truck to use
      * @param driver The driver to assign
      * @param originSite The origin site
-     * @return Optional containing the created transport
+     * @return Optional containing the created transport if successful
      */
     private Optional<Transport> createTransportWithTruckDriverAndSite(Truck truck, Driver driver, Site originSite) {
-        // Create transport with next available ID
-        int transportId = generateTransportId();
-        LocalDateTime departureTime = LocalDateTime.now().plusDays(1); // Default to tomorrow
+        if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
+            return Optional.empty();
+        }
 
-        Transport transport = new Transport(
-                transportId,
-                departureTime,
-                truck,
-                driver,
-                originSite,
-                TransportStatus.PLANNED
-        );
-
-        // Save to repository
+        String transportId = generateTransportId();
+        Transport transport = new Transport(transportId, truck, driver, originSite);
         saveTransport(transport);
-
-        // Mark truck and driver as unavailable
-        truck.setAvailable(false);
-        truckService.markTruckAsUnavailable(truck.getPlateNum());
-
-        driver.setAvailable(false);
-        driverService.markDriverAsUnavailable(driver.getDriverId());
-
         return Optional.of(transport);
     }
 
     /**
-     * Gets a default origin site for the transport.
-     * In a real implementation, this would likely be selected by the user.
+     * Gets the default origin site.
      *
-     * @return Optional containing a site, or empty if no sites exist
+     * @return Optional containing the default origin site if found
      */
     private Optional<Site> getDefaultOriginSite() {
-        List<Site> sites = siteService.getAllSites();
-        if (sites.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // Return the first site as default
-        return Optional.of(sites.get(0));
+        return siteService.getAllSites().stream()
+                .findFirst();
     }
 
     /**
      * Adds a destination document to a transport.
      *
-     * @param transportId ID of the transport
+     * @param transportId The ID of the transport
      * @param doc The destination document to add
      * @return true if added successfully, false otherwise
      */
-    public boolean addDestinationDocToTransport(int transportId, DestinationDoc doc) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean addDestinationDocToTransport(String transportId, DestinationDoc doc) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-            transport.addDestination(doc);
-            transportRepository.save(transport);
+            transport.addDestinationDoc(doc);
+            saveTransport(transport);
             return true;
         }
         return false;
@@ -293,19 +285,17 @@ public class TransportService {
     /**
      * Removes a destination document from a transport.
      *
-     * @param transportId ID of the transport
+     * @param transportId The ID of the transport
      * @param doc The destination document to remove
      * @return true if removed successfully, false otherwise
      */
-    public boolean removeDestinationDocFromTransport(int transportId, DestinationDoc doc) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean removeDestinationDocFromTransport(String transportId, DestinationDoc doc) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-            boolean removed = transport.removeDestination(doc);
-            if (removed) {
-                transportRepository.save(transport);
-            }
-            return removed;
+            transport.removeDestinationDoc(doc);
+            saveTransport(transport);
+            return true;
         }
         return false;
     }
@@ -313,60 +303,47 @@ public class TransportService {
     /**
      * Updates the status of a transport.
      *
-     * @param transportId ID of the transport
-     * @param newStatus New status to set
+     * @param transportId The ID of the transport
+     * @param newStatus The new status
      * @return true if updated successfully, false otherwise
      */
-    public boolean updateTransportStatus(int transportId, TransportStatus newStatus) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-
-            // Check if this is a significant status change
-            if ((transport.getStatus() != TransportStatus.COMPLETED &&
-                    transport.getStatus() != TransportStatus.CANCELLED) &&
-                    (newStatus == TransportStatus.COMPLETED || newStatus == TransportStatus.CANCELLED)) {
-                // We're completing or cancelling - release resources
-                releaseTransportResources(transport);
-            }
-
             transport.setStatus(newStatus);
-            transportRepository.save(transport);
+            saveTransport(transport);
             return true;
         }
         return false;
     }
 
     /**
-     * Releases the truck and driver associated with a transport.
+     * Releases resources associated with a transport.
      *
-     * @param transport The transport whose resources should be released
+     * @param transport The transport whose resources to release
      */
     private void releaseTransportResources(Transport transport) {
-        // Mark truck as available
-        Truck truck = transport.getTruck();
-        truck.setAvailable(true);
-        truckService.markTruckAsAvailable(truck.getPlateNum());
+        // Release truck
+        truckService.releaseTruck(transport.getTruck());
 
-        // Mark driver as available
-        Driver driver = transport.getDriver();
-        driver.setAvailable(true);
-        driverService.markDriverAsAvailable(driver.getDriverId());
+        // Release driver
+        driverService.releaseDriver(transport.getDriver());
     }
 
     /**
      * Updates the departure date and time of a transport.
      *
-     * @param transportId ID of the transport
-     * @param newTime New departure date and time
+     * @param transportId The ID of the transport
+     * @param newTime The new departure time
      * @return true if updated successfully, false otherwise
      */
-    public boolean updateDepartureDateTime(int transportId, LocalDateTime newTime) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean updateDepartureDateTime(String transportId, LocalDateTime newTime) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
             transport.setDepartureDateTime(newTime);
-            transportRepository.save(transport);
+            saveTransport(transport);
             return true;
         }
         return false;
@@ -375,144 +352,116 @@ public class TransportService {
     /**
      * Updates the departure weight of a transport.
      *
-     * @param transportId ID of the transport
-     * @param weight New departure weight
+     * @param transportId The ID of the transport
+     * @param weight The new departure weight
      * @return true if updated successfully, false otherwise
      */
-    public boolean updateDepartureWeight(int transportId, float weight) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
+    public boolean updateDepartureWeight(String transportId, float weight) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-
-            // Check if weight exceeds truck capacity
-            float maxAllowedWeight = transport.getTruck().getMaxWeight() - transport.getTruck().getNetWeight();
-            if (weight > maxAllowedWeight) {
-                System.out.println("⚠️ Warning: Weight (" + weight + " kg) exceeds truck capacity (" +
-                        maxAllowedWeight + " kg). Cargo may need to be redistributed.");
-            }
-
             transport.setDepartureWeight(weight);
-            transportRepository.save(transport);
+            saveTransport(transport);
             return true;
         }
         return false;
     }
 
     /**
-     * Retrieves summaries of all transports for display purposes.
+     * Gets all transport summaries.
      *
      * @return List of transport summaries
      */
     public List<TransportSummaryView> getAllTransportSummaries() {
-        return transportRepository.findAll().stream()
+        return getAllTransports().stream()
                 .map(this::createTransportSummary)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Creates a summary view from a transport.
+     * Creates a transport summary from a transport.
      *
      * @param transport The transport to summarize
-     * @return A summary view of the transport
+     * @return The transport summary
      */
     private TransportSummaryView createTransportSummary(Transport transport) {
-        // Map origin site to site view
-        Site site = transport.getOriginSite();
-        SiteDetailsView siteView = new SiteDetailsView(
-                site.getAddress(),
-                site.getPhoneNumber(),
-                site.getContactPersonName()
+        Site originSite = transport.getOriginSite();
+        SiteDetailsView originSiteView = new SiteDetailsView(
+            originSite.getAddress(),
+            originSite.getPhoneNumber(),
+            originSite.getContactPersonName()
         );
 
-        // Map destinations to destination views
-        List<DestinationDetailsView> destinations = transport.getDestinationList().stream()
-                .map(doc -> {
-                    TransportStatus docStatus;
-                    try {
-                        docStatus = TransportStatus.valueOf(doc.getStatus().toUpperCase());
-                    } catch (Exception e) {
-                        docStatus = TransportStatus.PLANNED; // Default status
-                    }
-
-                    return new DestinationDetailsView(
-                            doc.getDestinationDocId(),
-                            new SiteDetailsView(
-                                    doc.getDestinationId().getAddress(),
-                                    doc.getDestinationId().getPhoneNumber(),
-                                    doc.getDestinationId().getContactPersonName()
-                            ),
-                            doc.getDeliveryItems().stream()
-                                    .map(item -> new DeliveredItemDetailsView(
-                                            item.getProductId(),
-                                            item.getQuantity()
-                                    )).collect(Collectors.toList()),
-                            docStatus
-                    );
-                })
-                .collect(Collectors.toList());
+        List<DestinationDetailsView> destinationViews = transport.getDestinationDocs().stream()
+            .map(doc -> {
+                Site destSite = doc.getDestinationId();
+                SiteDetailsView destSiteView = new SiteDetailsView(
+                    destSite.getAddress(),
+                    destSite.getPhoneNumber(),
+                    destSite.getContactPersonName()
+                );
+                return new DestinationDetailsView(
+                    doc.getDestinationDocId(),
+                    destSiteView,
+                    doc.getDeliveryItems().stream()
+                        .map(item -> new DeliveredItemDetailsView(item.getProductId(), item.getQuantity()))
+                        .collect(Collectors.toList()),
+                    TransportStatus.valueOf(doc.getStatus())
+                );
+            })
+            .collect(Collectors.toList());
 
         return new TransportSummaryView(
-                transport.getTransportId(),
-                transport.getDepartureDateTime(),
-                siteView,
-                destinations,
-                transport.getDepartureWeight(),
-                transport.getStatus()
+            Integer.parseInt(transport.getTransportId()),
+            transport.getDepartureDateTime(),
+            originSiteView,
+            destinationViews,
+            transport.getDepartureWeight(),
+            transport.getStatus()
         );
     }
 
     /**
-     * Retrieves detailed information about a transport.
+     * Gets detailed view of a transport by ID.
      *
-     * @param transportId ID of the transport
-     * @return Detailed view of the transport, or null if not found
+     * @param transportId The ID of the transport
+     * @return The transport details view
      */
-    public TransportDetailsView getTransportDetailsViewById(int transportId) {
-        Optional<Transport> transportOpt = transportRepository.findById(transportId);
-
+    public TransportDetailsView getTransportDetailsViewById(String transportId) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
         if (transportOpt.isPresent()) {
             Transport transport = transportOpt.get();
-
-            // Create destination detail views
-            List<DestinationDetailsView> destinations = transport.getDestinationList().stream()
-                    .map(doc -> {
-                        TransportStatus docStatus;
-                        try {
-                            docStatus = TransportStatus.valueOf(doc.getStatus().toUpperCase());
-                        } catch (Exception e) {
-                            docStatus = TransportStatus.PLANNED; // Default status
-                        }
-
-                        return new DestinationDetailsView(
-                                doc.getDestinationDocId(),
-                                new SiteDetailsView(
-                                        doc.getDestinationId().getAddress(),
-                                        doc.getDestinationId().getPhoneNumber(),
-                                        doc.getDestinationId().getContactPersonName()
-                                ),
-                                doc.getDeliveryItems().stream().map(item ->
-                                        new DeliveredItemDetailsView(
-                                                item.getProductId(),
-                                                item.getQuantity()
-                                        )
-                                ).collect(Collectors.toList()),
-                                docStatus
-                        );
-                    })
-                    .collect(Collectors.toList());
+            
+            List<DestinationDetailsView> destinationViews = transport.getDestinationDocs().stream()
+                .map(doc -> {
+                    Site destSite = doc.getDestinationId();
+                    SiteDetailsView destSiteView = new SiteDetailsView(
+                        destSite.getAddress(),
+                        destSite.getPhoneNumber(),
+                        destSite.getContactPersonName()
+                    );
+                    return new DestinationDetailsView(
+                        doc.getDestinationDocId(),
+                        destSiteView,
+                        doc.getDeliveryItems().stream()
+                            .map(item -> new DeliveredItemDetailsView(item.getProductId(), item.getQuantity()))
+                            .collect(Collectors.toList()),
+                        TransportStatus.valueOf(doc.getStatus())
+                    );
+                })
+                .collect(Collectors.toList());
 
             return new TransportDetailsView(
-                    transport.getTransportId(),
-                    transport.getDepartureDateTime(),
-                    transport.getTruck(),
-                    transport.getDriver(),
-                    transport.getOriginSite(),
-                    destinations,
-                    transport.getDepartureWeight(),
-                    transport.getStatus()
+                Integer.parseInt(transport.getTransportId()),
+                transport.getDepartureDateTime(),
+                transport.getTruck(),
+                transport.getDriver(),
+                transport.getOriginSite(),
+                destinationViews,
+                transport.getDepartureWeight(),
+                transport.getStatus()
             );
         }
-
         return null;
     }
 }

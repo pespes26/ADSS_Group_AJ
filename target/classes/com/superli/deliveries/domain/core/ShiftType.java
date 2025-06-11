@@ -1,12 +1,11 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 /**
  * Represents the different types of shifts in the system.
  */
 public enum ShiftType {
-    MORNING("Morning Shift"),
-    AFTERNOON("Afternoon Shift"),
-    NIGHT("Night Shift");
+    MORNING("Morning"),
+    EVENING("Evening");
 
     private final String displayName;
 

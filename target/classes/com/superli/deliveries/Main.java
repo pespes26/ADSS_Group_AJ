@@ -1,17 +1,40 @@
 package com.superli.deliveries;
 
-import com.superli.deliveries.application.controllers.*;
-import com.superli.deliveries.infrastructure.repositories.DestinationDocRepository;
-import com.superli.deliveries.infrastructure.repositories.DriverRepository;
-import com.superli.deliveries.infrastructure.repositories.ProductRepository;
-import com.superli.deliveries.infrastructure.repositories.SiteRepository;
-import com.superli.deliveries.infrastructure.repositories.TransportRepository;
-import com.superli.deliveries.infrastructure.repositories.TruckRepository;
-import com.superli.deliveries.infrastructure.repositories.ZoneRepository;
-import com.superli.deliveries.service.*;
-import com.superli.deliveries.storage.*;
-
+import java.sql.SQLException;
 import java.util.Scanner;
+
+import com.superli.deliveries.application.controllers.DestinationDocController;
+import com.superli.deliveries.application.controllers.DriverController;
+import com.superli.deliveries.application.controllers.MainMenuController;
+import com.superli.deliveries.application.controllers.SiteController;
+import com.superli.deliveries.application.controllers.TransportController;
+import com.superli.deliveries.application.controllers.TruckController;
+import com.superli.deliveries.application.controllers.ZoneController;
+import com.superli.deliveries.application.services.DeliveredItemService;
+import com.superli.deliveries.application.services.DestinationDocService;
+import com.superli.deliveries.application.services.DriverService;
+import com.superli.deliveries.application.services.ProductService;
+import com.superli.deliveries.application.services.SiteService;
+import com.superli.deliveries.application.services.TransportService;
+import com.superli.deliveries.application.services.TruckService;
+import com.superli.deliveries.application.services.ZoneService;
+import com.superli.deliveries.dataaccess.dao.DeliveredItemDAO;
+import com.superli.deliveries.dataaccess.dao.DeliveredItemDAOImpl;
+import com.superli.deliveries.dataaccess.dao.DestinationDocDAO;
+import com.superli.deliveries.dataaccess.dao.DestinationDocDAOImpl;
+import com.superli.deliveries.dataaccess.dao.DriverDAO;
+import com.superli.deliveries.dataaccess.dao.DriverDAOImpl;
+import com.superli.deliveries.dataaccess.dao.ProductDAO;
+import com.superli.deliveries.dataaccess.dao.ProductDAOImpl;
+import com.superli.deliveries.dataaccess.dao.SiteDAO;
+import com.superli.deliveries.dataaccess.dao.SiteDAOImpl;
+import com.superli.deliveries.dataaccess.dao.TransportDAO;
+import com.superli.deliveries.dataaccess.dao.TransportDAOImpl;
+import com.superli.deliveries.dataaccess.dao.TruckDAO;
+import com.superli.deliveries.dataaccess.dao.TruckDAOImpl;
+import com.superli.deliveries.dataaccess.dao.ZoneDAO;
+import com.superli.deliveries.dataaccess.dao.ZoneDAOImpl;
+import com.superli.deliveries.util.Database;
 
 public class Main {
 
@@ -41,6 +64,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        // Test database connection
+        try {
+            var conn = Database.getConnection();
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("Database connection successful!");
+            }
+        } catch (SQLException e) {
+            System.err.println("Database connection failed: " + e.getMessage());
+            return;
+        }
+
         Scanner scanner = new Scanner(System.in);
 
         // --- User role selection and password authentication ---
@@ -51,13 +85,10 @@ public class Main {
         int choice = scanner.nextInt();
         scanner.nextLine(); // Clear input buffer after number
 
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
-
-        if (choice == 1 && password.equals("admin")) {
+        if (choice == 1) {
             currentUserRole = Role.SYSTEM_ADMIN;
             System.out.println("You are logged in as System Administrator.");
-        } else if (choice == 2 && password.equals("transport123")) {
+        } else if (choice == 2) {
             currentUserRole = Role.TRANSPORT_MANAGER;
             System.out.println("You are logged in as Transport Manager.");
         } else {
@@ -65,30 +96,38 @@ public class Main {
             return;
         }
 
-        // --- Repositories (in-memory) ---
-        var driverRepo = new DriverRepository();
-        var truckRepo = new TruckRepository();
-        var siteRepo = new SiteRepository();
-        var zoneRepo = new ZoneRepository();
-        var transportRepo = new TransportRepository();
-        var destinationDocRepo = new DestinationDocRepository();
-        var productRepo = new ProductRepository(); // Repository for products
+        // --- DAOs ---
+        DriverDAO driverDAO = null;
+        TruckDAO truckDAO = null;
+        SiteDAO siteDAO = null;
+        ZoneDAO zoneDAO = null;
+        TransportDAO transportDAO = null;
+        DestinationDocDAO destinationDocDAO = null;
+        ProductDAO productDAO = null;
+        DeliveredItemDAO deliveredItemDAO = null;
+        try {
+            driverDAO = new DriverDAOImpl();
+            truckDAO = new TruckDAOImpl();
+            siteDAO = new SiteDAOImpl();
+            zoneDAO = new ZoneDAOImpl();
+            transportDAO = new TransportDAOImpl();
+            destinationDocDAO = new DestinationDocDAOImpl();
+            productDAO = new ProductDAOImpl();
+            deliveredItemDAO = new DeliveredItemDAOImpl();
+        } catch (SQLException e) {
+            System.err.println("DAO initialization failed: " + e.getMessage());
+            return;
+        }
 
         // --- Services ---
-        var productService = new ProductService(productRepo);
-        var driverService = new DriverService(driverRepo);
-        var truckService = new TruckService(truckRepo);
-        var zoneService = new ZoneService(zoneRepo);
-        var siteService = new SiteService(siteRepo);
-        var transportService = new TransportService(transportRepo, driverService, truckService, siteService);
-        var destinationDocService = new DestinationDocService(destinationDocRepo);
-
-        // Initialize services that have interdependencies after creating initial services
-        var deliveredItemService = new DeliveredItemService(destinationDocRepo, transportService, productService);
-
-        // --- Initialize Mock Data for Testing ---
-        // NOTE: This should be removed before final submission
-        MockDataInitializer.initializeMockData(driverService, truckService, zoneService, siteService, productService);
+        var productService = new ProductService(productDAO);
+        var driverService = new DriverService();
+        var truckService = new TruckService(truckDAO);
+        var zoneService = new ZoneService(zoneDAO);
+        var siteService = new SiteService(siteDAO, zoneService);
+        var transportService = new TransportService(transportDAO, driverService, truckService, siteService);
+        var destinationDocService = new DestinationDocService(destinationDocDAO, siteService);
+        var deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService);
 
         // --- Controllers ---
         var driverController = new DriverController(driverService);

@@ -1,45 +1,84 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.core.Zone;
-import com.superli.deliveries.domain.ports.IZoneRepository;
-import com.superli.deliveries.dto.ZoneDTO;
-import com.superli.deliveries.Mappers.ZoneMapper;
-
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.superli.deliveries.Mappers.ZoneMapper;
+import com.superli.deliveries.dataaccess.dao.ZoneDAO;
+import com.superli.deliveries.domain.core.Zone;
+
 public class ZoneService {
+    private final ZoneDAO zoneDAO;
 
-    private final IZoneRepository zoneRepository;
-
-    public ZoneService(IZoneRepository zoneRepository) {
-        this.zoneRepository = zoneRepository;
+    public ZoneService(ZoneDAO zoneDAO) {
+        this.zoneDAO = zoneDAO;
     }
 
-    public List<ZoneDTO> getAllZones() {
-        return zoneRepository.findAll().stream()
-                .map(ZoneMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public Optional<ZoneDTO> getZoneById(String zoneId) {
-        return zoneRepository.findById(zoneId)
-                .map(ZoneMapper::toDTO);
-    }
-
-    public void saveZone(ZoneDTO zoneDTO) {
-        Zone zone = ZoneMapper.fromDTO(zoneDTO);
-        zoneRepository.save(zone);
-    }
-
-    public boolean deleteZone(String zoneId) {
-        Optional<Zone> zoneOpt = zoneRepository.findById(zoneId);
-        if (zoneOpt.isPresent()) {
-            zoneRepository.deleteById(zoneId);
-            return true;
+    public List<Zone> getAllZones() {
+        try {
+            return zoneDAO.findAll().stream()
+                    .map(ZoneMapper::toDomain)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all zones", e);
         }
-        return false;
+    }
+
+    public Optional<Zone> getZoneById(String id) {
+        try {
+            return zoneDAO.findById(id)
+                    .map(ZoneMapper::toDomain);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting zone by id: " + id, e);
+        }
+    }
+
+    public void saveZone(Zone zone) {
+        try {
+            zoneDAO.save(ZoneMapper.toDTO(zone));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving zone", e);
+        }
+    }
+
+    public boolean deleteZone(String id) {
+        try {
+            zoneDAO.deleteById(id);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public List<Zone> getActiveZones() {
+        try {
+            return zoneDAO.findActiveZones().stream()
+                    .map(ZoneMapper::toDomain)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting active zones", e);
+        }
+    }
+
+    public Optional<Zone> getZoneByName(String name) {
+        try {
+            return zoneDAO.findByName(name)
+                    .map(ZoneMapper::toDomain);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting zone by name: " + name, e);
+        }
+    }
+
+    public List<Zone> getZonesByCapacityRange(float minCapacity, float maxCapacity) {
+        try {
+            return zoneDAO.findByCapacityRange(minCapacity, maxCapacity).stream()
+                    .map(ZoneMapper::toDomain)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting zones by capacity range", e);
+        }
     }
 }
 

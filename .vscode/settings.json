@@ -1,3 +1,7 @@
 {
-    "java.project.sourcePaths": ["dev", "dev/test"]
+    "java.project.sourcePaths": [
+        "dev",
+        "dev/test"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

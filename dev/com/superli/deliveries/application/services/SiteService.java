@@ -1,78 +1,108 @@
 package com.superli.deliveries.application.services;
 
+import com.superli.deliveries.dataaccess.dao.SiteDAO;
 import com.superli.deliveries.domain.core.Site;
 import com.superli.deliveries.domain.core.Zone;
-import com.superli.deliveries.domain.ports.ISiteRepository;
 import com.superli.deliveries.dto.SiteDTO;
 import com.superli.deliveries.Mappers.SiteMapper;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SiteService {
+    private final SiteDAO siteDAO;
+    private final ZoneService zoneService;
 
-    private final ISiteRepository siteRepository;
-
-    public SiteService(ISiteRepository siteRepository) {
-        this.siteRepository = siteRepository;
+    public SiteService(SiteDAO siteDAO, ZoneService zoneService) {
+        this.siteDAO = siteDAO;
+        this.zoneService = zoneService;
     }
 
-    public List<SiteDTO> getAllSites() {
-        return siteRepository.findAll().stream()
-                .map(SiteMapper::toDTO) // מחזיר רשימת DTO
-                .collect(Collectors.toList());
-    }
-
-    public Optional<SiteDTO> getSiteById(String siteId) {
-        return siteRepository.findById(siteId)
-                .map(SiteMapper::toDTO); // מחזיר Optional<DTO>
-    }
-
-    public void saveSite(SiteDTO siteDTO) {
-        Site site = SiteMapper.fromDTO(siteDTO);
-        siteRepository.save(site);
-    }
-
-    public boolean updateAddress(String siteId, String newAddress) {
-        Optional<Site> siteOpt = siteRepository.findById(siteId);
-        if (siteOpt.isPresent()) {
-            Site site = siteOpt.get();
-            site.setAddress(newAddress);
-            siteRepository.save(site);
-            return true;
+    public List<Site> getAllSites() {
+        try {
+            return siteDAO.findAll().stream()
+                    .map(dto -> {
+                        Optional<Zone> zone = zoneService.getZoneById(dto.getZoneId());
+                        return zone.map(z -> SiteMapper.fromDTO(dto, z))
+                                .orElseThrow(() -> new RuntimeException("Zone not found for site: " + dto.getSiteId()));
+                    })
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all sites", e);
         }
-        return false;
     }
-    public boolean updateZone(String siteId, Zone newZone) {
-        Optional<Site> siteOpt = siteRepository.findById(siteId);
-        if (siteOpt.isPresent()) {
-            Site site = siteOpt.get();
-            site.setZone(newZone);
-            siteRepository.save(site);
-            return true;
+
+    public Optional<Site> getSiteById(String id) {
+        try {
+            return siteDAO.findById(id)
+                    .map(dto -> {
+                        Optional<Zone> zone = zoneService.getZoneById(dto.getZoneId());
+                        return zone.map(z -> SiteMapper.fromDTO(dto, z))
+                                .orElseThrow(() -> new RuntimeException("Zone not found for site: " + dto.getSiteId()));
+                    });
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting site by id: " + id, e);
         }
-        return false;
     }
-    public boolean updateContactPerson(String siteId, String newContactPerson) {
-        Optional<Site> siteOpt = siteRepository.findById(siteId);
-        if (siteOpt.isPresent()) {
-            Site site = siteOpt.get();
-            site.setContactPersonName(newContactPerson);
-            siteRepository.save(site);
-            return true;
+
+    public void saveSite(Site site) {
+        try {
+            siteDAO.save(SiteMapper.toDTO(site));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving site", e);
         }
-        return false;
     }
-    public boolean updatePhoneNumber(String siteId, String newPhoneNumber) {
-        Optional<Site> siteOpt = siteRepository.findById(siteId);
-        if (siteOpt.isPresent()) {
-            Site site = siteOpt.get();
-            site.setPhoneNumber(newPhoneNumber);
-            siteRepository.save(site);
-            return true;
+
+    public void deleteSite(String id) {
+        try {
+            siteDAO.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting site: " + id, e);
         }
-        return false;
+    }
+
+    public List<Site> getSitesByZone(String zoneId) {
+        try {
+            Optional<Zone> zone = zoneService.getZoneById(zoneId);
+            if (zone.isEmpty()) {
+                throw new RuntimeException("Zone not found: " + zoneId);
+            }
+            return siteDAO.findByZoneId(zoneId).stream()
+                    .map(dto -> SiteMapper.fromDTO(dto, zone.get()))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting sites by zone: " + zoneId, e);
+        }
+    }
+
+    public List<Site> getActiveSites() {
+        try {
+            return siteDAO.findActiveSites().stream()
+                    .map(dto -> {
+                        Optional<Zone> zone = zoneService.getZoneById(dto.getZoneId());
+                        return zone.map(z -> SiteMapper.fromDTO(dto, z))
+                                .orElseThrow(() -> new RuntimeException("Zone not found for site: " + dto.getSiteId()));
+                    })
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting active sites", e);
+        }
+    }
+
+    public Optional<Site> getSiteByAddress(String address) {
+        try {
+            return siteDAO.findByAddress(address)
+                    .map(dto -> {
+                        Optional<Zone> zone = zoneService.getZoneById(dto.getZoneId());
+                        return zone.map(z -> SiteMapper.fromDTO(dto, z))
+                                .orElseThrow(() -> new RuntimeException("Zone not found for site: " + dto.getSiteId()));
+                    });
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting site by address: " + address, e);
+        }
     }
 }
 

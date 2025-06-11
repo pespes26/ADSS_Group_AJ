@@ -9,81 +9,293 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main$Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main$Role.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DestinationDocController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DestinationDocController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DriverController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DriverController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/MainMenuController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/MainMenuController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/SiteController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/SiteController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController$CompatiblePair.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController$CompatiblePair.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TruckController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TruckController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/ZoneController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/ZoneController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DeliveredItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DeliveredItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DestinationDoc.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DestinationDoc.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Driver.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Driver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/LicenseType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/LicenseType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Product.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Product.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Site.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Site.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Transport.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Transport.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/TransportStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/TransportStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Truck.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Truck.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Zone.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Zone.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DeliveredItemDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DeliveredItemDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DestinationDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DestinationDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DriverDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DriverDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/SiteDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/SiteDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportSummaryView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportSummaryView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TruckDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TruckDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/ZoneView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/ZoneView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DeliveredItemService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DeliveredItemService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DestinationDocService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DestinationDocService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DriverService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DriverService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ProductService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ProductService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/SiteService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/SiteService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TransportService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TransportService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TruckService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TruckService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ZoneService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ZoneService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DestinationDocRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DestinationDocRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DriverRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DriverRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ProductRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ProductRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/SiteRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/SiteRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TransportRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TransportRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TruckRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TruckRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ZoneRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ZoneRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/DriverTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/DriverTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TransportTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TransportTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TruckTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TruckTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/DriverTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/ProductTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/SiteTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/TransportTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/TruckTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/domain/ZoneTest.class" beforeDir="false" />
-=======
     <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="fixing some bugs">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adss-aj-project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/adss-aj-project.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/MockDataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/MockDataInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ArchivedTransportMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ArchivedTransportMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DeliveredItemMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DeliveredItemMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DestinationDocMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DestinationDocMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DriverMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/DriverMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/EmployeeMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/EmployeeMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ProductMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ProductMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/SiteMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/SiteMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/TransportMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/TransportMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/TruckMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/TruckMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ZoneMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ZoneMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DestinationDocController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DestinationDocController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/SiteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/SiteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TransportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TransportController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TruckController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/TruckController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DeliveredItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DeliveredItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DestinationDocService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DestinationDocService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DriverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/DriverService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ProductService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DayOfWeek.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/WeekDays.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/SiteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/SiteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TransportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TransportService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TruckService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/TruckService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ZoneService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ZoneService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DeliveredItemDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DeliveredItemDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DestinationDocDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DestinationDocDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DriverDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/DriverDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/EmployeeDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/EmployeeDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ProductDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ProductDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ShiftDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ShiftDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/SiteDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/SiteDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/TransportDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/TransportDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/TruckDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/TruckDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ZoneDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/ZoneDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DestinationDoc.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/DestinationDoc.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TransportTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TransportTest.java" afterDir="false" />
->>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Site.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Site.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Transport.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Transport.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Zone.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Zone.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IDestinationDocRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IDriverRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IEmployeeRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IProductRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IShiftRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/ISiteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/ITransportRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/ITruckRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/ports/IZoneRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DeliveredItemDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DeliveredItemDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DestinationDocDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DestinationDocDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DriverDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/DriverDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/EmployeeDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/EmployeeDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ProductDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ProductDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ShiftDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ShiftDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/SiteDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/SiteDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/TransportDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/TransportDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/TruckDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/TruckDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ZoneDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/ZoneDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DestinationDocRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/DriverRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/EmployeeRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ProductRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/SiteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TransportRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/TruckRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/infrastructure/repositories/ZoneRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/util/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/util/Database.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerEmployeeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ControllerEmployeeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ControllerManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ControllerManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/HRManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/HRManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/HR/ShiftTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ShiftTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/DriverTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/DriverTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/ProductTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ProductTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/SiteTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/SiteTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TransportTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/TransportTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/TruckTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/TruckTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/test/com/superli/deliveries/ZoneTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ZoneTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Main$Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/MockDataInitializer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/ControllerEmployee.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/DestinationDocController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/DriverController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/EmployeerController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/MainMenuController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/ManagerController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/SiteController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/TransportController$CompatiblePair.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/TransportController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/TruckController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/controllers/ZoneController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/DeliveredItemService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/DestinationDocService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/DriverService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/EmployeeService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/ProductService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/ShiftService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/SiteService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/TransportService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/TruckService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application/services/ZoneService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main$Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ControllerEmployee.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DestinationDocController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DestinationDocController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DriverController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeerController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/MainMenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/MainMenuController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/SiteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/SiteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TruckController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TruckController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ZoneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ZoneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DeliveredItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DeliveredItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DestinationDocService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DestinationDocService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DriverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DriverService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/SiteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/SiteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TransportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TransportService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TruckService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TruckService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ZoneService.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ZoneService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DestinationDocController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/DriverController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/MainMenuController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/SiteController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController$CompatiblePair.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TransportController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/TruckController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/controllers/ZoneController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DeliveredItem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/DestinationDoc.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Driver.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/LicenseType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Product.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Site.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Transport.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/TransportStatus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Truck.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/Zone.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedEmployee.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedEmployee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedShifts.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedShifts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/AvailableShifts.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/AvailableShifts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DayOfWeek.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveredItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveredItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveryItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationDoc.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationDoc.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Employee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/EmployeeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/HRManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/LicenseType.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/LicenseType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ShiftType.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ShiftType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Site.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Site.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Transport.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Transport.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/TransportStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/TransportStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Truck.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Truck.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Zone.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Zone.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IDestinationDocRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IDriverRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IEmployeeRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IProductRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IShiftRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/ISiteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/ITransportRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/ITruckRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/ports/IZoneRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/DestinationDocRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/DriverRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/EmployeeRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/ProductRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/ShiftRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/SiteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/TransportRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/TruckRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/ZoneRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/employee/EmployeeRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/infrastructure/repositories/employee/ShiftRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DeliveredItemDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DestinationDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DestinationDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DestinationDetailsView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/DriverDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/SiteDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportDetailsView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportSummaryView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportSummaryView.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TransportSummaryView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/TruckDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/ZoneView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DeliveredItemService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DestinationDocService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/DriverService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ProductService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/SiteService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TransportService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/TruckService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/ZoneService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/employee/EmployeeService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/service/employee/ShiftService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DestinationDocRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/DriverRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ProductRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/SiteRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TransportRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/TruckRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/storage/ZoneRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/ArchivedEmployee.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/ArchivedShifts.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/AvailableShifts.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/DayOfWeek.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/DeliveredItem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/DeliveryItem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/DestinationDoc.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/DestinationStatus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Driver.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Employee.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/EmployeeType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/HRManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/LicenseType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Product.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Shift.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/ShiftType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Site.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Transport.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/TransportStatus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Truck.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/core/Zone.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IDestinationDocRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IDriverRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IEmployeeRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IProductRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IShiftRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/ISiteRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/ITransportRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/ITruckRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/domain/ports/IZoneRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/DestinationDocRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/DriverRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/EmployeeRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/ProductRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/ShiftRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/SiteRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/TransportRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/TruckRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/infrastructure/repositories/ZoneRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/DeliveredItemDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/DestinationDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/DriverDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/SiteDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/TransportDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/TransportSummaryView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/TruckDetailsView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/presentation/ZoneView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/ControllerEmployeeTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/ControllerManagerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/HRManagerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/ShiftTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/DriverTest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/DriverTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/ProductTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/SiteTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TransportTest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TransportTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TruckTest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/TruckTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/com/superli/deliveries/domain/ZoneTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +321,7 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2vrdpoaPlQaBDMwZwoUvOSXgqZz" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+  <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -121,12 +333,15 @@
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
     &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
     &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JUnit.ControllerManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest (1).executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DriverTest.constructor_EmptyName_ThrowsException.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DriverTest.constructor_NullId_ThrowsException.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DriverTest.constructor_ValidData_CreatesDriver.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DriverTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.DriverTest.setLicenseType_ValidType_UpdatesLicenseType.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ProductTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ShiftTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ShipmentAreaTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.SiteTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.TransportTest.constructor_ValidData_CreatesTransport.executor&quot;: &quot;Run&quot;,
@@ -134,10 +349,8 @@
     &quot;JUnit.TruckTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ZoneTest.executor&quot;: &quot;Run&quot;,
-<<<<<<< HEAD
-    &quot;JUnit.test in adss-aj-project.executor&quot;: &quot;Run&quot;,
-=======
->>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
+    &quot;Maven.adss-aj-project [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.adss-aj-project [test].executor&quot;: &quot;Run&quot;,
     &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
     &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
     &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
@@ -148,50 +361,32 @@
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Pesso/Desktop/Projects/ADSS_Group_AJ&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Pesso/Desktop/Projects/ADSS_P2/ADSS_Group_AJ&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-<<<<<<< HEAD
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-=======
     &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
->>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_P2\ADSS_Group_AJ" />
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_Group_AJ\release" />
     </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.superli.deliveries" />
+      <recent name="" />
+    </key>
   </component>
-<<<<<<< HEAD
   <component name="RunManager" selected="Application.Main">
-=======
-  <component name="RunManager">
->>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.Main" />
-      <module name="ADSS_AJ" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.superli.deliveries.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MainApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.MainApp" />
       <module name="adss-aj-project" />
       <extension name="coverage">
         <pattern>
@@ -203,16 +398,46 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DriverTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ControllerManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="adss-aj-project" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.superli.deliveries.domain.*" />
+          <option name="PATTERN" value="com.superli.deliveries.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.superli.deliveries.domain" />
-      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.domain.DriverTest" />
+      <option name="PACKAGE_NAME" value="com.superli.deliveries" />
+      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.ControllerManagerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProductTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="adss-aj-project" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value=".*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.superli.deliveries" />
+      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.ProductTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ShiftTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="adss-aj-project" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.superli.deliveries.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.superli.deliveries" />
+      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.ShiftTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -222,21 +447,13 @@
       <module name="adss-aj-project" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.superli.deliveries.domain.*" />
+          <option name="PATTERN" value="com.superli.deliveries.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.superli.deliveries.domain" />
-      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.domain.TruckTest" />
+      <option name="PACKAGE_NAME" value="com.superli.deliveries" />
+      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.TruckTest" />
       <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="test in adss-aj-project" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="adss-aj-project" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/dev/test" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -244,15 +461,20 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
-<<<<<<< HEAD
-        <item itemvalue="JUnit.test in adss-aj-project" />
-=======
->>>>>>> 767e60cec4fc7d63d8b6d5965781d002ebc0ef33
-        <item itemvalue="JUnit.DriverTest" />
+        <item itemvalue="JUnit.ShiftTest" />
         <item itemvalue="JUnit.TruckTest" />
-        <item itemvalue="Application.MainApp" />
+        <item itemvalue="JUnit.ControllerManagerTest" />
+        <item itemvalue="JUnit.ProductTest" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26094.121" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-IU-251.26094.121" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -282,6 +504,9 @@
       <workItem from="1745767874114" duration="818000" />
       <workItem from="1749277292237" duration="711000" />
       <workItem from="1749299819645" duration="266000" />
+      <workItem from="1749626085476" duration="6386000" />
+      <workItem from="1749635087110" duration="7124000" />
+      <workItem from="1749654985678" duration="124000" />
     </task>
     <task id="LOCAL-00001" summary="fix imports to all classes">
       <option name="closed" value="true" />

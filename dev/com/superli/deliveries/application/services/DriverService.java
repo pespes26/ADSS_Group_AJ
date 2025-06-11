@@ -22,8 +22,8 @@ public class DriverService {
     private final DriverDAO driverDAO;
     private final List<String> unavailableDriverIds;
 
-    public DriverService(DriverDAO driverDAO) {
-        this.driverDAO = driverDAO;
+    public DriverService() {
+        this.driverDAO = new DriverDAOImpl();
         this.unavailableDriverIds = new ArrayList<>();
     }
 
@@ -34,7 +34,7 @@ public class DriverService {
                     .map(DriverMapper::fromDTO)
                     .collect(Collectors.toList());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting all drivers", e);
         }
     }
 
@@ -43,54 +43,49 @@ public class DriverService {
         try {
             return driverDAO.findAll().stream()
                     .map(DriverMapper::fromDTO)
-                    .filter(driver -> !unavailableDriverIds.contains(driver.getId()))
+                    .filter(Driver::isAvailable)
                     .collect(Collectors.toList());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting available drivers", e);
         }
     }
 
     // Find specific driver by ID
-    public Optional<Driver> getDriverById(String driverId) {
-        Optional<DriverDTO> dtoOpt = null;
+    public Optional<Driver> getDriverById(String id) {
         try {
-            dtoOpt = driverDAO.findById(Integer.parseInt(driverId));
+            return driverDAO.findById(id)
+                    .map(DriverMapper::fromDTO);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting driver by id: " + id, e);
         }
-        return dtoOpt.map(DriverMapper::fromDTO);
     }
 
     // Save driver to DB
     public void saveDriver(Driver driver) {
-        DriverDTO dto = DriverMapper.toDTO(driver);
         try {
-            driverDAO.save(dto);
+            driverDAO.save(DriverMapper.toDTO(driver));
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error saving driver", e);
         }
     }
 
     // Delete driver from DB
-    public void deleteDriver(String driverId) {
+    public void deleteDriver(String id) {
         try {
-            driverDAO.deleteById(Integer.parseInt(driverId));
+            driverDAO.delete(id);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error deleting driver: " + id, e);
         }
-        unavailableDriverIds.remove(driverId);
     }
 
     // Mark driver as unavailable (assigned to transport)
     public void markDriverAsUnavailable(String driverId) {
-        if (!unavailableDriverIds.contains(driverId)) {
-            unavailableDriverIds.add(driverId);
-        }
+        updateDriverAvailability(driverId, false);
     }
 
     // Mark driver as available again
     public void markDriverAsAvailable(String driverId) {
-        unavailableDriverIds.remove(driverId);
+        updateDriverAvailability(driverId, true);
     }
 
     // Check if driver can drive a specific truck
@@ -99,53 +94,49 @@ public class DriverService {
     }
 
     // Update driver's license type
-    public boolean updateDriverLicenseType(String driverId, LicenseType newLicenseType) {
-        Optional<DriverDTO> dtoOpt = null;
-        try {
-            dtoOpt = driverDAO.findById(Integer.parseInt(driverId));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        if (dtoOpt.isPresent()) {
-            Driver driver = DriverMapper.fromDTO(dtoOpt.get());
-            driver.setLicenseType(newLicenseType);
-            try {
-                driverDAO.save(DriverMapper.toDTO(driver));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        }
-        return false;
+    public void updateDriverLicenseType(String id, LicenseType licenseType) {
+        Optional<Driver> driver = getDriverById(id);
+        driver.ifPresent(d -> {
+            d.setLicenseType(licenseType);
+            saveDriver(d);
+        });
     }
 
     // Update driver's availability
-    public boolean updateDriverAvailability(String driverId, boolean isAvailable) {
-        Optional<DriverDTO> dtoOpt = null;
-        try {
-            dtoOpt = driverDAO.findById(Integer.parseInt(driverId));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        if (dtoOpt.isPresent()) {
-            Driver driver = DriverMapper.fromDTO(dtoOpt.get());
-            driver.setAvailable(isAvailable);
-            try {
-                driverDAO.save(DriverMapper.toDTO(driver));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+    public void updateDriverAvailability(String id, boolean available) {
+        Optional<Driver> driver = getDriverById(id);
+        driver.ifPresent(d -> {
+            d.setAvailable(available);
+            saveDriver(d);
+        });
+    }
 
-            if (isAvailable) {
-                unavailableDriverIds.remove(driverId);
-            } else {
-                if (!unavailableDriverIds.contains(driverId)) {
-                    unavailableDriverIds.add(driverId);
-                }
-            }
-            return true;
+    public List<Driver> getDriversByLicenseType(String licenseType) {
+        try {
+            return driverDAO.findAll().stream()
+                    .map(DriverMapper::fromDTO)
+                    .filter(d -> d.getLicenseType().toString().equals(licenseType))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting drivers by license type: " + licenseType, e);
         }
-        return false;
+    }
+
+    public boolean isDriverAvailable(String id) {
+        Optional<Driver> driver = getDriverById(id);
+        return driver.map(Driver::isAvailable).orElse(false);
+    }
+
+    public boolean hasValidLicense(String id, LicenseType requiredType) {
+        Optional<Driver> driver = getDriverById(id);
+        return driver.map(d -> d.getLicenseType() == requiredType).orElse(false);
+    }
+
+    public void releaseDriver(Driver driver) {
+        if (driver != null) {
+            driver.setAvailable(true);
+            saveDriver(driver);
+        }
     }
 }
 

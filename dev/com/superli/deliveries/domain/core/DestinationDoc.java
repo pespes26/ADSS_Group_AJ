@@ -14,10 +14,10 @@ import com.superli.deliveries.domain.core.Site;
 public class DestinationDoc {
 
     /** Unique document identifier */
-    private final int destinationDocId;
+    private final String destinationDocId;
 
     /** ID of the transport this document belongs to */
-    private final int transportId;
+    private final String transportId;
 
     /** Destination site for this document */
     private final Site destinationId;
@@ -35,7 +35,7 @@ public class DestinationDoc {
      * @param destinationId Site to which items are delivered
      * @param status Initial status of the document
      */
-    public DestinationDoc(int destinationDocId, int transportId, Site destinationId, String status) {
+    public DestinationDoc(String destinationDocId, String transportId, Site destinationId, String status) {
         if (destinationId == null) {
             throw new IllegalArgumentException("Destination site cannot be null.");
         }
@@ -50,11 +50,11 @@ public class DestinationDoc {
         this.deliveryItems = new ArrayList<>();
     }
 
-    public int getDestinationDocId() {
+    public String getDestinationDocId() {
         return destinationDocId;
     }
 
-    public int getTransportId() {
+    public String getTransportId() {
         return transportId;
     }
 
@@ -123,7 +123,7 @@ public class DestinationDoc {
         if (this == o) return true;
         if (!(o instanceof DestinationDoc)) return false;
         DestinationDoc that = (DestinationDoc) o;
-        return destinationDocId == that.destinationDocId;
+        return destinationDocId.equals(that.destinationDocId);
     }
 
     @Override

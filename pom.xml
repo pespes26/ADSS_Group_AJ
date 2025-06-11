@@ -13,37 +13,42 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
+        <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
     <dependencies>
+        <!-- SLF4J Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- SQLite JDBC Driver -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.1.0</version>
+        </dependency>
+
+        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.1</version>
         </dependency>
     </dependencies>
 
     <build>
-        <sourceDirectory>dev/com/superli/deliveries</sourceDirectory>
-        <testSourceDirectory>dev/test</testSourceDirectory>
+        <sourceDirectory>dev</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
+
         <resources>
             <resource>
                 <directory>dev</directory>
@@ -54,6 +59,7 @@
         </resources>
 
         <plugins>
+            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -63,25 +69,27 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
+
+            <!-- Test Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
             </plugin>
-             <plugin>
+
+            <!-- Jar Plugin -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
-                 <configuration>
-                     <finalName>adss2025_v01</finalName>
-                     <outputDirectory>${project.basedir}/release</outputDirectory>
-                     <archive>
-                         <manifest>
-                             </manifest>
-                     </archive>
-                 </configuration>
-             </plugin>
+                <configuration>
+                    <finalName>adss2025_v01</finalName>
+                    <outputDirectory>${project.basedir}/release</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>

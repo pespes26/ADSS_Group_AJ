@@ -1,11 +1,24 @@
-package application.controllers;
+package com.superli.deliveries.application.controllers;
 
-import java.sql.SQLOutput;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import com.superli.deliveries.domain.core.AvailableShifts;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.Employee;
+import com.superli.deliveries.domain.core.HRManager;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Role;
+import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.domain.core.ShiftType;
 
 public class ManagerController {
     private static HRManager hrManager = new HRManager();
@@ -18,82 +31,47 @@ public class ManagerController {
     }
 
     // --------------------------------Employee Management ------------------------------------
-    public static void addNewEmployee( Scanner sc) {
+    public static String addNewEmployee(String id, String fullName, String bankAccount, double salary,
+                                        String employeeTerms, List<Role> roleQualifications, LicenseType licenseTypeIfNeeded) {
         HRManager hr = getHRManager();
-        System.out.println("--- Add New Employee ---");
 
-        String id;
-        while (true) {
-            System.out.print("Enter ID (9 digits): ");
-            id = sc.nextLine().trim();
-            if (!isNumeric(id) || id.length() != 9) {
-                System.out.println("Invalid ID. Please enter a 9-digit numeric ID.");
-                continue;
-            }
-            if (hr.FindEmployeeByID(id) != null) {
-                System.out.println("An employee with this ID already exists. Please enter a different ID.");
-                continue;
-            }
-            break;
-        }
-        System.out.print("Enter full name: ");
-        String fullName = sc.nextLine();
-
-        System.out.print("Enter bank account: ");
-        String bankAccount = sc.nextLine();
-
-        double salary = 0;
-        String salaryStr;
-        while (true) {
-            System.out.print("Enter salary: ");
-            salaryStr = sc.nextLine();
-            if (isNumeric(salaryStr)) {
-                salary = Double.parseDouble(salaryStr);
-                break;
-            } else {
-                System.out.println("Invalid salary. Please enter positive numbers only.");
-            }
+        if (!isNumeric(id) || id.length() != 9) {
+            return "Invalid ID. Please enter a 9-digit numeric ID.";
         }
 
-        System.out.print("Enter employment terms: ");
-        String employeeTerms = sc.nextLine();
+        if (hr.FindEmployeeByID(id) != null) {
+            return "An employee with this ID already exists.";
+        }
 
         Date employeeStartDate = new Date();
-
-        List<Role> roleQualifications = new ArrayList<>();
-        System.out.println("Enter role qualifications (type 'done' to finish):");
-        while (true) {
-            System.out.print("Role: ");
-            String roleName = sc.nextLine();
-            if (roleName.equalsIgnoreCase("done")) break;
-
-            Role existingRole = null;
-            for (Role r : hr.getAllRoles()) {
-                if (r.getRoleName().equalsIgnoreCase(roleName)) {
-                    existingRole = r;
-                    break;
-                }
-            }
-
-            if (existingRole != null) {
-                roleQualifications.add(existingRole);
-            } else {
-                System.out.println("Invalid Role.");
-            }
-        }
-
         List<AvailableShifts> availabilityConstraints = new ArrayList<>();
         Role loginRole = new Role("");
 
-        Employee newEmployee = new Employee(id, fullName, bankAccount, salary,
-                employeeTerms, employeeStartDate, roleQualifications,
-                availabilityConstraints, loginRole);
+        boolean isDriver = roleQualifications.stream()
+                .anyMatch(r -> r.getRoleName().equalsIgnoreCase("driver"));
+
+        Employee newEmployee;
+
+        if (isDriver) {
+            if (licenseTypeIfNeeded == null) {
+                return "License type is required for driver.";
+            }
+
+            newEmployee = new Driver(id, fullName, bankAccount, salary, employeeTerms,
+                    employeeStartDate, roleQualifications, availabilityConstraints, loginRole, licenseTypeIfNeeded);
+        } else {
+            newEmployee = new Employee(id, fullName, bankAccount, salary, employeeTerms,
+                    employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
+        }
 
         boolean addedSuccessfully = hr.addEmployee(newEmployee);
-        if (addedSuccessfully) {
-            System.out.println("Employee added successfully.");
-        }
+
+        return addedSuccessfully
+                ? (isDriver ? "Driver added successfully." : "Employee added successfully.")
+                : "Failed to add employee.";
     }
+
+
 
     public static void removeEmployeeById(Scanner sc) {
         HRManager hr = getHRManager();
@@ -337,7 +315,7 @@ public class ManagerController {
     }
 
 
-    public static void createShiftsForTheWeek( Scanner sc) {
+    public static void createShiftsForTheWeek(Scanner sc) {
         HRManager hr = getHRManager();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime deadline = LocalDate.now()
@@ -347,14 +325,11 @@ public class ManagerController {
         if (now.isAfter(deadline)) {
             LocalDate upcomingSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
 
-
             List<Shift> shiftsToArchive = new ArrayList<>();
             List<Shift> existingShifts = hr.getAllShifts();
 
             for (Shift s : existingShifts) {
-
                 LocalDate shiftDate = ((java.sql.Date) s.getShiftDate()).toLocalDate();
-
                 if (shiftDate.isBefore(upcomingSunday)) {
                     shiftsToArchive.add(s);
                 }
@@ -364,7 +339,6 @@ public class ManagerController {
                 hr.getArchivedShifts().archiveShift(shiftsToArchive);
                 existingShifts.removeAll(shiftsToArchive);
             }
-
 
             boolean alreadyCreated = false;
             for (Shift s : existingShifts) {
@@ -382,12 +356,18 @@ public class ManagerController {
 
             for (int i = 0; i < 7; i++) {
                 LocalDate shiftDate = upcomingSunday.plusDays(i);
-                DomainLayer.DayOfWeek day = DomainLayer.DayOfWeek.valueOf(shiftDate.getDayOfWeek().toString());
+                DayOfWeek day = DayOfWeek.valueOf(shiftDate.getDayOfWeek().name());
 
                 Date date = java.sql.Date.valueOf(shiftDate);
 
-                Shift morningShift = new Shift(date, ShiftType.MORNING, day, new ArrayList<>(), new HashMap<>(), null);
-                Shift eveningShift = new Shift(date, ShiftType.EVENING, day, new ArrayList<>(), new HashMap<>(), null);
+                int dayIndex = shiftDate.getDayOfWeek().getValue() % 7; // SUNDAY = 0, ..., SATURDAY = 6
+                int idMorning = dayIndex * 2;
+                int idEvening = dayIndex * 2 + 1;
+
+                Shift morningShift = new Shift(String.valueOf(idMorning), date, ShiftType.MORNING, day,
+                        new ArrayList<>(), new HashMap<>(), null);
+                Shift eveningShift = new Shift(String.valueOf(idEvening), date, ShiftType.EVENING, day,
+                        new ArrayList<>(), new HashMap<>(), null);
 
                 hr.addShift(morningShift);
                 hr.addShift(eveningShift);
@@ -565,23 +545,38 @@ public class ManagerController {
             assignedEmployees.add(selectedEmployee);
             unassignedRoles.remove(selectedRole);
         }
-
         boolean hasShiftManager = false;
+        boolean hasTransportationManager = false;
+
         for (Role role : assignments.keySet()) {
-            if (role.getRoleName().equalsIgnoreCase("Shift Manager")) {
+            String roleName = role.getRoleName().toLowerCase();
+            if (roleName.equals("shift manager")) {
                 hasShiftManager = true;
-                break;
+            }
+            else if (roleName.equals("transportation manager")) {
+                hasTransportationManager = true;
             }
         }
 
-        if (!hasShiftManager || assignments.size() < requiredRoles.size()) {
-            System.out.println("\nWarning: The shift is **invalid** because not all required roles were assigned or a Shift Manager is missing.");
+
+        boolean missingRoles = assignments.size() < requiredRoles.size();
+
+        if (!hasShiftManager || !hasTransportationManager || missingRoles) {
+            System.out.println("\nWarning: The shift is **invalid** due to the following reasons:");
+            if (!hasShiftManager)
+                System.out.println("- Missing assignment for: Shift Manager.");
+            if (!hasTransportationManager)
+                System.out.println("- Missing assignment for: Transportation Manager.");
+            if (missingRoles)
+                System.out.println("- Not all required roles have been assigned.");
+
             System.out.println("The shift will not be considered valid until all mandatory roles are assigned properly.");
             assignments.clear();
         } else {
             System.out.println("\nAll required roles have been assigned successfully. The shift is now valid.");
         }
     }
+
 
     public static void removeEmployeeFromShift(Scanner sc) {
         HRManager hr = getHRManager();
@@ -706,4 +701,3 @@ public class ManagerController {
         }
     }
 }
-

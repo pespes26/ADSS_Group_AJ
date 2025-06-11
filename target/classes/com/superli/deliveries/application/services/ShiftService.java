@@ -1,248 +1,173 @@
-package application.services;
+package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.enums.employee.Employee;
-import com.superli.deliveries.domain.enums.employee.Role;
-import com.superli.deliveries.domain.enums.employee.Shift;
-import com.superli.deliveries.domain.enums.employee.ShiftType;
-import com.superli.deliveries.domain.ports.employee.IShiftRepository;
+import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.dataaccess.dao.ShiftDAO;
+import com.superli.deliveries.dataaccess.dao.EmployeeDAO;
+import com.superli.deliveries.dto.ShiftDTO;
+import com.superli.deliveries.Mappers.ShiftMapper;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Service class that provides business logic for managing shifts.
- */
 public class ShiftService {
-    private final IShiftRepository shiftRepository;
 
-    public ShiftService(IShiftRepository shiftRepository) {
-        this.shiftRepository = shiftRepository;
+    private final ShiftDAO shiftDAO;
+    private final EmployeeDAO employeeDAO;
+
+    public ShiftService(ShiftDAO shiftDAO, EmployeeDAO employeeDAO) {
+        this.shiftDAO = shiftDAO;
+        this.employeeDAO = employeeDAO;
     }
 
-    /**
-     * Creates a new shift.
-     *
-     * @param shiftDate The date of the shift
-     * @param shiftType The type of shift
-     * @param shiftDay The day of the week
-     * @param requiredRoles The roles required for this shift
-     * @param manager The manager assigned to this shift
-     * @return The created shift
-     * @throws IllegalArgumentException if any parameter is null
-     */
-    public Shift createShift(Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay,
-                           Set<Role> requiredRoles, Employee manager) {
-        if (shiftDate == null) {
-            throw new IllegalArgumentException("Shift date cannot be null");
+    public List<Shift> getAllShifts() {
+        try {
+            return shiftDAO.findAll().stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all shifts", e);
         }
-        if (shiftType == null) {
-            throw new IllegalArgumentException("Shift type cannot be null");
+    }
+
+    public Optional<Shift> getShiftById(String shiftId) {
+        try {
+            return shiftDAO.findById(shiftId)
+                    .map(dto -> ShiftMapper.toDomain(dto));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shift by id: " + shiftId, e);
         }
-        if (shiftDay == null) {
-            throw new IllegalArgumentException("Shift day cannot be null");
+    }
+
+    public void saveShift(Shift shift) {
+        try {
+            ShiftDTO dto = ShiftMapper.toDTO(shift);
+            shiftDAO.save(dto);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving shift", e);
         }
-        if (requiredRoles == null) {
-            throw new IllegalArgumentException("Required roles cannot be null");
-        }
-        if (manager == null) {
-            throw new IllegalArgumentException("Manager cannot be null");
-        }
-
-        Shift shift = new Shift(shiftDate, shiftType, shiftDay, requiredRoles, manager);
-        return shiftRepository.save(shift);
     }
 
-    /**
-     * Finds a shift by its ID.
-     *
-     * @param id The shift ID
-     * @return The shift if found, null otherwise
-     */
-    public Shift findById(String id) {
-        return shiftRepository.findById(id).orElse(null);
-    }
-
-    /**
-     * Finds all shifts in the system.
-     *
-     * @return List of all shifts
-     */
-    public List<Shift> findAll() {
-        return shiftRepository.findAll();
-    }
-
-    /**
-     * Finds all shifts of a specific type.
-     *
-     * @param type The shift type to filter by
-     * @return List of shifts of the specified type
-     */
-    public List<Shift> findByType(ShiftType type) {
-        return shiftRepository.findByType(type);
-    }
-
-    /**
-     * Finds all shifts on a specific day.
-     *
-     * @param day The day to filter by
-     * @return List of shifts on the specified day
-     */
-    public List<Shift> findByDay(DayOfWeek day) {
-        return shiftRepository.findByDay(day);
-    }
-
-    /**
-     * Finds all shifts between two dates.
-     *
-     * @param startDate The start date
-     * @param endDate The end date
-     * @return List of shifts between the specified dates
-     */
-    public List<Shift> findByDateRange(Date startDate, Date endDate) {
-        return shiftRepository.findByDateRange(startDate, endDate);
-    }
-
-    /**
-     * Finds all shifts that require a specific role.
-     *
-     * @param role The role to filter by
-     * @return List of shifts requiring the specified role
-     */
-    public List<Shift> findByRequiredRole(Role role) {
-        return shiftRepository.findByRequiredRole(role);
-    }
-
-    /**
-     * Finds all shifts where an employee is assigned.
-     *
-     * @param employee The employee to filter by
-     * @return List of shifts where the employee is assigned
-     */
-    public List<Shift> findEmployeeShifts(Employee employee) {
-        return shiftRepository.findByAssignedEmployee(employee);
-    }
-
-    /**
-     * Finds all shifts managed by a specific employee.
-     *
-     * @param manager The manager to filter by
-     * @return List of shifts managed by the specified employee
-     */
-    public List<Shift> findManagerShifts(Employee manager) {
-        return shiftRepository.findByManager(manager);
-    }
-
-    /**
-     * Finds all archived shifts.
-     *
-     * @return List of archived shifts
-     */
-    public List<Shift> findArchived() {
-        return shiftRepository.findArchived();
-    }
-
-    /**
-     * Finds all active (non-archived) shifts.
-     *
-     * @return List of active shifts
-     */
-    public List<Shift> findActive() {
-        return shiftRepository.findActive();
-    }
-
-    /**
-     * Assigns an employee to a shift.
-     *
-     * @param shiftId The ID of the shift
-     * @param employee The employee to assign
-     * @return true if the employee was assigned successfully, false otherwise
-     * @throws IllegalArgumentException if the shift is not found or the employee cannot be assigned
-     */
-    public boolean assignEmployee(String shiftId, Employee employee) {
-        Shift shift = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
-
-        if (shift.isArchived()) {
-            throw new IllegalArgumentException("Cannot assign employee to archived shift");
-        }
-
-        if (shift.isShiftFullyAssigned()) {
-            throw new IllegalArgumentException("Shift is already fully assigned");
-        }
-
-        if (!shift.canAssignEmployee(employee)) {
-            throw new IllegalArgumentException("Employee cannot be assigned to this shift");
-        }
-
-        Role role = shift.getShiftRequiredRoles().iterator().next();
-        shift.addEmployeeToShift(employee, role);
-        shiftRepository.update(shift);
-        return true;
-    }
-
-    /**
-     * Removes an employee from a shift.
-     *
-     * @param shiftId The ID of the shift
-     * @param employee The employee to remove
-     * @return true if the employee was removed successfully, false otherwise
-     * @throws IllegalArgumentException if the shift is not found
-     */
-    public boolean removeEmployee(String shiftId, Employee employee) {
-        Shift shift = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
-
-        if (shift.isArchived()) {
-            throw new IllegalArgumentException("Cannot remove employee from archived shift");
-        }
-
-        if (!shift.isEmployeeAssigned(employee)) {
+    public boolean deleteShift(String shiftId) {
+        try {
+            Optional<ShiftDTO> shiftOpt = shiftDAO.findById(shiftId);
+            if (shiftOpt.isPresent()) {
+                shiftDAO.deleteById(shiftId);
+                return true;
+            }
             return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting shift: " + shiftId, e);
         }
-
-        shift.removeEmployeeFromShift(employee);
-        shiftRepository.update(shift);
-        return true;
     }
 
-    /**
-     * Updates the required roles for a shift.
-     *
-     * @param shift The shift to update
-     * @param requiredRoles The new required roles
-     * @throws IllegalArgumentException if either parameter is null
-     */
-    public void updateRequiredRoles(Shift shift, Set<Role> requiredRoles) {
-        if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null");
+    public List<Shift> getShiftsByDate(LocalDate date) {
+        try {
+            return shiftDAO.findByDate(date).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts by date: " + date, e);
         }
-        if (requiredRoles == null) {
-            throw new IllegalArgumentException("Required roles cannot be null");
-        }
-
-        // Create a new shift with the updated roles
-        Shift updatedShift = new Shift(
-            shift.getShiftDate(),
-            shift.getShiftType(),
-            shift.getShiftDay(),
-            requiredRoles,
-            shift.getShiftManager()
-        );
-        shiftRepository.update(updatedShift);
     }
 
-    /**
-     * Archives a shift.
-     *
-     * @param shiftId The ID of the shift to archive
-     * @return The archived shift
-     * @throws IllegalArgumentException if the shift is not found
-     */
-    public Shift archiveShift(String shiftId) {
-        Shift shift = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
-
-        shift.archive();
-        return shiftRepository.update(shift);
+    public List<Shift> getShiftsByDayOfWeek(DayOfWeek day) {
+        try {
+            return shiftDAO.findByDayOfWeek(day).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts by day: " + day, e);
+        }
     }
-} 
+
+    public List<Shift> getShiftsForEmployee(String employeeId) {
+        try {
+            return shiftDAO.findByEmployeeId(employeeId).stream()
+                    .<Shift>map(dto -> ShiftMapper.toDomain(dto))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting shifts for employee: " + employeeId, e);
+        }
+    }
+
+    public boolean isShiftInPast(Shift shift) {
+        if (shift == null || shift.getShiftDate() == null) return true;
+        return shift.getShiftDate().before(new Date());
+    }
+
+    public Shift createShift(LocalDate date, ShiftType type, DayOfWeek day, List<Role> requiredRoles, Map<Employee, Role> assignedEmployees, Employee manager) {
+        try {
+            Shift shift = new Shift(
+                    generateNewShiftId(),
+                    Date.from(date.atStartOfDay().toInstant(java.time.ZoneOffset.UTC)),
+                    type,
+                    day,
+                    requiredRoles,
+                    assignedEmployees,
+                    manager
+            );
+            saveShift(shift);
+            return shift;
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating shift", e);
+        }
+    }
+
+    private String generateNewShiftId() {
+        try {
+            return UUID.randomUUID().toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating new shift ID", e);
+        }
+    }
+}
+
+//public class ShiftService {
+//
+//    /**
+//     * Creates a new shift with required roles and manager.
+//     */
+//    public Shift createShift(Date date, ShiftType type, DayOfWeek day,
+//                             List<Role> requiredRoles, Map<Employee, Role> assignedEmployees, Employee manager) {
+//        int shiftId = UUID.randomUUID().hashCode();
+//        return new Shift(shiftId, date, type, day, requiredRoles, assignedEmployees, manager);
+//    }
+//
+//    /**
+//     * Assigns an employee to a shift, if valid.
+//     */
+//    public boolean assignEmployee(Shift shift, Employee employee, Role role) {
+//        if (shift.isEmployeeAssigned(employee)) return false;
+//        if (!shift.getShiftRequiredRoles().contains(role)) return false;
+//
+//        shift.addEmployeeToShift(employee, role);
+//        return true;
+//    }
+//
+//    /**
+//     * Removes an employee from a shift.
+//     */
+//    public boolean removeEmployee(Shift shift, Employee employee) {
+//        if (!shift.isEmployeeAssigned(employee)) return false;
+//
+//        shift.removeEmployeeFromShift(employee);
+//        return true;
+//    }
+//
+//    /**
+//     * Checks if a shift is fully staffed.
+//     */
+//    public boolean isFullyAssigned(Shift shift) {
+//        return shift.isShiftFullyAssigned();
+//    }
+//
+//    /**
+//     * Checks if a shift already ended.
+//     */
+//    public boolean isShiftInPast(Shift shift) {
+//        return shift.isPastShift();
+//    }
+//}

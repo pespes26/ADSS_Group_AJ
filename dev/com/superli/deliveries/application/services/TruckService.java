@@ -1,77 +1,144 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.domain.core.LicenseType;
-import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.domain.ports.ITruckRepository;
-import com.superli.deliveries.dto.TruckDTO;
-import com.superli.deliveries.Mappers.TruckMapper;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+
+import com.superli.deliveries.Mappers.TruckMapper;
+import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.dataaccess.dao.TruckDAO;
+import com.superli.deliveries.dto.TruckDTO;
+
+import java.sql.SQLException;
 
 public class TruckService {
 
-    private final ITruckRepository truckRepository;
-    private final List<String> unavailableTrucks = new ArrayList<>();
+    private final TruckDAO truckDAO;
 
-    public TruckService(ITruckRepository truckRepository) {
-        this.truckRepository = truckRepository;
+    public TruckService(TruckDAO truckDAO) {
+        this.truckDAO = truckDAO;
     }
 
-    public List<TruckDTO> getAllTrucks() {
-        return truckRepository.findAll().stream().map(TruckMapper::toDTO).collect(Collectors.toList());
-    }
-
-    public Optional<TruckDTO> getTruckByPlate(String truckPlate) {
-        return truckRepository.findByPlate(truckPlate).map(truck -> TruckMapper.toDTO(truck));
-    }
-
-    public void saveTruck(TruckDTO truckDTO) {
-        Truck truck = TruckMapper.fromDTO(truckDTO, truckDTO.getRequiredLicenseType());
-        truckRepository.save(truck);
-    }
-
-    public boolean deleteTruck(String truckId) {
-        Optional<Truck> truckOpt = truckRepository.findByPlate(truckId);
-        if (truckOpt.isPresent()) {
-            truckRepository.deleteByPlate(truckId);
-            return true;
+    public List<Truck> getAllTrucks() {
+        try {
+            return truckDAO.findAll().stream()
+                    .map(TruckMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all trucks", e);
         }
-        return false;
-    }
-    public Truck addTruck(String plateNum, String model, float netWeight,
-                          float maxWeight, LicenseType requiredLicenseType) {
-        Truck newTruck = new Truck(plateNum, model, netWeight, maxWeight, requiredLicenseType);
-        truckRepository.save(newTruck);
-        return newTruck;
     }
 
-    public boolean removeTruck(String plateNum) {
-        Optional<Truck> truckOpt = truckRepository.findByPlate(plateNum);
-        if (truckOpt.isPresent()) {
-            truckRepository.deleteByPlate(plateNum);
-            unavailableTrucks.remove(plateNum);
-            return true;
+    public Optional<Truck> getTruckById(String id) {
+        try {
+            return truckDAO.findByPlate(id)
+                    .map(TruckMapper::fromDTO);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting truck by id: " + id, e);
         }
-        return false;
+    }
+
+    public void saveTruck(Truck truck) {
+        try {
+            truckDAO.save(TruckMapper.toDTO(truck));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving truck", e);
+        }
+    }
+
+    public void deleteTruck(String id) {
+        try {
+            truckDAO.deleteByPlate(id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting truck: " + id, e);
+        }
+    }
+
+    public List<Truck> getAvailableTrucks() {
+        try {
+            return truckDAO.findAvailableTrucks().stream()
+                    .map(TruckMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting available trucks", e);
+        }
+    }
+
+    public List<Truck> getTrucksByType(String type) {
+        try {
+            return truckDAO.findByType(type).stream()
+                    .map(TruckMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting trucks by type: " + type, e);
+        }
+    }
+
+    public Optional<Truck> getTruckByPlate(String plate) {
+        try {
+            return truckDAO.findByPlate(plate)
+                    .map(TruckMapper::fromDTO);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting truck by plate: " + plate, e);
+        }
+    }
+
+    public List<Truck> getTrucksByCapacityRange(float minCapacity, float maxCapacity) {
+        try {
+            return truckDAO.findByCapacityRange(minCapacity, maxCapacity).stream()
+                    .map(TruckMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting trucks by capacity range", e);
+        }
     }
 
     public boolean markTruckAsUnavailable(String plateNum) {
-        if (truckRepository.existsByPlate(plateNum) && !unavailableTrucks.contains(plateNum)) {
-            unavailableTrucks.add(plateNum);
-            return true;
+        try {
+            Optional<TruckDTO> truckOpt = truckDAO.findByPlate(plateNum);
+            if (truckOpt.isPresent()) {
+                Truck truck = TruckMapper.fromDTO(truckOpt.get());
+                truck.setAvailable(false);
+                truckDAO.save(TruckMapper.toDTO(truck));
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return false;
     }
 
     public boolean markTruckAsAvailable(String plateNum) {
-        return unavailableTrucks.remove(plateNum);
+        try {
+            Optional<TruckDTO> truckOpt = truckDAO.findByPlate(plateNum);
+            if (truckOpt.isPresent()) {
+                Truck truck = TruckMapper.fromDTO(truckOpt.get());
+                truck.setAvailable(true);
+                truckDAO.save(TruckMapper.toDTO(truck));
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isTruckAvailable(String plateNum) {
-        return !unavailableTrucks.contains(plateNum);
+        try {
+            return truckDAO.findByPlate(plateNum)
+                    .map(dto -> dto.isAvailable())
+                    .orElse(false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void releaseTruck(Truck truck) {
+        if (truck != null) {
+            truck.setAvailable(true);
+            saveTruck(truck);
+        }
     }
 }
 

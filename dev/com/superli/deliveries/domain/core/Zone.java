@@ -15,14 +15,11 @@ public class Zone {
     /**
      * Constructs a new Zone object.
      *
-     * @param zoneId The unique identifier for the zone. Cannot be null or empty.
+     * @param zoneId The unique identifier for the zone.
      * @param name   The name of the zone. Cannot be null or empty.
-     * @throws IllegalArgumentException if zoneId or name is null or empty.
+     * @throws IllegalArgumentException if name is null or empty.
      */
     public Zone(String zoneId, String name) {
-        if (zoneId == null || zoneId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Zone ID cannot be null or empty.");
-        }
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Zone name cannot be null or empty.");
         }

@@ -1,11 +1,10 @@
 package com.superli.deliveries.domain.core;
 
-
 import java.time.DayOfWeek;
 import java.util.*;
 
 public class Shift {
-    private int shiftId;
+    private String shiftId;
     private Date shiftDate;
     private ShiftType shiftType;
     private DayOfWeek shiftDay;
@@ -13,7 +12,7 @@ public class Shift {
     private Map<Employee, Role> shiftEmployees;
     private Employee shiftManager;
 
-    public Shift(int shiftId, Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
+    public Shift(String shiftId, Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
         this.shiftId = shiftId;
         this.shiftDate = shiftDate;
         this.shiftType = shiftType;
@@ -46,6 +45,10 @@ public class Shift {
 
     public DayOfWeek getShiftDay() {
         return shiftDay;
+    }
+
+    public String getShiftId() {
+        return shiftId;
     }
 
     // ----------------------------------- End Getters -----------------------------------
@@ -122,10 +125,6 @@ public class Shift {
     public boolean isPastShift() {
         Date now = new Date();
         return shiftDate.before(now);
-    }
-
-    public int getShiftId() {
-        return shiftId;
     }
 
     // ----------------------------------- End Status Checks -----------------------------------

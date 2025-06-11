@@ -1,12 +1,24 @@
 package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.core.*;
-
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import com.superli.deliveries.domain.core.AvailableShifts;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.Employee;
+import com.superli.deliveries.domain.core.HRManager;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Role;
+import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.domain.core.ShiftType;
 
 public class ManagerController {
     private static HRManager hrManager = new HRManager();
@@ -352,9 +364,9 @@ public class ManagerController {
                 int idMorning = dayIndex * 2;
                 int idEvening = dayIndex * 2 + 1;
 
-                Shift morningShift = new Shift(idMorning, date, ShiftType.MORNING, day,
+                Shift morningShift = new Shift(String.valueOf(idMorning), date, ShiftType.MORNING, day,
                         new ArrayList<>(), new HashMap<>(), null);
-                Shift eveningShift = new Shift(idEvening, date, ShiftType.EVENING, day,
+                Shift eveningShift = new Shift(String.valueOf(idEvening), date, ShiftType.EVENING, day,
                         new ArrayList<>(), new HashMap<>(), null);
 
                 hr.addShift(morningShift);

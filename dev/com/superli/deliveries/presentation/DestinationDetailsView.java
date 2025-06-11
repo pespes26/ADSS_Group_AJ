@@ -11,12 +11,12 @@ import com.superli.deliveries.domain.core.TransportStatus;
  */
 public class DestinationDetailsView {
 
-    private final int destinationDocId;
+    private final String destinationDocId;
     private final SiteDetailsView destinationSite;
     private final List<DeliveredItemDetailsView> deliveredItems;
     private final TransportStatus status;
 
-    public DestinationDetailsView(int destinationDocId, SiteDetailsView destinationSite,
+    public DestinationDetailsView(String destinationDocId, SiteDetailsView destinationSite,
                                   List<DeliveredItemDetailsView> deliveredItems, TransportStatus status) {
         if (destinationSite == null) {
             throw new IllegalArgumentException("Destination site cannot be null.");
@@ -34,7 +34,7 @@ public class DestinationDetailsView {
         this.status = status;
     }
 
-    public int getDestinationDocId() {
+    public String getDestinationDocId() {
         return destinationDocId;
     }
 
@@ -65,7 +65,7 @@ public class DestinationDetailsView {
         if (this == o) return true;
         if (!(o instanceof DestinationDetailsView)) return false;
         DestinationDetailsView that = (DestinationDetailsView) o;
-        return destinationDocId == that.destinationDocId;
+        return destinationDocId.equals(that.destinationDocId);
     }
 
     @Override

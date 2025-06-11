@@ -1,10 +1,8 @@
-package com.superli.deliveries;
-import application.controllers;
+package com.superli.deliveries.application.controllers;
 
-import application.services.*;
-
-import domain.core.*;
 import java.util.Scanner;
+
+import com.superli.deliveries.application.Main;
 
 public class MainMenuController {
 

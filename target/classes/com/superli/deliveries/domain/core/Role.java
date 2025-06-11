@@ -1,29 +1,16 @@
-package domain.core;
+package com.superli.deliveries.domain.core;
 
 import java.util.Objects;
 
-/**
- * Represents a role or qualification that an employee can have.
- */
 public class Role {
     private String roleName;
 
     public Role(String roleName) {
-        if (roleName == null || roleName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be null or empty");
-        }
         this.roleName = roleName;
     }
 
     public String getRoleName() {
         return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        if (roleName == null || roleName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be null or empty");
-        }
-        this.roleName = roleName;
     }
 
     @Override
@@ -36,11 +23,6 @@ public class Role {
 
     @Override
     public int hashCode() {
-        return Objects.hash(roleName);
+        return roleName.hashCode();
     }
-
-    @Override
-    public String toString() {
-        return roleName;
-    }
-} 
+}

@@ -1,7 +1,7 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.Zone;
-import com.superli.deliveries.dto.ZoneDTO;
+import com.superli.deliveries.dto.del.ZoneDTO;
 
 public class ZoneMapper {
 

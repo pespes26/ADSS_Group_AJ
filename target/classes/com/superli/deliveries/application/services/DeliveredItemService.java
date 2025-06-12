@@ -10,8 +10,8 @@ import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.domain.core.DeliveredItem;
-import com.superli.deliveries.dataaccess.dao.DeliveredItemDAO;
-import com.superli.deliveries.dto.DeliveredItemDTO;
+import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAO;
+import com.superli.deliveries.dto.del.DeliveredItemDTO;
 import com.superli.deliveries.Mappers.DeliveredItemMapper;
 /**
  * Service responsible for managing delivered items within destination documents.

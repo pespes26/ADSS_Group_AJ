@@ -21,49 +21,95 @@ public class Database {
 
             try (Statement st = conn.createStatement()) {
                 // Create roles table
-                st.executeUpdate("""
+
+                    // Create roles table
+                    st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS roles (
-                        id TEXT PRIMARY KEY,
-                        name TEXT NOT NULL UNIQUE,
-                        description TEXT
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL UNIQUE
                     );""");
 
-                // Create employees table
-                st.executeUpdate("""
+                    // Create employees table
+                    st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS employees (
                         id TEXT PRIMARY KEY,
                         name TEXT NOT NULL,
-                        id_number TEXT UNIQUE NOT NULL,
                         bank_account TEXT NOT NULL,
                         salary REAL NOT NULL,
                         employment_terms TEXT NOT NULL,
-                        start_date TEXT NOT NULL,
-                        type_role_id TEXT,
-                        FOREIGN KEY (type_role_id) REFERENCES roles(id)
+                        start_date TEXT NOT NULL
                     );""");
 
-                // Create employee_roles table
-                st.executeUpdate("""
+                    // Create employee_roles table
+                    st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS employee_roles (
                         employee_id TEXT NOT NULL,
-                        role_id TEXT NOT NULL,
+                        role_id INTEGER NOT NULL,
                         PRIMARY KEY (employee_id, role_id),
                         FOREIGN KEY (employee_id) REFERENCES employees(id),
                         FOREIGN KEY (role_id) REFERENCES roles(id)
                     );""");
 
-                // Create available_shifts table
-                st.executeUpdate("""
+                    // Create available_shifts table
+                    st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS available_shifts (
-                        id TEXT PRIMARY KEY,
                         employee_id TEXT NOT NULL,
                         day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
                         shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
-                        shift_code TEXT NOT NULL,
+                        PRIMARY KEY (employee_id, day_of_week, shift_type)
+                    );""");
+
+                    // Create archived_employees table
+                    st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS archived_employees (
+                        employee_id TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        bank_account TEXT,
+                        salary REAL,
+                        employment_terms TEXT,
+                        start_date TEXT,
+                        archived_date TEXT NOT NULL,
                         FOREIGN KEY (employee_id) REFERENCES employees(id)
                     );""");
 
-                // Create driver table
+                    // Create archived_shifts table
+                // Create archived_shifts table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS archived_shifts (
+                        employee_id TEXT NOT NULL,
+                        day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
+                        shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
+                        date TEXT NOT NULL,
+                        role_id INTEGER NOT NULL,
+                        PRIMARY KEY (employee_id, day_of_week, shift_type),
+                        FOREIGN KEY (employee_id) REFERENCES employees(id),
+                        FOREIGN KEY (role_id) REFERENCES roles(id)
+                    );""");
+
+                    // Create shift_assignments table
+                    st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS shift_assignments (
+                        employee_id TEXT NOT NULL,
+                        day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
+                        shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
+                        date TEXT NOT NULL,
+                        role_id INTEGER NOT NULL,
+                        PRIMARY KEY (employee_id, day_of_week, shift_type),
+                        FOREIGN KEY (employee_id) REFERENCES employees(id),
+                        FOREIGN KEY (role_id) REFERENCES roles(id)
+                    );""");
+
+                    st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS shift_required_roles (
+                        day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
+                        shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
+                        role_id INTEGER NOT NULL,
+                        required_count INTEGER NOT NULL CHECK(required_count >= 1),
+                        PRIMARY KEY (day_of_week, shift_type, role_id),
+                        FOREIGN KEY (role_id) REFERENCES roles(id)
+                    );""");
+
+                    // Create driver table
                 st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS driver (
                         employee_id TEXT PRIMARY KEY,

@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.superli.deliveries.Mappers.DestinationDocMapper;
-import com.superli.deliveries.dataaccess.dao.DestinationDocDAO;
+import com.superli.deliveries.dataaccess.dao.del.DestinationDocDAO;
 import com.superli.deliveries.domain.core.DeliveredItem;
 import com.superli.deliveries.domain.core.DestinationDoc;
 import com.superli.deliveries.domain.core.Site;

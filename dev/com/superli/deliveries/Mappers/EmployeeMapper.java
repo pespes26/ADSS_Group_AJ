@@ -1,7 +1,7 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.dto.*;
+import com.superli.deliveries.dto.HR.EmployeeDTO;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,10 +47,10 @@ public class EmployeeMapper {
                 employee.getBankAccount(),
                 employee.getSalary(),
                 employee.getEmployeeTerms(),
-                dateFormat.format(employee.getEmployeeStartDate()),
-                null, // license
-                role,
-                qualificationLevel
+                dateFormat.format(employee.getEmployeeStartDate())
+                //null, // license
+                //role,/
+                //qualificationLevel
         );
     }
 }

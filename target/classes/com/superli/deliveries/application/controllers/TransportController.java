@@ -26,9 +26,9 @@ import com.superli.deliveries.domain.core.Site;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.TransportStatus;
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dto.SiteDTO;
-import com.superli.deliveries.dto.TransportDTO;
-import com.superli.deliveries.dto.TruckDTO;
+import com.superli.deliveries.dto.del.SiteDTO;
+import com.superli.deliveries.dto.del.TransportDTO;
+import com.superli.deliveries.dto.del.TruckDTO;
 
 /**
  * Controller for managing transport operations via console UI.

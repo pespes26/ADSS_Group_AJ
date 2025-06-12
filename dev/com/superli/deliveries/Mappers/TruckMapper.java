@@ -1,7 +1,7 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dto.TruckDTO;
+import com.superli.deliveries.dto.del.TruckDTO;
 
 public class TruckMapper {
 

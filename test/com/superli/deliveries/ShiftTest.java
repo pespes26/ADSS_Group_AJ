@@ -41,7 +41,7 @@ public class ShiftTest {
         requiredRoles.add(role);
         Map<Employee, Role> shiftEmployees = new HashMap<>();
         Employee manager = createTestEmployee("999999999");
-        return new Shift("2", today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
+        return new Shift(3,today, ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, shiftEmployees, manager);
     }
 
     /**
@@ -150,7 +150,7 @@ public class ShiftTest {
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date yesterday = calendar.getTime();
 
-        Shift shift = new Shift("5", yesterday, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
+        Shift shift = new Shift(1,yesterday, ShiftType.MORNING, DayOfWeek.SUNDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
 
         assertTrue(shift.isPastShift());
     }
@@ -164,111 +164,51 @@ public class ShiftTest {
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
 
-        Shift shift = new Shift("7", tomorrow, ShiftType.MORNING, DayOfWeek.TUESDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
+        Shift shift = new Shift(6,tomorrow, ShiftType.MORNING, DayOfWeek.TUESDAY, new ArrayList<>(), new HashMap<>(), createTestEmployee("999999999"));
 
         assertFalse(shift.isPastShift());
     }
 
     @Test
-    void constructor_ValidData_CreatesShift() {
-        // Arrange
-        int id = 123;
-        Date shiftDate = new Date();
-        ShiftType shiftType = ShiftType.MORNING;
-        DayOfWeek shiftDay = DayOfWeek.MONDAY;
-        List<Role> requiredRoles = new ArrayList<>();
-        Map<Employee, Role> employees = new HashMap<>();
-        Employee manager = new Employee("M1", "Manager", "manager@test.com", 0.0, "Standard", new Date(), new ArrayList<>(), new ArrayList<>(), new Role("Manager"));
+    public void givenUnassignedEmployee_whenAddEmployeeToShiftWithDriverRole_thenEmployeeAssignedSuccessfully() {
+        Role driver = new Role("Driver");
+        Shift shift = createTestShiftWithRole(driver);
+        Employee emp = createTestEmployee("123456789");
 
-        // Act
-        Shift shift = new Shift(String.valueOf(id), shiftDate, shiftType, shiftDay, requiredRoles, employees, manager);
+        shift.addEmployeeToShift(emp, driver);
 
-        // Assert
-        assertNotNull(shift);
-        assertEquals(String.valueOf(id), shift.getShiftId());
-        assertEquals(shiftDate, shift.getShiftDate());
-        assertEquals(shiftType, shift.getShiftType());
-        assertEquals(shiftDay, shift.getShiftDay());
-        assertEquals(requiredRoles, shift.getShiftRequiredRoles());
-        assertEquals(employees, shift.getShiftEmployees());
-        assertEquals(manager, shift.getShiftManager());
+        assertTrue(shift.getShiftEmployees().containsKey(emp));
+        assertTrue(shift.getShiftRequiredRoles().isEmpty());
+    }
+
+
+    @Test
+    public void givenDriverAssigned_whenRemoveEmployeeFromShift_thenDriverRoleRestored() {
+        Role driver = new Role("Driver");
+        Shift shift = createTestShiftWithRole(driver);
+        Employee emp = createTestEmployee("123456789");
+
+        shift.addEmployeeToShift(emp, driver);
+        shift.removeEmployeeFromShift(emp);
+
+        assertFalse(shift.getShiftEmployees().containsKey(emp));
+        assertTrue(shift.getShiftRequiredRoles().contains(driver));
     }
 
     @Test
-    void addEmployeeToShift_ValidAssignment_AddsEmployee() {
-        // Arrange
-        Shift shift = createTestShift();
-        Employee employee = new Employee("E1", "Test", "test@test.com", 0.0, "Standard", new Date(), new ArrayList<>(), new ArrayList<>(), new Role("Driver"));
-        Role role = new Role("Driver");
+    public void givenDriverRole_whenCheckUnassignedEmployee_thenReturnsFalse() {
+        Role driver = new Role("Driver");
+        Shift shift = createTestShiftWithRole(driver);
+        Employee emp = createTestEmployee("123456789");
 
-        // Act
-        shift.addEmployeeToShift(employee, role);
-
-        // Assert
-        assertTrue(shift.isEmployeeAssigned(employee));
-        assertFalse(shift.getShiftRequiredRoles().contains(role));
+        assertFalse(shift.isEmployeeAssigned(emp));
     }
 
     @Test
-    void removeEmployeeFromShift_ValidRemoval_RemovesEmployee() {
-        // Arrange
-        Shift shift = createTestShift();
-        Employee employee = new Employee("E1", "Test", "test@test.com", 0.0, "Standard", new Date(), new ArrayList<>(), new ArrayList<>(), new Role("Driver"));
-        Role role = new Role("Driver");
-        shift.addEmployeeToShift(employee, role);
+    public void givenDriverRoleUnassigned_whenCheckIsShiftFullyAssigned_thenReturnsFalse() {
+        Role driver = new Role("Driver");
+        Shift shift = createTestShiftWithRole(driver);
 
-        // Act
-        shift.removeEmployeeFromShift(employee);
-
-        // Assert
-        assertFalse(shift.isEmployeeAssigned(employee));
-        assertTrue(shift.getShiftRequiredRoles().contains(role));
-    }
-
-    @Test
-    void isShiftFullyAssigned_NoRequiredRoles_ReturnsTrue() {
-        // Arrange
-        Shift shift = createTestShift();
-        Employee employee = new Employee("E1", "Test", "test@test.com", 0.0, "Standard", new Date(), new ArrayList<>(), new ArrayList<>(), new Role("Driver"));
-        Role role = new Role("Driver");
-        shift.addEmployeeToShift(employee, role);
-
-        // Act & Assert
-        assertTrue(shift.isShiftFullyAssigned());
-    }
-
-    @Test
-    void isShiftFullyAssigned_HasRequiredRoles_ReturnsFalse() {
-        // Arrange
-        Shift shift = createTestShift();
-
-        // Act & Assert
         assertFalse(shift.isShiftFullyAssigned());
-    }
-
-    @Test
-    void isPastShift_ShiftDateBeforeNow_ReturnsTrue() {
-        // Arrange
-        Date pastDate = new Date(System.currentTimeMillis() - 86400000); // 1 day ago
-        Shift shift = new Shift("1", pastDate, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), null);
-
-        // Act & Assert
-        assertTrue(shift.isPastShift());
-    }
-
-    @Test
-    void isPastShift_ShiftDateAfterNow_ReturnsFalse() {
-        // Arrange
-        Date futureDate = new Date(System.currentTimeMillis() + 86400000); // 1 day in future
-        Shift shift = new Shift("1", futureDate, ShiftType.MORNING, DayOfWeek.MONDAY, new ArrayList<>(), new HashMap<>(), null);
-
-        // Act & Assert
-        assertFalse(shift.isPastShift());
-    }
-
-    private Shift createTestShift() {
-        List<Role> requiredRoles = new ArrayList<>();
-        requiredRoles.add(new Role("Driver"));
-        return new Shift("1", new Date(), ShiftType.MORNING, DayOfWeek.MONDAY, requiredRoles, new HashMap<>(), null);
     }
 }

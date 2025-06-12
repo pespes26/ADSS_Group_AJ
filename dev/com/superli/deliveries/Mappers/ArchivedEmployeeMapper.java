@@ -2,7 +2,7 @@ package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.ArchivedEmployee;
 import com.superli.deliveries.domain.core.Employee;
-import com.superli.deliveries.dto.ArchivedEmployeeDTO;
+import com.superli.deliveries.dto.HR.ArchivedEmployeeDTO;
 
 import java.util.ArrayList;
 import java.util.List;

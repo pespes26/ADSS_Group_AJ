@@ -3,12 +3,11 @@ package com.superli.deliveries.application.services;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 import com.superli.deliveries.Mappers.TruckMapper;
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dataaccess.dao.TruckDAO;
-import com.superli.deliveries.dto.TruckDTO;
+import com.superli.deliveries.dataaccess.dao.del.TruckDAO;
+import com.superli.deliveries.dto.del.TruckDTO;
 
 import java.sql.SQLException;
 

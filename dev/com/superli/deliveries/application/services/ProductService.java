@@ -1,12 +1,10 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.dataaccess.dao.ProductDAO;
+import com.superli.deliveries.dataaccess.dao.del.ProductDAO;
 import com.superli.deliveries.domain.core.Product;
-import com.superli.deliveries.dto.ProductDTO;
 import com.superli.deliveries.Mappers.ProductMapper;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

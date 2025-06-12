@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.superli.deliveries.Mappers.ZoneMapper;
-import com.superli.deliveries.dataaccess.dao.ZoneDAO;
+import com.superli.deliveries.dataaccess.dao.del.ZoneDAO;
 import com.superli.deliveries.domain.core.Zone;
 
 public class ZoneService {

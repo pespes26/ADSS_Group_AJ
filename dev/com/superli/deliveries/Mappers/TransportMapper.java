@@ -1,10 +1,10 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.dto.*;
+import com.superli.deliveries.dto.del.TransportDTO;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

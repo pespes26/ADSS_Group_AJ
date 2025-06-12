@@ -1,7 +1,7 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.dto.DeliveredItemDTO;
+import com.superli.deliveries.dto.del.DeliveredItemDTO;
 
 public class DeliveredItemMapper {
 

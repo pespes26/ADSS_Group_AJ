@@ -7,19 +7,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.superli.deliveries.Mappers.TransportMapper;
-import com.superli.deliveries.dataaccess.dao.TransportDAO;
+import com.superli.deliveries.dataaccess.dao.del.TransportDAO;
 import com.superli.deliveries.domain.core.DestinationDoc;
 import com.superli.deliveries.domain.core.Driver;
 import com.superli.deliveries.domain.core.Site;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.TransportStatus;
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dto.TransportDTO;
-import com.superli.deliveries.presentation.DeliveredItemDetailsView;
-import com.superli.deliveries.presentation.DestinationDetailsView;
-import com.superli.deliveries.presentation.SiteDetailsView;
-import com.superli.deliveries.presentation.TransportDetailsView;
-import com.superli.deliveries.presentation.TransportSummaryView;
+import com.superli.deliveries.dto.del.TransportDTO;
+import com.superli.deliveries.presentation.del.DeliveredItemDetailsView;
+import com.superli.deliveries.presentation.del.DestinationDetailsView;
+import com.superli.deliveries.presentation.del.SiteDetailsView;
+import com.superli.deliveries.presentation.del.TransportDetailsView;
+import com.superli.deliveries.presentation.del.TransportSummaryView;
 
 /**
  * Service layer for managing Transport operations and business logic.

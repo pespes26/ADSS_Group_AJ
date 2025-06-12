@@ -1,7 +1,7 @@
 package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.dto.*;
+import com.superli.deliveries.dto.HR.EmployeeRoleDTO;
 
 public class EmployeeRoleMapper {
 

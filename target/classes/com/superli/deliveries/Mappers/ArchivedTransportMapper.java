@@ -8,7 +8,7 @@ import com.superli.deliveries.domain.core.Driver;
 import com.superli.deliveries.domain.core.Site;
 import com.superli.deliveries.domain.core.TransportStatus;
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dto.ArchivedTransportDTO;
+import com.superli.deliveries.dto.del.ArchivedTransportDTO;
 
 public class ArchivedTransportMapper {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;

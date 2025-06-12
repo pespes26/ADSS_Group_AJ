@@ -4,7 +4,7 @@ import com.superli.deliveries.Mappers.SiteMapper;
 import com.superli.deliveries.domain.core.Zone;
 import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.ZoneService;
-import com.superli.deliveries.dto.SiteDTO;
+import com.superli.deliveries.dto.del.SiteDTO;
 
 import java.util.List;
 import java.util.Optional;

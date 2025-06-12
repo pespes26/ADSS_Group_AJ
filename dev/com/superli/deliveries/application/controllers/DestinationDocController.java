@@ -10,15 +10,12 @@ import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.TransportService;
 import com.superli.deliveries.Mappers.DestinationDocMapper;
 import com.superli.deliveries.Mappers.SiteMapper;
-import com.superli.deliveries.Mappers.TransportMapper;
-import com.superli.deliveries.dto.DestinationDocDTO;
-import com.superli.deliveries.dto.SiteDTO;
-import com.superli.deliveries.dto.TransportDTO;
+import com.superli.deliveries.dto.del.DestinationDocDTO;
+import com.superli.deliveries.dto.del.SiteDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * Controller for managing DestinationDoc (delivery documents) via console UI.

@@ -1,11 +1,11 @@
 package com.superli.deliveries.application.services;
 
+import com.superli.deliveries.dataaccess.dao.del.DriverDAO;
+import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
 import com.superli.deliveries.domain.core.Driver;
 import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Truck;
 //import com.superli.deliveries.domain.ports.IDriverRepository;
-import com.superli.deliveries.dataaccess.dao.*;
-import com.superli.deliveries.dto.*;
 import com.superli.deliveries.Mappers.*;
 
 import java.sql.SQLException;

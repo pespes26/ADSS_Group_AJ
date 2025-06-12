@@ -4,12 +4,10 @@ import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.application.services.TruckService;
 import com.superli.deliveries.Mappers.TruckMapper;
-import com.superli.deliveries.dto.TruckDTO;
+import com.superli.deliveries.dto.del.TruckDTO;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * Controller for managing truck-related actions in a console-based UI.

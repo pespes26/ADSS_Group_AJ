@@ -2,7 +2,7 @@ package com.superli.deliveries.Mappers;
 
 import com.superli.deliveries.domain.core.Site;
 import com.superli.deliveries.domain.core.Zone;
-import com.superli.deliveries.dto.SiteDTO;
+import com.superli.deliveries.dto.del.SiteDTO;
 
 public class SiteMapper {
 

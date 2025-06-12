@@ -195,7 +195,7 @@ public class ControllerEmployeeTest {
     private Shift createTestShift(DayOfWeek day, ShiftType shiftType) {
         Date today = new Date();
         String shiftId = UUID.randomUUID().toString();
-        return new Shift("3", today, shiftType, day, new ArrayList<>(), new HashMap<>(), null);
+        return new Shift(3, today, shiftType, day, new ArrayList<>(), new HashMap<>(), null);
     }
 
     private void simulateUserInput(String input) {

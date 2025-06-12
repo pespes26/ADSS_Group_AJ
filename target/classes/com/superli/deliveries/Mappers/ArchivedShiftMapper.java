@@ -2,46 +2,36 @@ package com.superli.deliveries.Mappers;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.time.ZoneId;
 import java.util.Date;
 
-import com.superli.deliveries.domain.core.Employee;
-import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.dto.HR.ArchivedShiftDTO;
 import com.superli.deliveries.domain.core.ShiftType;
-import com.superli.deliveries.dto.ArchivedShiftDTO;
 
 public class ArchivedShiftMapper {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    public static ArchivedShiftDTO toDTO(Shift shift) {
-        if (shift == null) return null;
-
-        LocalDate localDate = shift.getShiftDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+    public static ArchivedShiftDTO toDTO(String employeeId, DayOfWeek dayOfWeek, ShiftType shiftType, Date date, int roleId) {
         return new ArchivedShiftDTO(
-                shift.getShiftId(),
-                formatter.format(localDate),
-                shift.getShiftType().name(),
-                shift.getShiftDay().name(),
-                shift.getShiftManager() != null ? shift.getShiftManager().getId() : null
+                employeeId,
+                dayOfWeek,
+                shiftType,
+                date,
+                roleId
         );
     }
 
-    public static Shift fromDTO(ArchivedShiftDTO dto, Employee manager) {
-        if (dto == null) return null;
+    public static ArchivedShiftDTO fromResultSet(java.sql.ResultSet rs) throws java.sql.SQLException {
+        String employeeId = rs.getString("employee_id");
+        DayOfWeek dayOfWeek = DayOfWeek.valueOf(rs.getString("day_of_week"));
+        ShiftType shiftType = ShiftType.valueOf(rs.getString("shift_type"));
+        Date date = java.sql.Date.valueOf(rs.getString("date"));
+        int roleId = rs.getInt("role_id");
 
-        LocalDate localDate = LocalDate.parse(dto.getDate(), formatter);
-        Date shiftDate = Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        return new ArchivedShiftDTO(employeeId, dayOfWeek, shiftType, date, roleId);
+    }
 
-        return new Shift(
-                dto.getId(),
-                shiftDate,
-                ShiftType.valueOf(dto.getType()),
-                DayOfWeek.valueOf(dto.getDayOfWeek()),
-                Collections.emptyList(),     // required roles (not in DTO)
-                Collections.emptyMap(),      // employees (not in DTO)
-                manager
-        );
+    public static String getDateAsString(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return localDate.toString(); // YYYY-MM-DD
     }
 }

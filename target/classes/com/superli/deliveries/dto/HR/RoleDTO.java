@@ -4,7 +4,12 @@ public class RoleDTO {
     private int id;
     private String name;
 
-    public RoleDTO() {}
+    public RoleDTO(){
+
+    }
+    public RoleDTO(String name) {
+        this.name = name;
+    }
 
     public RoleDTO(int id, String name) {
         this.id = id;

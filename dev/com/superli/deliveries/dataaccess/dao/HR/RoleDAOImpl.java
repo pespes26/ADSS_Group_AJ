@@ -19,30 +19,29 @@ public class RoleDAOImpl implements RoleDAO {
         }
     }
 
+
     @Override
     public RoleDTO save(RoleDTO role) throws SQLException {
-        String sql = """
-            INSERT INTO roles (name)
-            VALUES (?)
-            ON CONFLICT(name) DO NOTHING
-        """;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Optional<RoleDTO> existing = findByName(role.getName());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        String sql = "INSERT INTO roles(name) VALUES(?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, role.getName());
             ps.executeUpdate();
 
-            // Try to get the generated ID if it's new
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     role.setId(rs.getInt(1));
-                } else {
-                    // Role already exists, fetch its ID
-                    Optional<RoleDTO> existing = findByName(role.getName());
-                    existing.ifPresent(value -> role.setId(value.getId()));
+                    return role;
                 }
             }
         }
-        return role;
+
+        throw new SQLException("Failed to insert new role into database");
     }
 
     @Override
@@ -60,16 +59,21 @@ public class RoleDAOImpl implements RoleDAO {
 
     @Override
     public Optional<RoleDTO> findByName(String name) throws SQLException {
-        String sql = "SELECT * FROM roles WHERE name = ?";
+        String sql = "SELECT id, name FROM roles WHERE name = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return Optional.of(fromResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    String roleName = rs.getString("name");
+                    return Optional.of(new RoleDTO(id, roleName));
+                }
             }
         }
         return Optional.empty();
     }
+
+
 
     @Override
     public List<RoleDTO> findAll() throws SQLException {

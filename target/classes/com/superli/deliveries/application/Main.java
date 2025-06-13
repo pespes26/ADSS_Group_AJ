@@ -46,7 +46,11 @@ public class Main {
 // Static variable to store current user role
 private static Role currentUserRole;
 
-/**
+    public static void runDeliveriesSystem() {
+        main(null);  // מריץ את אותה הפונקציה של main הקיים
+    }
+
+    /**
  * Checks if the current user is a system administrator.
  * @return true if current user is a system administrator, false otherwise
  */

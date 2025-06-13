@@ -1,9 +1,14 @@
 package com.superli.deliveries.application.controllers;
 
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import com.superli.deliveries.dataaccess.dao.HR.RoleDAO;
+import com.superli.deliveries.dataaccess.dao.HR.RoleDAOImpl;
 import com.superli.deliveries.domain.core.*;
 
 import com.superli.deliveries.domain.core.Employee;
@@ -11,10 +16,13 @@ import com.superli.deliveries.domain.core.HRManager;
 import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.domain.core.Shift;
+import com.superli.deliveries.util.Database;
 
 
 public class ManagerController {
     private static HRManager hrManager = new HRManager();
+    private static RoleController roleController;
+    private static ShiftController shiftController;
 
     public static void setHRManager(HRManager hr) {
         hrManager = hr;
@@ -24,6 +32,17 @@ public class ManagerController {
         return hrManager;
     }
 
+
+
+    public static void initHRControllers() throws SQLException {
+        Connection conn = Database.getConnection();
+        RoleDAO roleDAO = new RoleDAOImpl(conn);
+        roleController = new RoleController(roleDAO);
+    }
+
+    public static RoleController getRoleController() {
+        return roleController;
+    }
     // --------------------------------Employee Management ------------------------------------
     public static String addNewEmployee(String id, String fullName, String bankAccount, double salary,
                                         String employeeTerms, List<Role> roleQualifications, LicenseType licenseTypeIfNeeded,boolean isDriver) {

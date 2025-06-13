@@ -1,20 +1,31 @@
 package com.superli.deliveries.application.controllers;
+import com.superli.deliveries.dataaccess.dao.HR.RoleDAOImpl;
 import com.superli.deliveries.domain.core.*;
 
 import com.superli.deliveries.dataaccess.dao.HR.RoleDAO;
 import com.superli.deliveries.dto.HR.RoleDTO;
 import com.superli.deliveries.domain.core.Role;
+import com.superli.deliveries.util.Database;
+
+import java.util.List;
 
 public class RoleController {
 
     private static RoleDAO roleDAO;
 
-    // inject DAO once (או לקבל דרך constructor אם תעבור ל־Spring)
+    public RoleController(RoleDAO dao) {
+        RoleController.roleDAO = dao;
+    }
+
+
     public static void setRoleDAO(RoleDAO dao) {
         roleDAO = dao;
     }
 
     public static String addNewRole(String roleName) {
+
+
+        HRManager hr = ManagerController.getHRManager();
         if (roleName == null || roleName.trim().isEmpty()) {
             return "Invalid role name. Cannot be empty.";
         }
@@ -22,20 +33,36 @@ public class RoleController {
         if (!roleName.matches("[a-zA-Z ]+")) {
             return "Invalid role name. Please use letters only.";
         }
-
         try {
-            if (roleDAO.findByName(roleName).isPresent()) {
-                return "Role already exists.";
-            }
-
-            RoleDTO dto = new RoleDTO();
-            roleDAO.save(dto); // שומר לטבלת roles
+            hr.addRole(new Role(roleName));
+            RoleDTO dto = new RoleDTO(roleName);
+            roleDAO.save(dto);
 
             return "Role '" + roleName + "' added successfully.";
         } catch (Exception e) {
             return "Error adding role: " + e.getMessage();
         }
     }
+    public static void ensureSystemRolesExist() {
+        try {
+            if (roleDAO.findByName("shift manager").isEmpty()) {
+                RoleDTO dto1 = new RoleDTO("shift manager");
+                roleDAO.save(dto1);
+                ManagerController.getHRManager().addRole(new Role("shift manager"));
+                System.out.println("System role 'shift manager' added automatically.");
+            }
+            if (roleDAO.findByName("transportation manager").isEmpty()) {
+                RoleDTO dto2 = new RoleDTO("transportation manager");
+                roleDAO.save(dto2);
+                ManagerController.getHRManager().addRole(new Role("transportation manager"));
+                System.out.println("System role 'transportation manager' added automatically.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Failed to ensure system roles: " + e.getMessage());
+        }
+    }
+
+
 
 
     /**

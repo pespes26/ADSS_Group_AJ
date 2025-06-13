@@ -38,10 +38,10 @@ public class EmployeeController {
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
 
-        if (dayOfWeek != java.util.Calendar.THURSDAY) {
+       /* if (dayOfWeek != java.util.Calendar.THURSDAY) {
             System.out.println("Sorry, availability can only be updated on Thursdays.");
             return;
-        }
+        }*/
 
         if (!employee.getAvailabilityConstraints().isEmpty()) {
             System.out.println("You already have availability constraints.");

@@ -12,4 +12,6 @@ public interface RoleDAO {
     RoleDTO save(RoleDTO t) throws SQLException;
     void deleteById(int id) throws SQLException;
     Optional<RoleDTO> findByName(String name) throws SQLException;
-    }
+
+
+}

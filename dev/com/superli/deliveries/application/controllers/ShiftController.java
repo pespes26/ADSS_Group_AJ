@@ -1,6 +1,13 @@
 package com.superli.deliveries.application.controllers;
+import com.superli.deliveries.dataaccess.dao.HR.*;
 import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.dto.HR.RoleDTO;
+import com.superli.deliveries.dto.HR.ShiftDTO;
+import com.superli.deliveries.dto.HR.ShiftRoleDTO;
+import com.superli.deliveries.util.Database;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -50,8 +57,8 @@ public class ShiftController {
             Date date = java.sql.Date.valueOf(shiftDate);
 
 
-            Shift morningShift = new Shift(shiftIdCounter++,date, ShiftType.MORNING, day, new ArrayList<>(), new HashMap<>(), null);
-            Shift eveningShift = new Shift(shiftIdCounter++,date, ShiftType.EVENING, day, new ArrayList<>(), new HashMap<>(), null);
+            Shift morningShift = new Shift(shiftIdCounter++, date, ShiftType.MORNING, day, new ArrayList<>(), new HashMap<>(), null);
+            Shift eveningShift = new Shift(shiftIdCounter++, date, ShiftType.EVENING, day, new ArrayList<>(), new HashMap<>(), null);
 
             hr.addShift(morningShift);
             hr.addShift(eveningShift);
@@ -97,7 +104,7 @@ public class ShiftController {
 
         System.out.print("Enter shift number: ");
         int shiftIndex = Integer.parseInt(sc.nextLine());
-        if (shiftIndex < 0  || shiftIndex >= shifts.size()) {
+        if (shiftIndex < 0 || shiftIndex >= shifts.size()) {
             System.out.println("Invalid shift selection.");
             return;
         }
@@ -119,7 +126,7 @@ public class ShiftController {
 
         System.out.print("Choose an employee to remove: ");
         int employeeIndex = Integer.parseInt(sc.nextLine());
-        if (employeeIndex < 1  || employeeIndex > assignedEmployees.size()) {
+        if (employeeIndex < 1 || employeeIndex > assignedEmployees.size()) {
             System.out.println("Invalid employee selection.");
             return;
         }
@@ -187,7 +194,6 @@ public class ShiftController {
 
     public static void assignEmployeeToShift(Scanner sc) {
         HRManager hr = ManagerController.getHRManager();
-
         List<Shift> shifts = hr.getAllShifts();
         if (shifts.isEmpty()) {
             System.out.println("No shifts available.");
@@ -207,18 +213,45 @@ public class ShiftController {
         }
         Shift selectedShift = shifts.get(shiftIndex - 1);
 
-        List<Role> requiredRoles = new ArrayList<>(selectedShift.getShiftRequiredRoles());
-        if (requiredRoles.isEmpty()) {
-            System.out.println("No required roles defined for this shift. Please define roles before assigning employees.");
+        Map<Integer, Integer> requiredRoleMap;
+        Map<Role, Integer> requiredRoles = new HashMap<>();
+
+        try {
+            Connection conn = Database.getConnection();
+            ShiftRoleDAO shiftRoleDAO = new ShiftRoleDAOImpl(conn);
+            RoleDAO roleDAO = new RoleDAOImpl(conn);
+
+            requiredRoleMap = shiftRoleDAO.getRequiredRolesForShift(
+                    selectedShift.getShiftDay().toString(),
+                    selectedShift.getShiftType().toString()
+            );
+
+            if (requiredRoleMap.isEmpty()) {
+                System.out.println("No required roles defined for this shift. Please define roles before assigning employees.");
+                return;
+            }
+
+            for (Map.Entry<Integer, Integer> entry : requiredRoleMap.entrySet()) {
+                RoleDTO dto = roleDAO.findById(entry.getKey())
+                        .orElseThrow(() -> new RuntimeException("Role not found for ID: " + entry.getKey()));
+                requiredRoles.put(new Role(dto.getName()), entry.getValue());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Failed to load required roles: " + e.getMessage());
             return;
         }
 
         System.out.println("\nRequired roles for this shift:");
-        for (int i = 0; i < requiredRoles.size(); i++) {
-            System.out.println((i + 1) + ". " + requiredRoles.get(i).getRoleName());
+        for (Map.Entry<Role, Integer> entry : requiredRoles.entrySet()) {
+            System.out.println("- " + entry.getKey().getRoleName() + " (x" + entry.getValue() + ")");
         }
 
-        List<Role> unassignedRoles = new ArrayList<>(requiredRoles);
+        List<Role> unassignedRoles = new ArrayList<>();
+        requiredRoles.forEach((role, count) -> {
+            for (int i = 0; i < count; i++) unassignedRoles.add(role);
+        });
+
         Map<Role, Employee> assignments = new HashMap<>();
         List<Employee> assignedEmployees = new ArrayList<>();
 
@@ -232,7 +265,7 @@ public class ShiftController {
             int roleChoice = Integer.parseInt(sc.nextLine());
             if (roleChoice == 0) {
                 System.out.println("Exiting role assignment menu.");
-                return;
+                break;
             }
             if (roleChoice < 1 || roleChoice > unassignedRoles.size()) {
                 System.out.println("Invalid role selection.");
@@ -245,12 +278,11 @@ public class ShiftController {
             List<Employee> candidates = new ArrayList<>();
             for (Employee e : hr.getEmployees()) {
                 for (Role r : e.getRoleQualifications()) {
-                    if (r.getRoleName().equalsIgnoreCase(selectedRole.getRoleName())) {
-                        if (e.isAvailable(selectedShift.getShiftDay(), selectedShift.getShiftType()) &&
-                            !assignedEmployees.contains(e)) {
-                            candidates.add(e);
-                            break;
-                        }
+                    if (r.getRoleName().equalsIgnoreCase(selectedRole.getRoleName()) &&
+                        e.isAvailable(selectedShift.getShiftDay(), selectedShift.getShiftType()) &&
+                        !assignedEmployees.contains(e)) {
+                        candidates.add(e);
+                        break;
                     }
                 }
             }
@@ -263,7 +295,7 @@ public class ShiftController {
             System.out.println("Available employees for " + selectedRole.getRoleName() + ":");
             for (int i = 0; i < candidates.size(); i++) {
                 Employee e = candidates.get(i);
-                System.out.println((i+1) + ". " + e.getFullName() + " (ID: " + e.getId() + ")");
+                System.out.println((i + 1) + ". " + e.getFullName() + " (ID: " + e.getId() + ")");
             }
 
             System.out.print("Choose an employee to assign for this role (or 0 to skip): ");
@@ -286,21 +318,13 @@ public class ShiftController {
             assignedEmployees.add(selectedEmployee);
             unassignedRoles.remove(selectedRole);
         }
-        boolean hasShiftManager = false;
-        boolean hasTransportationManager = false;
 
-        for (Role role : assignments.keySet()) {
-            String roleName = role.getRoleName().toLowerCase();
-            if (roleName.equals("shift manager")) {
-                hasShiftManager = true;
-            }
-            else if (roleName.equals("transportation manager")) {
-                hasTransportationManager = true;
-            }
-        }
+        boolean hasShiftManager = assignments.keySet().stream()
+                .anyMatch(r -> r.getRoleName().equalsIgnoreCase("shift manager"));
+        boolean hasTransportationManager = assignments.keySet().stream()
+                .anyMatch(r -> r.getRoleName().equalsIgnoreCase("transportation manager"));
 
-
-        boolean missingRoles = assignments.size() < requiredRoles.size();
+        boolean missingRoles = assignments.size() < requiredRoles.values().stream().mapToInt(i -> i).sum();
 
         if (!hasShiftManager || !hasTransportationManager || missingRoles) {
             System.out.println("\nWarning: The shift is **invalid** due to the following reasons:");
@@ -312,11 +336,40 @@ public class ShiftController {
                 System.out.println("- Not all required roles have been assigned.");
 
             System.out.println("The shift will not be considered valid until all mandatory roles are assigned properly.");
-            assignments.clear();
         } else {
             System.out.println("\nAll required roles have been assigned successfully. The shift is now valid.");
         }
+
+        // שמירה ל־DB
+        try {
+            ShiftDTO shiftDTO = new ShiftDTO();
+            shiftDTO.setShiftDate(selectedShift.getShiftDate());
+            shiftDTO.setShiftDay(selectedShift.getShiftDay().toString());
+            shiftDTO.setShiftType(selectedShift.getShiftType().toString());
+
+            Map<Integer, Integer> assignedMap = new HashMap<>();
+            Connection conn = Database.getConnection();
+            RoleDAO roleDAO = new RoleDAOImpl(conn);
+
+            for (Map.Entry<Role, Employee> entry : assignments.entrySet()) {
+                RoleDTO dto = roleDAO.findByName(entry.getKey().getRoleName())
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + entry.getKey().getRoleName()));
+                int employeeId = Integer.parseInt(entry.getValue().getId());
+                assignedMap.put(employeeId, dto.getId());
+            }
+
+            shiftDTO.setAssignedEmployees(assignedMap);
+            ShiftDAO shiftDAO = new ShiftDAOImpl(conn); // מעביר את אותו conn
+            shiftDAO.save(shiftDTO);
+
+
+            System.out.println("Shift assignments saved to the database.");
+
+        } catch (Exception e) {
+            System.err.println("Failed to save shift assignments: " + e.getMessage());
+        }
     }
+
 
     public static void defineRolesForSpecificShift(Scanner sc) {
         HRManager hr = ManagerController.getHRManager();
@@ -326,35 +379,38 @@ public class ShiftController {
             return;
         }
 
-
         System.out.println("All shifts for next week:");
         for (int i = 0; i < shifts.size(); i++) {
             Shift s = shifts.get(i);
-            System.out.println(i+1 + ". " + s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
+            System.out.println(i + 1 + ". " + s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
         }
+
         int index;
         Shift selectedShift;
         while (true) {
-            System.out.print("Choose a shift to define required roles:");
+            System.out.print("Choose a shift to define required roles: ");
             index = Integer.parseInt(sc.nextLine());
-            if (index < 0 || index > shifts.size()) {
+            if (index <= 0 || index > shifts.size()) {
                 System.out.println("Invalid shift index.");
-                continue;
+            } else {
+                selectedShift = shifts.get(index - 1);
+                break;
             }
-            selectedShift = shifts.get(index-1);
-            break;
         }
 
+        if (hr.getAllRoles().stream().noneMatch(r -> r.getRoleName().equalsIgnoreCase("shift manager"))) {
+            hr.addRole(new Role("shift manager"));
+        }
+        if (hr.getAllRoles().stream().noneMatch(r -> r.getRoleName().equalsIgnoreCase("transportation manager"))) {
+            hr.addRole(new Role("transportation manager"));
+        }
 
-        List<Role> rolesToAssign = new ArrayList<>();
-        Role shiftManager = new Role("Shift manager");
-        rolesToAssign.add(shiftManager);
+        System.out.println("✅ Mandatory roles were automatically assigned to shift.");
         System.out.println("Enter required roles for this shift (type 'done' to finish):");
 
         while (true) {
-            System.out.print("Role: ");
+            System.out.print("Role name: ");
             String roleInput = sc.nextLine();
-
             if (roleInput.equalsIgnoreCase("done")) break;
 
             Role found = null;
@@ -366,18 +422,69 @@ public class ShiftController {
             }
 
             if (found != null) {
-                if (!rolesToAssign.contains(found)) {
-                    rolesToAssign.add(found);
-                    System.out.println("Role added.");
-                } else {
-                    System.out.println("Role already added.");
+                int requiredCount;
+                while (true) {
+                    System.out.print("Enter required number of employees for role '" + roleInput + "': ");
+                    String input = sc.nextLine();
+                    try {
+                        requiredCount = Integer.parseInt(input);
+                        if (requiredCount < 1) {
+                            System.out.println("Required count must be at least 1.");
+                        } else break;
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid number.");
+                    }
                 }
+
+                try {
+                    Connection conn = Database.getConnection();
+                    RoleDAO roleDAO = new RoleDAOImpl(conn);
+                    ShiftRoleDAO shiftRoleDAO = new ShiftRoleDAOImpl(conn);
+
+                    RoleDTO roleDTO = roleDAO.findByName(roleInput)
+                            .orElseThrow(() -> new RuntimeException("Role not found in DB: " + roleInput));
+
+                    ShiftRoleDTO dto = new ShiftRoleDTO();
+                    dto.setDayOfWeek(selectedShift.getShiftDay().toString());
+                    dto.setShiftType(selectedShift.getShiftType().toString());
+                    dto.setRoleId(roleDTO.getId());
+                    dto.setRequiredCount(requiredCount);
+
+                    shiftRoleDAO.save(dto);
+                    System.out.println("Inserted/Updated role '" + roleInput + "' with count " + requiredCount);
+                } catch (SQLException | RuntimeException e) {
+                    System.out.println("Error while inserting role: " + e.getMessage());
+                }
+
             } else {
                 System.out.println("Role not found in system.");
             }
         }
 
-        hr.defineRequiredRolesForShift(selectedShift, rolesToAssign);
-        System.out.println("Roles updated for shift on " + selectedShift.getShiftDate() + ".");
+        System.out.println("Finished updating required roles for shift on " + selectedShift.getShiftDate() + ".");
     }
+
+    public static void ensureSystemRolesExist() {
+        try {
+            Connection conn = Database.getConnection();
+            RoleDAO roleDAO = new RoleDAOImpl(conn);
+
+            String[] systemRoles = { "shift manager", "transportation manager" };
+
+            for (String roleName : systemRoles) {
+                Optional<RoleDTO> existing = roleDAO.findByName(roleName);
+                if (existing.isEmpty()) {
+                    RoleDTO newRole = new RoleDTO();
+                    newRole.setName(roleName);
+                    roleDAO.save(newRole);
+                    System.out.println("✅ Inserted missing system role: " + roleName);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error while ensuring system roles: " + e.getMessage());
+        }
+    }
+
+
 }

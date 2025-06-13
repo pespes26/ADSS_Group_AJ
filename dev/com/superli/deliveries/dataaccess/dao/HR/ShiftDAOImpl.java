@@ -1,5 +1,6 @@
 package com.superli.deliveries.dataaccess.dao.HR;
 
+import com.superli.deliveries.dto.HR.EmployeeDTO;
 import com.superli.deliveries.dto.HR.ShiftDTO;
 import com.superli.deliveries.exceptions.DataAccessException;
 import com.superli.deliveries.util.Database;
@@ -18,6 +19,10 @@ public class ShiftDAOImpl implements ShiftDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database connection", e);
         }
+    }
+
+    public ShiftDAOImpl(Connection testConnection) {
+        this.conn = testConnection;
     }
 
     @Override
@@ -39,16 +44,32 @@ public class ShiftDAOImpl implements ShiftDAO {
 
     @Override
     public void save(ShiftDTO shift) throws SQLException {
-        String sql = "INSERT OR REPLACE INTO shifts (id, shift_date, shift_type, shift_day) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO shift_assignments (employee_id, day_of_week, shift_type, date, role_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, shift.getId());
-            stmt.setDate(2, new java.sql.Date(shift.getShiftDate().getTime()));
-            stmt.setString(3, shift.getShiftType());
-            stmt.setString(4, shift.getShiftDay());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException("Error saving shift", e);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Map.Entry<Integer, Integer> entry : shift.getAssignedEmployees().entrySet()) {
+                ps.setString(1, String.valueOf(entry.getKey())); // employee_id
+                ps.setString(2, shift.getShiftDay().toUpperCase());
+                ps.setString(3, shift.getShiftType().toUpperCase());
+                ps.setString(4, shift.getShiftDate().toString());
+                ps.setInt(5, entry.getValue()); // role_id
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+
+    public void saveAssignment(String employeeId, String dayOfWeek, String shiftType, String date, int roleId) throws SQLException {
+        String sql = "INSERT INTO shift_assignments (employee_id, day_of_week, shift_type, date, role_id) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, employeeId);
+            ps.setString(2, dayOfWeek);
+            ps.setString(3, shiftType.toUpperCase());
+            ps.setString(4, date);
+            ps.setInt(5, roleId);
+            ps.executeUpdate();
         }
     }
 
@@ -58,8 +79,8 @@ public class ShiftDAOImpl implements ShiftDAO {
         String sql = "SELECT * FROM shifts WHERE shift_day = ? AND shift_type = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, day.toString());
-            ps.setString(2, st.toString());
+            ps.setString(1, day.name());
+            ps.setString(2, st.name());
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -124,5 +145,30 @@ public class ShiftDAOImpl implements ShiftDAO {
         return dto;
     }
 
+
+    @Override
+    public List<String> getEmployeeIdsByRoleAndDate(String roleName, String date) throws SQLException {
+        String sql = """
+        SELECT e.id
+        FROM shift_assignments sa
+        JOIN employees e ON sa.employee_id = e.id
+        JOIN roles r ON sa.role_id = r.id
+        WHERE sa.date = ? AND r.name = ?
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, date);
+            ps.setString(2, roleName);
+
+            ResultSet rs = ps.executeQuery();
+            List<String> employeeIds = new ArrayList<>();
+
+            while (rs.next()) {
+                employeeIds.add(rs.getString("id"));
+            }
+
+            return employeeIds;
+        }
+    }
 
 }

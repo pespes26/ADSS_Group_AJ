@@ -3,6 +3,7 @@ package com.superli.deliveries.presentation.HR;
 import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.application.controllers.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,7 +15,11 @@ public class HRDetailsView {
 
     public void mainLoginMenu() {
         Scanner sc = new Scanner(System.in);
-
+        try {
+            ManagerController.initHRControllers();
+        } catch (SQLException e) {
+            System.out.println("Failed to initialize HR controllers: " + e.getMessage());
+        }
         while (true) {
             System.out.println("\nWelcome to the Shift Management System");
             System.out.println("Choose login type:");
@@ -34,7 +39,7 @@ public class HRDetailsView {
                     break;
                 case "2":
                     System.out.println("Exiting program. Goodbye!");
-                    System.exit(0);
+                    return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
@@ -50,7 +55,12 @@ public class HRDetailsView {
             System.out.println("Incorrect password. Access denied.");
             return;
         }
-
+        try {
+            ShiftController shiftRoleService = new ShiftController();
+            ShiftController.ensureSystemRolesExist();
+        } catch (Exception e) {
+            System.out.println("❌ Failed to ensure system roles: " + e.getMessage());
+        }
         while (true) {
             System.out.println("\n--- HR Manager Menu ---");
             System.out.println("1. Employee Management");

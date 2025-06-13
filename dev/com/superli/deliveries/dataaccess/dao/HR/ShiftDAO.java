@@ -14,6 +14,9 @@ public interface ShiftDAO {
     List<ShiftDTO> findByEmployeeId(String employeeId) throws SQLException;
     List<ShiftDTO> findByDayOfWeekAndShiftType(DayOfWeek day, ShiftType st) throws SQLException;
     void clearAllAndArchive() throws SQLException;
+    void saveAssignment(String employeeId, String dayOfWeek, String shiftType, String date, int roleId) throws SQLException;
+     List<String> getEmployeeIdsByRoleAndDate(String roleName, String date) throws SQLException ;
+
 }
 
 

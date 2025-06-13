@@ -44,9 +44,9 @@ public class ManagerController {
         return roleController;
     }
     // --------------------------------Employee Management ------------------------------------
-    public static String addNewEmployee(String id, String fullName, String bankAccount, double salary,
+    public static String addNewEmployee(String id, String fullName, String bankAccount, double salary, int site,
                                         String employeeTerms, List<Role> roleQualifications, LicenseType licenseTypeIfNeeded,boolean isDriver) {
-        return EmployeeManagmentController.addNewEmployee( id,  fullName,  bankAccount,  salary,
+        return EmployeeManagmentController.addNewEmployee(id, fullName, bankAccount, salary, site,
                 employeeTerms, roleQualifications,  licenseTypeIfNeeded, isDriver);
     }
     public static String removeEmployeeById (Employee e){

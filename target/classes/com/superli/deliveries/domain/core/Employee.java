@@ -3,13 +3,13 @@ package com.superli.deliveries.domain.core;
 import java.time.DayOfWeek;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class Employee {
     private String id;
     private String fullName;
     private String bankAccount;
     private double salary;
+    private int siteId; //new
     private List<Role> roleQualifications;
     private String employeeTerms;
     private Date employeeStartDate;
@@ -18,13 +18,14 @@ public class Employee {
     //private boolean activeWorker;
     //private Role loginRole;
 
-    public Employee(String id, String fullName, String bankAccount, double salary,
+    public Employee(String id, String fullName, String bankAccount, double salary, int siteId,
                     String employeeTerms, Date employeeStartDate,
                     List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole) {
         this.id = id;
         this.fullName = fullName;
         this.bankAccount = bankAccount;
         this.salary = salary;
+        this.siteId = siteId; // new
         this.employeeTerms = employeeTerms;
         this.employeeStartDate = employeeStartDate;
         this.roleQualifications = roleQualifications;
@@ -88,6 +89,11 @@ public class Employee {
     public void setRoleQualifications(List<Role> roleQualifications) {
         this.roleQualifications = roleQualifications;
     }
+
+    public int getSiteId() {return siteId;} // new
+
+    public void setSiteId(int siteId) {this.siteId = siteId;} //new
+
     // ---------------------------------- Checking methods ------------------------------------
     /**
      * Checks if the employee is available to work on a given day and shift type.

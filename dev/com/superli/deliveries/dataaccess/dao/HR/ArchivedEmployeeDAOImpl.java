@@ -1,6 +1,6 @@
 package com.superli.deliveries.dataaccess.dao.HR;
 
-import com.superli.deliveries.dto.HR.EmployeeDTO;
+import com.superli.deliveries.dto.HR.ArchivedEmployeeDTO;
 import com.superli.deliveries.exceptions.DataAccessException;
 import com.superli.deliveries.util.Database;
 
@@ -20,28 +20,50 @@ public class ArchivedEmployeeDAOImpl implements ArchivedEmployeeDAO {
     }
 
     @Override
-    public List<EmployeeDTO> findAllArchivedEmployees() throws SQLException {
-        List<EmployeeDTO> archivedEmployees = new ArrayList<>();
+    public List<ArchivedEmployeeDTO> findAll() throws SQLException {
+        List<ArchivedEmployeeDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM archived_employees";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                EmployeeDTO employee = new EmployeeDTO(
-                        rs.getString("id"),
+                ArchivedEmployeeDTO dto = new ArchivedEmployeeDTO(
+                        rs.getString("employee_id"),
                         rs.getString("name"),
                         rs.getString("bank_account"),
                         rs.getDouble("salary"),
                         rs.getString("employment_terms"),
-                        rs.getString("start_date") // נשאר כמחרוזת לפי DTO
+                        rs.getString("start_date"),
+                        rs.getInt("site_id"),
+                        rs.getString("archived_date")
                 );
-                archivedEmployees.add(employee);
+                list.add(dto);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to retrieve archived employees", e);
+            throw new DataAccessException("Failed to fetch archived employees", e);
         }
 
-        return archivedEmployees;
+        return list;
+    }
+
+    @Override
+    public void save(ArchivedEmployeeDTO employee) throws SQLException {
+        String sql = """
+                INSERT INTO archived_employees 
+                (employee_id, name, bank_account, salary, employment_terms, start_date, site_id, archived_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, employee.getId());
+            ps.setString(2, employee.getFullName());
+            ps.setString(3, employee.getBankAccount());
+            ps.setDouble(4, employee.getSalary());
+            ps.setString(5, employee.getEmploymentTerms());
+            ps.setString(6, employee.getStartDate());
+            ps.setInt(7, employee.getSiteId());
+            ps.setString(8, employee.getArchivedDate());
+            ps.executeUpdate();
+        }
     }
 }

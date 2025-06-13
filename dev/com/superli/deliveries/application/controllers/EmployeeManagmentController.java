@@ -6,34 +6,34 @@ import java.util.List;
 import java.util.Scanner;
 
 public class EmployeeManagmentController {
- public static String addNewEmployee(String id, String fullName, String bankAccount, double salary,
-                                      String employeeTerms, List<Role> roleQualifications, LicenseType licenseTypeIfNeeded, boolean isDriver) {
-    HRManager hr = ManagerController.getHRManager();
+    public static String addNewEmployee(String id, String fullName, String bankAccount, double salary, int site,
+                                        String employeeTerms, List<Role> roleQualifications, LicenseType licenseTypeIfNeeded, boolean isDriver) {
+        HRManager hr = ManagerController.getHRManager();
 
-    Date employeeStartDate = new Date();
-    List<AvailableShifts> availabilityConstraints = new ArrayList<>();
-    Role loginRole = new Role("");
+        Date employeeStartDate = new Date();
+        List<AvailableShifts> availabilityConstraints = new ArrayList<>();
+        Role loginRole = new Role("");
 
-    Employee newEmployee;
+        Employee newEmployee;
 
-    if (isDriver) {
-        if (licenseTypeIfNeeded == null) {
-            return "License type is required for driver.";
+        if (isDriver) {
+            if (licenseTypeIfNeeded == null) {
+                return "License type is required for driver.";
+            }
+
+            newEmployee = new Driver(id, fullName, bankAccount, salary, site, employeeTerms,
+                    employeeStartDate, roleQualifications, availabilityConstraints, loginRole, licenseTypeIfNeeded);
+        } else {
+            newEmployee = new Employee(id, fullName, bankAccount, salary, site, employeeTerms,
+                    employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
         }
 
-        newEmployee = new Driver(id, fullName, bankAccount, salary, employeeTerms,
-                employeeStartDate, roleQualifications, availabilityConstraints, loginRole, licenseTypeIfNeeded);
-    } else {
-        newEmployee = new Employee(id, fullName, bankAccount, salary, employeeTerms,
-                employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
+        boolean addedSuccessfully = hr.addEmployee(newEmployee);
+
+        return addedSuccessfully
+                ? (isDriver ? "Driver added successfully." : "Employee added successfully.")
+                : "Failed to add employee.";
     }
-
-    boolean addedSuccessfully = hr.addEmployee(newEmployee);
-
-    return addedSuccessfully
-            ? (isDriver ? "Driver added successfully." : "Employee added successfully.")
-            : "Failed to add employee.";
-}
 
     public static String removeEmployeeById (Employee e){
         HRManager hr = ManagerController.getHRManager();

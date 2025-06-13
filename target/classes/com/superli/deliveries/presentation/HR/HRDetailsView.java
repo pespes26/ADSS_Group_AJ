@@ -176,6 +176,9 @@ public class HRDetailsView {
                     }
                 }
 
+                System.out.print("Enter the employee site: ");
+                int site = Integer.parseInt(sc.nextLine());
+
                 System.out.print("Enter employment terms: ");
                 String employeeTerms = sc.nextLine();
 
@@ -220,7 +223,7 @@ public class HRDetailsView {
                 }
 
                 String result = ManagerController.addNewEmployee(
-                        id, fullName, bankAccount, salary, employeeTerms,
+                        id, fullName, bankAccount, salary, site, employeeTerms,
                         roleQualifications, licenseTypeIfNeeded,isDriver);
 
                 System.out.println(result);

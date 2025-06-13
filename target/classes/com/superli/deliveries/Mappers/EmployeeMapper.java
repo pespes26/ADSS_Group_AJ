@@ -18,7 +18,7 @@ public class EmployeeMapper {
         try {
             startDate = dateFormat.parse(dto.getStartDate());
         } catch (ParseException e) {
-            e.printStackTrace(); // או טיפול לפי הצורך
+            e.printStackTrace();
         }
 
         return new Employee(
@@ -26,20 +26,17 @@ public class EmployeeMapper {
                 dto.getFullName(),
                 dto.getBankAccount(),
                 dto.getSalary(),
+                dto.getSiteId(),
                 dto.getEmploymentTerms(),
                 startDate,
                 roleQualifications,
-                null,      // availabilityConstraints
-                null       // loginRole
+                null, // availabilityConstraints
+                null  // loginRole
         );
     }
 
     public static EmployeeDTO toDTO(Employee employee) {
         if (employee == null) return null;
-
-        List<Role> roles = employee.getRoleQualifications();
-        String role = roles.isEmpty() ? null : roles.get(0).getRoleName();
-        int qualificationLevel = 1;
 
         return new EmployeeDTO(
                 employee.getId(),
@@ -47,10 +44,8 @@ public class EmployeeMapper {
                 employee.getBankAccount(),
                 employee.getSalary(),
                 employee.getEmployeeTerms(),
-                dateFormat.format(employee.getEmployeeStartDate())
-                //null, // license
-                //role,/
-                //qualificationLevel
+                dateFormat.format(employee.getEmployeeStartDate()),
+                employee.getSiteId()
         );
     }
 }

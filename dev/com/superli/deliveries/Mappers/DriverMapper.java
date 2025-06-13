@@ -13,8 +13,9 @@ public class DriverMapper {
                 dto.getFullName(),                           // fullName
                 null,                                        // bankAccount (TODO)
                 0.0,                                         // salary (TODO)
-                null,                                        // employeeTerms (TODO)
+                -1,                                        // employeeTerms (TODO)
                 null,                                        // employeeStartDate (TODO)
+                null,
                 null,                                        // roleQualifications (TODO)
                 null,                                        // availabilityConstraints (TODO)
                 null,                                        // loginRole (TODO)

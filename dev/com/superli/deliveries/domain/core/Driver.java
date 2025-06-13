@@ -23,9 +23,9 @@ public class Driver extends Employee {
     /**
      * Constructs a new Driver object.
      */
-    public Driver(String id, String fullName, String bankAccount, double salary, String employeeTerms,
+    public Driver(String id, String fullName, String bankAccount, double salary, int siteId, String employeeTerms,
                   Date employeeStartDate, List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole, LicenseType licenseType) {
-        super(id, fullName, bankAccount, salary, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
+        super(id, fullName, bankAccount, salary, -1, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
         Role r = new Role("Driver");
         this.addRoleQualification(r);
         if (licenseType == null) {

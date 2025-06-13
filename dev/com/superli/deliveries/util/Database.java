@@ -22,26 +22,28 @@ public class Database {
             try (Statement st = conn.createStatement()) {
                 // Create roles table
 
-                    // Create roles table
-                    st.executeUpdate("""
+                // Create roles table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS roles (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL UNIQUE
                     );""");
 
-                    // Create employees table
-                    st.executeUpdate("""
+                // Create employees table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS employees (
                         id TEXT PRIMARY KEY,
                         name TEXT NOT NULL,
                         bank_account TEXT NOT NULL,
                         salary REAL NOT NULL,
+                        site_id INT NOT NULL,
                         employment_terms TEXT NOT NULL,
-                        start_date TEXT NOT NULL
+                        start_date TEXT NOT NULL,
+                        FOREIGN KEY (site_id) REFERENCES sites(id)
                     );""");
 
-                    // Create employee_roles table
-                    st.executeUpdate("""
+                // Create employee_roles table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS employee_roles (
                         employee_id TEXT NOT NULL,
                         role_id INTEGER NOT NULL,
@@ -50,8 +52,8 @@ public class Database {
                         FOREIGN KEY (role_id) REFERENCES roles(id)
                     );""");
 
-                    // Create available_shifts table
-                    st.executeUpdate("""
+                // Create available_shifts table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS available_shifts (
                         employee_id TEXT NOT NULL,
                         day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
@@ -59,8 +61,8 @@ public class Database {
                         PRIMARY KEY (employee_id, day_of_week, shift_type)
                     );""");
 
-                    // Create archived_employees table
-                    st.executeUpdate("""
+                // Create archived_employees table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS archived_employees (
                         employee_id TEXT NOT NULL,
                         name TEXT NOT NULL,
@@ -68,26 +70,28 @@ public class Database {
                         salary REAL,
                         employment_terms TEXT,
                         start_date TEXT,
+                        site_id INT NOT NULL,
                         archived_date TEXT NOT NULL,
                         FOREIGN KEY (employee_id) REFERENCES employees(id)
+                        FOREIGN KEY (site_id) REFERENCES sites(id)
                     );""");
 
-                    // Create archived_shifts table
+
                 // Create archived_shifts table
                 st.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS archived_shifts (
-                        employee_id TEXT NOT NULL,
-                        day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
-                        shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
-                        date TEXT NOT NULL,
-                        role_id INTEGER NOT NULL,
-                        PRIMARY KEY (employee_id, day_of_week, shift_type),
-                        FOREIGN KEY (employee_id) REFERENCES employees(id),
-                        FOREIGN KEY (role_id) REFERENCES roles(id)
-                    );""");
+                        CREATE TABLE IF NOT EXISTS archived_shifts (
+                            employee_id TEXT NOT NULL,
+                            day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
+                            shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
+                            date TEXT NOT NULL,
+                            role_id INTEGER NOT NULL,
+                            PRIMARY KEY (employee_id, day_of_week, shift_type),
+                            FOREIGN KEY (employee_id) REFERENCES employees(id),
+                            FOREIGN KEY (role_id) REFERENCES roles(id)
+                        );""");
 
-                    // Create shift_assignments table
-                    st.executeUpdate("""
+                // Create shift_assignments table
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS shift_assignments (
                         employee_id TEXT NOT NULL,
                         day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
@@ -99,7 +103,7 @@ public class Database {
                         FOREIGN KEY (role_id) REFERENCES roles(id)
                     );""");
 
-                    st.executeUpdate("""
+                st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS shift_required_roles (
                         day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
                         shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
@@ -109,7 +113,7 @@ public class Database {
                         FOREIGN KEY (role_id) REFERENCES roles(id)
                     );""");
 
-                    // Create driver table
+                // Create driver table
                 st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS driver (
                         employee_id TEXT PRIMARY KEY,

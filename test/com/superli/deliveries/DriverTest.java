@@ -22,6 +22,7 @@ class DriverTest {
                 name,
                 "000-000-000",
                 0.0,
+                -1,
                 "Standard",
                 new Date(),
                 new ArrayList<>(),

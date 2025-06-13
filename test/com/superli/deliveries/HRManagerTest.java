@@ -29,11 +29,13 @@ public class HRManagerTest {
                 "Test Employee",
                 "Test Bank",
                 5000.0,
+                2,
                 "Full Time",
                 new Date(),
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new Role("Test Role")
+
         );
     }
 

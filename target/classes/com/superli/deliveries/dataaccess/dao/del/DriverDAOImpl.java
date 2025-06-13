@@ -26,10 +26,10 @@ public class DriverDAOImpl implements DriverDAO {
     @Override
     public Optional<DriverDTO> findById(String id) throws SQLException {
         String sql = "SELECT e.*, d.*, er.role_name, er.qualification_level " +
-                    "FROM employees e " +
-                    "LEFT JOIN driver d ON e.id = d.employee_id " +
-                    "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
-                    "WHERE e.id = ?";
+                     "FROM employees e " +
+                     "LEFT JOIN driver d ON e.id = d.employee_id " +
+                     "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
+                     "WHERE e.id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -49,9 +49,9 @@ public class DriverDAOImpl implements DriverDAO {
     public List<DriverDTO> findAll() throws SQLException {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = "SELECT e.*, d.*, er.role_name, er.qualification_level " +
-                    "FROM employees e " +
-                    "LEFT JOIN driver d ON e.id = d.employee_id " +
-                    "LEFT JOIN employee_roles er ON e.id = er.employee_id";
+                     "FROM employees e " +
+                     "LEFT JOIN driver d ON e.id = d.employee_id " +
+                     "LEFT JOIN employee_roles er ON e.id = er.employee_id";
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -69,18 +69,18 @@ public class DriverDAOImpl implements DriverDAO {
     @Override
     public DriverDTO save(DriverDTO dto) throws SQLException {
         String sql = "INSERT INTO employees (id, full_name) VALUES (?, ?) " +
-                    "ON CONFLICT(id) DO UPDATE SET full_name = ?";
+                     "ON CONFLICT(id) DO UPDATE SET full_name = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, dto.getId());
             stmt.setString(2, dto.getFullName());
             stmt.setString(3, dto.getFullName());
-            
+
             stmt.executeUpdate();
 
             // Save driver-specific data
             String driverSql = "INSERT INTO driver (employee_id, license_type) VALUES (?, ?) " +
-                             "ON CONFLICT(employee_id) DO UPDATE SET license_type = ?";
+                               "ON CONFLICT(employee_id) DO UPDATE SET license_type = ?";
 
             try (PreparedStatement driverStmt = conn.prepareStatement(driverSql)) {
                 driverStmt.setString(1, dto.getId());
@@ -91,14 +91,14 @@ public class DriverDAOImpl implements DriverDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Error saving driver", e);
         }
-        
+
         return dto;
     }
 
     @Override
     public void delete(String id) throws SQLException {
         String sql = "DELETE FROM employees WHERE id = ?";
-        
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             stmt.executeUpdate();
@@ -111,10 +111,10 @@ public class DriverDAOImpl implements DriverDAO {
     public List<DriverDTO> findAvailableDrivers() throws SQLException {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = "SELECT e.*, d.*, er.role_name, er.qualification_level " +
-                    "FROM employees e " +
-                    "LEFT JOIN driver d ON e.id = d.employee_id " +
-                    "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
-                    "WHERE d.available = true";
+                     "FROM employees e " +
+                     "LEFT JOIN driver d ON e.id = d.employee_id " +
+                     "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
+                     "WHERE d.available = true";
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -133,10 +133,10 @@ public class DriverDAOImpl implements DriverDAO {
     public List<DriverDTO> findByLicenseType(String licenseType) throws SQLException {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = "SELECT e.*, d.*, er.role_name, er.qualification_level " +
-                    "FROM employees e " +
-                    "LEFT JOIN driver d ON e.id = d.employee_id " +
-                    "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
-                    "WHERE d.license_type = ?";
+                     "FROM employees e " +
+                     "LEFT JOIN driver d ON e.id = d.employee_id " +
+                     "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
+                     "WHERE d.license_type = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, licenseType);
@@ -155,10 +155,10 @@ public class DriverDAOImpl implements DriverDAO {
     @Override
     public Optional<DriverDTO> findByLicenseNumber(String licenseNumber) throws SQLException {
         String sql = "SELECT e.*, d.*, er.role_name, er.qualification_level " +
-                    "FROM employees e " +
-                    "LEFT JOIN driver d ON e.id = d.employee_id " +
-                    "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
-                    "WHERE d.license_number = ?";
+                     "FROM employees e " +
+                     "LEFT JOIN driver d ON e.id = d.employee_id " +
+                     "LEFT JOIN employee_roles er ON e.id = er.employee_id " +
+                     "WHERE d.license_number = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, licenseNumber);
@@ -176,16 +176,17 @@ public class DriverDAOImpl implements DriverDAO {
 
     private Driver mapResultSetToDriver(ResultSet rs) throws SQLException {
         Driver driver = new Driver(
-            String.valueOf(rs.getInt("id")),
-            rs.getString("full_name"),
-            null, // bankAccount
-            0.0, // salary
-            null, // employeeTerms
-            null, // employeeStartDate
-            null, // roleQualifications
-            null, // availabilityConstraints
-            null, // loginRole
-            LicenseType.valueOf(rs.getString("license_type"))
+                String.valueOf(rs.getInt("id")),
+                rs.getString("full_name"),
+                null, // bankAccount
+                0.0, // salary
+                -1, // site
+                null, // employeeTerms
+                null, // employeeStartDate
+                null, // roleQualifications
+                null, // availabilityConstraints
+                null, // loginRole
+                LicenseType.valueOf(rs.getString("license_type"))
         );
         driver.setAvailable(rs.getBoolean("available"));
         return driver;

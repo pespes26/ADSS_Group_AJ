@@ -8,6 +8,7 @@ public class EmployeeDTO {
     private String name;
     private String bankAccount;
     private double salary;
+    private int siteId;
     private String employmentTerms;
     private String startDate;
 
@@ -20,15 +21,17 @@ public class EmployeeDTO {
 
     public EmployeeDTO(String id, String name, String bankAccount,
                        double salary, String employmentTerms,
-                       String startDate) {
+                       String startDate, int siteId) {
         this.id = id;
         this.name = name;
         this.bankAccount = bankAccount;
         this.salary = salary;
         this.employmentTerms = employmentTerms;
         this.startDate = startDate;
+        this.siteId = siteId;
         initViews();
     }
+
 
     // --- View Initializer ---
     private void initViews() {
@@ -80,6 +83,10 @@ public class EmployeeDTO {
     public void setSalary(double salary) {
         this.salary = salary;
     }
+
+    public int getSiteId() {return siteId;} // new
+
+    public void setSiteId(int siteId) {this.siteId = siteId;} // new
 
     public String getEmploymentTerms() {
         return employmentTerms;

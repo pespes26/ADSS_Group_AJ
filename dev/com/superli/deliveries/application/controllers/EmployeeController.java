@@ -1,5 +1,7 @@
 package com.superli.deliveries.application.controllers;
 
+import com.superli.deliveries.dataaccess.dao.HR.*;
+import com.superli.deliveries.dto.HR.*;
 import com.superli.deliveries.domain.core.Employee;
 import com.superli.deliveries.domain.core.HRManager;
 import com.superli.deliveries.domain.core.Shift;
@@ -8,7 +10,9 @@ import com.superli.deliveries.domain.core.AvailableShifts;
 //import com.superli.deliveries.domain.core.DayOfWeek;
 import com.superli.deliveries.domain.core.ShiftType;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -26,7 +30,7 @@ public class EmployeeController {
                 hasShifts = true;
                 Role assignedRole = shift.getShiftEmployees().get(employee);
                 System.out.println(shift.getShiftDate() + " - " + shift.getShiftDay() + " - " + shift.getShiftType()
-                        + " | Role: " + assignedRole.getRoleName());
+                                   + " | Role: " + assignedRole.getRoleName());
             }
         }
 
@@ -36,12 +40,20 @@ public class EmployeeController {
     }
     public static void updateAvailability(Employee employee, Scanner sc) {
         java.util.Calendar calendar = java.util.Calendar.getInstance();
-        int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+        /*int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
 
-       /* if (dayOfWeek != java.util.Calendar.THURSDAY) {
+        if (dayOfWeek != java.util.Calendar.THURSDAY) {
             System.out.println("Sorry, availability can only be updated on Thursdays.");
             return;
         }*/
+
+        AvailableShiftDAO dao;
+        try {
+            dao = new AvailableShiftDAOImpl();
+        } catch (SQLException e) {
+            System.err.println(" Failed to connect to database: " + e.getMessage());
+            return;
+        }
 
         if (!employee.getAvailabilityConstraints().isEmpty()) {
             System.out.println("You already have availability constraints.");
@@ -52,6 +64,17 @@ public class EmployeeController {
             String choice = sc.nextLine().trim();
 
             if (choice.equals("1")) {
+                for (AvailableShifts a : new ArrayList<>(employee.getAvailabilityConstraints())) {
+                    try {
+                        dao.deleteByCompositeKey(
+                                Integer.parseInt(employee.getId()),
+                                a.getDay().name(),
+                                a.getShift().name()
+                        );
+                    } catch (SQLException e) {
+                        System.err.println("Failed to delete from DB: " + e.getMessage());
+                    }
+                }
                 employee.clearAvailability();
                 System.out.println("All previous availability constraints cleared.");
             } else if (choice.equals("2")) {
@@ -60,7 +83,7 @@ public class EmployeeController {
                 return;
             } else if (choice.equals("0")) {
                 return;
-            }else {
+            } else {
                 System.out.println("Invalid choice. No changes made.");
                 return;
             }
@@ -70,9 +93,7 @@ public class EmployeeController {
             System.out.print("Enter day of week, or type 'done' to finish: ");
             String dayInput = sc.nextLine().trim().toUpperCase();
 
-            if (dayInput.equalsIgnoreCase("DONE")) {
-                break;
-            }
+            if (dayInput.equalsIgnoreCase("DONE")) break;
 
             DayOfWeek day = parseDay(dayInput);
             if (day == null) {
@@ -92,6 +113,7 @@ public class EmployeeController {
         System.out.println("Availability updated successfully.");
     }
 
+
     private static void editAvailability(Employee employee, Scanner sc) {
         while (true) {
             System.out.println("Your current availability:");
@@ -105,7 +127,7 @@ public class EmployeeController {
             System.out.println("0. Logout");
             String choice = sc.nextLine().trim().toLowerCase();
 
-            if (choice.equals("done")) {
+            if (choice.equals("0")) {
                 break;
             } else if (choice.equals("1")) {
                 Object[] dayShift = readDayAndShift(sc);
@@ -125,13 +147,12 @@ public class EmployeeController {
 
                 removeAvailability(employee, day, shift);
 
-            } else if (choice.equals("0")){
-                return;
-            }else {
+            } else {
                 System.out.println("Invalid choice. Try again.");
             }
         }
     }
+
 
     private static Object[] readDayAndShift(Scanner sc) {
         DayOfWeek day = null;
@@ -188,7 +209,21 @@ public class EmployeeController {
     private static void addNewAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
         employee.addAvailability(new AvailableShifts(day, shift));
         System.out.println("Added availability: Day - " + day + ", Shift - " + shift);
+
+        try {
+            AvailableShiftDAO dao = new AvailableShiftDAOImpl();
+            AvailableShiftDTO dto = new AvailableShiftDTO(
+                    Integer.parseInt(employee.getId()),
+                    day.name(),
+                    shift.name()
+            );
+            dao.save(dto);
+            System.out.println("Saved to DB");
+        } catch (Exception e) {
+            System.err.println("Failed to save to DB: " + e.getMessage());
+        }
     }
+
 
     private static void removeAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
         AvailableShifts toRemove = null;
@@ -202,8 +237,19 @@ public class EmployeeController {
         if (toRemove != null) {
             employee.getAvailabilityConstraints().remove(toRemove);
             System.out.println("Removed availability: " + day + " " + shift);
+
+            try {
+                AvailableShiftDAO dao = new AvailableShiftDAOImpl();
+                int employeeId = Integer.parseInt(employee.getId());
+                dao.deleteByCompositeKey(employeeId, day.name(), shift.name());
+                System.out.println("Also removed from DB.");
+            } catch (Exception e) {
+                System.err.println("Failed to delete from DB: " + e.getMessage());
+            }
+
         } else {
             System.out.println("No such availability found to remove.");
         }
     }
+
 }

@@ -7,8 +7,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AvailableShiftDAO {
-    Optional<AvailableShiftDTO> findById(int id) throws SQLException;
+    AvailableShiftDTO save(AvailableShiftDTO shift) throws SQLException;
+
+    Optional<AvailableShiftDTO> findById(int id);
+
     List<AvailableShiftDTO> findAll() throws SQLException;
-    AvailableShiftDTO save(AvailableShiftDTO t) throws SQLException;
-    void deleteById(int id) throws SQLException;
+
+    boolean exists(int employeeId, String dayOfWeek, String shiftType) throws SQLException;
+
+    void deleteById(int id);
+
+    void deleteByCompositeKey(int employeeId, String dayOfWeek, String shiftType) throws SQLException;
 }

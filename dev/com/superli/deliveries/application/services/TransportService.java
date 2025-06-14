@@ -63,7 +63,11 @@ public class TransportService {
     private void initializeNextTransportId() {
         try {
             nextTransportId = transportDAO.findAll().stream()
-                    .mapToInt(dto -> Integer.parseInt(dto.getTransportId()))
+                    .mapToInt(dto -> {
+                        // Extract numeric part from transport ID (e.g., "TR001" -> 1)
+                        String id = dto.getTransportId();
+                        return Integer.parseInt(id.replaceAll("[^0-9]", ""));
+                    })
                     .max()
                     .orElse(0) + 1;
         } catch (SQLException e) {
@@ -77,7 +81,8 @@ public class TransportService {
      * @return The next available transport ID
      */
     private String generateTransportId() {
-        return String.valueOf(nextTransportId++);
+        // Format: TR + padded number (e.g., TR001, TR002, etc.)
+        return String.format("TR%03d", nextTransportId++);
     }
 
     /**
@@ -131,13 +136,31 @@ public class TransportService {
     }
 
     /**
-     * Saves a transport to the repository.
+     * Saves a transport to the database.
      *
      * @param transport The transport to save
+     * @return The saved transport
      */
-    public void saveTransport(Transport transport) {
+    public Transport saveTransport(Transport transport) {
         try {
-            transportDAO.save(TransportMapper.toDTO(transport));
+            // Validate weight against truck capacity
+            if (transport.getDepartureWeight() > transport.getTruck().getMaxWeight()) {
+                throw new IllegalArgumentException("Transport weight exceeds truck's maximum capacity");
+            }
+
+            TransportDTO dto = TransportMapper.toDTO(transport);
+            TransportDTO savedDto = transportDAO.save(dto);
+            
+            // Get required dependencies for mapping
+            Optional<Truck> truck = truckService.getTruckById(savedDto.getTruckId());
+            Optional<Driver> driver = driverService.getDriverById(savedDto.getDriverId());
+            Optional<Site> site = siteService.getSiteById(savedDto.getOriginSiteId());
+            
+            if (truck.isEmpty() || driver.isEmpty() || site.isEmpty()) {
+                throw new RuntimeException("Required dependencies not found for transport mapping");
+            }
+            
+            return TransportMapper.fromDTO(savedDto, truck.get(), driver.get(), site.get());
         } catch (SQLException e) {
             throw new RuntimeException("Error saving transport", e);
         }

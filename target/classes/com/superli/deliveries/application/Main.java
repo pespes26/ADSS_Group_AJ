@@ -18,6 +18,7 @@ import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.TransportService;
 import com.superli.deliveries.application.services.TruckService;
 import com.superli.deliveries.application.services.ZoneService;
+import com.superli.deliveries.config.DataInitializer;
 import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAO;
 import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAOImpl;
 import com.superli.deliveries.dataaccess.dao.del.DestinationDocDAO;
@@ -130,7 +131,20 @@ public static void main(String[] args) {
     var siteService = new SiteService(siteDAO, zoneService);
     var transportService = new TransportService(transportDAO, driverService, truckService, siteService);
     var destinationDocService = new DestinationDocService(destinationDocDAO, siteService);
-    var deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService);
+    var deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService, destinationDocDAO);
+
+    // --- Initialize Data ---
+    var dataInitializer = new DataInitializer(
+        driverService,
+        truckService,
+        zoneService,
+        siteService,
+        productService,
+        transportService,
+        destinationDocService,
+        deliveredItemService
+    );
+    dataInitializer.initializeIfNeeded();
 
     // --- Controllers ---
     var driverController = new DriverController(driverService);

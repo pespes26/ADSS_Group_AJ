@@ -1,25 +1,32 @@
 package com.superli.deliveries.dataaccess.dao.del;
 
-import com.superli.deliveries.dto.del.DeliveredItemDTO;
-import com.superli.deliveries.util.Database;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.superli.deliveries.dto.del.DeliveredItemDTO;
+import com.superli.deliveries.util.Database;
+
 public class DeliveredItemDAOImpl implements DeliveredItemDAO {
+    private final Connection conn;
+
+    public DeliveredItemDAOImpl() throws SQLException {
+        this.conn = Database.getConnection();
+    }
 
     @Override
     public Optional<DeliveredItemDTO> findById(String id) throws SQLException {
-        String sql = "SELECT * FROM delivered_items WHERE id = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM delivered_items WHERE item_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToDeliveredItemDTO(rs));
-                }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(mapResultSetToDeliveredItemDTO(rs));
             }
         }
         return Optional.empty();
@@ -29,8 +36,7 @@ public class DeliveredItemDAOImpl implements DeliveredItemDAO {
     public List<DeliveredItemDTO> findAll() throws SQLException {
         List<DeliveredItemDTO> items = new ArrayList<>();
         String sql = "SELECT * FROM delivered_items";
-        try (Connection conn = Database.getConnection();
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 items.add(mapResultSetToDeliveredItemDTO(rs));
@@ -41,57 +47,39 @@ public class DeliveredItemDAOImpl implements DeliveredItemDAO {
 
     @Override
     public DeliveredItemDTO save(DeliveredItemDTO item) throws SQLException {
-        if (item.getId() == null) {
-            return insert(item);
-        } else {
-            return update(item);
+        String sql = "INSERT INTO delivered_items (item_id, destination_doc_id, product_id, quantity) " +
+                    "VALUES (?, ?, ?, ?) " +
+                    "ON CONFLICT(item_id) DO UPDATE SET " +
+                    "destination_doc_id = ?, product_id = ?, quantity = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, item.getId());
+            stmt.setString(2, item.getDestinationDocId());
+            stmt.setString(3, item.getProductId());
+            stmt.setInt(4, item.getQuantity());
+            
+            // Values for UPDATE
+            stmt.setString(5, item.getDestinationDocId());
+            stmt.setString(6, item.getProductId());
+            stmt.setInt(7, item.getQuantity());
+            
+            stmt.executeUpdate();
+            return item;
         }
     }
 
     @Override
     public void deleteById(String id) throws SQLException {
-        String sql = "DELETE FROM delivered_items WHERE id = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "DELETE FROM delivered_items WHERE item_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             stmt.executeUpdate();
         }
     }
 
-    private DeliveredItemDTO insert(DeliveredItemDTO item) throws SQLException {
-        String sql = "INSERT INTO delivered_items (destination_doc_id, product_id, quantity) VALUES (?, ?, ?)";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, item.getDestinationDocId());
-            stmt.setString(2, item.getProductId());
-            stmt.setInt(3, item.getQuantity());
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    item.setId(generatedKeys.getString(1));
-                }
-            }
-            return item;
-        }
-    }
-
-    private DeliveredItemDTO update(DeliveredItemDTO item) throws SQLException {
-        String sql = "UPDATE delivered_items SET destination_doc_id = ?, product_id = ?, quantity = ? WHERE id = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, item.getDestinationDocId());
-            stmt.setString(2, item.getProductId());
-            stmt.setInt(3, item.getQuantity());
-            stmt.setString(4, item.getId());
-            stmt.executeUpdate();
-            return item;
-        }
-    }
-
     private DeliveredItemDTO mapResultSetToDeliveredItemDTO(ResultSet rs) throws SQLException {
         DeliveredItemDTO dto = new DeliveredItemDTO();
-        dto.setId(rs.getString("id"));
+        dto.setId(rs.getString("item_id"));
         dto.setDestinationDocId(rs.getString("destination_doc_id"));
         dto.setProductId(rs.getString("product_id"));
         dto.setQuantity(rs.getInt("quantity"));

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.superli.deliveries.domain.core.DeliveredItem;
-import com.superli.deliveries.domain.core.Site;
-
 /**
  * Represents a delivery document that is part of a specific transport and is linked to a destination site.
  * Includes document ID, destination site, list of delivered items, and delivery status.
@@ -91,6 +88,20 @@ public class DestinationDoc {
 
     public boolean removeDeliveredItem(DeliveredItem item) {
         return item != null && deliveryItems.remove(item);
+    }
+
+    /**
+     * Adds a delivery item to this document.
+     * @param item The item to add.
+     */
+    public void addDeliveryItem(DeliveredItem item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Item cannot be null");
+        }
+        if (!item.getDestinationDocId().equals(this.destinationDocId)) {
+            throw new IllegalArgumentException("Item's document ID does not match this document");
+        }
+        deliveryItems.add(item);
     }
 
     @Override

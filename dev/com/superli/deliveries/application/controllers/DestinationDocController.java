@@ -1,21 +1,21 @@
 package com.superli.deliveries.application.controllers;
 
-import com.superli.deliveries.domain.core.DeliveredItem;
-import com.superli.deliveries.domain.core.DestinationDoc;
-import com.superli.deliveries.domain.core.Site;
-import com.superli.deliveries.domain.core.Transport;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
+
+import com.superli.deliveries.Mappers.DestinationDocMapper;
+import com.superli.deliveries.Mappers.SiteMapper;
 import com.superli.deliveries.application.services.DeliveredItemService;
 import com.superli.deliveries.application.services.DestinationDocService;
 import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.TransportService;
-import com.superli.deliveries.Mappers.DestinationDocMapper;
-import com.superli.deliveries.Mappers.SiteMapper;
+import com.superli.deliveries.domain.core.DeliveredItem;
+import com.superli.deliveries.domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.dto.del.DestinationDocDTO;
 import com.superli.deliveries.dto.del.SiteDTO;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
 
 /**
  * Controller for managing DestinationDoc (delivery documents) via console UI.
@@ -53,7 +53,11 @@ public class DestinationDocController {
         List<DestinationDoc> existingDocs = destinationDocService.getAllDocs();
         if (!existingDocs.isEmpty()) {
             nextDocId = existingDocs.stream()
-                    .mapToInt(doc -> Integer.parseInt(doc.getDestinationDocId()))
+                    .mapToInt(doc -> {
+                        // Extract numeric part from document ID (e.g., "DOCTR001" -> 1)
+                        String id = doc.getDestinationDocId();
+                        return Integer.parseInt(id.replaceAll("[^0-9]", ""));
+                    })
                     .max()
                     .orElse(0) + 1;
         }
@@ -63,7 +67,7 @@ public class DestinationDocController {
      * Generate a new unique document ID
      */
     private String generateNextDocId() {
-        return String.valueOf(nextDocId++);
+        return String.format("DOCTR%03d", nextDocId++);
     }
 
     public void runMenu() {
@@ -249,7 +253,7 @@ public class DestinationDocController {
                 int quantity = Integer.parseInt(scanner.nextLine().trim());
 
                 // Create and add the item
-                DeliveredItem newItem = new DeliveredItem(productId, quantity);
+                DeliveredItem newItem = new DeliveredItem(null, docId, productId, quantity);
                 boolean added = deliveredItemService.addDeliveredItem(docId, newItem);
 
                 if (added) {

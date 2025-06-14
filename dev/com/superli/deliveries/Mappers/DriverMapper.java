@@ -1,35 +1,43 @@
 package com.superli.deliveries.Mappers;
 
-import com.superli.deliveries.domain.core.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.dto.del.DriverDTO;
 
 public class DriverMapper {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static Driver fromDTO(DriverDTO dto) {
         if (dto == null) return null;
 
         return new Driver(
-                dto.getId(),                                 // id (String in Entity)
+                dto.getId(),                                 // id
                 dto.getFullName(),                           // fullName
-                null,                                        // bankAccount (TODO)
-                0.0,                                         // salary (TODO)
-                -1,                                        // employeeTerms (TODO)
-                null,                                        // employeeStartDate (TODO)
-                null,
-                null,                                        // roleQualifications (TODO)
-                null,                                        // availabilityConstraints (TODO)
-                null,                                        // loginRole (TODO)
-                LicenseType.valueOf(dto.getLicenseType())    // licenseType
+                "000-000-000",                              // bankAccount (default)
+                0.0,                                        // salary (default)
+                -1,                                         // siteId (default)
+                "Standard",                                 // employeeTerms (default)
+                new Date(),                                 // employeeStartDate (default)
+                new ArrayList<>(),                          // roleQualifications
+                new ArrayList<>(),                          // availabilityConstraints
+                new Role("DRIVER"),                         // loginRole
+                LicenseType.valueOf(dto.getLicenseType())   // licenseType
         );
     }
 
     public static DriverDTO toDTO(Driver driver) {
         if (driver == null) return null;
 
-        return new DriverDTO(
-                driver.getId(),
-                driver.getFullName(),
-                driver.getLicenseType().name()
-        );
+        DriverDTO dto = new DriverDTO();
+        dto.setId(driver.getId());
+        dto.setFullName(driver.getFullName());
+        dto.setLicenseType(driver.getLicenseType().name());
+        dto.setAvailable(driver.isAvailable());
+        return dto;
     }
 }

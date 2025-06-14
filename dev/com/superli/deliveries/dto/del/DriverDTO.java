@@ -4,6 +4,7 @@ public class DriverDTO {
     private String id;
     private String fullName;
     private String licenseType;
+    private boolean available;
 
     public DriverDTO() {}
 
@@ -21,4 +22,7 @@ public class DriverDTO {
 
     public String getLicenseType() { return licenseType; }
     public void setLicenseType(String licenseType) { this.licenseType = licenseType; }
+
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
 }

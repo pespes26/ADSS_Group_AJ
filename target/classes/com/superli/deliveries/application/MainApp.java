@@ -1,9 +1,8 @@
 package com.superli.deliveries.application;
 
-import com.superli.deliveries.application.Main; // DELIVERIES
-import com.superli.deliveries.presentation.HR.HRDetailsView; // HR
+import java.util.Scanner; // DELIVERIES
 
-import java.util.Scanner;
+import com.superli.deliveries.presentation.HR.HRDetailsView; // HR
 
 public class MainApp {
     public static void main(String[] args) {

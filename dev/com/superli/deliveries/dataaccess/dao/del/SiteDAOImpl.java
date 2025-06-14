@@ -1,13 +1,17 @@
 package com.superli.deliveries.dataaccess.dao.del;
 
-import com.superli.deliveries.dto.del.SiteDTO;
-import com.superli.deliveries.util.Database;
-import com.superli.deliveries.exceptions.DataAccessException;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.superli.deliveries.dto.del.SiteDTO;
+import com.superli.deliveries.exceptions.DataAccessException;
+import com.superli.deliveries.util.Database;
 
 public class SiteDAOImpl implements SiteDAO {
     private final Connection conn;
@@ -35,7 +39,7 @@ public class SiteDAOImpl implements SiteDAO {
 
     @Override
     public Optional<SiteDTO> findById(String id) throws SQLException {
-        String sql = "SELECT * FROM sites WHERE id = ?";
+        String sql = "SELECT * FROM sites WHERE site_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -52,9 +56,9 @@ public class SiteDAOImpl implements SiteDAO {
 
     @Override
     public SiteDTO save(SiteDTO site) throws SQLException {
-        String sql = "INSERT INTO sites (id, address, phone_number, contact_person_name, zone_id) " +
+        String sql = "INSERT INTO sites (site_id, address, phone_number, contact_person_name, zone_id) " +
                     "VALUES (?, ?, ?, ?, ?) " +
-                    "ON CONFLICT(id) DO UPDATE SET " +
+                    "ON CONFLICT(site_id) DO UPDATE SET " +
                     "address = ?, phone_number = ?, contact_person_name = ?, zone_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -80,7 +84,7 @@ public class SiteDAOImpl implements SiteDAO {
 
     @Override
     public void deleteById(String id) throws SQLException {
-        String sql = "DELETE FROM sites WHERE id = ?";
+        String sql = "DELETE FROM sites WHERE site_id = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -111,7 +115,7 @@ public class SiteDAOImpl implements SiteDAO {
     @Override
     public List<SiteDTO> findActiveSites() throws SQLException {
         List<SiteDTO> sites = new ArrayList<>();
-        String sql = "SELECT * FROM sites WHERE active = true";
+        String sql = "SELECT * FROM sites";
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -144,7 +148,7 @@ public class SiteDAOImpl implements SiteDAO {
 
     private SiteDTO mapResultSetToSiteDTO(ResultSet rs) throws SQLException {
         SiteDTO dto = new SiteDTO();
-        dto.setSiteId(rs.getString("id"));
+        dto.setSiteId(rs.getString("site_id"));
         dto.setAddress(rs.getString("address"));
         dto.setPhoneNumber(rs.getString("phone_number"));
         dto.setContactPersonName(rs.getString("contact_person_name"));

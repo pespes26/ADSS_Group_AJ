@@ -1,18 +1,17 @@
 package com.superli.deliveries.application.services;
 
-import com.superli.deliveries.dataaccess.dao.del.DriverDAO;
-import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
-import com.superli.deliveries.domain.core.Driver;
-import com.superli.deliveries.domain.core.LicenseType;
-import com.superli.deliveries.domain.core.Truck;
-//import com.superli.deliveries.domain.ports.IDriverRepository;
-import com.superli.deliveries.Mappers.*;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.superli.deliveries.Mappers.DriverMapper;
+import com.superli.deliveries.dataaccess.dao.del.DriverDAO;
+import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.LicenseType;
+import com.superli.deliveries.domain.core.Truck;
 
 /**
  * Service layer responsible for business logic related to drivers.
@@ -41,9 +40,8 @@ public class DriverService {
     // Get only available drivers (not marked as unavailable)
     public List<Driver> getAvailableDrivers() {
         try {
-            return driverDAO.findAll().stream()
+            return driverDAO.findAvailableDrivers().stream()
                     .map(DriverMapper::fromDTO)
-                    .filter(Driver::isAvailable)
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting available drivers", e);
@@ -80,12 +78,20 @@ public class DriverService {
 
     // Mark driver as unavailable (assigned to transport)
     public void markDriverAsUnavailable(String driverId) {
-        updateDriverAvailability(driverId, false);
+        try {
+            driverDAO.updateDriverAvailability(driverId, false);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error marking driver as unavailable: " + driverId, e);
+        }
     }
 
     // Mark driver as available again
     public void markDriverAsAvailable(String driverId) {
-        updateDriverAvailability(driverId, true);
+        try {
+            driverDAO.updateDriverAvailability(driverId, true);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error marking driver as available: " + driverId, e);
+        }
     }
 
     // Check if driver can drive a specific truck
@@ -104,11 +110,11 @@ public class DriverService {
 
     // Update driver's availability
     public void updateDriverAvailability(String id, boolean available) {
-        Optional<Driver> driver = getDriverById(id);
-        driver.ifPresent(d -> {
-            d.setAvailable(available);
-            saveDriver(d);
-        });
+        try {
+            driverDAO.updateDriverAvailability(id, available);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating driver availability", e);
+        }
     }
 
     public List<Driver> getDriversByLicenseType(String licenseType) {

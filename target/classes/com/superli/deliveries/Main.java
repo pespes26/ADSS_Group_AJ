@@ -1,11 +1,11 @@
 package com.superli.deliveries;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.superli.deliveries.application.controllers.DeliveredItemController;
 import com.superli.deliveries.application.controllers.DestinationDocController;
 import com.superli.deliveries.application.controllers.DriverController;
-import com.superli.deliveries.application.controllers.MainMenuController;
+import com.superli.deliveries.application.controllers.ProductController;
 import com.superli.deliveries.application.controllers.SiteController;
 import com.superli.deliveries.application.controllers.TransportController;
 import com.superli.deliveries.application.controllers.TruckController;
@@ -18,124 +18,70 @@ import com.superli.deliveries.application.services.SiteService;
 import com.superli.deliveries.application.services.TransportService;
 import com.superli.deliveries.application.services.TruckService;
 import com.superli.deliveries.application.services.ZoneService;
-import com.superli.deliveries.dataaccess.dao.DeliveredItemDAO;
-import com.superli.deliveries.dataaccess.dao.DeliveredItemDAOImpl;
-import com.superli.deliveries.dataaccess.dao.DestinationDocDAO;
-import com.superli.deliveries.dataaccess.dao.DestinationDocDAOImpl;
-import com.superli.deliveries.dataaccess.dao.DriverDAO;
-import com.superli.deliveries.dataaccess.dao.DriverDAOImpl;
-import com.superli.deliveries.dataaccess.dao.ProductDAO;
-import com.superli.deliveries.dataaccess.dao.ProductDAOImpl;
-import com.superli.deliveries.dataaccess.dao.SiteDAO;
-import com.superli.deliveries.dataaccess.dao.SiteDAOImpl;
-import com.superli.deliveries.dataaccess.dao.TransportDAO;
-import com.superli.deliveries.dataaccess.dao.TransportDAOImpl;
-import com.superli.deliveries.dataaccess.dao.TruckDAO;
-import com.superli.deliveries.dataaccess.dao.TruckDAOImpl;
-import com.superli.deliveries.dataaccess.dao.ZoneDAO;
-import com.superli.deliveries.dataaccess.dao.ZoneDAOImpl;
-import com.superli.deliveries.util.Database;
+import com.superli.deliveries.config.DataInitializer;
+import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAO;
+import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.DestinationDocDAO;
+import com.superli.deliveries.dataaccess.dao.del.DestinationDocDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.DriverDAO;
+import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.ProductDAO;
+import com.superli.deliveries.dataaccess.dao.del.ProductDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.SiteDAO;
+import com.superli.deliveries.dataaccess.dao.del.SiteDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.TransportDAO;
+import com.superli.deliveries.dataaccess.dao.del.TransportDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.TruckDAO;
+import com.superli.deliveries.dataaccess.dao.del.TruckDAOImpl;
+import com.superli.deliveries.dataaccess.dao.del.ZoneDAO;
+import com.superli.deliveries.dataaccess.dao.del.ZoneDAOImpl;
 
 public class Main {
-
-    // Role enum inside Main
-    enum Role {
-        SYSTEM_ADMIN,
-        TRANSPORT_MANAGER
-    }
-
-    // Static variable to store current user role
-    private static Role currentUserRole;
-
-    /**
-     * Checks if the current user is a system administrator.
-     * @return true if current user is a system administrator, false otherwise
-     */
-    public static boolean isSystemAdmin() {
-        return currentUserRole == Role.SYSTEM_ADMIN;
-    }
-
-    /**
-     * Checks if the current user is a transport manager.
-     * @return true if current user is a transport manager, false otherwise
-     */
-    public static boolean isTransportManager() {
-        return currentUserRole == Role.TRANSPORT_MANAGER;
-    }
-
     public static void main(String[] args) {
-        // Test database connection
         try {
-            var conn = Database.getConnection();
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Database connection successful!");
-            }
-        } catch (SQLException e) {
-            System.err.println("Database connection failed: " + e.getMessage());
-            return;
-        }
+            // Initialize DAOs
+            ZoneDAO zoneDAO = new ZoneDAOImpl();
+            SiteDAO siteDAO = new SiteDAOImpl();
+            DriverDAO driverDAO = new DriverDAOImpl();
+            TruckDAO truckDAO = new TruckDAOImpl();
+            ProductDAO productDAO = new ProductDAOImpl();
+            TransportDAO transportDAO = new TransportDAOImpl();
+            DestinationDocDAO destinationDocDAO = new DestinationDocDAOImpl();
+            DeliveredItemDAO deliveredItemDAO = new DeliveredItemDAOImpl();
 
-        Scanner scanner = new Scanner(System.in);
+            // Initialize services
+            ZoneService zoneService = new ZoneService(zoneDAO);
+            SiteService siteService = new SiteService(siteDAO, zoneService);
+            DriverService driverService = new DriverService(); // Uses its own DAO
+            TruckService truckService = new TruckService(truckDAO);
+            ProductService productService = new ProductService(productDAO);
+            TransportService transportService = new TransportService(transportDAO, driverService, truckService, siteService);
+            DestinationDocService destinationDocService = new DestinationDocService(destinationDocDAO, siteService);
+            DeliveredItemService deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService);
 
-        // --- User role selection and password authentication ---
-        System.out.println("Select user type:");
-        System.out.println("1. System Administrator");
-        System.out.println("2. Transport Manager");
-        System.out.print("Your choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear input buffer after number
+            // Initialize data
+            DataInitializer dataInitializer = new DataInitializer(
+                driverService,
+                truckService,
+                zoneService,
+                siteService,
+                productService,
+                transportService,
+                destinationDocService,
+                deliveredItemService
+            );
+            dataInitializer.initializeIfNeeded();
 
-        if (choice == 1) {
-            currentUserRole = Role.SYSTEM_ADMIN;
-            System.out.println("You are logged in as System Administrator.");
-        } else if (choice == 2) {
-            currentUserRole = Role.TRANSPORT_MANAGER;
-            System.out.println("You are logged in as Transport Manager.");
-        } else {
-            System.out.println("Invalid password or selection. Program terminating.");
-            return;
-        }
+            // Create scanner for user input
+            Scanner scanner = new Scanner(System.in);
 
-        // --- DAOs ---
-        DriverDAO driverDAO = null;
-        TruckDAO truckDAO = null;
-        SiteDAO siteDAO = null;
-        ZoneDAO zoneDAO = null;
-        TransportDAO transportDAO = null;
-        DestinationDocDAO destinationDocDAO = null;
-        ProductDAO productDAO = null;
-        DeliveredItemDAO deliveredItemDAO = null;
-        try {
-            driverDAO = new DriverDAOImpl();
-            truckDAO = new TruckDAOImpl();
-            siteDAO = new SiteDAOImpl();
-            zoneDAO = new ZoneDAOImpl();
-            transportDAO = new TransportDAOImpl();
-            destinationDocDAO = new DestinationDocDAOImpl();
-            productDAO = new ProductDAOImpl();
-            deliveredItemDAO = new DeliveredItemDAOImpl();
-        } catch (SQLException e) {
-            System.err.println("DAO initialization failed: " + e.getMessage());
-            return;
-        }
-
-        // --- Services ---
-        var productService = new ProductService(productDAO);
-        var driverService = new DriverService();
-        var truckService = new TruckService(truckDAO);
-        var zoneService = new ZoneService(zoneDAO);
-        var siteService = new SiteService(siteDAO, zoneService);
-        var transportService = new TransportService(transportDAO, driverService, truckService, siteService);
-        var destinationDocService = new DestinationDocService(destinationDocDAO, siteService);
-        var deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService);
-
-        // --- Controllers ---
-        var driverController = new DriverController(driverService);
-        var truckController = new TruckController(truckService);
-        var siteController = new SiteController(siteService, zoneService);
-        var zoneController = new ZoneController(zoneService, siteService, scanner);
-
-        var transportController = new TransportController(
+            // Initialize controllers
+            DriverController driverController = new DriverController(driverService);
+            TruckController truckController = new TruckController(truckService);
+            ZoneController zoneController = new ZoneController(zoneService, siteService, scanner);
+            SiteController siteController = new SiteController(siteService, zoneService);
+            ProductController productController = new ProductController(productService);
+            TransportController transportController = new TransportController(
                 transportService,
                 truckService,
                 driverService,
@@ -143,27 +89,33 @@ public class Main {
                 productService,
                 destinationDocService,
                 deliveredItemService
-        );
-
-        var destinationDocController = new DestinationDocController(
+            );
+            DestinationDocController destinationDocController = new DestinationDocController(
                 destinationDocService,
                 deliveredItemService,
                 siteService,
                 transportService
-        );
+            );
+            DeliveredItemController deliveredItemController = new DeliveredItemController(deliveredItemService, productService, transportService);
 
-        // --- Main Menu Controller ---
-        var mainMenuController = new MainMenuController(
-                transportController,
-                driverController,
-                truckController,
-                siteController,
-                zoneController,
-                destinationDocController,
-                scanner
-        );
+            // Start the application
+            System.out.println("Welcome to the Delivery Management System!");
+            System.out.println("Please select an option:");
+            System.out.println("1. Manage Drivers");
+            System.out.println("2. Manage Trucks");
+            System.out.println("3. Manage Zones");
+            System.out.println("4. Manage Sites");
+            System.out.println("5. Manage Products");
+            System.out.println("6. Manage Transports");
+            System.out.println("7. Manage Destination Documents");
+            System.out.println("8. Manage Delivered Items");
+            System.out.println("0. Exit");
 
-        // --- Run the application ---
-        mainMenuController.run();
+            // TODO: Add menu handling logic here
+
+        } catch (Exception e) {
+            System.err.println("Error initializing application: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-}
+} 

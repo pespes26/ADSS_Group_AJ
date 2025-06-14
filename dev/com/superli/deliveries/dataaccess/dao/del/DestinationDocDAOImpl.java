@@ -39,7 +39,7 @@ public class DestinationDocDAOImpl implements DestinationDocDAO {
 
     @Override
     public Optional<DestinationDocDTO> findById(String id) {
-        String sql = "SELECT * FROM destination_docs WHERE id = ?";
+        String sql = "SELECT * FROM destination_docs WHERE destination_doc_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -56,8 +56,10 @@ public class DestinationDocDAOImpl implements DestinationDocDAO {
 
     @Override
     public DestinationDocDTO save(DestinationDocDTO doc) {
-        String sql = "INSERT INTO destination_docs (id, transport_id, site_id, status) VALUES (?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE transport_id = ?, site_id = ?, status = ?";
+        String sql = "INSERT INTO destination_docs (destination_doc_id, transport_id, destination_site_id, status) " +
+                    "VALUES (?, ?, ?, ?) " +
+                    "ON CONFLICT(destination_doc_id) DO UPDATE SET " +
+                    "transport_id = ?, destination_site_id = ?, status = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, doc.getDestinationDocId());
@@ -77,7 +79,7 @@ public class DestinationDocDAOImpl implements DestinationDocDAO {
 
     @Override
     public void deleteById(String id) {
-        String sql = "DELETE FROM destination_docs WHERE id = ?";
+        String sql = "DELETE FROM destination_docs WHERE destination_doc_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -142,9 +144,9 @@ public class DestinationDocDAOImpl implements DestinationDocDAO {
 
     private DestinationDocDTO mapResultSetToDocDTO(ResultSet rs) throws SQLException {
         return new DestinationDocDTO(
-            rs.getString("id"),
+            rs.getString("destination_doc_id"),
             rs.getString("transport_id"),
-            rs.getString("site_id"),
+            rs.getString("destination_site_id"),
             rs.getString("status")
         );
     }

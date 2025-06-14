@@ -2,6 +2,8 @@ package com.superli.deliveries.dto.del;
 
 import java.util.List;
 
+import com.superli.deliveries.domain.core.TransportStatus;
+
 public class TransportDTO {
     private String transportId;
     private String departureDateTime;
@@ -9,13 +11,13 @@ public class TransportDTO {
     private String driverId;
     private String originSiteId;
     private float departureWeight;
-    private String status;
+    private TransportStatus status;
     private List<String> destinationDocIds;
 
     public TransportDTO() {}
 
     public TransportDTO(String transportId, String departureDateTime, String truckId, String driverId,
-                        String originSiteId, float departureWeight, String status, List<String> destinationDocIds) {
+                        String originSiteId, float departureWeight, TransportStatus status, List<String> destinationDocIds) {
         this.transportId = transportId;
         this.departureDateTime = departureDateTime;
         this.truckId = truckId;
@@ -44,8 +46,8 @@ public class TransportDTO {
     public float getDepartureWeight() { return departureWeight; }
     public void setDepartureWeight(float departureWeight) { this.departureWeight = departureWeight; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public TransportStatus getStatus() { return status; }
+    public void setStatus(TransportStatus status) { this.status = status; }
 
     public List<String> getDestinationDocIds() { return destinationDocIds; }
     public void setDestinationDocIds(List<String> destinationDocIds) { this.destinationDocIds = destinationDocIds; }

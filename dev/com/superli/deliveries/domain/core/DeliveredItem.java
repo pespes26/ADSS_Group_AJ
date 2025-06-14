@@ -14,6 +14,12 @@ import java.util.Objects;
  */
 public class DeliveredItem {
 
+    /** The unique ID of this delivered item. */
+    private final String itemId;
+
+    /** The ID of the destination document this item belongs to. */
+    private final String destinationDocId;
+
     /** The unique ID of the product being delivered. */
     private final String productId;
 
@@ -23,11 +29,13 @@ public class DeliveredItem {
     /**
      * Constructs a new DeliveredItem instance.
      *
+     * @param itemId The unique identifier of this delivered item.
+     * @param destinationDocId The ID of the destination document this item belongs to.
      * @param productId The unique identifier of the product. Cannot be null or blank.
      * @param quantity The quantity of the product delivered. Must be zero or greater.
      * @throws IllegalArgumentException if productId is null/blank or quantity is negative.
      */
-    public DeliveredItem(String productId, int quantity) {
+    public DeliveredItem(String itemId, String destinationDocId, String productId, int quantity) {
         if (productId == null || productId.isBlank()) {
             throw new IllegalArgumentException("Product ID cannot be null or blank.");
         }
@@ -35,8 +43,28 @@ public class DeliveredItem {
             throw new IllegalArgumentException("Quantity cannot be negative.");
         }
 
+        this.itemId = itemId;
+        this.destinationDocId = destinationDocId;
         this.productId = productId;
         this.quantity = quantity;
+    }
+
+    /**
+     * Returns the ID of this delivered item.
+     *
+     * @return The item's unique identifier.
+     */
+    public String getItemId() {
+        return itemId;
+    }
+
+    /**
+     * Returns the ID of the destination document this item belongs to.
+     *
+     * @return The destination document's unique identifier.
+     */
+    public String getDestinationDocId() {
+        return destinationDocId;
     }
 
     /**
@@ -73,12 +101,14 @@ public class DeliveredItem {
     /**
      * Returns a string representation of this DeliveredItem.
      *
-     * @return A string containing productId and quantity.
+     * @return A string containing itemId, destinationDocId, productId and quantity.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("=== DELIVERED ITEM ===\n");
+        sb.append("Item ID: ").append(itemId).append("\n");
+        sb.append("Destination Document ID: ").append(destinationDocId).append("\n");
         sb.append("Product ID: ").append(productId).append("\n");
         sb.append("Quantity: ").append(quantity).append("\n");
         sb.append("=====================");

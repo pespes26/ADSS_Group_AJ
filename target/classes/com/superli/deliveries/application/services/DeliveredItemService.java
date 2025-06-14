@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAO;
+import com.superli.deliveries.dataaccess.dao.del.DestinationDocDAO;
+import com.superli.deliveries.domain.core.DeliveredItem;
 import com.superli.deliveries.domain.core.DestinationDoc;
 import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.domain.core.DeliveredItem;
-import com.superli.deliveries.dataaccess.dao.del.DeliveredItemDAO;
 import com.superli.deliveries.dto.del.DeliveredItemDTO;
-import com.superli.deliveries.Mappers.DeliveredItemMapper;
+import com.superli.deliveries.dto.del.DestinationDocDTO;
 /**
  * Service responsible for managing delivered items within destination documents.
  * Also handles weight calculation and validation.
@@ -22,13 +23,127 @@ public class DeliveredItemService {
     private final DeliveredItemDAO deliveredItemDAO;
     private final TransportService transportService;
     private final ProductService productService;
+    private final DestinationDocDAO destinationDocDAO;
 
     public DeliveredItemService(DeliveredItemDAO deliveredItemDAO,
                                 TransportService transportService,
-                                ProductService productService) {
+                                ProductService productService,
+                                DestinationDocDAO destinationDocDAO) {
         this.deliveredItemDAO = deliveredItemDAO;
         this.transportService = transportService;
         this.productService = productService;
+        this.destinationDocDAO = destinationDocDAO;
+    }
+
+    /**
+     * Retrieves all delivered items.
+     * @return A list of all delivered items.
+     */
+    public List<DeliveredItem> getAllDeliveredItems() {
+        try {
+            return deliveredItemDAO.findAll().stream()
+                    .map(dto -> new DeliveredItem(
+                            dto.getId(),
+                            dto.getDestinationDocId(),
+                            dto.getProductId(),
+                            dto.getQuantity()))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all delivered items", e);
+        }
+    }
+
+    /**
+     * Retrieves a delivered item by its ID.
+     * @param id The ID of the delivered item to retrieve.
+     * @return An Optional containing the delivered item if found, empty otherwise.
+     */
+    public Optional<DeliveredItem> getDeliveredItemById(String id) {
+        try {
+            return deliveredItemDAO.findById(id)
+                    .map(dto -> new DeliveredItem(
+                            dto.getId(),
+                            dto.getDestinationDocId(),
+                            dto.getProductId(),
+                            dto.getQuantity()));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting delivered item by ID: " + id, e);
+        }
+    }
+
+    /**
+     * Saves a delivered item.
+     * @param item The delivered item to save.
+     * @return The saved delivered item.
+     */
+    public DeliveredItem saveDeliveredItem(DeliveredItem item) {
+        try {
+            DeliveredItemDTO dto = new DeliveredItemDTO(
+                    item.getItemId(),
+                    item.getDestinationDocId(),
+                    item.getProductId(),
+                    item.getQuantity());
+            DeliveredItemDTO savedDto = deliveredItemDAO.save(dto);
+            return new DeliveredItem(
+                    savedDto.getId(),
+                    savedDto.getDestinationDocId(),
+                    savedDto.getProductId(),
+                    savedDto.getQuantity());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving delivered item", e);
+        }
+    }
+
+    /**
+     * Deletes a delivered item by its ID.
+     * @param id The ID of the delivered item to delete.
+     */
+    public void deleteDeliveredItem(String id) {
+        try {
+            deliveredItemDAO.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting delivered item: " + id, e);
+        }
+    }
+
+    /**
+     * Retrieves all delivered items for a specific transport.
+     * @param transportId The ID of the transport.
+     * @return A list of delivered items for the transport.
+     */
+    public List<DeliveredItem> getDeliveredItemsByTransport(String transportId) {
+        try {
+            return deliveredItemDAO.findAll().stream()
+                    .filter(dto -> dto.getDestinationDocId().equals(transportId))
+                    .map(dto -> new DeliveredItem(
+                            dto.getId(),
+                            dto.getDestinationDocId(),
+                            dto.getProductId(),
+                            dto.getQuantity()))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting delivered items for transport: " + transportId, e);
+        }
+    }
+
+    /**
+     * Retrieves all delivered items for a specific product.
+     * @param productId The ID of the product.
+     * @return A list of delivered items for the product.
+     */
+    public List<DeliveredItem> getDeliveredItemsByProduct(String productId) {
+        try {
+            return deliveredItemDAO.findAll().stream()
+                    .filter(dto -> dto.getProductId().equals(productId))
+                    .map(dto -> new DeliveredItem(
+                            dto.getId(),
+                            dto.getDestinationDocId(),
+                            dto.getProductId(),
+                            dto.getQuantity()))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting delivered items for product: " + productId, e);
+        }
     }
 
     /**
@@ -45,7 +160,14 @@ public class DeliveredItemService {
                 return false;
             }
 
-            DeliveredItemDTO dto = DeliveredItemMapper.toDTO(item, docId); // ID will be generated by DB
+            // Generate a new item ID
+            String itemId = getNextItemId();
+            
+            DeliveredItemDTO dto = new DeliveredItemDTO(
+                    itemId,
+                    docId,
+                    item.getProductId(),
+                    item.getQuantity());
             deliveredItemDAO.save(dto);
 
             // Update the transport's departure weight
@@ -54,6 +176,30 @@ public class DeliveredItemService {
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error adding delivered item", e);
+        }
+    }
+
+    /**
+     * Generates the next available item ID
+     */
+    private String getNextItemId() {
+        try {
+            List<DeliveredItemDTO> items = deliveredItemDAO.findAll();
+            int maxId = 0;
+            for (DeliveredItemDTO item : items) {
+                String id = item.getId();
+                if (id != null && id.startsWith("I")) {
+                    try {
+                        int num = Integer.parseInt(id.substring(1));
+                        maxId = Math.max(maxId, num);
+                    } catch (NumberFormatException e) {
+                        // Skip invalid IDs
+                    }
+                }
+            }
+            return String.format("I%03d", maxId + 1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error generating item ID", e);
         }
     }
 
@@ -93,7 +239,11 @@ public class DeliveredItemService {
         try {
             return deliveredItemDAO.findAll().stream()
                     .filter(dto -> dto.getDestinationDocId().equals(docId))
-                    .map(DeliveredItemMapper::fromDTO)
+                    .map(dto -> new DeliveredItem(
+                            dto.getId(),
+                            dto.getDestinationDocId(),
+                            dto.getProductId(),
+                            dto.getQuantity()))
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting delivered items for doc: " + docId, e);
@@ -107,7 +257,7 @@ public class DeliveredItemService {
      * @param newQuantity The new quantity to set.
      * @return true if the item was found and updated, false otherwise.
      */
-    public boolean updateQuantity(String docId, String productId, int newQuantity) {
+    public boolean updateItemQuantity(String docId, String productId, int newQuantity) {
         try {
             List<DeliveredItemDTO> items = deliveredItemDAO.findAll();
             Optional<DeliveredItemDTO> itemToUpdate = items.stream()
@@ -117,25 +267,16 @@ public class DeliveredItemService {
 
             if (itemToUpdate.isPresent()) {
                 DeliveredItemDTO dto = itemToUpdate.get();
-                DeliveredItem tempItem = new DeliveredItem(productId, newQuantity);
-                
-                // Check weight limit with the new quantity
-                if (wouldExceedWeightLimit(docId, tempItem)) {
-                    System.out.println("⚠️ Warning: New quantity would exceed the truck's weight limit.");
-                    return false;
-                }
-
                 dto.setQuantity(newQuantity);
                 deliveredItemDAO.save(dto);
 
                 // Update the transport's departure weight
                 updateTransportWeight(docId);
-
                 return true;
             }
             return false;
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating quantity", e);
+            throw new RuntimeException("Error updating item quantity", e);
         }
     }
 
@@ -186,21 +327,34 @@ public class DeliveredItemService {
      * @return true if adding the item would exceed the limit
      */
     private boolean wouldExceedWeightLimit(String docId, DeliveredItem item) {
-        float currentWeight = calculateDocumentWeight(docId);
-        Optional<Product> productOpt = productService.getProductById(item.getProductId());
-        
-        if (productOpt.isPresent()) {
-            float itemWeight = productOpt.get().getWeight() * item.getQuantity();
-            float totalWeight = currentWeight + itemWeight;
-
-            // Get the transport's truck
-            Optional<Transport> transportOpt = transportService.getTransportById(docId);
-            if (transportOpt.isPresent()) {
-                Truck truck = transportOpt.get().getTruck();
-                return totalWeight > truck.getMaxWeight();
-            }
+        // Get the destination document to find its transport
+        Optional<DestinationDocDTO> docOpt = destinationDocDAO.findById(docId);
+        if (docOpt.isEmpty()) {
+            return false;
         }
-        return false;
+        String transportId = docOpt.get().getTransportId();
+        
+        // Get the transport and its truck
+        Optional<Transport> transportOpt = transportService.getTransportById(transportId);
+        if (transportOpt.isEmpty()) {
+            return false;
+        }
+        Transport transport = transportOpt.get();
+        Truck truck = transport.getTruck();
+        
+        // Calculate current weight
+        float currentWeight = calculateTotalTransportWeight(transportId);
+        
+        // Calculate new item weight
+        Optional<Product> productOpt = productService.getProductById(item.getProductId());
+        if (productOpt.isEmpty()) {
+            return false;
+        }
+        float itemWeight = productOpt.get().getWeight() * item.getQuantity();
+        
+        // Check if total weight would exceed truck's max weight
+        float totalWeight = currentWeight + itemWeight;
+        return totalWeight > truck.getMaxWeight();
     }
 
     /**
@@ -208,12 +362,31 @@ public class DeliveredItemService {
      * @param docId The document ID
      */
     private void updateTransportWeight(String docId) {
-        Optional<Transport> transportOpt = transportService.getTransportById(docId);
-        if (transportOpt.isPresent()) {
-            Transport transport = transportOpt.get();
-            float totalWeight = calculateTotalTransportWeight(transport.getTransportId());
-            transport.setDepartureWeight(totalWeight);
-            transportService.saveTransport(transport);
+        // Get the destination document to find its transport
+        Optional<DestinationDocDTO> docOpt = destinationDocDAO.findById(docId);
+        if (docOpt.isEmpty()) {
+            return;
+        }
+        String transportId = docOpt.get().getTransportId();
+        
+        // Get the transport
+        Optional<Transport> transportOpt = transportService.getTransportById(transportId);
+        if (transportOpt.isEmpty()) {
+            return;
+        }
+        Transport transport = transportOpt.get();
+        
+        // Calculate new total weight
+        float totalWeight = calculateTotalTransportWeight(transportId);
+        
+        // Update the transport's weight
+        transport.setDepartureWeight(totalWeight);
+        transportService.saveTransport(transport);
+        
+        // Verify the update
+        Optional<Transport> verifyOpt = transportService.getTransportById(transportId);
+        if (verifyOpt.isPresent() && Math.abs(verifyOpt.get().getDepartureWeight() - totalWeight) > 0.001f) {
+            throw new RuntimeException("Weight update verification failed");
         }
     }
 }

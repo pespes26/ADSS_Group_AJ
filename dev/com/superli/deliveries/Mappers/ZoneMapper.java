@@ -17,9 +17,7 @@ public class ZoneMapper {
         if (zone == null) return null;
         return new ZoneDTO(
                 zone.getZoneId(),
-                zone.getName(),
-                0.0f, // Default capacity since Zone doesn't have this field
-                true  // Default active state since Zone doesn't have this field
+                zone.getName()
         );
     }
 }

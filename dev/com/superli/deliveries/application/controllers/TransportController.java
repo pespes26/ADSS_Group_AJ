@@ -78,7 +78,11 @@ public class TransportController {
             // Find the maximum document ID and set the next ID to max + 1
             nextDocumentId = Math.max(
                     existingDocs.stream()
-                            .mapToInt(doc -> Integer.parseInt(doc.getDestinationDocId()))
+                            .mapToInt(doc -> {
+                                // Extract numeric part from document ID (e.g., "DOCTR001" -> 1)
+                                String id = doc.getDestinationDocId();
+                                return Integer.parseInt(id.replaceAll("[^0-9]", ""));
+                            })
                             .max()
                             .orElse(999),
                     999) + 1;
@@ -89,7 +93,24 @@ public class TransportController {
      * Generate the next sequential document ID
      */
     private String getNextDocumentId() {
-        return String.valueOf(nextDocumentId++);
+        return String.format("DOCTR%03d", nextDocumentId++);
+    }
+
+    private String getNextProductId() {
+        List<Product> products = productService.getAllProducts();
+        int maxId = 0;
+        for (Product product : products) {
+            String id = product.getProductId();
+            if (id.startsWith("P")) {
+                try {
+                    int num = Integer.parseInt(id.substring(1));
+                    maxId = Math.max(maxId, num);
+                } catch (NumberFormatException e) {
+                    // Skip invalid IDs
+                }
+            }
+        }
+        return String.format("P%03d", maxId + 1);
     }
 
     public void runMenu() {
@@ -136,7 +157,7 @@ public class TransportController {
     private void showAllTransports() {
         List<Transport> transports = transportService.getAllTransports();
         if (transports.isEmpty()) {
-            System.out.println("No transports found.");
+            System.out.println("\nNo transports found in the system.");
         } else {
             System.out.println("\n╔════════════════════════════════════╗");
             System.out.println("║           ALL TRANSPORTS           ║");
@@ -148,35 +169,71 @@ public class TransportController {
                 System.out.println("\n[" + (i+1) + "] TRANSPORT #" + transportDTO.getTransportId());
                 System.out.println("    Status: " + transportDTO.getStatus());
                 System.out.println("    Departure: " + transportDTO.getDepartureDateTime());
-                System.out.println("    Origin: " + transportDTO.getOriginSiteId());
-                System.out.println("    Destinations: " + transportDTO.getDestinationDocIds().size());
-                System.out.println("    Total Weight: " + transportDTO.getDepartureWeight() + " kg");
-                System.out.println("    " + "-".repeat(40));
+                System.out.println("    Origin: " + transport.getOriginSite().getAddress());
+                System.out.println("    Destinations: " + transportDTO.getDestinationDocIds().size() + " sites");
+                System.out.println("    Weight: " + transportDTO.getDepartureWeight() + " kg / " + 
+                    transport.getTruck().getMaxWeight() + " kg");
+                System.out.println("    Truck: " + transport.getTruck().getPlateNum() + 
+                    " (" + transport.getTruck().getModel() + ")");
+                System.out.println("    Driver: " + transport.getDriver().getFullName());
+                System.out.println("    " + "─".repeat(40));
             }
+            System.out.println("\nTotal transports: " + transports.size());
         }
     }
 
     private void showTransportById() {
-        System.out.print("Enter Transport ID: ");
+        System.out.print("\nEnter Transport ID: ");
         try {
             String id = scanner.nextLine().trim();
             Optional<Transport> transportOpt = transportService.getTransportById(id);
             if (transportOpt.isEmpty()) {
-                System.out.println("Transport not found.");
+                System.out.println("\nTransport with ID '" + id + "' not found.");
             } else {
                 Transport transport = transportOpt.get();
                 TransportDTO transportDTO = TransportMapper.toDTO(transport);
-                System.out.println("Transport ID: " + transportDTO.getTransportId());
-                System.out.println("Status: " + transportDTO.getStatus());
-                System.out.println("Departure: " + transportDTO.getDepartureDateTime());
-                System.out.println("Origin Site ID: " + transportDTO.getOriginSiteId());
-                System.out.println("Truck ID: " + transportDTO.getTruckId());
-                System.out.println("Driver ID: " + transportDTO.getDriverId());
-                System.out.println("Departure Weight: " + transportDTO.getDepartureWeight() + " kg");
-                System.out.println("Destination Documents: " + transportDTO.getDestinationDocIds());
+                
+                System.out.println("\n╔════════════════════════════════════╗");
+                System.out.println("║         TRANSPORT DETAILS          ║");
+                System.out.println("╚════════════════════════════════════╝");
+                
+                System.out.println("\nBasic Information:");
+                System.out.println("  ID: " + transportDTO.getTransportId());
+                System.out.println("  Status: " + transportDTO.getStatus());
+                System.out.println("  Departure: " + transportDTO.getDepartureDateTime());
+                
+                System.out.println("\nWeight Information:");
+                System.out.println("  Current Weight: " + transportDTO.getDepartureWeight() + " kg");
+                System.out.println("  Truck Capacity: " + transport.getTruck().getMaxWeight() + " kg");
+                System.out.println("  Available Capacity: " + 
+                    (transport.getTruck().getMaxWeight() - transportDTO.getDepartureWeight()) + " kg");
+                
+                System.out.println("\nRoute Information:");
+                System.out.println("  Origin: " + transport.getOriginSite().getAddress());
+                System.out.println("  Destinations: " + transportDTO.getDestinationDocIds().size() + " sites");
+                
+                if (!transport.getDestinationDocs().isEmpty()) {
+                    System.out.println("\nDestination Details:");
+                    for (int i = 0; i < transport.getDestinationDocs().size(); i++) {
+                        DestinationDoc doc = transport.getDestinationDocs().get(i);
+                        System.out.println("  " + (i+1) + ". " + doc.getDestinationId().getAddress());
+                        System.out.println("     Status: " + doc.getStatus());
+                        System.out.println("     Items: " + doc.getDeliveryItems().size() + " items");
+                    }
+                } else {
+                    System.out.println("\nNo destinations assigned to this transport.");
+                }
+                
+                System.out.println("\nVehicle Information:");
+                System.out.println("  Truck: " + transport.getTruck().getPlateNum() + 
+                    " (" + transport.getTruck().getModel() + ")");
+                System.out.println("  Driver: " + transport.getDriver().getFullName() + 
+                    " (License: " + transport.getDriver().getLicenseType() + ")");
+                
+                System.out.println("\n" + "═".repeat(40));
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid ID.");
+            System.out.println("\nInvalid input. Please enter a valid transport ID.");
         }
     }
 
@@ -334,7 +391,7 @@ public class TransportController {
 
         Site originSite = sites.get(siteChoice - 1);
         SiteDTO originSiteDTO = SiteMapper.toDTO(originSite);
-        System.out.println("✅ Selected origin: " + originSiteDTO.getAddress());
+        System.out.println(" Selected origin: " + originSiteDTO.getAddress());
 
         // STEP 3: Create the transport with current timestamp (up to minute precision)
         LocalDateTime now = LocalDateTime.now();
@@ -357,7 +414,7 @@ public class TransportController {
         }
 
         Transport transport = transportOpt.get();
-        System.out.println("✅ Transport created with ID: " + transport.getTransportId());
+        System.out.println(" Transport created with ID: " + transport.getTransportId());
 
         // STEP 4 & 5: Select destinations and add items
         System.out.println("\n--- STEP 3: Selecting Destinations ---");
@@ -401,7 +458,7 @@ public class TransportController {
                         System.out.println("This site is already selected.");
                     } else {
                         selectedDestinations.add(selectedSite);
-                        System.out.println("✅ Added destination: " + selectedSite.getAddress());
+                        System.out.println(" Added destination: " + selectedSite.getAddress());
                     }
                 }
             } catch (NumberFormatException e) {
@@ -458,60 +515,44 @@ public class TransportController {
                         addItemsToDestination(doc);
                     }
                     case "2" -> {
-                        // Add new product manually
-                        System.out.print("Enter product ID: ");
-                        String productId = scanner.nextLine().trim();
+                        // Add new product
+                        System.out.println("\nEnter new product details:");
+                        System.out.print("Product name: ");
+                        String newProductName = scanner.nextLine().trim();
+                        System.out.print("Product weight (kg): ");
+                        float newProductWeight = Float.parseFloat(scanner.nextLine().trim());
+                        System.out.print("Quantity: ");
+                        int newQuantity = Integer.parseInt(scanner.nextLine().trim());
 
-                        if (productId.isEmpty()) {
-                            System.out.println("Product ID cannot be empty.");
+                        if (newQuantity <= 0 || newProductWeight <= 0) {
+                            System.out.println("Quantity and weight must be positive.");
                         } else {
-                            System.out.print("Enter product name: ");
-                            String productName = scanner.nextLine().trim();
+                            // Calculate weight of this item
+                            float newItemWeight = newProductWeight * newQuantity;
 
-                            if (productName.isEmpty()) {
-                                System.out.println("Product name cannot be empty.");
+                            // Check if adding this would exceed capacity
+                            if (currentWeight + newItemWeight > maxCapacity) {
+                                System.out.println("   Adding this item would exceed truck capacity.");
+                                System.out.println("   Current weight: " + currentWeight + " kg");
+                                System.out.println("   Item weight: " + newItemWeight + " kg");
+                                System.out.println("   Maximum capacity: " + maxCapacity + " kg");
                             } else {
-                                System.out.print("Enter weight per unit (kg): ");
-                                try {
-                                    float weight = Float.parseFloat(scanner.nextLine().trim());
+                                // Create and save new product
+                                String newProductId = getNextProductId();
+                                Product newProduct = new Product(newProductId, newProductName, newProductWeight);
+                                productService.saveProduct(newProduct);
 
-                                    if (weight <= 0) {
-                                        System.out.println("Weight must be positive.");
-                                    } else {
-                                        // Create the new product
-                                        Product newProduct = new Product(productId, productName, weight);
-                                        productService.saveProduct(newProduct);
-
-                                        System.out.print("Enter quantity: ");
-                                        int quantity = Integer.parseInt(scanner.nextLine().trim());
-
-                                        if (quantity <= 0) {
-                                            System.out.println("Quantity must be positive.");
-                                        } else {
-                                            // Calculate weight of this item
-                                            float itemWeight = weight * quantity;
-
-                                            // Check if adding this would exceed capacity
-                                            if (currentWeight + itemWeight > maxCapacity) {
-                                                System.out.println("   Adding this item would exceed truck capacity.");
-                                                System.out.println("   Current weight: " + currentWeight + " kg");
-                                                System.out.println("   Item weight: " + itemWeight + " kg");
-                                                System.out.println("   Maximum capacity: " + maxCapacity + " kg");
-                                            } else {
-                                                // Add item to document
-                                                DeliveredItem item = new DeliveredItem(productId, quantity);
-                                                doc.addDeliveredItem(item);
-
-                                                // Update current weight
-                                                currentWeight += itemWeight;
-
-                                                System.out.println("✅ Added " + quantity + " units of " +
-                                                        productName + " (+" + itemWeight + " kg)");
-                                            }
-                                        }
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Invalid input. Please enter a number.");
+                                // Add item to document
+                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), newProductId, newQuantity);
+                                if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), newItem)) {
+                                    // Update current weight
+                                    currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
+                                    // Add item to document's list
+                                    doc.addDeliveryItem(newItem);
+                                    System.out.println("Added " + newQuantity + " units of " +
+                                            newProductName + " (+" + newItemWeight + " kg)");
+                                } else {
+                                    System.out.println("Failed to add item. Please try again.");
                                 }
                             }
                         }
@@ -678,11 +719,11 @@ public class TransportController {
                     continue;
                 }
 
-                DeliveredItem item = new DeliveredItem(selectedProduct.getProductId(), quantity);
+                DeliveredItem item = new DeliveredItem(null, doc.getDestinationDocId(), selectedProduct.getProductId(), quantity);
                 if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), item)) {
-                    System.out.println("✅ Added " + quantity + " units of " + selectedProduct.getName());
+                    System.out.println(" Added " + quantity + " units of " + selectedProduct.getName());
                 } else {
-                    System.out.println("❌ Failed to add item. Weight limit may be exceeded.");
+                    System.out.println(" Failed to add item. Weight limit may be exceeded.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");

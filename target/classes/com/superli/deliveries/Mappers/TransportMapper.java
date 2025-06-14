@@ -1,12 +1,15 @@
 package com.superli.deliveries.Mappers;
 
-import com.superli.deliveries.domain.core.*;
-import com.superli.deliveries.dto.del.TransportDTO;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.stream.Collectors;
+
+import com.superli.deliveries.domain.core.DestinationDoc;
+import com.superli.deliveries.domain.core.Driver;
+import com.superli.deliveries.domain.core.Site;
+import com.superli.deliveries.domain.core.Transport;
+import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.dto.del.TransportDTO;
 
 public class TransportMapper {
 
@@ -26,20 +29,17 @@ public class TransportMapper {
 
     public static TransportDTO toDTO(Transport transport) {
         if (transport == null) return null;
-
-        List<String> destinationDocIds = transport.getDestinationDocs().stream()
-                .map(DestinationDoc::getDestinationDocId)
-                .collect(Collectors.toList());
-
         return new TransportDTO(
                 transport.getTransportId(),
-                transport.getDepartureDateTime().format(formatter),
+                transport.getDepartureDateTime().toString(),
                 transport.getTruck().getPlateNum(),
-                transport.getDriver().getId(),
+                transport.getDriver().getDriverId(),
                 transport.getOriginSite().getSiteId(),
                 transport.getDepartureWeight(),
-                transport.getStatus().name(),
-                destinationDocIds
+                transport.getStatus(),
+                transport.getDestinationDocs().stream()
+                        .map(DestinationDoc::getDestinationDocId)
+                        .collect(Collectors.toList())
         );
     }
 }

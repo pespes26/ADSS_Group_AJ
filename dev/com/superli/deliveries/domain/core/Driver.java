@@ -1,8 +1,5 @@
 package com.superli.deliveries.domain.core;
-
-import com.superli.deliveries.domain.core.Employee;
-import com.superli.deliveries.domain.core.Role;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +25,14 @@ public class Driver extends Employee {
         super(id, fullName, bankAccount, salary, -1, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
         Role r = new Role("Driver");
         this.addRoleQualification(r);
+        if (getRoleQualifications() == null) {
+            setRoleQualifications(new ArrayList<>());
+        }
         if (licenseType == null) {
             throw new IllegalArgumentException("License type cannot be null.");
         }
         this.licenseType = licenseType;
+        this.available = true; // Initialize available to true by default
     }
 
     /**

@@ -1,13 +1,17 @@
 package com.superli.deliveries.dataaccess.dao.del;
 
-import com.superli.deliveries.dto.del.ProductDTO;
-import com.superli.deliveries.util.Database;
-import com.superli.deliveries.exceptions.DataAccessException;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.superli.deliveries.dto.del.ProductDTO;
+import com.superli.deliveries.exceptions.DataAccessException;
+import com.superli.deliveries.util.Database;
 
 public class ProductDAOImpl implements ProductDAO {
     private final Connection conn;
@@ -35,7 +39,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Optional<ProductDTO> findById(String id) throws SQLException {
-        String sql = "SELECT * FROM products WHERE id = ?";
+        String sql = "SELECT * FROM products WHERE product_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -52,23 +56,19 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public ProductDTO save(ProductDTO product) throws SQLException {
-        String sql = "INSERT INTO products (id, name, category, weight, available) " +
-                    "VALUES (?, ?, ?, ?, ?) " +
-                    "ON CONFLICT(id) DO UPDATE SET " +
-                    "name = ?, category = ?, weight = ?, available = ?";
+        String sql = "INSERT INTO products (product_id, name, weight) " +
+                    "VALUES (?, ?, ?) " +
+                    "ON CONFLICT(product_id) DO UPDATE SET " +
+                    "name = ?, weight = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, product.getId());
             stmt.setString(2, product.getName());
-            stmt.setString(3, product.getCategory());
-            stmt.setFloat(4, product.getWeight());
-            stmt.setBoolean(5, product.isAvailable());
+            stmt.setFloat(3, product.getWeight());
             
             // Values for UPDATE
-            stmt.setString(6, product.getName());
-            stmt.setString(7, product.getCategory());
-            stmt.setFloat(8, product.getWeight());
-            stmt.setBoolean(9, product.isAvailable());
+            stmt.setString(4, product.getName());
+            stmt.setFloat(5, product.getWeight());
             
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -80,7 +80,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public void deleteById(String id) throws SQLException {
-        String sql = "DELETE FROM products WHERE id = ?";
+        String sql = "DELETE FROM products WHERE product_id = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -130,7 +130,7 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public List<ProductDTO> findAvailableProducts() throws SQLException {
         List<ProductDTO> products = new ArrayList<>();
-        String sql = "SELECT * FROM products WHERE available = true";
+        String sql = "SELECT * FROM products";
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -146,11 +146,9 @@ public class ProductDAOImpl implements ProductDAO {
 
     private ProductDTO mapResultSetToProductDTO(ResultSet rs) throws SQLException {
         ProductDTO dto = new ProductDTO();
-        dto.setId(rs.getString("id"));
+        dto.setId(rs.getString("product_id"));
         dto.setName(rs.getString("name"));
-        dto.setCategory(rs.getString("category"));
         dto.setWeight(rs.getFloat("weight"));
-        dto.setAvailable(rs.getBoolean("available"));
         return dto;
     }
 } 

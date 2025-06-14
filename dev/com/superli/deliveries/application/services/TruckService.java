@@ -1,15 +1,13 @@
 package com.superli.deliveries.application.services;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.superli.deliveries.Mappers.TruckMapper;
-import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.dataaccess.dao.del.TruckDAO;
-import com.superli.deliveries.dto.del.TruckDTO;
-
-import java.sql.SQLException;
+import com.superli.deliveries.domain.core.Truck;
 
 public class TruckService {
 
@@ -95,31 +93,19 @@ public class TruckService {
 
     public boolean markTruckAsUnavailable(String plateNum) {
         try {
-            Optional<TruckDTO> truckOpt = truckDAO.findByPlate(plateNum);
-            if (truckOpt.isPresent()) {
-                Truck truck = TruckMapper.fromDTO(truckOpt.get());
-                truck.setAvailable(false);
-                truckDAO.save(TruckMapper.toDTO(truck));
-                return true;
-            }
-            return false;
+            truckDAO.updateTruckAvailability(plateNum, false);
+            return true;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error marking truck as unavailable: " + plateNum, e);
         }
     }
 
     public boolean markTruckAsAvailable(String plateNum) {
         try {
-            Optional<TruckDTO> truckOpt = truckDAO.findByPlate(plateNum);
-            if (truckOpt.isPresent()) {
-                Truck truck = TruckMapper.fromDTO(truckOpt.get());
-                truck.setAvailable(true);
-                truckDAO.save(TruckMapper.toDTO(truck));
-                return true;
-            }
-            return false;
+            truckDAO.updateTruckAvailability(plateNum, true);
+            return true;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error marking truck as available: " + plateNum, e);
         }
     }
 

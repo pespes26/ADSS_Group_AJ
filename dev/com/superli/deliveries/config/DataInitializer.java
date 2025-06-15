@@ -152,32 +152,66 @@ public class DataInitializer {
         return drivers;
     }
 
-    private Driver createDriver(String id, String name, LicenseType licenseType, boolean available, 
-                              Role role, Site site) {
+//    private Driver createDriver(String id, String name, LicenseType licenseType, boolean available,
+//                              Role role, Site site) {
+//        List<Role> roles = new ArrayList<>();
+//        roles.add(role);
+//        List<AvailableShifts> constraints = new ArrayList<>();
+//        constraints.add(new AvailableShifts(DayOfWeek.MONDAY, ShiftType.MORNING));
+//        constraints.add(new AvailableShifts(DayOfWeek.TUESDAY, ShiftType.MORNING));
+//        constraints.add(new AvailableShifts(DayOfWeek.WEDNESDAY, ShiftType.MORNING));
+//        constraints.add(new AvailableShifts(DayOfWeek.THURSDAY, ShiftType.MORNING));
+//        constraints.add(new AvailableShifts(DayOfWeek.FRIDAY, ShiftType.MORNING));
+//        // Convert siteId from "S001" to int 1
+//        int siteId = Integer.parseInt(site.getSiteId().substring(1));
+//        return new Driver(
+//            id,
+//            name,
+//            "ACC" + id,
+//            2500.0,
+//            siteId,
+//            "FULL_TIME",
+//            new Date(),
+//            roles,
+//            constraints,
+//            role,
+//            licenseType
+//        );
+//    }
+    private Driver createDriver(String id, String name, LicenseType licenseType, boolean available,
+                                Role role, Site site) {
         List<Role> roles = new ArrayList<>();
         roles.add(role);
+
         List<AvailableShifts> constraints = new ArrayList<>();
         constraints.add(new AvailableShifts(DayOfWeek.MONDAY, ShiftType.MORNING));
         constraints.add(new AvailableShifts(DayOfWeek.TUESDAY, ShiftType.MORNING));
         constraints.add(new AvailableShifts(DayOfWeek.WEDNESDAY, ShiftType.MORNING));
         constraints.add(new AvailableShifts(DayOfWeek.THURSDAY, ShiftType.MORNING));
         constraints.add(new AvailableShifts(DayOfWeek.FRIDAY, ShiftType.MORNING));
+
         // Convert siteId from "S001" to int 1
         int siteId = Integer.parseInt(site.getSiteId().substring(1));
-        return new Driver(
-            id,
-            name,
-            "ACC" + id,
-            2500.0,
-            siteId,
-            "FULL_TIME",
-            new Date(),
-            roles,
-            constraints,
-            role,
-            licenseType
+
+        Driver driver = new Driver(
+                id,
+                name,
+                "ACC" + id,
+                2500.0,
+                siteId,
+                "FULL_TIME",
+                new Date(),
+                roles,
+                constraints,
+                role,
+                licenseType
         );
+
+        driver.setAvailable(available);
+
+        return driver;
     }
+
 
     private List<Truck> initializeTrucks() {
         log.info("Initializing trucks...");

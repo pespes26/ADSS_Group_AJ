@@ -90,7 +90,7 @@ public class SiteDAOImpl implements SiteDAO {
             stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting site with id: " + id, e);
+            throw new DataAccessException("Error deleting site with site_id: " + id, e);
         }
     }
 

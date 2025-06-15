@@ -9,10 +9,8 @@ public class Product {
 
     /** Unique identifier for the product (links to Inventory module) */
     private final String productId;
-
     /** Name of the product (for display and identification) */
     private final String name;
-
     /** Weight of a single unit of the product */
     private final float weight;
 

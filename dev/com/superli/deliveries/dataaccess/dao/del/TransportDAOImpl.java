@@ -44,7 +44,7 @@ public class TransportDAOImpl implements TransportDAO {
 
     @Override
     public Optional<TransportDTO> findById(String id) throws SQLException {
-        String sql = "SELECT * FROM transports WHERE transport_id = ?";
+        String sql = "SELECT * FROM transports WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -61,11 +61,11 @@ public class TransportDAOImpl implements TransportDAO {
 
     @Override
     public TransportDTO save(TransportDTO transport) throws SQLException {
-        String sql = "INSERT INTO transports (transport_id, departure_datetime, truck_plate_num, driver_id, " +
+        String sql = "INSERT INTO transports (id, departure_datetime, truck_id, driver_id, " +
                     "origin_site_id, departure_weight, status) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                    "ON CONFLICT(transport_id) DO UPDATE SET " +
-                    "departure_datetime = ?, truck_plate_num = ?, driver_id = ?, " +
+                    "ON CONFLICT(id) DO UPDATE SET " +
+                    "departure_datetime = ?, truck_id = ?, driver_id = ?, " +
                     "origin_site_id = ?, departure_weight = ?, status = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -95,7 +95,7 @@ public class TransportDAOImpl implements TransportDAO {
 
     @Override
     public void deleteById(String id) throws SQLException {
-        String sql = "DELETE FROM transports WHERE transport_id = ?";
+        String sql = "DELETE FROM transports WHERE id = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -126,7 +126,7 @@ public class TransportDAOImpl implements TransportDAO {
     @Override
     public List<TransportDTO> findByTruckPlate(String truckPlate) throws SQLException {
         List<TransportDTO> transports = new ArrayList<>();
-        String sql = "SELECT * FROM transports WHERE truck_plate_num = ?";
+        String sql = "SELECT * FROM transports WHERE truck_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, truckPlate);
@@ -178,13 +178,27 @@ public class TransportDAOImpl implements TransportDAO {
 
     private TransportDTO mapResultSetToTransportDTO(ResultSet rs) throws SQLException {
         TransportDTO dto = new TransportDTO();
-        dto.setTransportId(rs.getString("transport_id"));
+        dto.setTransportId(rs.getString("id"));
         dto.setDepartureDateTime(rs.getString("departure_datetime"));
-        dto.setTruckId(rs.getString("truck_plate_num"));
+        dto.setTruckId(rs.getString("truck_id"));
         dto.setDriverId(rs.getString("driver_id"));
         dto.setOriginSiteId(rs.getString("origin_site_id"));
         dto.setDepartureWeight(rs.getFloat("departure_weight"));
         dto.setStatus(TransportStatus.valueOf(rs.getString("status")));
         return dto;
     }
+
+    @Override
+    public void updateStatus(String transportId, String newStatus) throws SQLException {
+        String sql = "UPDATE transports SET status = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newStatus);
+            stmt.setString(2, transportId.trim());  // מוסיף trim כדי להסיר רווחים מוסתרים
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated == 0) {
+                System.err.println("No transport found with ID: " + transportId);
+            }
+        }
+    }
+
 } 

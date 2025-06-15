@@ -11,10 +11,12 @@ public interface TransportDAO {
     Optional<TransportDTO> findById(String id) throws SQLException;
     TransportDTO save(TransportDTO transport) throws SQLException;
     void deleteById(String id) throws SQLException;
-    
-    // Domain-specific queries
+    void updateStatus(String transportId, String newStatus) throws SQLException;
+
+        // Domain-specific queries
     List<TransportDTO> findByDriverId(String driverId) throws SQLException;
     List<TransportDTO> findByTruckPlate(String truckPlate) throws SQLException;
     List<TransportDTO> findByStatus(String status) throws SQLException;
     List<TransportDTO> findActiveTransports() throws SQLException;
+
 }

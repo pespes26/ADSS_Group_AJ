@@ -47,7 +47,7 @@ public class DeliveredItemService {
                             dto.getDestinationDocId(),
                             dto.getProductId(),
                             dto.getQuantity()))
-                    .collect(Collectors.toList());
+                            .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting all delivered items", e);
         }

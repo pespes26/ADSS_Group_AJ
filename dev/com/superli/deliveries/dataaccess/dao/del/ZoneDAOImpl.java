@@ -49,7 +49,7 @@ public class ZoneDAOImpl implements ZoneDAO {
                 return Optional.of(mapResultSetToZoneDTO(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding zone by id: " + id, e);
+            throw new DataAccessException("Error finding zone by zone_id: " + id, e);
         }
         return Optional.empty();
     }
@@ -82,7 +82,7 @@ public class ZoneDAOImpl implements ZoneDAO {
             stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting zone with id: " + id, e);
+            throw new DataAccessException("Error deleting zone with zone_id: " + id, e);
         }
     }
 

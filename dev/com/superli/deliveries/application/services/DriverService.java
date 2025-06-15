@@ -49,12 +49,12 @@ public class DriverService {
     }
 
     // Find specific driver by ID
-    public Optional<Driver> getDriverById(String id) {
+    public Optional<Driver> getDriverById(String Employee_id) {
         try {
-            return driverDAO.findById(id)
+            return driverDAO.findById(Employee_id)
                     .map(DriverMapper::fromDTO);
         } catch (SQLException e) {
-            throw new RuntimeException("Error getting driver by id: " + id, e);
+            throw new RuntimeException("Error getting driver by id: " + Employee_id, e);
         }
     }
 
@@ -68,11 +68,11 @@ public class DriverService {
     }
 
     // Delete driver from DB
-    public void deleteDriver(String id) {
+    public void deleteDriver(String Employee_id) {
         try {
-            driverDAO.delete(id);
+            driverDAO.delete(Employee_id);
         } catch (SQLException e) {
-            throw new RuntimeException("Error deleting driver: " + id, e);
+            throw new RuntimeException("Error deleting driver: " + Employee_id, e);
         }
     }
 
@@ -100,8 +100,8 @@ public class DriverService {
     }
 
     // Update driver's license type
-    public void updateDriverLicenseType(String id, LicenseType licenseType) {
-        Optional<Driver> driver = getDriverById(id);
+    public void updateDriverLicenseType(String Employee_id, LicenseType licenseType) {
+        Optional<Driver> driver = getDriverById(Employee_id);
         driver.ifPresent(d -> {
             d.setLicenseType(licenseType);
             saveDriver(d);
@@ -109,9 +109,9 @@ public class DriverService {
     }
 
     // Update driver's availability
-    public void updateDriverAvailability(String id, boolean available) {
+    public void updateDriverAvailability(String Employee_id, boolean available) {
         try {
-            driverDAO.updateDriverAvailability(id, available);
+            driverDAO.updateDriverAvailability(Employee_id, available);
         } catch (SQLException e) {
             throw new RuntimeException("Error updating driver availability", e);
         }
@@ -128,13 +128,13 @@ public class DriverService {
         }
     }
 
-    public boolean isDriverAvailable(String id) {
-        Optional<Driver> driver = getDriverById(id);
+    public boolean isDriverAvailable(String Employee_id) {
+        Optional<Driver> driver = getDriverById(Employee_id);
         return driver.map(Driver::isAvailable).orElse(false);
     }
 
-    public boolean hasValidLicense(String id, LicenseType requiredType) {
-        Optional<Driver> driver = getDriverById(id);
+    public boolean hasValidLicense(String Employee_id, LicenseType requiredType) {
+        Optional<Driver> driver = getDriverById(Employee_id);
         return driver.map(d -> d.getLicenseType() == requiredType).orElse(false);
     }
 

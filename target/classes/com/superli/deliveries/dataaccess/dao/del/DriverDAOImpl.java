@@ -32,15 +32,15 @@ public class DriverDAOImpl implements DriverDAO {
     public Optional<DriverDTO> findById(String id) throws SQLException {
         String sql = """
             SELECT 
-                e.id, e.full_name, e.bank_account, e.salary, e.site_id, 
-                e.employee_terms, e.employee_start_date, e.login_role,
-                d.license_type, d.available,
-                GROUP_CONCAT(er.role_name) as roles
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
+                GROUP_CONCAT(r.name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
             LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
             WHERE e.id = ? 
-            GROUP BY e.id, d.id
+            GROUP BY e.id, d.license_type, d.available
         """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -62,15 +62,14 @@ public class DriverDAOImpl implements DriverDAO {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = """
             SELECT 
-                e.id, e.full_name, e.bank_account, e.salary, e.site_id, 
-                e.employee_terms, e.employee_start_date, e.login_role,
-                d.license_type, d.available,
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
                 GROUP_CONCAT(er.role_name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN employee_roles er ON e.id = er.id 
             GROUP BY e.id, d.id
-            ORDER BY e.full_name
+            ORDER BY e.name
         """;
 
         try (Statement stmt = conn.createStatement();
@@ -87,64 +86,79 @@ public class DriverDAOImpl implements DriverDAO {
     }
 
     @Override
-    public DriverDTO save(DriverDTO dto) throws SQLException {
+    public DriverDTO save(DriverDTO driverDto) throws SQLException {
         conn.setAutoCommit(false);
         try {
-            // First save to employees table
+            // === שמירה לטבלת employees ===
             String employeeSql = """
-                INSERT INTO employees 
-                (id, full_name, bank_account, salary, site_id, employee_terms, employee_start_date, login_role) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET 
-                    full_name = ?,
-                    bank_account = ?,
-                    salary = ?,
-                    site_id = ?,
-                    employee_terms = ?,
-                    employee_start_date = ?,
-                    login_role = ?
-            """;
+            INSERT INTO employees 
+            (id, name, bank_account, salary, site_id, employment_terms, start_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET 
+                name = ?,
+                bank_account = ?,
+                salary = ?,
+                site_id = ?,
+                employment_terms = ?,
+                start_date = ?
+        """;
 
             try (PreparedStatement employeeStmt = conn.prepareStatement(employeeSql)) {
-                employeeStmt.setString(1, dto.getId());
-                employeeStmt.setString(2, dto.getFullName());
-                employeeStmt.setString(3, "000-000-000"); // Default bank account
-                employeeStmt.setDouble(4, 0.0); // Default salary
-                employeeStmt.setInt(5, -1); // Default site ID
-                employeeStmt.setString(6, "Standard"); // Default terms
-                employeeStmt.setString(7, new java.sql.Date(System.currentTimeMillis()).toString()); // Current date
-                employeeStmt.setString(8, "DRIVER"); // Default role
-                // Update values
-                employeeStmt.setString(9, dto.getFullName());
-                employeeStmt.setString(10, "000-000-000");
-                employeeStmt.setDouble(11, 0.0);
-                employeeStmt.setInt(12, -1);
-                employeeStmt.setString(13, "Standard");
-                employeeStmt.setString(14, new java.sql.Date(System.currentTimeMillis()).toString());
-                employeeStmt.setString(15, "DRIVER");
+                // חובה לוודא שהשם לא ריק
+                String name = driverDto.getFullName();
+                if (name == null || name.trim().isEmpty()) {
+                    throw new DataAccessException("❌ Missing name for driver with ID: " + driverDto.getId());
+                }
+
+                String currentDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+
+                employeeStmt.setString(1, driverDto.getId());
+                employeeStmt.setString(2, name);
+                employeeStmt.setString(3, "000-000-000"); // ברירת מחדל לחשבון בנק
+                employeeStmt.setDouble(4, 0.0);
+                employeeStmt.setInt(5, -1);
+                employeeStmt.setString(6, "Standard");
+                employeeStmt.setString(7, currentDate);
+
+                // פרמטרים לעדכון במקרה של ON CONFLICT
+                employeeStmt.setString(8, name);
+                employeeStmt.setString(9, "000-000-000");
+                employeeStmt.setDouble(10, 0.0);
+                employeeStmt.setInt(11, -1);
+                employeeStmt.setString(12, "Standard");
+                employeeStmt.setString(13, currentDate);
+
                 employeeStmt.executeUpdate();
             }
 
-            // Then save to drivers table
+            // === שמירה לטבלת drivers ===
             String driverSql = """
-                INSERT INTO drivers (id, license_type, available) 
-                VALUES (?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET 
-                    license_type = ?,
-                    available = ?
-            """;
+            INSERT INTO drivers (id, license_type, available) 
+            VALUES (?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET 
+                license_type = ?,
+                available = ?
+        """;
 
             try (PreparedStatement driverStmt = conn.prepareStatement(driverSql)) {
-                driverStmt.setString(1, dto.getId());
-                driverStmt.setString(2, dto.getLicenseType());
-                driverStmt.setBoolean(3, dto.isAvailable());
-                driverStmt.setString(4, dto.getLicenseType());
-                driverStmt.setBoolean(5, dto.isAvailable());
+                // בדיקה לרישיון
+                String licenseType = driverDto.getLicenseType();
+                if (licenseType == null || !List.of("B", "C", "C1", "C2", "E").contains(licenseType)) {
+                    throw new DataAccessException("❌ Invalid license type for driver ID: " + driverDto.getId());
+                }
+
+                driverStmt.setString(1, driverDto.getId());
+                driverStmt.setString(2, licenseType);
+                driverStmt.setBoolean(3, driverDto.isAvailable());
+                driverStmt.setString(4, licenseType);
+                driverStmt.setBoolean(5, driverDto.isAvailable());
+
                 driverStmt.executeUpdate();
             }
 
             conn.commit();
-            return dto;
+            return driverDto;
+
         } catch (SQLException e) {
             conn.rollback();
             throw new DataAccessException("Error saving driver", e);
@@ -152,6 +166,76 @@ public class DriverDAOImpl implements DriverDAO {
             conn.setAutoCommit(true);
         }
     }
+
+//    @Override
+//    public DriverDTO save(DriverDTO driverDto) throws SQLException {
+//        conn.setAutoCommit(false);
+//        try {
+//            // First save to employees table
+//            String employeeSql = """
+//                INSERT INTO employees
+//                (id, name, bank_account, salary, site_id, employment_terms, start_date)
+//                VALUES (?, ?, ?, ?, ?, ?, ?)
+//                ON CONFLICT(id) DO UPDATE SET
+//                    name = ?,
+//                    bank_account = ?,
+//                    salary = ?,
+//                    site_id = ?,
+//                    employment_terms = ?,
+//                    start_date = ?
+//            """;
+//
+//            try (PreparedStatement employeeStmt = conn.prepareStatement(employeeSql)) {
+//                employeeStmt.setString(1, driverDto.getId());
+//                String name = driverDto.getFullName();
+//                if (driverDto.getFullName() == null || driverDto.getFullName().trim().isEmpty()) {
+//                    throw new DataAccessException("❌Driver full name is required");
+//                }
+//                employeeStmt.setString(2, name);
+//                employeeStmt.setString(3, "000-000-000"); // Default bank account
+//                employeeStmt.setDouble(4, 0.0); // Default salary
+//                employeeStmt.setInt(5, -1); // Default site ID
+//                employeeStmt.setString(6, "Standard"); // Default terms
+//                employeeStmt.setString(7, new java.sql.Date(System.currentTimeMillis()).toString()); // Current date
+//                employeeStmt.executeUpdate();
+//            }
+//
+//            // Then save to drivers table
+//            String driverSql = """
+//                INSERT INTO drivers (id, license_type, available)
+//                VALUES (?, ?, ?)
+//                ON CONFLICT(id) DO UPDATE SET
+//                    license_type = ?,
+//                    available = ?
+//            """;
+//
+//            try (PreparedStatement driverStmt = conn.prepareStatement(driverSql)) {
+//                String name = driverDto.getFullName();
+//                System.out.println("DEBUG: saving driver with full name = '" + name + "'");
+//                if (name == null || name.trim().isEmpty()) {
+//                    throw new DataAccessException("Driver full name is required and cannot be empty.");
+//                }
+//                driverStmt.setString(1, driverDto.getId()); // id
+//                driverStmt.setString(2, name); // name
+//                String licenseType = driverDto.getLicenseType();
+//                if (licenseType == null || !List.of("A", "B", "C", "D", "E").contains(licenseType)) {
+//                    throw new DataAccessException("Invalid license type for driver: " + licenseType);
+//                }
+//                driverStmt.setString(2, licenseType);
+//                driverStmt.setBoolean(3, driverDto.isAvailable());      // available
+//                driverStmt.executeUpdate();
+//            }
+//
+//
+//            conn.commit();
+//            return driverDto;
+//        } catch (SQLException e) {
+//            conn.rollback();
+//            throw new DataAccessException("Error saving driver", e);
+//        } finally {
+//            conn.setAutoCommit(true);
+//        }
+//    }
 
     @Override
     public void delete(String id) throws SQLException {
@@ -185,16 +269,15 @@ public class DriverDAOImpl implements DriverDAO {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = """
             SELECT 
-                e.id, e.full_name, e.bank_account, e.salary, e.site_id, 
-                e.employee_terms, e.employee_start_date, e.login_role,
-                d.license_type, d.available,
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
                 GROUP_CONCAT(er.role_name) as roles
             FROM employees e 
             INNER JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN employee_roles er ON e.id = er.id 
             WHERE d.available = 1 
             GROUP BY e.id, d.id, d.available
-            ORDER BY e.full_name
+            ORDER BY e.name
         """;
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -213,16 +296,15 @@ public class DriverDAOImpl implements DriverDAO {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = """
             SELECT 
-                e.id, e.full_name, e.bank_account, e.salary, e.site_id, 
-                e.employee_terms, e.employee_start_date, e.login_role,
-                d.license_type, d.available,
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
                 GROUP_CONCAT(er.role_name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN employee_roles er ON e.id = er.id 
             WHERE d.license_type = ? 
             GROUP BY e.id, d.id
-            ORDER BY e.full_name
+            ORDER BY e.name
         """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -243,13 +325,12 @@ public class DriverDAOImpl implements DriverDAO {
     public Optional<DriverDTO> findByLicenseNumber(String licenseNumber) throws SQLException {
         String sql = """
             SELECT 
-                e.id, e.full_name, e.bank_account, e.salary, e.site_id, 
-                e.employee_terms, e.employee_start_date, e.login_role,
-                d.license_type, d.available,
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
                 GROUP_CONCAT(er.role_name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN employee_roles er ON e.id = er.id 
             WHERE d.license_number = ? 
             GROUP BY e.id, d.id
         """;
@@ -314,7 +395,7 @@ public class DriverDAOImpl implements DriverDAO {
     }
 
     private Driver mapResultSetToDriver(ResultSet rs) throws SQLException {
-        String dateStr = rs.getString("employee_start_date");
+        String dateStr = rs.getString("start_date");
         java.util.Date startDate = null;
         try {
             if (dateStr != null) {
@@ -331,11 +412,11 @@ public class DriverDAOImpl implements DriverDAO {
 
         Driver driver = new Driver(
                 rs.getString("id"),
-                rs.getString("full_name"),
+                rs.getString("name"),
                 rs.getString("bank_account"),
                 rs.getDouble("salary"),
                 rs.getInt("site_id"),
-                rs.getString("employee_terms"),
+                rs.getString("employment_terms"),
                 startDate,
                 new ArrayList<>(), // roleQualifications
                 new ArrayList<>(), // availabilityConstraints

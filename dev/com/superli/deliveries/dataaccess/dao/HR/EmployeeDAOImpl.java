@@ -153,4 +153,27 @@ public class EmployeeDAOImpl implements EmployeeDAO {
         }
         return employees;
     }
+
+    public List<EmployeeDTO> findAvailableDrivers() throws SQLException {
+        List<EmployeeDTO> employees = new ArrayList<>();
+        String sql = """
+        SELECT e.* 
+        FROM employees e
+        JOIN employee_roles er ON e.id = er.employee_id
+        WHERE er.role_name = ? AND e.available = 1
+    """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "DRIVER");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                employees.add(fromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding available drivers", e);
+        }
+        return employees;
+    }
+
 }

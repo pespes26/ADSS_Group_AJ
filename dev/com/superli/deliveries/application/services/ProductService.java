@@ -31,6 +31,12 @@ public class ProductService {
         }
     }
 
+    public Optional<Product> findByName(String name) {
+        return getAllProducts().stream()
+                .filter(p -> p.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
     public Optional<Product> getProductById(String id) {
         try {
             return productDAO.findById(id)

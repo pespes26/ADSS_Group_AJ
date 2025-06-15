@@ -47,22 +47,24 @@ public class DeliveredItemDAOImpl implements DeliveredItemDAO {
 
     @Override
     public DeliveredItemDTO save(DeliveredItemDTO item) throws SQLException {
-        String sql = "INSERT INTO delivered_items (item_id, destination_doc_id, product_id, quantity) " +
-                    "VALUES (?, ?, ?, ?) " +
+        String sql = "INSERT INTO delivered_items (item_id, destination_doc_id, product_id, quantity, status) " +
+                    "VALUES (?, ?, ?, ?, ?) " +
                     "ON CONFLICT(item_id) DO UPDATE SET " +
-                    "destination_doc_id = ?, product_id = ?, quantity = ?";
+                    "destination_doc_id = ?, product_id = ?, quantity = ?, status = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, item.getId());
             stmt.setString(2, item.getDestinationDocId());
             stmt.setString(3, item.getProductId());
             stmt.setInt(4, item.getQuantity());
-            
-            // Values for UPDATE
-            stmt.setString(5, item.getDestinationDocId());
-            stmt.setString(6, item.getProductId());
-            stmt.setInt(7, item.getQuantity());
-            
+            stmt.setString(5, "PENDING"); // סטטוס קבוע בעת שמירה
+
+            // For update:
+            stmt.setString(6, item.getDestinationDocId());
+            stmt.setString(7, item.getProductId());
+            stmt.setInt(8, item.getQuantity());
+            stmt.setString(9, "PENDING"); // גם בעדכון
+
             stmt.executeUpdate();
             return item;
         }

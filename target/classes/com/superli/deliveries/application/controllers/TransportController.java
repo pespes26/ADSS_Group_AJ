@@ -8,27 +8,12 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import com.superli.deliveries.Mappers.SiteMapper;
-import com.superli.deliveries.Mappers.TransportMapper;
-import com.superli.deliveries.Mappers.TruckMapper;
-import com.superli.deliveries.application.services.DeliveredItemService;
-import com.superli.deliveries.application.services.DestinationDocService;
-import com.superli.deliveries.application.services.DriverService;
-import com.superli.deliveries.application.services.ProductService;
-import com.superli.deliveries.application.services.SiteService;
-import com.superli.deliveries.application.services.TransportService;
-import com.superli.deliveries.application.services.TruckService;
-import com.superli.deliveries.domain.core.DeliveredItem;
-import com.superli.deliveries.domain.core.DestinationDoc;
-import com.superli.deliveries.domain.core.Driver;
-import com.superli.deliveries.domain.core.Product;
-import com.superli.deliveries.domain.core.Site;
-import com.superli.deliveries.domain.core.Transport;
-import com.superli.deliveries.domain.core.TransportStatus;
-import com.superli.deliveries.domain.core.Truck;
-import com.superli.deliveries.dto.del.SiteDTO;
-import com.superli.deliveries.dto.del.TransportDTO;
-import com.superli.deliveries.dto.del.TruckDTO;
+import com.superli.deliveries.Mappers.*;
+import com.superli.deliveries.application.services.*;
+import com.superli.deliveries.dataaccess.dao.HR.EmployeeDAOImpl;
+import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.dto.HR.EmployeeDTO;
+import com.superli.deliveries.dto.del.*;
 
 /**
  * Controller for managing transport operations via console UI.
@@ -494,7 +479,6 @@ public class TransportController {
             // Add to transport
             transport.addDestinationDoc(doc);
 
-            // Add items
             boolean addingItems = true;
             while (addingItems) {
                 System.out.println("\nCurrent cargo weight: " + currentWeight + " kg");
@@ -511,11 +495,10 @@ public class TransportController {
                 switch (itemChoice) {
                     case "0" -> addingItems = false;
                     case "1" -> {
-                        // Add existing product
                         addItemsToDestination(doc);
+                        currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
                     }
                     case "2" -> {
-                        // Add new product
                         System.out.println("\nEnter new product details:");
                         System.out.print("Product name: ");
                         String newProductName = scanner.nextLine().trim();
@@ -527,30 +510,30 @@ public class TransportController {
                         if (newQuantity <= 0 || newProductWeight <= 0) {
                             System.out.println("Quantity and weight must be positive.");
                         } else {
-                            // Calculate weight of this item
                             float newItemWeight = newProductWeight * newQuantity;
 
-                            // Check if adding this would exceed capacity
                             if (currentWeight + newItemWeight > maxCapacity) {
                                 System.out.println("   Adding this item would exceed truck capacity.");
                                 System.out.println("   Current weight: " + currentWeight + " kg");
                                 System.out.println("   Item weight: " + newItemWeight + " kg");
                                 System.out.println("   Maximum capacity: " + maxCapacity + " kg");
                             } else {
-                                // Create and save new product
-                                String newProductId = getNextProductId();
-                                Product newProduct = new Product(newProductId, newProductName, newProductWeight);
-                                productService.saveProduct(newProduct);
+                                Optional<Product> existing = productService.findByName(newProductName);
+                                String finalProductId;
 
-                                // Add item to document
-                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), newProductId, newQuantity);
+                                if (existing.isPresent()) {
+                                    finalProductId = existing.get().getProductId();
+                                } else {
+                                    finalProductId = getNextProductId();
+                                    Product newProduct = new Product(finalProductId, newProductName, newProductWeight);
+                                    productService.saveProduct(newProduct);
+                                }
+
+                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), finalProductId, newQuantity);
                                 if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), newItem)) {
-                                    // Update current weight
                                     currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
-                                    // Add item to document's list
                                     doc.addDeliveryItem(newItem);
-                                    System.out.println("Added " + newQuantity + " units of " +
-                                            newProductName + " (+" + newItemWeight + " kg)");
+                                    System.out.println("Added " + newQuantity + " units of " + newProductName + " (+" + newItemWeight + " kg)");
                                 } else {
                                     System.out.println("Failed to add item. Please try again.");
                                 }
@@ -560,6 +543,72 @@ public class TransportController {
                     default -> System.out.println("Invalid choice.");
                 }
             }
+//            // Add items
+//            boolean addingItems = true;
+//            while (addingItems) {
+//                System.out.println("\nCurrent cargo weight: " + currentWeight + " kg");
+//                System.out.println("Remaining capacity: " + (maxCapacity - currentWeight) + " kg");
+//
+//                System.out.println("\nOptions:");
+//                System.out.println("1. Add existing product");
+//                System.out.println("2. Add new product");
+//                System.out.println("0. Finish adding items for this destination");
+//
+//                System.out.print("Your choice: ");
+//                String itemChoice = scanner.nextLine().trim();
+//
+//                switch (itemChoice) {
+//                    case "0" -> addingItems = false;
+//                    case "1" -> {
+//                        // Add existing product
+//                        addItemsToDestination(doc);
+//                    }
+//                    case "2" -> {
+//                        // Add new product
+//                        System.out.println("\nEnter new product details:");
+//                        System.out.print("Product name: ");
+//                        String newProductName = scanner.nextLine().trim();
+//                        System.out.print("Product weight (kg): ");
+//                        float newProductWeight = Float.parseFloat(scanner.nextLine().trim());
+//                        System.out.print("Quantity: ");
+//                        int newQuantity = Integer.parseInt(scanner.nextLine().trim());
+//
+//                        if (newQuantity <= 0 || newProductWeight <= 0) {
+//                            System.out.println("Quantity and weight must be positive.");
+//                        } else {
+//                            // Calculate weight of this item
+//                            float newItemWeight = newProductWeight * newQuantity;
+//
+//                            // Check if adding this would exceed capacity
+//                            if (currentWeight + newItemWeight > maxCapacity) {
+//                                System.out.println("   Adding this item would exceed truck capacity.");
+//                                System.out.println("   Current weight: " + currentWeight + " kg");
+//                                System.out.println("   Item weight: " + newItemWeight + " kg");
+//                                System.out.println("   Maximum capacity: " + maxCapacity + " kg");
+//                            } else {
+//                                // Create and save new product
+//                                String newProductId = getNextProductId();
+//                                Product newProduct = new Product(newProductId, newProductName, newProductWeight);
+//                                productService.saveProduct(newProduct);
+//
+//                                // Add item to document
+//                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), newProductId, newQuantity);
+//                                if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), newItem)) {
+//                                    // Update current weight
+//                                    currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
+//                                    // Add item to document's list
+//                                    doc.addDeliveryItem(newItem);
+//                                    System.out.println("Added " + newQuantity + " units of " +
+//                                            newProductName + " (+" + newItemWeight + " kg)");
+//                                } else {
+//                                    System.out.println("Failed to add item. Please try again.");
+//                                }
+//                            }
+//                        }
+//                    }
+//                    default -> System.out.println("Invalid choice.");
+//                }
+//            }
 
             // Save the document if it has items
             if (!doc.getDeliveryItems().isEmpty()) {
@@ -616,6 +665,7 @@ public class TransportController {
         return pairs;
     }
 
+
     private void updateTransportStatus() {
         System.out.println("\n╔════════════════════════════════════╗");
         System.out.println("║       UPDATE TRANSPORT STATUS      ║");
@@ -639,6 +689,7 @@ public class TransportController {
             System.out.println("2. DISPATCHED");
             System.out.println("3. COMPLETED");
             System.out.println("4. CANCELLED");
+            System.out.println("5. SELF-DELIVERY");
 
             System.out.print("Select new status (number): ");
             int statusChoice = Integer.parseInt(scanner.nextLine().trim());
@@ -649,15 +700,19 @@ public class TransportController {
                 case 2 -> newStatus = TransportStatus.DISPATCHED;
                 case 3 -> newStatus = TransportStatus.COMPLETED;
                 case 4 -> newStatus = TransportStatus.CANCELLED;
+                case 5 -> newStatus = TransportStatus.SELFDELIVERY;
                 default -> {
                     System.out.println("Invalid selection.");
                     return;
                 }
             }
-
             boolean updated = transportService.updateTransportStatus(transportId, newStatus);
             if (updated) {
                 System.out.println("Transport status updated to: " + newStatus);
+
+                // טען מחדש את האובייקט מה־DB כדי לוודא שהשינוי נשמר
+                Optional<Transport> updatedTransport = transportService.getTransportById(transportId);
+                updatedTransport.ifPresent(t -> System.out.println("DB status: " + t.getStatus()));
             } else {
                 System.out.println("Failed to update status.");
             }

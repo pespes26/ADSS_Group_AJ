@@ -14,5 +14,5 @@ public interface EmployeeDAO {
 
     // Domain-specific queries
     List<EmployeeDTO> findByRole(String role) throws SQLException;
-
+    List<EmployeeDTO> findAvailableDrivers() throws SQLException;
 }

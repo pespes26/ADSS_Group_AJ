@@ -44,7 +44,7 @@ public class TruckDAOImpl implements TruckDAO {
 
     @Override
     public Optional<TruckDTO> findById(String plateNum) throws SQLException {
-        String sql = "SELECT * FROM trucks WHERE plate_num = ?";
+        String sql = "SELECT * FROM trucks WHERE license_plate = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, plateNum);
@@ -66,9 +66,9 @@ public class TruckDAOImpl implements TruckDAO {
 
     @Override
     public TruckDTO save(TruckDTO truck) throws SQLException {
-        String sql = "INSERT INTO trucks (plate_num, model, net_weight, max_weight, license_type, available) " +
+        String sql = "INSERT INTO trucks (license_plate, model, net_weight, max_weight, license_type, available) " +
                     "VALUES (?, ?, ?, ?, ?, ?) " +
-                    "ON CONFLICT(plate_num) DO UPDATE SET " +
+                    "ON CONFLICT(license_plate) DO UPDATE SET " +
                     "model = ?, net_weight = ?, max_weight = ?, license_type = ?, available = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -96,7 +96,7 @@ public class TruckDAOImpl implements TruckDAO {
 
     @Override
     public void deleteById(String plateNum) throws SQLException {
-        String sql = "DELETE FROM trucks WHERE plate_num = ?";
+        String sql = "DELETE FROM trucks WHERE license_plate = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, plateNum);
@@ -116,7 +116,7 @@ public class TruckDAOImpl implements TruckDAO {
         conn.setAutoCommit(false);
         try {
             // First verify the truck exists
-            String checkSql = "SELECT plate_num FROM trucks WHERE plate_num = ?";
+            String checkSql = "SELECT license_plate FROM trucks WHERE license_plate = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
                 checkStmt.setString(1, plateNum);
                 ResultSet rs = checkStmt.executeQuery();
@@ -126,7 +126,7 @@ public class TruckDAOImpl implements TruckDAO {
             }
 
             // Then update the availability
-            String updateSql = "UPDATE trucks SET available = ? WHERE plate_num = ?";
+            String updateSql = "UPDATE trucks SET available = ? WHERE license_plate = ?";
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                 updateStmt.setInt(1, available ? 1 : 0);  // Convert boolean to int for SQLite
                 updateStmt.setString(2, plateNum);
@@ -137,7 +137,7 @@ public class TruckDAOImpl implements TruckDAO {
             }
 
             // Verify the update
-            String verifySql = "SELECT available FROM trucks WHERE plate_num = ?";
+            String verifySql = "SELECT available FROM trucks WHERE license_plate = ?";
             try (PreparedStatement verifyStmt = conn.prepareStatement(verifySql)) {
                 verifyStmt.setString(1, plateNum);
                 ResultSet rs = verifyStmt.executeQuery();
@@ -232,7 +232,7 @@ public class TruckDAOImpl implements TruckDAO {
 
     private TruckDTO mapResultSetToTruckDTO(ResultSet rs) throws SQLException {
         TruckDTO dto = new TruckDTO();
-        dto.setLicensePlate(rs.getString("plate_num"));
+        dto.setLicensePlate(rs.getString("license_plate"));
         dto.setModel(rs.getString("model"));
         dto.setNetWeight(rs.getFloat("net_weight"));
         dto.setMaxWeight(rs.getFloat("max_weight"));

@@ -330,16 +330,27 @@ public class TransportService {
      * @param newStatus The new status
      * @return true if updated successfully, false otherwise
      */
+//    public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
+//        Optional<Transport> transportOpt = getTransportById(transportId);
+//        if (transportOpt.isPresent()) {
+//            Transport transport = transportOpt.get();
+//            transport.setStatus(newStatus);
+//            saveTransport(transport);
+//            return true;
+//        }
+//        return false;
+//    }
     public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
-        Optional<Transport> transportOpt = getTransportById(transportId);
-        if (transportOpt.isPresent()) {
-            Transport transport = transportOpt.get();
-            transport.setStatus(newStatus);
-            saveTransport(transport);
+        try {
+            // עדכון הסטטוס במסד הנתונים ישירות
+            transportDAO.updateStatus(transportId, newStatus.name());
             return true;
+        } catch (SQLException e) {
+            System.err.println("Failed to update status for transport " + transportId + ": " + e.getMessage());
+            return false;
         }
-        return false;
     }
+
 
     /**
      * Releases resources associated with a transport.
@@ -487,4 +498,5 @@ public class TransportService {
         }
         return null;
     }
+
 }

@@ -39,7 +39,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Optional<ProductDTO> findById(String id) throws SQLException {
-        String sql = "SELECT * FROM products WHERE product_id = ?";
+        String sql = "SELECT * FROM products WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -56,9 +56,9 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public ProductDTO save(ProductDTO product) throws SQLException {
-        String sql = "INSERT INTO products (product_id, name, weight) " +
+        String sql = "INSERT INTO products (id, name, weight) " +
                     "VALUES (?, ?, ?) " +
-                    "ON CONFLICT(product_id) DO UPDATE SET " +
+                    "ON CONFLICT(id) DO UPDATE SET " +
                     "name = ?, weight = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -80,7 +80,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public void deleteById(String id) throws SQLException {
-        String sql = "DELETE FROM products WHERE product_id = ?";
+        String sql = "DELETE FROM products WHERE id = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -146,7 +146,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     private ProductDTO mapResultSetToProductDTO(ResultSet rs) throws SQLException {
         ProductDTO dto = new ProductDTO();
-        dto.setId(rs.getString("product_id"));
+        dto.setId(rs.getString("id"));
         dto.setName(rs.getString("name"));
         dto.setWeight(rs.getFloat("weight"));
         return dto;

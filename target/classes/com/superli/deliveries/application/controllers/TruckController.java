@@ -56,19 +56,15 @@ public class TruckController {
         if (trucks.isEmpty()) {
             System.out.println("No trucks found.");
         } else {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║             ALL TRUCKS            ║");
-            System.out.println("╚════════════════════════════════════╝");
+            System.out.println("\nAll Trucks:");
 
-            for (int i = 0; i < trucks.size(); i++) {
-                Truck truck = trucks.get(i);
+            for (Truck truck : trucks) {
                 TruckDTO truckDTO = TruckMapper.toDTO(truck);
-                System.out.println("\n[" + (i+1) + "] TRUCK: " + truckDTO.getModel() + " (Plate: " + truckDTO.getlicensePlate() + ")");
-                System.out.println("    Required License: " + truckDTO.getRequiredLicenseType());
-                System.out.println("    Weight Capacity: " + truckDTO.getNetWeight() + " kg (net) / "
-                        + truckDTO.getMaxWeight() + " kg (max)");
-                System.out.println("    Status: " + (truckService.isTruckAvailable(truckDTO.getlicensePlate()) ? "Available" : "Not Available"));
-                System.out.println("    " + "-".repeat(40));
+                System.out.printf("Plane Number: %-7s | Model: %-15s | License: %-7s | Status: %-10s%n",
+                    truckDTO.getlicensePlate(),
+                    truckDTO.getModel(),
+                    truckDTO.getRequiredLicenseType(),
+                    truckService.isTruckAvailable(truckDTO.getlicensePlate()) ? "Available" : "Unavailable");
             }
         }
     }
@@ -78,18 +74,15 @@ public class TruckController {
         if (available.isEmpty()) {
             System.out.println("No available trucks at the moment.");
         } else {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║          AVAILABLE TRUCKS          ║");
-            System.out.println("╚════════════════════════════════════╝");
+            System.out.println("\nAvailable Trucks:");
 
-            for (int i = 0; i < available.size(); i++) {
-                Truck truck = available.get(i);
+            for (Truck truck : available) {
                 TruckDTO truckDTO = TruckMapper.toDTO(truck);
-                System.out.println("\n[" + (i+1) + "] TRUCK: " + truckDTO.getModel() + " (Plate: " + truckDTO.getlicensePlate() + ")");
-                System.out.println("    Required License: " + truckDTO.getRequiredLicenseType());
-                System.out.println("    Weight Capacity: " + truckDTO.getNetWeight() + " kg (net) / "
-                        + truckDTO.getMaxWeight() + " kg (max)");
-                System.out.println("    " + "-".repeat(40));
+                System.out.printf("Plane Number: %-7s | Model: %-15s | License: %-7s | Status: %-10s%n",
+                    truckDTO.getlicensePlate(),
+                    truckDTO.getModel(),
+                    truckDTO.getRequiredLicenseType(),
+                    "Available");
             }
         }
     }

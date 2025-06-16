@@ -25,22 +25,22 @@ public class ZoneController {
 
         while (!back) {
             System.out.println("\n=== Zone Management ===");
-            System.out.println("1. Add Zone");
-            System.out.println("2. View All Zones");
+            System.out.println("1. View All Zones");
+            System.out.println("2. Add Zone");
             System.out.println("3. Edit Zone");
-            System.out.println("4. Show Sites in Zone");
-            System.out.println("5. Delete Zone");
+            System.out.println("4. Delete Zone");
+            System.out.println("5. Show Sites in Zone");
             System.out.println("0. Back to Main Menu");
             System.out.print("Choose an option: ");
 
             String input = scanner.nextLine().trim();
 
             switch (input) {
-                case "1" -> addZone();
-                case "2" -> viewAllZones();
+                case "2" -> addZone();
+                case "1" -> viewAllZones();
                 case "3" -> editZone();
-                case "4" -> showSitesInZone();
-                case "5" -> deleteZone();
+                case "5" -> showSitesInZone();
+                case "4" -> deleteZone();
                 case "0" -> back = true;
                 default -> System.out.println("Invalid choice. Try again.");
             }
@@ -70,23 +70,29 @@ public class ZoneController {
         List<Zone> zones = zoneService.getAllZones();
         if (zones.isEmpty()) {
             System.out.println("No zones found.");
-        } else {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║              ALL ZONES             ║");
-            System.out.println("╚════════════════════════════════════╝");
+            return;
+        }
 
-            for (int i = 0; i < zones.size(); i++) {
-                Zone zone = zones.get(i);
-                System.out.println("\n[" + (i+1) + "] ZONE: " + zone.getName() + " (ID: " + zone.getZoneId() + ")");
-                System.out.println("    " + "-".repeat(40));
-            }
+        System.out.println("\nAll Zones:");
+        System.out.printf("%-4s | %-20s | %-8s%n",
+            "ID", "Name", "Sites");
+        System.out.println("-".repeat(40));
+
+        for (Zone zone : zones) {
+            long siteCount = siteService.getAllSites().stream()
+                .filter(site -> site.getZone().getZoneId().equals(zone.getZoneId()))
+                .count();
+            System.out.printf("%-4s | %-20s | %-8d%n",
+                zone.getZoneId(),
+                zone.getName(),
+                siteCount);
         }
     }
 
     private void editZone() {
-        System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║           EDIT ZONE INFO           ║");
-        System.out.println("╚════════════════════════════════════╝");
+
+        System.out.println("Edit Zone Info: ");
+
 
         // First, show all zones
         viewAllZones();
@@ -136,9 +142,9 @@ public class ZoneController {
     }
 
     private void showSitesInZone() {
-        System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║           SITES IN ZONE            ║");
-        System.out.println("╚════════════════════════════════════╝");
+
+        System.out.println("Sites in Zone: ");
+
 
         // First, show all zones
         viewAllZones();

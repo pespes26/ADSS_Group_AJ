@@ -1,6 +1,7 @@
 package com.superli.deliveries;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import com.superli.deliveries.domain.core.*;
 
@@ -9,94 +10,123 @@ import com.superli.deliveries.domain.core.*;
  */
 class TruckTest {
 
+    private Truck testTruck;
+
+    @BeforeEach
+    void setUp() {
+        testTruck = new Truck(
+            "TR-123",
+            "Volvo FH",
+            8000.0f,
+            20000.0f,
+            LicenseType.C
+        );
+    }
+
+    // Core Functionality Tests
     @Test
     void constructor_ValidData_CreatesTruck() {
-        // Arrange & Act
-        Truck truck = new Truck(
-                "TR-123",
-                "Volvo FH",
-                8000.0f,
-                20000.0f,
-                LicenseType.C
-        );
-
-        // Assert core immutable attributes
-        assertEquals("TR-123", truck.getPlateNum());
-        assertEquals("Volvo FH", truck.getModel());
-        assertEquals(8000.0f, truck.getNetWeight());
-        assertEquals(20000.0f, truck.getMaxWeight());
-        assertEquals(LicenseType.C, truck.getRequiredLicenseType());
-
-        // Assert default availability
-        assertTrue(truck.isAvailable(), "New truck should be available by default");
+        assertNotNull(testTruck);
+        assertEquals("TR-123", testTruck.getPlateNum());
+        assertEquals("Volvo FH", testTruck.getModel());
+        assertEquals(8000.0f, testTruck.getNetWeight());
+        assertEquals(20000.0f, testTruck.getMaxWeight());
+        assertEquals(LicenseType.C, testTruck.getRequiredLicenseType());
+        assertTrue(testTruck.isAvailable());
     }
 
     @Test
-    void constructor_SpecificAvailability_CreatesTruck() {
-        Truck truck = new Truck(
-                "TR-456",
-                "Scania",
-                9000.0f,
-                25000.0f,
-                LicenseType.C,
-                false
-        );
-
-        assertFalse(truck.isAvailable());
-        assertEquals(LicenseType.C, truck.getRequiredLicenseType());
+    void constructor_NullPlateNum_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck(null, "Volvo", 8000.0f, 20000.0f, LicenseType.C);
+        });
     }
 
     @Test
-    void setAvailability_ChangesAvailabilityStatus() {
-        // Arrange
-        Truck truck = new Truck(
-                "TR-789",
-                "Mercedes",
-                7000.0f,
-                18000.0f,
-                LicenseType.B
-        );
-
-        // Initial state
-        assertTrue(truck.isAvailable());
-
-        // Change availability multiple times
-        truck.setAvailable(false);
-        assertFalse(truck.isAvailable());
-
-        truck.setAvailable(true);
-        assertTrue(truck.isAvailable());
+    void constructor_BlankPlateNum_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("   ", "Volvo", 8000.0f, 20000.0f, LicenseType.C);
+        });
     }
 
     @Test
-    void multipleAvailabilityChanges_DoNotAffectOtherAttributes() {
-        Truck truck = new Truck(
-                "TR-MULTI",
-                "Iveco",
-                8500.0f,
-                22000.0f,
-                LicenseType.C1
-        );
-
-        // Store original core attributes
-        String originalPlateNum = truck.getPlateNum();
-        String originalModel = truck.getModel();
-        float originalNetWeight = truck.getNetWeight();
-        float originalMaxWeight = truck.getMaxWeight();
-        LicenseType originalLicenseType = truck.getRequiredLicenseType();
-
-        // Change availability multiple times
-        truck.setAvailable(false);
-        truck.setAvailable(true);
-        truck.setAvailable(false);
-
-        // Verify core attributes remain unchanged
-        assertEquals(originalPlateNum, truck.getPlateNum());
-        assertEquals(originalModel, truck.getModel());
-        assertEquals(originalNetWeight, truck.getNetWeight());
-        assertEquals(originalMaxWeight, truck.getMaxWeight());
-        assertEquals(originalLicenseType, truck.getRequiredLicenseType());
+    void constructor_NullModel_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", null, 8000.0f, 20000.0f, LicenseType.C);
+        });
     }
 
-    // Existing validation tests remain the same...
+    @Test
+    void constructor_BlankModel_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", "   ", 8000.0f, 20000.0f, LicenseType.C);
+        });
+    }
+
+    // Weight Validation Tests
+    @Test
+    void constructor_NegativeNetWeight_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", "Volvo", -1000.0f, 20000.0f, LicenseType.C);
+        });
+    }
+
+    @Test
+    void constructor_NegativeMaxWeight_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", "Volvo", 8000.0f, -1000.0f, LicenseType.C);
+        });
+    }
+
+    @Test
+    void constructor_MaxWeightLessThanNetWeight_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", "Volvo", 10000.0f, 5000.0f, LicenseType.C);
+        });
+    }
+
+    // Capacity Tests
+    @Test
+    void getCapacity_ReturnsCorrectValue() {
+        assertEquals(12000.0f, testTruck.getMaxWeight() - testTruck.getNetWeight());
+    }
+
+    @Test
+    void getCapacity_ZeroCapacity_ReturnsZero() {
+        Truck truck = new Truck("TR-456", "Small Truck", 5000.0f, 5000.0f, LicenseType.B);
+        assertEquals(0.0f, truck.getMaxWeight() - truck.getNetWeight());
+    }
+
+    // Availability Tests
+    @Test
+    void setAvailable_UpdatesAvailability() {
+        testTruck.setAvailable(false);
+        assertFalse(testTruck.isAvailable());
+        testTruck.setAvailable(true);
+        assertTrue(testTruck.isAvailable());
+    }
+
+    // License Type Tests
+    @Test
+    void constructor_NullLicenseType_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Truck("TR-123", "Volvo", 8000.0f, 20000.0f, null);
+        });
+    }
+
+    // Equality Tests
+    @Test
+    void equals_SamePlateNum_ShouldBeEqual() {
+        Truck truck1 = new Truck("TR-123", "Volvo", 8000.0f, 20000.0f, LicenseType.C);
+        Truck truck2 = new Truck("TR-123", "Scania", 9000.0f, 25000.0f, LicenseType.B);
+        assertEquals(truck1, truck2);
+        assertEquals(truck1.hashCode(), truck2.hashCode());
+    }
+
+    @Test
+    void equals_DifferentPlateNum_ShouldNotBeEqual() {
+        Truck truck1 = new Truck("TR-123", "Volvo", 8000.0f, 20000.0f, LicenseType.C);
+        Truck truck2 = new Truck("TR-456", "Volvo", 8000.0f, 20000.0f, LicenseType.C);
+        assertNotEquals(truck1, truck2);
+    }
 }

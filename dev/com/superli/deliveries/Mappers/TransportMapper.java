@@ -18,13 +18,16 @@ public class TransportMapper {
     public static Transport fromDTO(TransportDTO dto, Truck truck, Driver driver, Site originSite) {
         if (dto == null || truck == null || driver == null || originSite == null) return null;
 
-        return new Transport(
+        Transport transport = new Transport(
                 dto.getTransportId(),
                 truck,
                 driver,
                 originSite,
                 LocalDateTime.parse(dto.getDepartureDateTime(), formatter)
         );
+        transport.setStatus(dto.getStatus());
+        transport.setDepartureWeight(dto.getDepartureWeight());
+        return transport;
     }
 
     public static TransportDTO toDTO(Transport transport) {

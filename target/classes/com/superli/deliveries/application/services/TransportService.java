@@ -2,6 +2,7 @@ package com.superli.deliveries.application.services;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,9 +29,10 @@ import com.superli.deliveries.presentation.del.TransportSummaryView;
 public class TransportService {
 
     private final TransportDAO transportDAO;
-    private final DriverService driverService;
-    private final TruckService truckService;
+    private DriverService driverService;
+    private TruckService truckService;
     private final SiteService siteService;
+    private final DestinationDocService destinationDocService;
 
     // Counter for generating sequential transport IDs
     private int nextTransportId = 1;
@@ -42,15 +44,18 @@ public class TransportService {
      * @param driverService Service for driver operations
      * @param truckService Service for truck operations
      * @param siteService Service for site operations
+     * @param destinationDocService Service for destination document operations
      */
     public TransportService(TransportDAO transportDAO,
                             DriverService driverService,
                             TruckService truckService,
-                            SiteService siteService) {
+                            SiteService siteService,
+                            DestinationDocService destinationDocService) {
         this.transportDAO = transportDAO;
         this.driverService = driverService;
         this.truckService = truckService;
         this.siteService = siteService;
+        this.destinationDocService = destinationDocService;
 
         // Initialize nextTransportId based on existing transports
         initializeNextTransportId();
@@ -99,7 +104,13 @@ public class TransportService {
                         Optional<Site> site = siteService.getSiteById(dto.getOriginSiteId());
                         
                         if (truck.isPresent() && driver.isPresent() && site.isPresent()) {
-                            return TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get());
+                            Transport transport = TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get());
+                            // Load destination documents
+                            List<DestinationDoc> docs = destinationDocService.getDocsByTransport(dto.getTransportId());
+                            for (DestinationDoc doc : docs) {
+                                transport.addDestinationDoc(doc);
+                            }
+                            return transport;
                         }
                         return null;
                     })
@@ -126,7 +137,13 @@ public class TransportService {
                 Optional<Site> site = siteService.getSiteById(dto.getOriginSiteId());
                 
                 if (truck.isPresent() && driver.isPresent() && site.isPresent()) {
-                    return Optional.of(TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get()));
+                    Transport transport = TransportMapper.fromDTO(dto, truck.get(), driver.get(), site.get());
+                    // Load destination documents
+                    List<DestinationDoc> docs = destinationDocService.getDocsByTransport(transportId);
+                    for (DestinationDoc doc : docs) {
+                        transport.addDestinationDoc(doc);
+                    }
+                    return Optional.of(transport);
                 }
             }
             return Optional.empty();
@@ -271,8 +288,18 @@ public class TransportService {
             return Optional.empty();
         }
 
+        // Check if driver and truck are available
+        if (!driver.isAvailable() || !truck.isAvailable()) {
+            return Optional.empty();
+        }
+
         String transportId = generateTransportId();
         Transport transport = new Transport(transportId, truck, driver, originSite);
+        
+        // Mark driver and truck as unavailable
+        driverService.markDriverAsUnavailable(driver.getDriverId());
+        truckService.markTruckAsUnavailable(truck.getPlateNum());
+        
         saveTransport(transport);
         return Optional.of(transport);
     }
@@ -324,45 +351,90 @@ public class TransportService {
     }
 
     /**
-     * Updates the status of a transport.
+     * Gets the valid next statuses for a given current status.
      *
-     * @param transportId The ID of the transport
-     * @param newStatus The new status
-     * @return true if updated successfully, false otherwise
+     * @param currentStatus The current status of the transport
+     * @return List of valid next statuses
      */
-//    public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
-//        Optional<Transport> transportOpt = getTransportById(transportId);
-//        if (transportOpt.isPresent()) {
-//            Transport transport = transportOpt.get();
-//            transport.setStatus(newStatus);
-//            saveTransport(transport);
-//            return true;
-//        }
-//        return false;
-//    }
-    public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
-        try {
-            // עדכון הסטטוס במסד הנתונים ישירות
-            transportDAO.updateStatus(transportId, newStatus.name());
-            return true;
-        } catch (SQLException e) {
-            System.err.println("Failed to update status for transport " + transportId + ": " + e.getMessage());
-            return false;
+    public List<TransportStatus> getValidNextStatuses(TransportStatus currentStatus) {
+        List<TransportStatus> validStatuses = new ArrayList<>();
+        
+        switch (currentStatus) {
+            case PLANNED:
+                validStatuses.add(TransportStatus.DISPATCHED);
+                validStatuses.add(TransportStatus.CANCELLED);
+                break;
+            case DISPATCHED:
+                validStatuses.add(TransportStatus.COMPLETED);
+                validStatuses.add(TransportStatus.CANCELLED);
+                break;
+            case COMPLETED:
+            case CANCELLED:
+            case SELFDELIVERY:
+                // No valid transitions
+                break;
         }
+        
+        return validStatuses;
     }
 
+    /**
+     * Validates if a status transition is allowed.
+     *
+     * @param currentStatus The current status
+     * @param newStatus The proposed new status
+     * @return true if the transition is valid, false otherwise
+     */
+    public boolean isValidStatusTransition(TransportStatus currentStatus, TransportStatus newStatus) {
+        return getValidNextStatuses(currentStatus).contains(newStatus);
+    }
 
     /**
-     * Releases resources associated with a transport.
+     * Updates the status of a transport with validation.
      *
-     * @param transport The transport whose resources to release
+     * @param transportId The ID of the transport
+     * @param newStatus The new status to set
+     * @return true if the status was updated successfully, false otherwise
+     */
+    public boolean updateTransportStatus(String transportId, TransportStatus newStatus) {
+        Optional<Transport> transportOpt = getTransportById(transportId);
+        if (transportOpt.isEmpty()) {
+            return false;
+        }
+
+        Transport transport = transportOpt.get();
+        TransportStatus currentStatus = transport.getStatus();
+
+        // Validate status transition
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
+            return false;
+        }
+
+        // Update status
+        transport.setStatus(newStatus);
+        saveTransport(transport);
+
+        // If transport is completed or cancelled, release resources
+        if (newStatus == TransportStatus.COMPLETED || newStatus == TransportStatus.CANCELLED) {
+            releaseTransportResources(transport);
+        }
+
+        return true;
+    }
+
+    /**
+     * Releases resources (driver and truck) associated with a transport.
+     * This is called when a transport is completed or cancelled.
+     *
+     * @param transport The transport whose resources should be released
      */
     private void releaseTransportResources(Transport transport) {
-        // Release truck
-        truckService.releaseTruck(transport.getTruck());
-
-        // Release driver
-        driverService.releaseDriver(transport.getDriver());
+        if (transport != null) {
+            // Release driver
+            driverService.markDriverAsAvailable(transport.getDriver().getDriverId());
+            // Release truck
+            truckService.markTruckAsAvailable(transport.getTruck().getPlateNum());
+        }
     }
 
     /**
@@ -497,6 +569,64 @@ public class TransportService {
             );
         }
         return null;
+    }
+
+    /**
+     * Checks if a driver is currently assigned to any active transport.
+     * @param driverId The ID of the driver to check
+     * @return true if the driver is assigned to an active transport, false otherwise
+     * @throws SQLException if there's an error accessing the database
+     */
+    public boolean isDriverAssignedToActiveTransport(String driverId) throws SQLException {
+        return transportDAO.findActiveTransportsByDriver(driverId).size() > 0;
+    }
+
+    /**
+     * Sets the driver service. Used to handle circular dependency.
+     * @param driverService The driver service to set
+     */
+    public void setDriverService(DriverService driverService) {
+        this.driverService = driverService;
+    }
+
+    /**
+     * Sets the truck service. Used to handle circular dependency.
+     * @param truckService The truck service to set
+     */
+    public void setTruckService(TruckService truckService) {
+        this.truckService = truckService;
+    }
+
+    public Transport createTransport(Driver driver, Truck truck, Site sourceSite, Site destinationSite,
+                                   LocalDateTime plannedStartTime, LocalDateTime plannedEndTime) {
+        // Validate driver and truck availability
+        if (!driverService.isDriverAvailable(driver.getDriverId())) {
+            throw new IllegalStateException("Driver is not available for transport");
+        }
+        if (!truckService.isTruckAvailable(truck.getPlateNum())) {
+            throw new IllegalStateException("Truck is not available for transport");
+        }
+
+        // Create and save the transport
+        Transport transport = new Transport(
+            generateTransportId(),
+            truck,
+            driver,
+            sourceSite,
+            plannedStartTime
+        );
+
+        try {
+            // Save the transport first
+            transportDAO.save(TransportMapper.toDTO(transport));
+            
+            // Mark driver as unavailable
+            driverService.markDriverAsUnavailable(driver.getDriverId());
+            
+            return transport;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating transport", e);
+        }
     }
 
 }

@@ -15,7 +15,7 @@ public class DriverMapper {
     public static Driver fromDTO(DriverDTO dto) {
         if (dto == null) return null;
 
-        return new Driver(
+        Driver driver = new Driver(
                 dto.getId(),                                 // id
                 dto.getFullName(),                           // fullName
                 "000-000-000",                              // bankAccount (default)
@@ -28,6 +28,8 @@ public class DriverMapper {
                 new Role("DRIVER"),                         // loginRole
                 LicenseType.valueOf(dto.getLicenseType())   // licenseType
         );
+        driver.setAvailable(dto.isAvailable());  // Set the availability status from DTO
+        return driver;
     }
 
     public static DriverDTO toDTO(Driver driver) {

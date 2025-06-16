@@ -162,16 +162,35 @@ public class TransportDAOImpl implements TransportDAO {
     @Override
     public List<TransportDTO> findActiveTransports() throws SQLException {
         List<TransportDTO> transports = new ArrayList<>();
-        String sql = "SELECT * FROM transports WHERE status IN ('PLANNED', 'IN_DELIVERY')";
+        String sql = """
+            SELECT * FROM transports 
+            WHERE status IN ('PENDING', 'IN_PROGRESS')
+            ORDER BY created_at DESC
+        """;
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
                 transports.add(mapResultSetToTransportDTO(rs));
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding active transports", e);
+        }
+        return transports;
+    }
+
+    @Override
+    public List<TransportDTO> findActiveTransportsByDriver(String driverId) throws SQLException {
+        List<TransportDTO> transports = new ArrayList<>();
+        String sql = """
+            SELECT * FROM transports 
+            WHERE driver_id = ? AND status IN ('PENDING', 'IN_PROGRESS')
+        """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, driverId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                transports.add(mapResultSetToTransportDTO(rs));
+            }
         }
         return transports;
     }

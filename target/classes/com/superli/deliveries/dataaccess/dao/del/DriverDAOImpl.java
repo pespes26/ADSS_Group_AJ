@@ -64,11 +64,13 @@ public class DriverDAOImpl implements DriverDAO {
             SELECT 
                 e.id, e.name, e.bank_account, e.salary, e.site_id, 
                 e.employment_terms, e.start_date, d.license_type, d.available,
-                GROUP_CONCAT(er.role_name) as roles
+                GROUP_CONCAT(DISTINCT r.name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.id 
-            GROUP BY e.id, d.id
+            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
+            GROUP BY e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                     e.employment_terms, e.start_date, d.license_type, d.available
             ORDER BY e.name
         """;
 
@@ -271,12 +273,14 @@ public class DriverDAOImpl implements DriverDAO {
             SELECT 
                 e.id, e.name, e.bank_account, e.salary, e.site_id, 
                 e.employment_terms, e.start_date, d.license_type, d.available,
-                GROUP_CONCAT(er.role_name) as roles
+                GROUP_CONCAT(DISTINCT r.name) as roles
             FROM employees e 
             INNER JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.id 
+            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
             WHERE d.available = 1 
-            GROUP BY e.id, d.id, d.available
+            GROUP BY e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                     e.employment_terms, e.start_date, d.license_type, d.available
             ORDER BY e.name
         """;
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -292,18 +296,49 @@ public class DriverDAOImpl implements DriverDAO {
     }
 
     @Override
+    public List<DriverDTO> findUnavailableDrivers() throws SQLException {
+        List<DriverDTO> drivers = new ArrayList<>();
+        String sql = """
+            SELECT 
+                e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                e.employment_terms, e.start_date, d.license_type, d.available,
+                GROUP_CONCAT(DISTINCT r.name) as roles
+            FROM employees e 
+            INNER JOIN drivers d ON e.id = d.id 
+            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
+            WHERE d.available = 0 
+            GROUP BY e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                     e.employment_terms, e.start_date, d.license_type, d.available
+            ORDER BY e.name
+        """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Driver driver = mapResultSetToDriver(rs);
+                if (!driver.isAvailable()) {  // Double check availability
+                    drivers.add(DriverMapper.toDTO(driver));
+                }
+            }
+        }
+        return drivers;
+    }
+
+    @Override
     public List<DriverDTO> findByLicenseType(String licenseType) throws SQLException {
         List<DriverDTO> drivers = new ArrayList<>();
         String sql = """
             SELECT 
                 e.id, e.name, e.bank_account, e.salary, e.site_id, 
                 e.employment_terms, e.start_date, d.license_type, d.available,
-                GROUP_CONCAT(er.role_name) as roles
+                GROUP_CONCAT(DISTINCT r.name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.id 
+            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
             WHERE d.license_type = ? 
-            GROUP BY e.id, d.id
+            GROUP BY e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                     e.employment_terms, e.start_date, d.license_type, d.available
             ORDER BY e.name
         """;
 
@@ -327,12 +362,14 @@ public class DriverDAOImpl implements DriverDAO {
             SELECT 
                 e.id, e.name, e.bank_account, e.salary, e.site_id, 
                 e.employment_terms, e.start_date, d.license_type, d.available,
-                GROUP_CONCAT(er.role_name) as roles
+                GROUP_CONCAT(DISTINCT r.name) as roles
             FROM employees e 
             LEFT JOIN drivers d ON e.id = d.id 
-            LEFT JOIN employee_roles er ON e.id = er.id 
+            LEFT JOIN employee_roles er ON e.id = er.employee_id 
+            LEFT JOIN roles r ON er.role_id = r.id
             WHERE d.license_number = ? 
-            GROUP BY e.id, d.id
+            GROUP BY e.id, e.name, e.bank_account, e.salary, e.site_id, 
+                     e.employment_terms, e.start_date, d.license_type, d.available
         """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -410,6 +447,15 @@ public class DriverDAOImpl implements DriverDAO {
             LicenseType.valueOf(licenseTypeStr) : 
             LicenseType.C; // Default to C if null
 
+        // Parse roles from GROUP_CONCAT result
+        List<Role> roles = new ArrayList<>();
+        String rolesStr = rs.getString("roles");
+        if (rolesStr != null && !rolesStr.isEmpty()) {
+            for (String roleName : rolesStr.split(",")) {
+                roles.add(new Role(roleName.trim()));
+            }
+        }
+
         Driver driver = new Driver(
                 rs.getString("id"),
                 rs.getString("name"),
@@ -418,7 +464,7 @@ public class DriverDAOImpl implements DriverDAO {
                 rs.getInt("site_id"),
                 rs.getString("employment_terms"),
                 startDate,
-                new ArrayList<>(), // roleQualifications
+                roles, // Use parsed roles instead of empty list
                 new ArrayList<>(), // availabilityConstraints
                 new Role("DRIVER"), // loginRole
                 licenseType

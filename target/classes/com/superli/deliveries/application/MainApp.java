@@ -20,11 +20,11 @@ public class MainApp {
             switch (choice) {
                 case "1":
                     HRDetailsView hrSystem = new HRDetailsView();
-                    hrSystem.mainLoginMenu(); // הכניסה הראשית למערכת HR
+                    hrSystem.mainLoginMenu(); 
                     break;
 
                 case "2":
-                    Main.runDeliveriesSystem(); // הפעלת מערכת המשלוחים
+                    Main.runDeliveriesSystem(); 
                     break;
 
                 case "0":

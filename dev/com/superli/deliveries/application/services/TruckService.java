@@ -8,13 +8,17 @@ import java.util.stream.Collectors;
 import com.superli.deliveries.Mappers.TruckMapper;
 import com.superli.deliveries.dataaccess.dao.del.TruckDAO;
 import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.domain.core.Transport;
+import com.superli.deliveries.domain.core.TransportStatus;
 
 public class TruckService {
 
     private final TruckDAO truckDAO;
+    private final TransportService transportService;
 
-    public TruckService(TruckDAO truckDAO) {
+    public TruckService(TruckDAO truckDAO, TransportService transportService) {
         this.truckDAO = truckDAO;
+        this.transportService = transportService;
     }
 
     public List<Truck> getAllTrucks() {
@@ -56,10 +60,61 @@ public class TruckService {
         try {
             return truckDAO.findAvailableTrucks().stream()
                     .map(TruckMapper::fromDTO)
+                    .filter(truck -> !isTruckAssignedToTransport(truck.getPlateNum()))
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting available trucks", e);
         }
+    }
+
+    /**
+     * Checks if a truck is assigned to any active transport.
+     * @param plateNum The plate number of the truck to check
+     * @return true if the truck is assigned to an active transport, false otherwise
+     */
+    public boolean isTruckAssignedToTransport(String plateNum) {
+        try {
+            List<Transport> transports = transportService.getAllTransports();
+            return transports.stream()
+                    .filter(t -> t.getTruck().getPlateNum().equals(plateNum))
+                    .anyMatch(t -> t.getStatus() != TransportStatus.COMPLETED && 
+                                 t.getStatus() != TransportStatus.CANCELLED);
+        } catch (Exception e) {
+            throw new RuntimeException("Error checking truck assignment", e);
+        }
+    }
+
+    /**
+     * Updates a truck's availability status.
+     * @param plateNum The plate number of the truck
+     * @param available The new availability status
+     * @throws IllegalStateException if trying to make a truck available while assigned to an active transport
+     */
+    public void updateTruckAvailability(String plateNum, boolean available) {
+        try {
+            if (available && isTruckAssignedToTransport(plateNum)) {
+                throw new IllegalStateException("Truck is assigned to an active transport and cannot be made available");
+            }
+            truckDAO.updateTruckAvailability(plateNum, available);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating truck availability", e);
+        }
+    }
+
+    /**
+     * Marks a truck as unavailable (e.g., when assigned to a transport).
+     * @param plateNum The plate number of the truck
+     */
+    public void markTruckAsUnavailable(String plateNum) {
+        updateTruckAvailability(plateNum, false);
+    }
+
+    /**
+     * Marks a truck as available (e.g., when transport is completed/cancelled).
+     * @param plateNum The plate number of the truck
+     */
+    public void markTruckAsAvailable(String plateNum) {
+        updateTruckAvailability(plateNum, true);
     }
 
     public List<Truck> getTrucksByType(String type) {
@@ -88,24 +143,6 @@ public class TruckService {
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting trucks by capacity range", e);
-        }
-    }
-
-    public boolean markTruckAsUnavailable(String plateNum) {
-        try {
-            truckDAO.updateTruckAvailability(plateNum, false);
-            return true;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error marking truck as unavailable: " + plateNum, e);
-        }
-    }
-
-    public boolean markTruckAsAvailable(String plateNum) {
-        try {
-            truckDAO.updateTruckAvailability(plateNum, true);
-            return true;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error marking truck as available: " + plateNum, e);
         }
     }
 
@@ -275,4 +312,5 @@ public class TruckService {
 //        Optional<Truck> truckOpt = truckRepository.findByPlate(plateNum);
 //        return truckOpt.map(Truck::isAvailable).orElse(false);
 //    }
+//}
 //}

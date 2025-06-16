@@ -60,22 +60,18 @@ public class SiteController {
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║              ALL SITES             ║");
-        System.out.println("╚════════════════════════════════════╝");
+        System.out.println("\nAll Sites:");
+        System.out.printf("%-4s | %-15s | %-12s | %-15s | %-6s%n",
+            "ID", "Address", "Phone", "Contact", "Zone");
+        System.out.println("-".repeat(60));
 
-        for (int i = 0; i < sites.size(); i++) {
-            SiteDTO site = sites.get(i);
-            System.out.println("\n[" + (i+1) + "] SITE: " + site.getSiteId());
-            System.out.println("    Address: " + site.getAddress());
-            if (site.getPhoneNumber() != null && !site.getPhoneNumber().isEmpty()) {
-                System.out.println("    Phone: " + site.getPhoneNumber());
-            }
-            if (site.getContactPersonName() != null && !site.getContactPersonName().isEmpty()) {
-                System.out.println("    Contact: " + site.getContactPersonName());
-            }
-            System.out.println("    Zone ID: " + site.getZoneId());
-            System.out.println("    " + "-".repeat(40));
+        for (SiteDTO site : sites) {
+            System.out.printf("%-4s | %-15s | %-12s | %-15s | %-6s%n",
+                site.getSiteId(),
+                site.getAddress(),
+                site.getPhoneNumber() != null ? site.getPhoneNumber() : "N/A",
+                site.getContactPersonName() != null ? site.getContactPersonName() : "N/A",
+                site.getZoneId());
         }
     }
 

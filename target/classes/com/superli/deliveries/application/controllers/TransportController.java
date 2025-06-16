@@ -101,16 +101,14 @@ public class TransportController {
     public void runMenu() {
         boolean running = true;
         while (running) {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║           TRANSPORT MENU           ║");
-            System.out.println("╠════════════════════════════════════╣");
-            System.out.println("║ 1. Show all transports             ║");
-            System.out.println("║ 2. Show transport by ID            ║");
-            System.out.println("║ 3. Create structured transport     ║");
-            System.out.println("║ 4. Update transport status         ║");
-            System.out.println("║ 5. Delete transport                ║");
-            System.out.println("║ 0. Back to main menu               ║");
-            System.out.println("╚════════════════════════════════════╝");
+
+            System.out.println("\n=== Transport Menu ===");
+            System.out.println("1. Show all transports             ");
+            System.out.println("2. Show transport by ID            ");
+            System.out.println("3. Create structured transport     ");
+            System.out.println("4. Update transport status         ");
+            System.out.println("5. Delete transport                ");
+            System.out.println("0. Back to main menu               ");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine().trim();
@@ -144,20 +142,24 @@ public class TransportController {
         if (transports.isEmpty()) {
             System.out.println("\nNo transports found in the system.");
         } else {
-            System.out.println("\n╔════════════════════════════════════╗");
-            System.out.println("║           ALL TRANSPORTS           ║");
-            System.out.println("╚════════════════════════════════════╝");
+
+            System.out.println("All Transports: ");
+
 
             for (int i = 0; i < transports.size(); i++) {
                 Transport transport = transports.get(i);
                 TransportDTO transportDTO = TransportMapper.toDTO(transport);
                 System.out.println("\n[" + (i+1) + "] TRANSPORT #" + transportDTO.getTransportId());
                 System.out.println("    Status: " + transportDTO.getStatus());
-                System.out.println("    Departure: " + transportDTO.getDepartureDateTime());
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                LocalDateTime departure = LocalDateTime.parse(transportDTO.getDepartureDateTime());
+                System.out.println("    Date: " + departure.format(dateFormatter));
+                System.out.println("    Time: " + departure.format(timeFormatter));
                 System.out.println("    Origin: " + transport.getOriginSite().getAddress());
                 System.out.println("    Destinations: " + transportDTO.getDestinationDocIds().size() + " sites");
-                System.out.println("    Weight: " + transportDTO.getDepartureWeight() + " kg / " + 
-                    transport.getTruck().getMaxWeight() + " kg");
+                System.out.println("    Weight: " + String.format("%.2f", transportDTO.getDepartureWeight()) + " kg / " + 
+                    String.format("%.2f", transport.getTruck().getMaxWeight()) + " kg");
                 System.out.println("    Truck: " + transport.getTruck().getPlateNum() + 
                     " (" + transport.getTruck().getModel() + ")");
                 System.out.println("    Driver: " + transport.getDriver().getFullName());
@@ -185,13 +187,17 @@ public class TransportController {
                 System.out.println("\nBasic Information:");
                 System.out.println("  ID: " + transportDTO.getTransportId());
                 System.out.println("  Status: " + transportDTO.getStatus());
-                System.out.println("  Departure: " + transportDTO.getDepartureDateTime());
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                LocalDateTime departure = LocalDateTime.parse(transportDTO.getDepartureDateTime());
+                System.out.println("  Date: " + departure.format(dateFormatter));
+                System.out.println("  Time: " + departure.format(timeFormatter));
                 
                 System.out.println("\nWeight Information:");
-                System.out.println("  Current Weight: " + transportDTO.getDepartureWeight() + " kg");
-                System.out.println("  Truck Capacity: " + transport.getTruck().getMaxWeight() + " kg");
+                System.out.println("  Current Weight: " + String.format("%.2f", transportDTO.getDepartureWeight()) + " kg");
+                System.out.println("  Truck Capacity: " + String.format("%.2f", transport.getTruck().getMaxWeight()) + " kg");
                 System.out.println("  Available Capacity: " + 
-                    (transport.getTruck().getMaxWeight() - transportDTO.getDepartureWeight()) + " kg");
+                    String.format("%.2f", (transport.getTruck().getMaxWeight() - transportDTO.getDepartureWeight())) + " kg");
                 
                 System.out.println("\nRoute Information:");
                 System.out.println("  Origin: " + transport.getOriginSite().getAddress());
@@ -237,9 +243,12 @@ public class TransportController {
         System.out.println("╚══════════════════════════════════════════╝");
 
         // STEP 1: Choose driver-truck assignment method
-        System.out.println("\n--- STEP 1: Driver and Truck Assignment ---");
-        System.out.println("1. Automatic assignment (system finds compatible pair)");
-        System.out.println("2. Manual selection");
+        System.out.println("\n╔══════════════════════════════════════════╗");
+        System.out.println("║         STEP 1: DRIVER & TRUCK           ║");
+        System.out.println("╠══════════════════════════════════════════╣");
+        System.out.println("║ 1. Automatic assignment                  ║");
+        System.out.println("║ 2. Manual selection                      ║");
+        System.out.println("╚══════════════════════════════════════════╝");
         System.out.print("Choose assignment method: ");
 
         String assignmentChoice = scanner.nextLine().trim();
@@ -261,68 +270,58 @@ public class TransportController {
         }
 
         CompatiblePair selectedPair;
-
-        if (assignmentChoice.equals("1")) {
-            // AUTOMATIC ASSIGNMENT
-            System.out.println("\n--- Automatic Assignment ---");
-
-            // Find compatible pairs
+        if ("1".equals(assignmentChoice)) {
+            // Automatic assignment
             List<CompatiblePair> compatiblePairs = findCompatiblePairs(availableTrucks, availableDrivers);
-
             if (compatiblePairs.isEmpty()) {
-                System.out.println("No compatible driver-truck pairs found. Please ensure drivers have appropriate licenses for available trucks.");
+                System.out.println("No compatible driver-truck pairs found.");
                 return;
             }
 
-            // Display compatible pairs and let user choose
+            // Display compatible pairs
             System.out.println("\nCompatible driver-truck pairs:");
             for (int i = 0; i < compatiblePairs.size(); i++) {
                 CompatiblePair pair = compatiblePairs.get(i);
-                TruckDTO truckDTO = TruckMapper.toDTO(pair.truck);
-                System.out.printf("%d. Driver: %s (%s) - Truck: %s (%s, max: %.1f kg)\n",
-                        i + 1,
-                        pair.driver.getFullName(),
-                        pair.driver.getLicenseType(),
-                        truckDTO.getlicensePlate(),
-                        truckDTO.getModel(),
-                        truckDTO.getMaxWeight());
+                System.out.printf("%d. Driver: %s (License: %s) - Truck: %s (Required License: %s)%n",
+                    i + 1,
+                    pair.driver().getFullName(),
+                    pair.driver().getLicenseType(),
+                    pair.truck().getModel(),
+                    pair.truck().getRequiredLicenseType());
             }
 
-            System.out.print("Select a pair (number): ");
-            int pairChoice = Integer.parseInt(scanner.nextLine().trim());
-            if (pairChoice < 1 || pairChoice > compatiblePairs.size()) {
+            // Let user select a pair
+            System.out.print("\nSelect a pair (1-" + compatiblePairs.size() + "): ");
+            int selection = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (selection < 0 || selection >= compatiblePairs.size()) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            selectedPair = compatiblePairs.get(pairChoice - 1);
-        } else {
-            // MANUAL SELECTION
-            System.out.println("\n--- Manual Selection ---");
-
-            // Show available trucks
+            selectedPair = compatiblePairs.get(selection);
+        } else if ("2".equals(assignmentChoice)) {
+            // Manual selection
+            // First select truck
             System.out.println("\nAvailable trucks:");
             for (int i = 0; i < availableTrucks.size(); i++) {
                 Truck truck = availableTrucks.get(i);
-                TruckDTO truckDTO = TruckMapper.toDTO(truck);
-                System.out.printf("%d. %s (%s, max: %.1f kg)\n",
-                        i + 1,
-                        truckDTO.getModel(),
-                        truckDTO.getlicensePlate(),
-                        truckDTO.getMaxWeight());
+                System.out.printf("%d. %s (Required License: %s)%n",
+                    i + 1,
+                    truck.getModel(),
+                    truck.getRequiredLicenseType());
             }
 
-            System.out.print("Select a truck (number): ");
-            int truckChoice = Integer.parseInt(scanner.nextLine().trim());
-            if (truckChoice < 1 || truckChoice > availableTrucks.size()) {
-                System.out.println("Invalid selection.");
+            System.out.print("\nSelect a truck (1-" + availableTrucks.size() + "): ");
+            int truckSelection = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (truckSelection < 0 || truckSelection >= availableTrucks.size()) {
+                System.out.println("Invalid truck selection.");
                 return;
             }
-            Truck selectedTruck = availableTrucks.get(truckChoice - 1);
+            Truck selectedTruck = availableTrucks.get(truckSelection);
 
-            // Show compatible drivers
+            // Then select compatible driver
             List<Driver> compatibleDrivers = availableDrivers.stream()
-                    .filter(driver -> driver.getLicenseType().equals(selectedTruck.getRequiredLicenseType()))
-                    .collect(Collectors.toList());
+                .filter(d -> d.getLicenseType().equals(selectedTruck.getRequiredLicenseType()))
+                .collect(Collectors.toList());
 
             if (compatibleDrivers.isEmpty()) {
                 System.out.println("No drivers available with the required license type: " + selectedTruck.getRequiredLicenseType());
@@ -332,21 +331,24 @@ public class TransportController {
             System.out.println("\nCompatible drivers:");
             for (int i = 0; i < compatibleDrivers.size(); i++) {
                 Driver driver = compatibleDrivers.get(i);
-                System.out.printf("%d. %s (%s)\n",
-                        i + 1,
-                        driver.getFullName(),
-                        driver.getLicenseType());
+                System.out.printf("%d. %s (License: %s)%n",
+                    i + 1,
+                    driver.getFullName(),
+                    driver.getLicenseType());
             }
 
-            System.out.print("Select a driver (number): ");
-            int driverChoice = Integer.parseInt(scanner.nextLine().trim());
-            if (driverChoice < 1 || driverChoice > compatibleDrivers.size()) {
-                System.out.println("Invalid selection.");
+            System.out.print("\nSelect a driver (1-" + compatibleDrivers.size() + "): ");
+            int driverSelection = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (driverSelection < 0 || driverSelection >= compatibleDrivers.size()) {
+                System.out.println("Invalid driver selection.");
                 return;
             }
-            Driver selectedDriver = compatibleDrivers.get(driverChoice - 1);
+            Driver selectedDriver = compatibleDrivers.get(driverSelection);
 
             selectedPair = new CompatiblePair(selectedTruck, selectedDriver);
+        } else {
+            System.out.println("Invalid choice.");
+            return;
         }
 
         // STEP 2: Select origin site
@@ -443,7 +445,7 @@ public class TransportController {
                         System.out.println("This site is already selected.");
                     } else {
                         selectedDestinations.add(selectedSite);
-                        System.out.println(" Added destination: " + selectedSite.getAddress());
+                        System.out.println("Added destination: " + selectedSite.getAddress());
                     }
                 }
             } catch (NumberFormatException e) {
@@ -474,10 +476,11 @@ public class TransportController {
 
             // Create a destination document
             String docId = getNextDocumentId();
-            DestinationDoc doc = new DestinationDoc(docId, transport.getTransportId(), destination, "PLANNED");
+            DestinationDoc doc = new DestinationDoc(docId, transport.getTransportId(), destination, "PENDING");
 
             // Add to transport
             transport.addDestinationDoc(doc);
+            transportService.saveTransport(transport);
 
             boolean addingItems = true;
             while (addingItems) {
@@ -492,147 +495,118 @@ public class TransportController {
                 System.out.print("Your choice: ");
                 String itemChoice = scanner.nextLine().trim();
 
-                switch (itemChoice) {
-                    case "0" -> addingItems = false;
-                    case "1" -> {
-                        addItemsToDestination(doc);
-                        currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
+                if (itemChoice.equals("0")) {
+                    addingItems = false;
+                    continue;
+                }
+
+                if (itemChoice.equals("1")) {
+                    // Show available products
+                    List<Product> products = productService.getAllProducts();
+                    if (products.isEmpty()) {
+                        System.out.println("No products available. Please add products first.");
+                        continue;
                     }
-                    case "2" -> {
-                        System.out.println("\nEnter new product details:");
-                        System.out.print("Product name: ");
-                        String newProductName = scanner.nextLine().trim();
-                        System.out.print("Product weight (kg): ");
-                        float newProductWeight = Float.parseFloat(scanner.nextLine().trim());
-                        System.out.print("Quantity: ");
-                        int newQuantity = Integer.parseInt(scanner.nextLine().trim());
 
-                        if (newQuantity <= 0 || newProductWeight <= 0) {
-                            System.out.println("Quantity and weight must be positive.");
-                        } else {
-                            float newItemWeight = newProductWeight * newQuantity;
+                    System.out.println("\nAvailable Products:");
+                    for (int i = 0; i < products.size(); i++) {
+                        Product p = products.get(i);
+                        System.out.println((i+1) + ". " + p.getName() + " (ID: " + p.getProductId() + ")");
+                    }
 
-                            if (currentWeight + newItemWeight > maxCapacity) {
-                                System.out.println("   Adding this item would exceed truck capacity.");
-                                System.out.println("   Current weight: " + currentWeight + " kg");
-                                System.out.println("   Item weight: " + newItemWeight + " kg");
-                                System.out.println("   Maximum capacity: " + maxCapacity + " kg");
-                            } else {
-                                Optional<Product> existing = productService.findByName(newProductName);
-                                String finalProductId;
+                    System.out.print("\nEnter product number (or 0 to finish): ");
+                    String productChoice = scanner.nextLine().trim();
 
-                                if (existing.isPresent()) {
-                                    finalProductId = existing.get().getProductId();
-                                } else {
-                                    finalProductId = getNextProductId();
-                                    Product newProduct = new Product(finalProductId, newProductName, newProductWeight);
-                                    productService.saveProduct(newProduct);
-                                }
+                    if (productChoice.equals("0")) {
+                        continue;
+                    }
 
-                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), finalProductId, newQuantity);
-                                if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), newItem)) {
-                                    currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
-                                    doc.addDeliveryItem(newItem);
-                                    System.out.println("Added " + newQuantity + " units of " + newProductName + " (+" + newItemWeight + " kg)");
-                                } else {
-                                    System.out.println("Failed to add item. Please try again.");
-                                }
+                    try {
+                        int productIndex = Integer.parseInt(productChoice) - 1;
+                        if (productIndex >= 0 && productIndex < products.size()) {
+                            Product selectedProduct = products.get(productIndex);
+                            System.out.print("Enter quantity: ");
+                            int quantity = Integer.parseInt(scanner.nextLine().trim());
+
+                            // Calculate weight for this item
+                            double itemWeight = selectedProduct.getWeight() * quantity;
+                            if (currentWeight + itemWeight > maxCapacity) {
+                                System.out.println("Adding this quantity would exceed truck capacity!");
+                                continue;
                             }
+
+                            // Create and add the delivered item
+                            DeliveredItem item = new DeliveredItem(null, doc.getDestinationDocId(), selectedProduct.getProductId(), quantity);
+                            if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), item)) {
+                                doc.addDeliveryItem(item);
+                                currentWeight += itemWeight;
+                                System.out.print("Added " + quantity + " units of " + selectedProduct.getName() + "\n");
+                            } else {
+                                System.out.println("Failed to add item!");
+                            }
+                        } else {
+                            System.out.println("Invalid product selection!");
                         }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input! Please enter a valid number.");
                     }
-                    default -> System.out.println("Invalid choice.");
+                } else if (itemChoice.equals("2")) {
+                    // Add new product
+                    System.out.print("Enter product name: ");
+                    String name = scanner.nextLine().trim();
+                    System.out.print("Enter product weight (kg): ");
+                    double weight = Double.parseDouble(scanner.nextLine().trim());
+                    System.out.print("Enter quantity: ");
+                    int quantity = Integer.parseInt(scanner.nextLine().trim());
+
+                    // Calculate weight for this item
+                    double itemWeight = weight * quantity;
+                    if (currentWeight + itemWeight > maxCapacity) {
+                        System.out.println("Adding this quantity would exceed truck capacity!");
+                        continue;
+                    }
+
+                    // Create new product
+                    String productId = productService.getNextProductId();
+                    Product newProduct = new Product(productId, name, (float)weight);
+                    productService.saveProduct(newProduct);
+
+                    // Create and add the delivered item
+                    DeliveredItem item = new DeliveredItem(null, doc.getDestinationDocId(), productId, quantity);
+                    if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), item)) {
+                        doc.addDeliveryItem(item);
+                        currentWeight += itemWeight;
+                        System.out.println("Added " + quantity + " units of " + name);
+                    } else {
+                        System.out.println("Failed to add item!");
+                    }
+                } else {
+                    System.out.println("Invalid choice!");
                 }
             }
-//            // Add items
-//            boolean addingItems = true;
-//            while (addingItems) {
-//                System.out.println("\nCurrent cargo weight: " + currentWeight + " kg");
-//                System.out.println("Remaining capacity: " + (maxCapacity - currentWeight) + " kg");
-//
-//                System.out.println("\nOptions:");
-//                System.out.println("1. Add existing product");
-//                System.out.println("2. Add new product");
-//                System.out.println("0. Finish adding items for this destination");
-//
-//                System.out.print("Your choice: ");
-//                String itemChoice = scanner.nextLine().trim();
-//
-//                switch (itemChoice) {
-//                    case "0" -> addingItems = false;
-//                    case "1" -> {
-//                        // Add existing product
-//                        addItemsToDestination(doc);
-//                    }
-//                    case "2" -> {
-//                        // Add new product
-//                        System.out.println("\nEnter new product details:");
-//                        System.out.print("Product name: ");
-//                        String newProductName = scanner.nextLine().trim();
-//                        System.out.print("Product weight (kg): ");
-//                        float newProductWeight = Float.parseFloat(scanner.nextLine().trim());
-//                        System.out.print("Quantity: ");
-//                        int newQuantity = Integer.parseInt(scanner.nextLine().trim());
-//
-//                        if (newQuantity <= 0 || newProductWeight <= 0) {
-//                            System.out.println("Quantity and weight must be positive.");
-//                        } else {
-//                            // Calculate weight of this item
-//                            float newItemWeight = newProductWeight * newQuantity;
-//
-//                            // Check if adding this would exceed capacity
-//                            if (currentWeight + newItemWeight > maxCapacity) {
-//                                System.out.println("   Adding this item would exceed truck capacity.");
-//                                System.out.println("   Current weight: " + currentWeight + " kg");
-//                                System.out.println("   Item weight: " + newItemWeight + " kg");
-//                                System.out.println("   Maximum capacity: " + maxCapacity + " kg");
-//                            } else {
-//                                // Create and save new product
-//                                String newProductId = getNextProductId();
-//                                Product newProduct = new Product(newProductId, newProductName, newProductWeight);
-//                                productService.saveProduct(newProduct);
-//
-//                                // Add item to document
-//                                DeliveredItem newItem = new DeliveredItem(null, doc.getDestinationDocId(), newProductId, newQuantity);
-//                                if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), newItem)) {
-//                                    // Update current weight
-//                                    currentWeight = deliveredItemService.calculateTotalTransportWeight(transport.getTransportId());
-//                                    // Add item to document's list
-//                                    doc.addDeliveryItem(newItem);
-//                                    System.out.println("Added " + newQuantity + " units of " +
-//                                            newProductName + " (+" + newItemWeight + " kg)");
-//                                } else {
-//                                    System.out.println("Failed to add item. Please try again.");
-//                                }
-//                            }
-//                        }
-//                    }
-//                    default -> System.out.println("Invalid choice.");
-//                }
-//            }
 
-            // Save the document if it has items
             if (!doc.getDeliveryItems().isEmpty()) {
                 destinationDocService.saveDoc(doc);
+                transport.setDepartureWeight(currentWeight);
+                transportService.saveTransport(transport);  // Save the transport after updating weight
                 createdDocs.add(doc);
-                System.out.println("✅ Created destination document #" + docId +
+                System.out.println("Created destination document #" + docId +
                         " for " + destination.getAddress() +
                         " with " + doc.getDeliveryItems().size() + " items.");
             } else {
-                System.out.println("ℹ️ No items added for this destination. Document not created.");
+                System.out.println("No items added for this destination. Document not created.");
             }
         }
 
-        // Update transport weight
-        transport.setDepartureWeight(currentWeight);
-        transportService.saveTransport(transport);
-
         System.out.println("\n=== TRANSPORT CREATION COMPLETE ===");
         System.out.println("Transport ID: " + transport.getTransportId());
-        System.out.println("Total cargo weight: " + currentWeight + " kg");
+        System.out.println("Total cargo weight: " + String.format("%.2f", currentWeight) + " kg");
         System.out.println("Documents created: " + createdDocs.size());
 
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        System.out.println("Departure date/time: " + transport.getDepartureDateTime().format(outputFormatter));
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        System.out.println("Date: " + transport.getDepartureDateTime().format(dateFormatter));
+        System.out.println("Time: " + transport.getDepartureDateTime().format(timeFormatter));
     }
 
     /**
@@ -645,6 +619,14 @@ public class TransportController {
         public CompatiblePair(Truck truck, Driver driver) {
             this.truck = truck;
             this.driver = driver;
+        }
+
+        public Truck truck() {
+            return truck;
+        }
+
+        public Driver driver() {
+            return driver;
         }
     }
 
@@ -671,118 +653,81 @@ public class TransportController {
         System.out.println("║       UPDATE TRANSPORT STATUS      ║");
         System.out.println("╚════════════════════════════════════╝");
 
-        System.out.print("Enter transport ID: ");
-        try {
-            String transportId = scanner.nextLine().trim();
-            Optional<Transport> transportOpt = transportService.getTransportById(transportId);
+        System.out.print("\nEnter transport ID: ");
+        String transportId = scanner.nextLine().trim();
 
-            if (transportOpt.isEmpty()) {
-                System.out.println("Transport not found.");
+        Optional<Transport> transportOpt = transportService.getTransportById(transportId);
+        if (transportOpt.isEmpty()) {
+            System.out.println("\nTransport with ID '" + transportId + "' not found.");
+            return;
+        }
+
+        Transport transport = transportOpt.get();
+        TransportStatus currentStatus = transport.getStatus();
+        System.out.println("\nCurrent status: " + currentStatus);
+
+        List<TransportStatus> validStatuses = transportService.getValidNextStatuses(currentStatus);
+        if (validStatuses.isEmpty()) {
+            System.out.println("\nNo status changes are allowed for transports in " + currentStatus + " status.");
+            return;
+        }
+
+        System.out.println("\n╔════════════════════════════════════╗");
+        System.out.println("║        AVAILABLE NEXT STATUSES      ║");
+        System.out.println("╠════════════════════════════════════╣");
+        for (int i = 0; i < validStatuses.size(); i++) {
+            System.out.println("║ " + (i + 1) + ". " + validStatuses.get(i) + 
+                " ".repeat(25 - validStatuses.get(i).toString().length()) + "║");
+        }
+        System.out.println("╚════════════════════════════════════╝");
+
+        System.out.print("\nEnter status number: ");
+        String choice = scanner.nextLine().trim();
+        
+        try {
+            int statusIndex = Integer.parseInt(choice) - 1;
+            if (statusIndex < 0 || statusIndex >= validStatuses.size()) {
+                System.out.println("\nInvalid status number. Please enter a number between 1 and " + validStatuses.size());
                 return;
             }
-
-            Transport transport = transportOpt.get();
-            System.out.println("Current status: " + transport.getStatus());
-
-            System.out.println("\nAvailable statuses:");
-            System.out.println("1. PLANNED");
-            System.out.println("2. DISPATCHED");
-            System.out.println("3. COMPLETED");
-            System.out.println("4. CANCELLED");
-            System.out.println("5. SELF-DELIVERY");
-
-            System.out.print("Select new status (number): ");
-            int statusChoice = Integer.parseInt(scanner.nextLine().trim());
-
-            TransportStatus newStatus;
-            switch (statusChoice) {
-                case 1 -> newStatus = TransportStatus.PLANNED;
-                case 2 -> newStatus = TransportStatus.DISPATCHED;
-                case 3 -> newStatus = TransportStatus.COMPLETED;
-                case 4 -> newStatus = TransportStatus.CANCELLED;
-                case 5 -> newStatus = TransportStatus.SELFDELIVERY;
-                default -> {
-                    System.out.println("Invalid selection.");
-                    return;
+            
+            TransportStatus newStatus = validStatuses.get(statusIndex);
+            try {
+                boolean updated = transportService.updateTransportStatus(transportId, newStatus);
+                if (updated) {
+                    System.out.println("\nTransport status updated successfully to " + newStatus);
+                    if (newStatus == TransportStatus.COMPLETED || newStatus == TransportStatus.CANCELLED) {
+                        System.out.println("Driver and truck have been marked as available.");
+                    }
+                } else {
+                    System.out.println("\nFailed to update transport status. The status transition may not be valid.");
                 }
+            } catch (IllegalStateException e) {
+                System.out.println("\nError: " + e.getMessage());
             }
-            boolean updated = transportService.updateTransportStatus(transportId, newStatus);
-            if (updated) {
-                System.out.println("Transport status updated to: " + newStatus);
-
-                // טען מחדש את האובייקט מה־DB כדי לוודא שהשינוי נשמר
-                Optional<Transport> updatedTransport = transportService.getTransportById(transportId);
-                updatedTransport.ifPresent(t -> System.out.println("DB status: " + t.getStatus()));
-            } else {
-                System.out.println("Failed to update status.");
-            }
-
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid ID.");
+            System.out.println("\nInvalid input. Please enter a number.");
         }
     }
 
     private void deleteTransport() {
-        System.out.print("Enter transport ID to delete: ");
+        System.out.println("\n╔════════════════════════════════════╗");
+        System.out.println("║         DELETE TRANSPORT           ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        System.out.print("\nEnter transport ID to delete: ");
         try {
             String transportId = scanner.nextLine().trim();
             boolean deleted = transportService.deleteTransport(transportId);
 
             if (deleted) {
-                System.out.println("Transport deleted successfully.");
+                System.out.println("\nTransport deleted successfully.");
             } else {
-                System.out.println("Transport not found or could not be deleted.");
+                System.out.println("\nTransport not found or could not be deleted.");
             }
 
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid ID.");
-        }
-    }
-
-    private void addItemsToDestination(DestinationDoc doc) {
-        List<Product> products = productService.getAllProducts();
-        if (products.isEmpty()) {
-            System.out.println("No products available.");
-            return;
-        }
-
-        System.out.println("\nAvailable Products:");
-        for (int i = 0; i < products.size(); i++) {
-            Product product = products.get(i);
-            System.out.println((i + 1) + ". " + product.getName() + " (ID: " + product.getProductId() + ")");
-        }
-
-        while (true) {
-            System.out.print("\nEnter product number (or 0 to finish): ");
-            try {
-                int choice = Integer.parseInt(scanner.nextLine().trim());
-                if (choice == 0) {
-                    break;
-                }
-
-                if (choice < 1 || choice > products.size()) {
-                    System.out.println("Invalid product number.");
-                    continue;
-                }
-
-                Product selectedProduct = products.get(choice - 1);
-                System.out.print("Enter quantity: ");
-                int quantity = Integer.parseInt(scanner.nextLine().trim());
-
-                if (quantity <= 0) {
-                    System.out.println("Quantity must be positive.");
-                    continue;
-                }
-
-                DeliveredItem item = new DeliveredItem(null, doc.getDestinationDocId(), selectedProduct.getProductId(), quantity);
-                if (deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), item)) {
-                    System.out.println(" Added " + quantity + " units of " + selectedProduct.getName());
-                } else {
-                    System.out.println(" Failed to add item. Weight limit may be exceeded.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
+            System.out.println("\nInvalid input. Please enter a valid ID.");
         }
     }
 }

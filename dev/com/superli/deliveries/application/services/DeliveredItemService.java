@@ -154,14 +154,25 @@ public class DeliveredItemService {
      */
     public boolean addDeliveredItem(String docId, DeliveredItem item) {
         try {
+            // Get the product to calculate weight
+            Optional<Product> productOpt = productService.getProductById(item.getProductId());
+            if (productOpt.isEmpty()) {
+                System.out.println("❌ Product not found!");
+                return false;
+            }
+
+            Product product = productOpt.get();
+            double itemWeight = product.getWeight() * item.getQuantity();
+
             // Check if weight limit would be exceeded
             if (wouldExceedWeightLimit(docId, item)) {
-                System.out.println("⚠️ Warning: Adding this item would exceed the truck's weight limit.");
+                System.out.println("❌ Adding this quantity would exceed the truck's weight limit!");
                 return false;
             }
 
             // Generate a new item ID
             String itemId = getNextItemId();
+            item = new DeliveredItem(itemId, docId, item.getProductId(), item.getQuantity());
             
             DeliveredItemDTO dto = new DeliveredItemDTO(
                     itemId,

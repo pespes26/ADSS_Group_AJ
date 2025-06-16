@@ -18,5 +18,6 @@ public interface TransportDAO {
     List<TransportDTO> findByTruckPlate(String truckPlate) throws SQLException;
     List<TransportDTO> findByStatus(String status) throws SQLException;
     List<TransportDTO> findActiveTransports() throws SQLException;
+    List<TransportDTO> findActiveTransportsByDriver(String driverId) throws SQLException;
 
 }

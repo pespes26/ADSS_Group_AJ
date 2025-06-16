@@ -12,6 +12,8 @@ import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
 import com.superli.deliveries.domain.core.Driver;
 import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Truck;
+import com.superli.deliveries.domain.core.Transport;
+import com.superli.deliveries.domain.core.TransportStatus;
 
 /**
  * Service layer responsible for business logic related to drivers.
@@ -20,10 +22,12 @@ public class DriverService {
 
     private final DriverDAO driverDAO;
     private final List<String> unavailableDriverIds;
+    private final TransportService transportService;
 
-    public DriverService() {
+    public DriverService(TransportService transportService) {
         this.driverDAO = new DriverDAOImpl();
         this.unavailableDriverIds = new ArrayList<>();
+        this.transportService = transportService;
     }
 
     // Get all drivers from DB
@@ -42,9 +46,20 @@ public class DriverService {
         try {
             return driverDAO.findAvailableDrivers().stream()
                     .map(DriverMapper::fromDTO)
+                    .filter(driver -> !isDriverAssignedToTransport(driver.getDriverId()))
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException("Error getting available drivers", e);
+        }
+    }
+
+    public List<Driver> getUnavailableDrivers() {
+        try {
+            return driverDAO.findUnavailableDrivers().stream()
+                    .map(DriverMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting unavailable drivers", e);
         }
     }
 
@@ -76,22 +91,54 @@ public class DriverService {
         }
     }
 
-    // Mark driver as unavailable (assigned to transport)
-    public void markDriverAsUnavailable(String driverId) {
+    /**
+     * Checks if a driver is assigned to any active transport.
+     * @param driverId The ID of the driver to check
+     * @return true if the driver is assigned to an active transport, false otherwise
+     */
+    public boolean isDriverAssignedToTransport(String driverId) {
         try {
-            driverDAO.updateDriverAvailability(driverId, false);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error marking driver as unavailable: " + driverId, e);
+            List<Transport> transports = transportService.getAllTransports();
+            return transports.stream()
+                    .filter(t -> t.getDriver().getDriverId().equals(driverId))
+                    .anyMatch(t -> t.getStatus() != TransportStatus.COMPLETED && 
+                                 t.getStatus() != TransportStatus.CANCELLED);
+        } catch (Exception e) {
+            throw new RuntimeException("Error checking driver assignment", e);
         }
     }
 
-    // Mark driver as available again
-    public void markDriverAsAvailable(String driverId) {
+    /**
+     * Updates a driver's availability status.
+     * @param driverId The ID of the driver
+     * @param available The new availability status
+     * @throws IllegalStateException if trying to make a driver available while assigned to an active transport
+     */
+    public void updateDriverAvailability(String driverId, boolean available) {
         try {
-            driverDAO.updateDriverAvailability(driverId, true);
+            if (available && isDriverAssignedToTransport(driverId)) {
+                throw new IllegalStateException("Driver is assigned to an active transport and cannot be made available");
+            }
+            driverDAO.updateDriverAvailability(driverId, available);
         } catch (SQLException e) {
-            throw new RuntimeException("Error marking driver as available: " + driverId, e);
+            throw new RuntimeException("Error updating driver availability", e);
         }
+    }
+
+    /**
+     * Marks a driver as unavailable (e.g., when assigned to a transport).
+     * @param driverId The ID of the driver
+     */
+    public void markDriverAsUnavailable(String driverId) {
+        updateDriverAvailability(driverId, false);
+    }
+
+    /**
+     * Marks a driver as available (e.g., when transport is completed/cancelled).
+     * @param driverId The ID of the driver
+     */
+    public void markDriverAsAvailable(String driverId) {
+        updateDriverAvailability(driverId, true);
     }
 
     // Check if driver can drive a specific truck
@@ -106,15 +153,6 @@ public class DriverService {
             d.setLicenseType(licenseType);
             saveDriver(d);
         });
-    }
-
-    // Update driver's availability
-    public void updateDriverAvailability(String Employee_id, boolean available) {
-        try {
-            driverDAO.updateDriverAvailability(Employee_id, available);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating driver availability", e);
-        }
     }
 
     public List<Driver> getDriversByLicenseType(String licenseType) {

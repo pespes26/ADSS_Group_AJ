@@ -23,21 +23,21 @@ public class HRDetailsView {
         while (true) {
             System.out.println("\nWelcome to the Shift Management System");
             System.out.println("Choose login type:");
-            System.out.println("0 - HRManager");
-            System.out.println("1 - Employee");
-            System.out.println("2 - exit");
+            System.out.println("1 - HRManager");
+            System.out.println("2 - Employee");
+            System.out.println("0 - exit");
             System.out.print("Enter choice: ");
 
             String choice = sc.nextLine();
 
             switch (choice) {
-                case "0":
+                case "1":
                     HRManagerMenu();
                     break;
-                case "1":
+                case "2":
                     employeeLoginMenu();
                     break;
-                case "2":
+                case "0":
                     System.out.println("Exiting program. Goodbye!");
                     return;
                 default:

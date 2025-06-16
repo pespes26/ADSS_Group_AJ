@@ -125,12 +125,19 @@ public static void main(String[] args) {
 
     // --- Services ---
     var productService = new ProductService(productDAO);
-    var driverService = new DriverService();
-    var truckService = new TruckService(truckDAO);
     var zoneService = new ZoneService(zoneDAO);
     var siteService = new SiteService(siteDAO, zoneService);
-    var transportService = new TransportService(transportDAO, driverService, truckService, siteService);
     var destinationDocService = new DestinationDocService(destinationDocDAO, siteService);
+    
+    // Create services with null dependencies first
+    var transportService = new TransportService(transportDAO, null, null, siteService, destinationDocService);
+    var truckService = new TruckService(truckDAO, transportService);
+    var driverService = new DriverService(transportService);
+    
+    // Set the circular dependencies
+    transportService.setDriverService(driverService);
+    transportService.setTruckService(truckService);
+    
     var deliveredItemService = new DeliveredItemService(deliveredItemDAO, transportService, productService, destinationDocDAO);
 
     // --- Initialize Data ---

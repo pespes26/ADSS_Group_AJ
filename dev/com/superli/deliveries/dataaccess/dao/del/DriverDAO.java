@@ -12,6 +12,7 @@ public interface DriverDAO {
     DriverDTO save(DriverDTO driver) throws SQLException;
     void delete(String id) throws SQLException;
     List<DriverDTO> findAvailableDrivers() throws SQLException;
+    List<DriverDTO> findUnavailableDrivers() throws SQLException;
     List<DriverDTO> findByLicenseType(String licenseType) throws SQLException;
     Optional<DriverDTO> findByLicenseNumber(String licenseNumber) throws SQLException;
     void updateDriverAvailability(String id, boolean available) throws SQLException;

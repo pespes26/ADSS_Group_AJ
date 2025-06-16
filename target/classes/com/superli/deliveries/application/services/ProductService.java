@@ -3,6 +3,7 @@ package com.superli.deliveries.application.services;
 import com.superli.deliveries.dataaccess.dao.del.ProductDAO;
 import com.superli.deliveries.domain.core.Product;
 import com.superli.deliveries.Mappers.ProductMapper;
+import com.superli.deliveries.dto.del.ProductDTO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -96,6 +97,30 @@ public class ProductService {
         return getAllProducts().stream()
                 .filter(product -> product.getName().toLowerCase().contains(partialName.toLowerCase()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Generates the next available product ID
+     */
+    public String getNextProductId() {
+        try {
+            List<ProductDTO> products = productDAO.findAll();
+            int maxId = 0;
+            for (ProductDTO product : products) {
+                String id = product.getId();
+                if (id != null && id.startsWith("P")) {
+                    try {
+                        int num = Integer.parseInt(id.substring(1));
+                        maxId = Math.max(maxId, num);
+                    } catch (NumberFormatException e) {
+                        // Skip invalid IDs
+                    }
+                }
+            }
+            return String.format("P%03d", maxId + 1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error generating product ID", e);
+        }
     }
 }
 

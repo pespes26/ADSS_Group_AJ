@@ -23,11 +23,11 @@ public class Driver extends Employee {
     public Driver(String id, String fullName, String bankAccount, double salary, int siteId, String employeeTerms,
                   Date employeeStartDate, List<Role> roleQualifications, List<AvailableShifts> availabilityConstraints, Role loginRole, LicenseType licenseType) {
         super(id, fullName, bankAccount, salary, -1, employeeTerms, employeeStartDate, roleQualifications, availabilityConstraints, loginRole);
-        Role r = new Role("Driver");
+        /* Role r = new Role("Driver");
         this.addRoleQualification(r);
         if (getRoleQualifications() == null) {
             setRoleQualifications(new ArrayList<>());
-        }
+        } */
         if (licenseType == null) {
             throw new IllegalArgumentException("License type cannot be null.");
         }

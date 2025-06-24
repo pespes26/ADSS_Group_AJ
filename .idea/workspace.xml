@@ -9,42 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="fixing some bugs">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deliveries.db" beforeDir="false" afterPath="$PROJECT_DIR$/deliveries.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftRoleMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/Mappers/ShiftRoleMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/MainApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeManagmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/EmployeeManagmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ManagerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/RoleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/RoleController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ShiftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/ShiftController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/RoleDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/RoleDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAOImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAOImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/AvailableShifts.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/AvailableShifts.java" afterDir="false" />
+    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="HR changes">
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Employee.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/HRManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Shift.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ArchivedEmployeeDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ArchivedEmployeeDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ArchivedShiftDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ArchivedShiftDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ShiftDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ShiftDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ShiftRoleDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/dto/HR/ShiftRoleDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/EmployeeDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/EmployeeDetailsView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/HRDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/HRDetailsView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/util/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/util/Database.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedShiftMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedShiftMapper.class" afterDir="false" />
@@ -300,7 +267,6 @@
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TransportTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TransportTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TruckTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TruckTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ZoneTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ZoneTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/com/superli/deliveries/ShiftAssignmentTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/com/superli/deliveries/ShiftAssignmentTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -574,7 +540,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749245518279</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="HR changes">
+      <option name="closed" value="true" />
+      <created>1750755241232</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1750755241232</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -598,7 +572,8 @@
     <MESSAGE value="fixed employee+shifts+mainMenu&#10;still need to fix:&#10;driver + employee (the extends part)" />
     <MESSAGE value="fixed tests&#10;left: extends for driver" />
     <MESSAGE value="fixing some bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing some bugs" />
+    <MESSAGE value="HR changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="HR changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

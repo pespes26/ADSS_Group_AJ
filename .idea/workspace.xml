@@ -9,265 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="HR changes">
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/controllers/DriverController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/domain/core/Driver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedEmployeeMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedShiftMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedShiftMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedShiftMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedTransportMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedTransportMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ArchivedTransportMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/AvailableShiftMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/AvailableShiftMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/AvailableShiftMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DeliveredItemMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DeliveredItemMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DeliveredItemMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DestinationDocMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DestinationDocMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DestinationDocMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DriverMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DriverMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/DriverMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeRoleMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeRoleMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/EmployeeRoleMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ProductMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ProductMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ProductMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/RoleMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/RoleMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/RoleMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftRoleMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftRoleMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ShiftRoleMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/SiteMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/SiteMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/SiteMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TransportMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TransportMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TransportMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TruckMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TruckMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/TruckMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ZoneMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ZoneMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/Mappers/ZoneMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/MockDataInitializer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/Main$Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/Main$Role.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/MainApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/MainApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/MainApp.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DeliveredItemController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DeliveredItemController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DeliveredItemController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DestinationDocController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DestinationDocController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DestinationDocController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DriverController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DriverController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/DriverController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeManagmentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeManagmentController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/EmployeeManagmentController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/MainMenuController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/MainMenuController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/MainMenuController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ManagerController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ManagerController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ManagerController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ProductController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ProductController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ProductController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/RoleController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/RoleController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/RoleController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ShiftController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ShiftController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ShiftController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/SiteController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/SiteController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/SiteController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController$CompatiblePair.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController$CompatiblePair.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TransportController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TruckController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TruckController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/TruckController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ZoneController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ZoneController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/controllers/ZoneController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DeliveredItemService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DeliveredItemService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DeliveredItemService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DestinationDocService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DestinationDocService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DestinationDocService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DriverService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DriverService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/DriverService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/EmployeeService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/EmployeeService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/EmployeeService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ProductService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ProductService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ProductService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/SiteService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/SiteService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/SiteService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TransportService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TransportService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TransportService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TruckService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TruckService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/TruckService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ZoneService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ZoneService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/application/services/ZoneService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/config/DataInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/config/DataInitializer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/config/DataInitializer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedEmployeeDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ArchivedShiftDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/AvailableShiftDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/AvailableShiftDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/AvailableShiftDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/AvailableShiftDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/EmployeeRoleDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/RoleDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/RoleDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/RoleDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/RoleDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/HR/ShiftRoleDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ArchivedTransportDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DeliveredItemDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DeliveredItemDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DeliveredItemDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DeliveredItemDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DestinationDocDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DestinationDocDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DestinationDocDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DestinationDocDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DriverDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DriverDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DriverDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/DriverDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ProductDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ProductDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ProductDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ProductDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/SiteDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/SiteDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/SiteDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/SiteDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TransportDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TransportDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TransportDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TransportDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TruckDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TruckDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TruckDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/TruckDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ZoneDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ZoneDAOImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ZoneDAOImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dataaccess/dao/del/ZoneDAOImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedEmployee.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedEmployee.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedEmployee.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedShifts.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedShifts.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedShifts.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedTransport.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedTransport.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ArchivedTransport.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/AvailableShifts.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/AvailableShifts.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/AvailableShifts.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveredItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveredItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DeliveredItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationDoc.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationDoc.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationDoc.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/DestinationStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Driver.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Driver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Driver.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Employee.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Employee.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Employee.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/HRManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/HRManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/HRManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/LicenseType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/LicenseType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/LicenseType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Product.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Product.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Product.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Role.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Role.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Shift.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Shift.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Shift.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ShiftType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ShiftType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/ShiftType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Site.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Site.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Site.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Transport.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Transport.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Transport.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/TransportStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/TransportStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/TransportStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Truck.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Truck.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Truck.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Zone.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Zone.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/domain/core/Zone.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedEmployeeDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedEmployeeDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedEmployeeDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedShiftDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedShiftDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ArchivedShiftDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/AvailableShiftDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/AvailableShiftDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/AvailableShiftDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeRoleDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeRoleDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/EmployeeRoleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/RoleDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/RoleDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/RoleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftRoleDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftRoleDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/HR/ShiftRoleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ArchivedTransportDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ArchivedTransportDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ArchivedTransportDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DeliveredItemDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DeliveredItemDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DeliveredItemDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DestinationDocDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DestinationDocDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DestinationDocDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DriverDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DriverDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/DriverDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ProductDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ProductDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ProductDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/SiteDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/SiteDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/SiteDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TransportDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TransportDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TransportDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TruckDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TruckDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/TruckDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ZoneDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ZoneDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/dto/del/ZoneDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/exceptions/DataAccessException.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/exceptions/DataAccessException.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/exceptions/DataAccessException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeSummaryDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeSummaryDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/EmployeeSummaryDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/HRDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/HRDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/HR/HRDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DeliveredItemDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DeliveredItemDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DeliveredItemDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DestinationDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DestinationDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DestinationDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DriverDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DriverDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/DriverDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/SiteDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/SiteDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/SiteDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportSummaryView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportSummaryView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TransportSummaryView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TruckDetailsView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TruckDetailsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/TruckDetailsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/ZoneView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/ZoneView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/presentation/del/ZoneView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/util/Database.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/superli/deliveries/util/Database.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/superli/deliveries/util/Database.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ControllerEmployeeTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ControllerEmployeeTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ControllerManagerTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ControllerManagerTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/DriverTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/DriverTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/HRLogisticsIntegrationTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/HRLogisticsIntegrationTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/HRManagerTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/HRManagerTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ProductTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ProductTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/RoleDAOTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/RoleDAOTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ShiftAssignmentTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ShiftAssignmentTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ShiftTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ShiftTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/SiteTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/SiteTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TransportTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TransportTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TruckTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/TruckTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ZoneTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/superli/deliveries/ZoneTest.class" afterDir="false" />
-    </list>
+    <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="HR changes 2" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -548,7 +290,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750755241232</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="HR changes 2">
+      <option name="closed" value="true" />
+      <created>1750758138352</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1750758138352</updated>
+    </task>
+    <task id="LOCAL-00011" summary="HR changes 2">
+      <option name="closed" value="true" />
+      <created>1750758188526</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1750758188526</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -573,7 +331,8 @@
     <MESSAGE value="fixed tests&#10;left: extends for driver" />
     <MESSAGE value="fixing some bugs" />
     <MESSAGE value="HR changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="HR changes" />
+    <MESSAGE value="HR changes 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="HR changes 2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

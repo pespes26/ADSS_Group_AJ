@@ -2,6 +2,7 @@ package com.superli.deliveries;
 
 import com.superli.deliveries.dataaccess.dao.HR.ShiftDAO;
 import com.superli.deliveries.dataaccess.dao.HR.ShiftDAOImpl;
+import com.superli.deliveries.domain.core.ShiftType;
 import org.junit.jupiter.api.*;
 
 import java.sql.*;
@@ -43,13 +44,15 @@ public class ShiftAssignmentTest {
         stmt.execute("""
             CREATE TABLE shift_assignments (
                 employee_id TEXT NOT NULL,
-                day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
-                shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
-                date TEXT NOT NULL,
-                role_id INTEGER NOT NULL,
-                PRIMARY KEY (employee_id, day_of_week, shift_type),
+                day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')),
+                shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')),
+                date TEXT,
+                role_id INTEGER,
+                site_id INTEGER NOT NULL,
+                PRIMARY KEY (employee_id, day_of_week, shift_type, site_id),
                 FOREIGN KEY (employee_id) REFERENCES employees(id),
-                FOREIGN KEY (role_id) REFERENCES roles(id)
+                FOREIGN KEY (role_id) REFERENCES roles(id),
+                FOREIGN KEY (site_id) REFERENCES sites(site_id)
             );
         """);
 
@@ -65,7 +68,7 @@ public class ShiftAssignmentTest {
 
     @Test
     public void testSaveAssignment_insertsRecord() throws SQLException {
-        shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-15", 1);
+        shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-15", 1,1);
 
         PreparedStatement ps = conn.prepareStatement("SELECT * FROM shift_assignments");
         ResultSet rs = ps.executeQuery();
@@ -82,10 +85,10 @@ public class ShiftAssignmentTest {
 
     @Test
     public void testSaveAssignment_duplicatePrimaryKey_throwsException() throws SQLException {
-        shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-15", 1);
+        shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-15", 1,1);
 
         SQLException thrown = assertThrows(SQLException.class, () -> {
-            shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-16", 1);
+            shiftDAO.saveAssignment("123456789", "SUNDAY", "MORNING", "2025-06-16", 1,1);
         });
 
         assertTrue(thrown.getMessage().contains("UNIQUE") || thrown.getMessage().contains("PRIMARY"));
@@ -94,7 +97,7 @@ public class ShiftAssignmentTest {
     @Test
     public void testSaveAssignment_invalidShiftType_fails() {
         SQLException thrown = assertThrows(SQLException.class, () -> {
-            shiftDAO.saveAssignment("123456789", "SUNDAY", "NIGHT", "2025-06-15", 1);
+            shiftDAO.saveAssignment("123456789", "SUNDAY", "NIGHT", "2025-06-15", 1,1);
         });
 
         assertTrue(thrown.getMessage().contains("CHECK constraint failed") || thrown.getMessage().contains("shift_type"));
@@ -103,7 +106,7 @@ public class ShiftAssignmentTest {
     @Test
     public void testSaveAssignment_invalidDayOfWeek_fails() {
         SQLException thrown = assertThrows(SQLException.class, () -> {
-            shiftDAO.saveAssignment("123456789", "FUNDAY", "MORNING", "2025-06-15", 1);
+            shiftDAO.saveAssignment("123456789", "FUNDAY", "MORNING", "2025-06-15", 1,1);
         });
 
         assertTrue(thrown.getMessage().contains("CHECK constraint failed") || thrown.getMessage().contains("day_of_week"));
@@ -111,54 +114,71 @@ public class ShiftAssignmentTest {
 
     @Test
     public void testGetDriversByDate() throws SQLException {
-
         Statement stmt = conn.createStatement();
-        stmt.execute("DROP TABLE IF EXISTS roles");
-        stmt.execute("""
-            CREATE TABLE roles (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE
-            );
-        """);
-        stmt.execute("INSERT INTO roles (id, name) VALUES (1, 'Driver'), (2, 'Warehouse Worker')");
 
+
+        stmt.execute("DROP TABLE IF EXISTS roles");
+        stmt.execute("DROP TABLE IF EXISTS employees");
+        stmt.execute("DROP TABLE IF EXISTS shift_assignments");
+
+        stmt.execute("""
+        CREATE TABLE roles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE
+        );
+    """);
+
+        stmt.execute("""
+        CREATE TABLE employees (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            bank_account TEXT,
+            salary REAL,
+            employment_terms TEXT,
+            start_date TEXT
+        );
+    """);
+
+        stmt.execute("""
+        CREATE TABLE shift_assignments (
+            employee_id TEXT NOT NULL,
+            day_of_week TEXT,
+            shift_type TEXT,
+            date TEXT,
+            role_id INTEGER,
+            site_id INTEGER,
+            FOREIGN KEY (employee_id) REFERENCES employees(id),
+            FOREIGN KEY (role_id) REFERENCES roles(id)
+        );
+    """);
+
+
+        stmt.execute("INSERT INTO roles (id, name) VALUES (1, 'Driver'), (2, 'Warehouse Worker')");
 
         stmt.execute("""
         INSERT INTO employees (id, name, bank_account, salary, employment_terms, start_date) VALUES
         ('111111111', 'Driver One', '111', 5000, 'Full-Time', '2023-01-01'),
         ('222222222', 'Driver Two', '222', 5200, 'Full-Time', '2023-02-01'),
-        ('333333333', 'Warehouse worker', '333', 4800, 'Part-Time', '2024-01-15');
+        ('333333333', 'Warehouse Worker', '333', 4800, 'Part-Time', '2024-01-15');
     """);
-
 
         stmt.execute("""
-        INSERT INTO shift_assignments (employee_id, day_of_week, shift_type, date, role_id) VALUES
-        ('111111111', 'SUNDAY', 'MORNING', '2025-06-15', 1),
-        ('222222222', 'SUNDAY', 'MORNING', '2025-06-15', 1),
-        ('333333333', 'SUNDAY', 'MORNING', '2025-06-15', 2);
+        INSERT INTO shift_assignments (employee_id, day_of_week, shift_type, date, role_id,site_id) VALUES
+        ('111111111', 'SUNDAY', 'MORNING', '2025-06-15', 1,1),
+        ('222222222', 'SUNDAY', 'MORNING', '2025-06-15', 1,1),
+        ('333333333', 'SUNDAY', 'MORNING', '2025-06-15', 2,1);
     """);
 
-        // ביצוע שאילתה – שליפת כל הדרייברים למשמרת בתאריך 2025-06-15
-        PreparedStatement ps = conn.prepareStatement("""
-        SELECT e.id, e.name
-        FROM shift_assignments sa
-        JOIN employees e ON sa.employee_id = e.id
-        JOIN roles r ON sa.role_id = r.id
-        WHERE sa.date = ? AND r.name = 'Driver'
-    """);
-        ps.setString(1, "2025-06-15");
-        ResultSet rs = ps.executeQuery();
 
+        ShiftDAOImpl dao = new ShiftDAOImpl(conn);
+        List<String> drivers = dao.getEmployeeIdsByRoleAndDateAndType("Driver", "2025-06-15", ShiftType.MORNING,1);
 
-        int count = 0;
-        while (rs.next()) {
-            String id = rs.getString("id");
-            String name = rs.getString("name");
-            System.out.println("Found driver: " + id + " - " + name);
-            count++;
+        for (String id : drivers) {
+            System.out.println("Found driver: " + id);
         }
 
-        assertEquals(2, count, "Should find 2 drivers for that shift and date.");
+        assertEquals(2, drivers.size(), "Should find 2 drivers for that shift and date.");
     }
+
 
 }

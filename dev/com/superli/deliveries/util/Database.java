@@ -97,22 +97,24 @@ public class Database {
                         shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
                         date TEXT NOT NULL,
                         role_id INTEGER NOT NULL,
-                        PRIMARY KEY (employee_id, day_of_week, shift_type),
+                        site_id INTEGER NOT NULL,
+                        PRIMARY KEY (employee_id, day_of_week, shift_type,site_id),
                         FOREIGN KEY (employee_id) REFERENCES employees(id),
-                        FOREIGN KEY (role_id) REFERENCES roles(id)
+                        FOREIGN KEY (role_id) REFERENCES roles(id),
+                        FOREIGN KEY (site_id) REFERENCES sites(site_id)
                     );""");
 
-                // Create shift_required_roles table
                 st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS shift_required_roles (
                         day_of_week TEXT CHECK(day_of_week IN ('SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY')) NOT NULL,
                         shift_type TEXT CHECK(shift_type IN ('MORNING','EVENING')) NOT NULL,
                         role_id INTEGER NOT NULL,
+                        site_id INTEGER NOT NULL,
                         required_count INTEGER NOT NULL CHECK(required_count >= 1),
-                        PRIMARY KEY (day_of_week, shift_type, role_id),
+                        PRIMARY KEY (day_of_week, shift_type, role_id,site_id),
                         FOREIGN KEY (role_id) REFERENCES roles(id)
+                        
                     );""");
-
                 // Create driver table
                 st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS drivers (

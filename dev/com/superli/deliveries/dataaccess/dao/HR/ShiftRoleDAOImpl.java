@@ -19,44 +19,55 @@ public class ShiftRoleDAOImpl implements ShiftRoleDAO {
     @Override
     public void save(ShiftRoleDTO dto) throws SQLException {
         String sql = """
-            INSERT OR REPLACE INTO shift_required_roles (day_of_week, shift_type, role_id, required_count)
-            VALUES (?, ?, ?, ?)
-        """;
+        INSERT INTO shift_required_roles 
+        (day_of_week, shift_type, role_id, site_id, required_count)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(day_of_week, shift_type, role_id, site_id) 
+        DO UPDATE SET required_count = excluded.required_count
+    """;
 
-        try (PreparedStatement ps = Database.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dto.getDayOfWeek().toUpperCase());
             ps.setString(2, dto.getShiftType().toUpperCase());
             ps.setInt(3, dto.getRoleId());
-            ps.setInt(4, dto.getRequiredCount());
+            ps.setInt(4, dto.getSiteId());
+            ps.setInt(5, dto.getRequiredCount());
             ps.executeUpdate();
         }
     }
 
-    @Override
-    public void delete(String dayOfWeek, String shiftType, int roleId) throws SQLException {
-        String sql = "DELETE FROM shift_required_roles WHERE day_of_week = ? AND shift_type = ? AND role_id = ?";
 
-        try (PreparedStatement ps = Database.getConnection().prepareStatement(sql)) {
+    @Override
+    public void delete(String dayOfWeek, String shiftType, int roleId, int siteId) throws SQLException {
+        String sql = """
+        DELETE FROM shift_required_roles
+        WHERE day_of_week = ? AND shift_type = ? AND role_id = ? AND site_id = ?
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dayOfWeek.toUpperCase());
             ps.setString(2, shiftType.toUpperCase());
             ps.setInt(3, roleId);
+            ps.setInt(4, siteId);
             ps.executeUpdate();
         }
     }
+
 
     @Override
     public List<ShiftRoleDTO> findAll() throws SQLException {
         List<ShiftRoleDTO> results = new ArrayList<>();
         String sql = "SELECT * FROM shift_required_roles";
 
-        try (Statement st = Database.getConnection().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 results.add(new ShiftRoleDTO(
                         rs.getString("day_of_week"),
                         rs.getString("shift_type"),
                         rs.getInt("role_id"),
+                        rs.getInt("site_id"),
                         rs.getInt("required_count")
                 ));
             }
@@ -66,13 +77,17 @@ public class ShiftRoleDAOImpl implements ShiftRoleDAO {
     }
 
     @Override
-    public ShiftRoleDTO findByKey(String dayOfWeek, String shiftType, int roleId) throws SQLException {
-        String sql = "SELECT * FROM shift_required_roles WHERE day_of_week = ? AND shift_type = ? AND role_id = ?";
+    public ShiftRoleDTO findByKey(String dayOfWeek, String shiftType, int roleId, int siteId) throws SQLException {
+        String sql = """
+        SELECT * FROM shift_required_roles
+        WHERE day_of_week = ? AND shift_type = ? AND role_id = ? AND site_id = ?
+    """;
 
-        try (PreparedStatement ps = Database.getConnection().prepareStatement(sql)) {
-            ps.setString(1, dayOfWeek);
-            ps.setString(2, shiftType);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, dayOfWeek.toUpperCase());
+            ps.setString(2, shiftType.toUpperCase());
             ps.setInt(3, roleId);
+            ps.setInt(4, siteId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -80,7 +95,8 @@ public class ShiftRoleDAOImpl implements ShiftRoleDAO {
                             rs.getString("day_of_week"),
                             rs.getString("shift_type"),
                             rs.getInt("role_id"),
-                            rs.getInt("required_count")
+                            rs.getInt("required_count"),
+                            rs.getInt("site_id")
                     );
                 } else {
                     return null;
@@ -88,14 +104,21 @@ public class ShiftRoleDAOImpl implements ShiftRoleDAO {
             }
         }
     }
+
     @Override
-    public Map<Integer, Integer> getRequiredRolesForShift(String dayOfWeek, String shiftType) throws SQLException {
+    public Map<Integer, Integer> getRequiredRolesForShift(String dayOfWeek, String shiftType, int siteId) throws SQLException {
         Map<Integer, Integer> requiredRoles = new HashMap<>();
 
-        String sql = "SELECT role_id, required_count FROM shift_required_roles WHERE day_of_week = ? AND shift_type = ?";
+        String sql = """
+        SELECT role_id, required_count
+        FROM shift_required_roles
+        WHERE day_of_week = ? AND shift_type = ? AND site_id = ?
+    """;
+
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dayOfWeek.toUpperCase());
             ps.setString(2, shiftType.toUpperCase());
+            ps.setInt(3, siteId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -108,5 +131,18 @@ public class ShiftRoleDAOImpl implements ShiftRoleDAO {
 
         return requiredRoles;
     }
+
+    @Override
+    public void deleteAllForShift(String dayOfWeek, String shiftType, int siteId) throws SQLException {
+        String sql = "DELETE FROM shift_required_roles WHERE day_of_week = ? AND shift_type = ? AND site_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, dayOfWeek.toUpperCase());
+            ps.setString(2, shiftType.toUpperCase());
+            ps.setInt(3, siteId);
+            ps.executeUpdate();
+        }
+    }
+
 
 }

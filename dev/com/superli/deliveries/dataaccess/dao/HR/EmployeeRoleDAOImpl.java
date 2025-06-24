@@ -19,6 +19,10 @@ public class EmployeeRoleDAOImpl implements EmployeeRoleDAO {
         }
     }
 
+    public EmployeeRoleDAOImpl(Connection conn) {
+        this.conn = conn;
+    }
+
     @Override
     public void assignRole(int employeeId, int roleId) throws SQLException {
         String sql = """
@@ -69,4 +73,14 @@ public class EmployeeRoleDAOImpl implements EmployeeRoleDAO {
 
         return roles;
     }
+
+    @Override
+    public void removeRolesByEmployeeId(int employeeId) throws SQLException {
+        String sql = "DELETE FROM employee_roles WHERE employee_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ps.executeUpdate();
+        }
+    }
+
 }

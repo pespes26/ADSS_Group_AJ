@@ -5,14 +5,16 @@ public class ShiftRoleDTO {
     private String shiftType;
     private int roleId;
     private int requiredCount;
+    private int siteId;
 
     public ShiftRoleDTO() {}
 
-    public ShiftRoleDTO(String dayOfWeek, String shiftType, int roleId, int requiredCount) {
+    public ShiftRoleDTO(String dayOfWeek, String shiftType, int roleId, int requiredCount, int siteId) {
         this.dayOfWeek = dayOfWeek;
         this.shiftType = shiftType;
         this.roleId = roleId;
         this.requiredCount = requiredCount;
+        this.siteId = siteId;
     }
 
     public String getDayOfWeek() { return dayOfWeek; }
@@ -26,4 +28,7 @@ public class ShiftRoleDTO {
 
     public int getRequiredCount() { return requiredCount; }
     public void setRequiredCount(int requiredCount) { this.requiredCount = requiredCount; }
+
+    public int getSiteId() { return siteId; }
+    public void setSiteId(int siteId) { this.siteId = siteId; }
 }

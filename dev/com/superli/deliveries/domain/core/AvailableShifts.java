@@ -21,4 +21,17 @@ public class AvailableShifts {
     public ShiftType getShift() {
         return shift;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AvailableShifts)) return false;
+        AvailableShifts that = (AvailableShifts) o;
+        return day == that.day && shift == that.shift;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(day, shift);
+    }
 }

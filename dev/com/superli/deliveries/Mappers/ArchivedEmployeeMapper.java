@@ -12,8 +12,7 @@ public class ArchivedEmployeeMapper {
                 employee.getSalary(),
                 employee.getEmploymentTerms(),
                 employee.getStartDate(),
-                employee.getSiteId(),
-                archivedDate
+                employee.getSiteId()
         );
     }
 }

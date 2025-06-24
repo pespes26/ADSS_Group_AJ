@@ -29,7 +29,7 @@ public class ArchivedShiftDAOImpl implements ArchivedShiftDAO {
                 String employeeId = rs.getString("employee_id");
                 DayOfWeek dayOfWeek = DayOfWeek.valueOf(rs.getString("day_of_week"));
                 ShiftType shiftType = ShiftType.valueOf(rs.getString("shift_type"));
-                Date date = java.sql.Date.valueOf(rs.getString("date")); // <-- תיקון
+                Date date = java.sql.Date.valueOf(rs.getString("date"));
                 int roleId = rs.getInt("role_id");
 
                 ArchivedShiftDTO shift = new ArchivedShiftDTO(employeeId, dayOfWeek, shiftType, date, roleId);

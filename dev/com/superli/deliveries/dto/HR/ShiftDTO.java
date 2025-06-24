@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ShiftDTO {
-    private int id;
+    private int siteId;
     private Date shiftDate;
     private String shiftType;
     private String shiftDay;
@@ -16,9 +16,9 @@ public class ShiftDTO {
 
     public ShiftDTO() {}
 
-    public ShiftDTO(int id, Date shiftDate, String shiftType, String shiftDay,
+    public ShiftDTO(int siteId, Date shiftDate, String shiftType, String shiftDay,
                     List<Integer> requiredRoleIds, Map<Integer, Integer> assignedEmployees) {
-        this.id = id;
+        this.siteId = siteId;
         this.shiftDate = shiftDate;
         this.shiftType = shiftType;
         this.shiftDay = shiftDay;
@@ -26,8 +26,9 @@ public class ShiftDTO {
         this.assignedEmployees = assignedEmployees;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getSiteId() { return siteId; }
+    public void setSiteId(int siteId) { this.siteId = siteId; }
+
 
     public Date getShiftDate() { return shiftDate; }
     public void setShiftDate(Date shiftDate) { this.shiftDate = shiftDate; }

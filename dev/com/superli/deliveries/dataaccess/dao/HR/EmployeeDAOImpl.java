@@ -20,6 +20,11 @@ public class EmployeeDAOImpl implements EmployeeDAO {
         }
     }
 
+    public EmployeeDAOImpl(Connection conn) {
+        this.conn = conn;
+    }
+
+
     @Override
     public Optional<EmployeeDTO> findById(String id) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id = ?";
@@ -90,7 +95,7 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
             String archiveSql = """
                 INSERT INTO archived_employees 
-                (id, name, bank_account, salary, employment_terms, start_date, site_id)
+                (employee_id, name, bank_account, salary, employment_terms, start_date, site_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
             try (PreparedStatement archivePs = conn.prepareStatement(archiveSql)) {
@@ -153,27 +158,4 @@ public class EmployeeDAOImpl implements EmployeeDAO {
         }
         return employees;
     }
-
-    public List<EmployeeDTO> findAvailableDrivers() throws SQLException {
-        List<EmployeeDTO> employees = new ArrayList<>();
-        String sql = """
-        SELECT e.* 
-        FROM employees e
-        JOIN employee_roles er ON e.id = er.employee_id
-        WHERE er.role_name = ? AND e.available = 1
-    """;
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "DRIVER");
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                employees.add(fromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding available drivers", e);
-        }
-        return employees;
-    }
-
 }

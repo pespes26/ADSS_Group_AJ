@@ -1,12 +1,14 @@
 package com.superli.deliveries.presentation.HR;
 
+import com.superli.deliveries.application.services.RoleService;
+import com.superli.deliveries.application.services.ShiftService;
 import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.application.controllers.*;
+import com.superli.deliveries.dto.HR.ArchivedEmployeeDTO;
+import com.superli.deliveries.dto.HR.ArchivedShiftDTO;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class HRDetailsView {
 
@@ -23,21 +25,21 @@ public class HRDetailsView {
         while (true) {
             System.out.println("\nWelcome to the Shift Management System");
             System.out.println("Choose login type:");
-            System.out.println("1 - HRManager");
-            System.out.println("2 - Employee");
-            System.out.println("0 - exit");
+            System.out.println("0 - HRManager");
+            System.out.println("1 - Employee");
+            System.out.println("2 - exit");
             System.out.print("Enter choice: ");
 
             String choice = sc.nextLine();
 
             switch (choice) {
-                case "1":
+                case "0":
                     HRManagerMenu();
                     break;
-                case "2":
+                case "1":
                     employeeLoginMenu();
                     break;
-                case "0":
+                case "2":
                     System.out.println("Exiting program. Goodbye!");
                     return;
                 default:
@@ -56,10 +58,10 @@ public class HRDetailsView {
             return;
         }
         try {
-            ShiftController shiftRoleService = new ShiftController();
-            ShiftController.ensureSystemRolesExist();
+
+            ShiftService.ensureSystemRolesExist();
         } catch (Exception e) {
-            System.out.println("❌ Failed to ensure system roles: " + e.getMessage());
+            System.out.println("Failed to ensure system roles: " + e.getMessage());
         }
         while (true) {
             System.out.println("\n--- HR Manager Menu ---");
@@ -181,7 +183,8 @@ public class HRDetailsView {
 
                 System.out.print("Enter employment terms: ");
                 String employeeTerms = sc.nextLine();
-
+                LicenseType licenseTypeIfNeeded = null;
+                boolean isDriver = false;
                 List<Role> roleQualifications = new ArrayList<>();
                 System.out.println("Enter role qualifications (type 'done' to finish):");
                 while (true) {
@@ -202,25 +205,26 @@ public class HRDetailsView {
                     } else {
                         System.out.println("Invalid role.");
                     }
-                }
+                    isDriver = roleQualifications.stream()
+                            .anyMatch(r -> r.getRoleName().equalsIgnoreCase("driver"));
 
-                boolean isDriver = roleQualifications.stream()
-                        .anyMatch(r -> r.getRoleName().equalsIgnoreCase("driver"));
 
-                LicenseType licenseTypeIfNeeded = null;
-
-                if (isDriver) {
-                    System.out.println("Enter license type for driver (B, C, C1, C2, E): ");
-                    while (true) {
-                        try {
-                            String licenseInput = sc.nextLine().trim().toUpperCase();
-                            licenseTypeIfNeeded = LicenseType.valueOf(licenseInput);
-                            break;
-                        } catch (IllegalArgumentException e) {
-                            System.out.println("Invalid license type. Please enter one of: B, C, C1, C2, E.");
+                    if (isDriver) {
+                        System.out.println("Enter license type for driver (B, C, C1, C2, E): ");
+                        while (true) {
+                            try {
+                                String licenseInput = sc.nextLine().trim().toUpperCase();
+                                licenseTypeIfNeeded = LicenseType.valueOf(licenseInput);
+                                break;
+                            } catch (IllegalArgumentException e) {
+                                System.out.println("Invalid license type. Please enter one of: B, C, C1, C2, E.");
+                            }
                         }
                     }
+
                 }
+
+
 
                 String result = ManagerController.addNewEmployee(
                         id, fullName, bankAccount, salary, site, employeeTerms,
@@ -266,12 +270,18 @@ public class HRDetailsView {
 
             case "4":
                 ManagerController.editEmployee(sc);
+
                 break;
             case "5":
-                ManagerController.printEmployeeById(sc);
+                System.out.print("Enter Employee ID to display: ");
+                String e_id = sc.nextLine();
+                System.out.println(ManagerController.printEmployeeById(e_id));
                 break;
             case "6":
-                hr.printEmployees();
+
+                for (Employee emp: hr.getEmployees()) {
+                    System.out.println(emp.toString());
+                }
                 break;
             default:
                 System.out.println("Invalid action in Employee Management.");
@@ -300,11 +310,9 @@ public class HRDetailsView {
                 }
                 if (!existsSM) {
                     ManagerController.getHRManager().addRole(new Role("shift manager"));
-                    System.out.println("System role 'Shift Manager' added automatically.");
                 }
                 if (!existsTM) {
                     ManagerController.getHRManager().addRole(new Role("transportation manager"));
-                    System.out.println("System role 'Transportation Manager' added automatically.");
                 }
 
                 // Repeated role creation by user
@@ -323,11 +331,96 @@ public class HRDetailsView {
                 break;
 
             case "2":
-                ManagerController.createShiftsForTheWeek(sc);
+                System.out.println(ManagerController.createShiftsForTheWeek());
                 break;
             case "3":
-                ShiftController.defineRolesForSpecificShift(sc);
+                List<Shift> shifts = hr.getAllShifts();
+
+                if (shifts.isEmpty()) {
+                    System.out.println("No shifts available.");
+                    break;
+                }
+
+                System.out.print("Enter Site ID: ");
+                String input = sc.nextLine().trim();
+                int siteId = Integer.parseInt(input);
+
+                System.out.println("All shifts for next week:");
+                for (int i = 0; i < Math.min(14, shifts.size()); i++) {
+                    Shift s = shifts.get(i);
+                    System.out.println((i + 1) + ". " + s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
+                }
+
+
+
+                int index;
+                Shift selectedShift;
+                while (true) {
+                    System.out.print("Choose a shift to define required roles: ");
+                    try {
+                        index = Integer.parseInt(sc.nextLine());
+                        if (index <= 0 || index > shifts.size()) {
+                            System.out.println("Invalid shift index.");
+                        } else {
+                            selectedShift = shifts.get(index - 1);
+                            break;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid number.");
+                    }
+                }
+
+                List<String> existingRoleNames = RoleService.getAllRoleNames();
+
+                Map<String, Integer> requiredRoles = new HashMap<>();
+                System.out.println("Enter required roles for this shift (type 'done' to finish):");
+
+                while (true) {
+                    System.out.print("Role name: ");
+                    String roleName = sc.nextLine().trim();
+
+                    if (roleName.equalsIgnoreCase("done")) break;
+
+                    if (!existingRoleNames.contains(roleName.toLowerCase())) {
+                        System.out.println("Role not found. Please enter a valid existing role.");
+                        continue;
+                    }
+
+                    while (true) {
+                        System.out.print("Required number of employees: ");
+                        try {
+                            int count = Integer.parseInt(sc.nextLine());
+                            if (count < 1) {
+                                System.out.println("Count must be at least 1.");
+                                continue;
+                            }
+                            requiredRoles.put(roleName, count);
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid number.");
+                        }
+                    }
+                }
+
+                if (!requiredRoles.isEmpty()) {
+                    try {
+                        ManagerController.defineRolesForSpecificShift(
+                                selectedShift.getShiftDay(),
+                                selectedShift.getShiftType(),
+                                requiredRoles,
+                                siteId
+                        );
+                        System.out.println("Roles defined successfully for the selected shift.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("Unexpected error: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("No roles were defined.");
+                }
                 break;
+
             case "4":
                 hr.printRoles();
                 break;
@@ -355,7 +448,10 @@ public class HRDetailsView {
                     ManagerController.removeEmployeeFromShift(sc);
                     break;
                 case "3":
-                    ManagerController.viewAssignedShifts();
+                    List<String> assignedShiftDetails = ManagerController.viewAssignedShifts();
+                    for (String line : assignedShiftDetails) {
+                        System.out.println(line);
+                    }
                     break;
                 case "0":
                     return;
@@ -375,24 +471,24 @@ public class HRDetailsView {
 
             switch (assignChoice) {
                 case "1":
-                    List<Shift> archivedShifts = ManagerController.displayArchivedShifts();
+                    List<ArchivedShiftDTO> archivedShifts = ArchiveController.getAllArchivedShifts();
                     if (archivedShifts.isEmpty()) {
                         System.out.println("No archived shifts available.");
                     } else {
                         System.out.println("--- Archived Shifts ---");
-                        for (Shift s : archivedShifts) {
-                            System.out.println(s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
+                        for (ArchivedShiftDTO s : archivedShifts) {
+                            System.out.println(s.getDate() + " - " + s.getDayOfWeek() + " - " + s.getShiftType());
                         }
                     }
                     break;
                 case "2":
-                    List<Employee> archivedEmployees = ManagerController.displayArchivedEmployees();
+                    List<ArchivedEmployeeDTO> archivedEmployees = ArchiveController.getAllArchivedEmployees();
                     if (archivedEmployees.isEmpty()) {
                         System.out.println("No archived employees available.");
                     } else {
                         System.out.println("--- Archived Employees ---");
-                        for (Employee e : archivedEmployees) {
-                            System.out.println("Name: " + e.getFullName() + ", ID: " + e.getId());
+                        for (ArchivedEmployeeDTO e : archivedEmployees) {
+                            System.out.println("Name: " + e.getFullName() + ", ID: " + e.getEmployeeId());
                         }
                     }
                     break;

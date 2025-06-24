@@ -1,5 +1,6 @@
 package com.superli.deliveries.domain.core;
 
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.Date;
 import java.util.List;
@@ -28,8 +29,8 @@ public class Employee {
         this.siteId = siteId; // new
         this.employeeTerms = employeeTerms;
         this.employeeStartDate = employeeStartDate;
-        this.roleQualifications = roleQualifications;
-        this.availabilityConstraints = availabilityConstraints;
+        this.roleQualifications = roleQualifications != null ? roleQualifications : new java.util.ArrayList<>();
+        this.availabilityConstraints = availabilityConstraints != null ? availabilityConstraints : new java.util.ArrayList<>();
         //this.activeWorker = activeWorker;
         //this.loginRole = loginRole;
     }
@@ -93,6 +94,14 @@ public class Employee {
     public int getSiteId() {return siteId;} // new
 
     public void setSiteId(int siteId) {this.siteId = siteId;} //new
+
+    public String getEmploymentTerms() {
+        return this.employeeTerms;
+    }
+
+    public Date getStartDate() {
+        return this.employeeStartDate;
+    }
 
     // ---------------------------------- Checking methods ------------------------------------
     /**
@@ -198,6 +207,24 @@ public class Employee {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String formattedDate = formatter.format(employeeStartDate);
+        return '\n' + "---Employee Details--- " + '\n' +
+                "ID: " + id + '\n' +
+                "Name: " + fullName + '\n' +
+                "Bank account: " + bankAccount + '\n' +
+                "Salary: " + salary + '\n' +
+                "Terms: " + employeeTerms + '\n' +
+                "Start date: " + formattedDate + '\n' +
+                "----------------------";
+
+        //(this.getLicense() != null ? ", license='" + employee.getLicense() + '\'' : "") +
+
     }
 
 }

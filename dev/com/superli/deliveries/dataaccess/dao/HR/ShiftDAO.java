@@ -14,9 +14,10 @@ public interface ShiftDAO {
     List<ShiftDTO> findByEmployeeId(String employeeId) throws SQLException;
     List<ShiftDTO> findByDayOfWeekAndShiftType(DayOfWeek day, ShiftType st) throws SQLException;
     void clearAllAndArchive() throws SQLException;
-    void saveAssignment(String employeeId, String dayOfWeek, String shiftType, String date, int roleId) throws SQLException;
-     List<String> getEmployeeIdsByRoleAndDate(String roleName, String date) throws SQLException ;
+    void saveAssignment(String employeeId, String dayOfWeek, String shiftType, String date, int roleId, int siteId) throws SQLException;
+    public List<String> getEmployeeIdsByRoleAndDateAndType(String roleName, String date, ShiftType shiftType, int siteId) throws SQLException;
 
+    public void removeAssignment(String employeeId, String dayOfWeek, String shiftType, String date, int siteId) throws SQLException;
+    public List<String> getEmployeeIdsByRoleAndDate(String roleName, String date) throws SQLException;
+    public boolean isEmployeeAlreadyAssigned(String employeeId, String dayOfWeek, String shiftType, String shiftDate) throws SQLException;
 }
-
-

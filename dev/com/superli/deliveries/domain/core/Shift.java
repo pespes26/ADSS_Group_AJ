@@ -4,7 +4,7 @@ import java.time.DayOfWeek;
 import java.util.*;
 
 public class Shift {
-    private int shiftId;
+    private int siteID;
     private Date shiftDate;
     private ShiftType shiftType;
     private DayOfWeek shiftDay;
@@ -12,8 +12,8 @@ public class Shift {
     private Map<Employee, Role> shiftEmployees;
     private Employee shiftManager;
 
-    public Shift(int shiftId, Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
-        this.shiftId = shiftId;
+    public Shift(int siteID, Date shiftDate, ShiftType shiftType, DayOfWeek shiftDay, List<Role> shiftRequiredRoles, Map<Employee, Role> shiftEmployees, Employee shiftManager) {
+        this.siteID = siteID;
         this.shiftDate = shiftDate;
         this.shiftType = shiftType;
         this.shiftDay = shiftDay;
@@ -47,8 +47,8 @@ public class Shift {
         return shiftDay;
     }
 
-    public int getShiftId() {
-        return shiftId;
+    public int getSiteId() {
+        return siteID;
     }
 
     // ----------------------------------- End Getters -----------------------------------
@@ -128,4 +128,6 @@ public class Shift {
     }
 
     // ----------------------------------- End Status Checks -----------------------------------
+
+
 }

@@ -19,6 +19,14 @@ public class RoleDAOImpl implements RoleDAO {
         }
     }
 
+    public RoleDAOImpl() {
+        try {
+            this.conn = Database.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect", e);
+        }
+    }
+
 
     @Override
     public RoleDTO save(RoleDTO role) throws SQLException {

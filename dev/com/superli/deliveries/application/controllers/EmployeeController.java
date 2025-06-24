@@ -2,13 +2,8 @@ package com.superli.deliveries.application.controllers;
 
 import com.superli.deliveries.dataaccess.dao.HR.*;
 import com.superli.deliveries.dto.HR.*;
-import com.superli.deliveries.domain.core.Employee;
-import com.superli.deliveries.domain.core.HRManager;
-import com.superli.deliveries.domain.core.Shift;
-import com.superli.deliveries.domain.core.Role;
-import com.superli.deliveries.domain.core.AvailableShifts;
-//import com.superli.deliveries.domain.core.DayOfWeek;
-import com.superli.deliveries.domain.core.ShiftType;
+import com.superli.deliveries.domain.core.*;
+import com.superli.deliveries.presentation.HR.EmployeeView;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
@@ -17,50 +12,39 @@ import java.util.List;
 import java.util.Scanner;
 
 public class EmployeeController {
-    private static HRManager hrManager = new HRManager();
+    private static final HRManager hrManager = new HRManager();
+    private static final EmployeeView view = new EmployeeView();
 
     public static void viewMyShifts(Employee employee, HRManager hr) {
         List<Shift> shifts = hr.getAllShifts();
         boolean hasShifts = false;
 
-        System.out.println("Your Shifts:");
+        view.printShiftsHeader();
 
         for (Shift shift : shifts) {
             if (shift.getShiftEmployees().containsKey(employee)) {
                 hasShifts = true;
                 Role assignedRole = shift.getShiftEmployees().get(employee);
-                System.out.println(shift.getShiftDate() + " - " + shift.getShiftDay() + " - " + shift.getShiftType()
-                                   + " | Role: " + assignedRole.getRoleName());
+                view.printShift(shift, assignedRole);
             }
         }
 
         if (!hasShifts) {
-            System.out.println("You have no assigned shifts.");
+            view.printNoShifts();
         }
     }
+
     public static void updateAvailability(Employee employee, Scanner sc) {
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-        /*int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
-
-        if (dayOfWeek != java.util.Calendar.THURSDAY) {
-            System.out.println("Sorry, availability can only be updated on Thursdays.");
-            return;
-        }*/
-
         AvailableShiftDAO dao;
         try {
             dao = new AvailableShiftDAOImpl();
         } catch (SQLException e) {
-            System.err.println(" Failed to connect to database: " + e.getMessage());
+            view.printDBConnectionError(e.getMessage());
             return;
         }
 
         if (!employee.getAvailabilityConstraints().isEmpty()) {
-            System.out.println("You already have availability constraints.");
-            System.out.println("Do you want to:");
-            System.out.println("1. Clear and submit new constraints");
-            System.out.println("2. Edit existing ones");
-            System.out.println("0. Logout");
+            view.printHasConstraintsMenu();
             String choice = sc.nextLine().trim();
 
             if (choice.equals("1")) {
@@ -72,59 +56,51 @@ public class EmployeeController {
                                 a.getShift().name()
                         );
                     } catch (SQLException e) {
-                        System.err.println("Failed to delete from DB: " + e.getMessage());
+                        view.printDBDeleteError(e.getMessage());
                     }
                 }
                 employee.clearAvailability();
-                System.out.println("All previous availability constraints cleared.");
+                view.printClearSuccess();
             } else if (choice.equals("2")) {
                 editAvailability(employee, sc);
-                System.out.println("Availability updated successfully.");
+                view.printAvailabilityUpdated();
                 return;
             } else if (choice.equals("0")) {
                 return;
             } else {
-                System.out.println("Invalid choice. No changes made.");
+                view.printInvalidChoice();
                 return;
             }
         }
 
         while (true) {
-            System.out.print("Enter day of week, or type 'done' to finish: ");
+            view.printPromptEnterDay();
             String dayInput = sc.nextLine().trim().toUpperCase();
 
             if (dayInput.equalsIgnoreCase("DONE")) break;
 
             DayOfWeek day = parseDay(dayInput);
             if (day == null) {
-                System.out.println("Invalid day: " + dayInput + ". Please try again.");
+                view.printInvalidDay(dayInput);
                 continue;
             }
 
             ShiftType shift = readShift(sc);
 
             if (shiftExists(employee, day, shift)) {
-                System.out.println("This shift is already in your availability constraints.");
+                view.printShiftAlreadyExists();
             } else {
                 addNewAvailability(employee, day, shift);
             }
         }
 
-        System.out.println("Availability updated successfully.");
+        view.printAvailabilityUpdated();
     }
-
 
     private static void editAvailability(Employee employee, Scanner sc) {
         while (true) {
-            System.out.println("Your current availability:");
-            for (AvailableShifts a : employee.getAvailabilityConstraints()) {
-                System.out.println("- " + a.getDay() + " " + a.getShift());
-            }
-
-            System.out.println("Do you want to:");
-            System.out.println("1. Add a new availability");
-            System.out.println("2. Remove an existing availability");
-            System.out.println("0. Logout");
+            view.printEditAvailabilityHeader(employee.getAvailabilityConstraints());
+            view.printEditMenu();
             String choice = sc.nextLine().trim().toLowerCase();
 
             if (choice.equals("0")) {
@@ -135,7 +111,7 @@ public class EmployeeController {
                 ShiftType shift = (ShiftType) dayShift[1];
 
                 if (shiftExists(employee, day, shift)) {
-                    System.out.println("This shift is already in your availability constraints.");
+                    view.printShiftAlreadyExists();
                 } else {
                     addNewAvailability(employee, day, shift);
                 }
@@ -148,29 +124,27 @@ public class EmployeeController {
                 removeAvailability(employee, day, shift);
 
             } else {
-                System.out.println("Invalid choice. Try again.");
+                view.printInvalidChoice();
             }
         }
     }
-
 
     private static Object[] readDayAndShift(Scanner sc) {
         DayOfWeek day = null;
         while (day == null) {
-            System.out.print("Enter day of week: ");
+            view.printPromptEnterDayOnly();
             String dayInput = sc.nextLine().trim().toUpperCase();
             day = parseDay(dayInput);
             if (day == null) {
-                System.out.println("Invalid day. Try again.");
+                view.printInvalidDay(dayInput);
             }
         }
 
         ShiftType shift = readShift(sc);
-
         return new Object[]{day, shift};
     }
 
-    private static DayOfWeek parseDay(String input) {
+    public static DayOfWeek parseDay(String input) {
         for (DayOfWeek d : DayOfWeek.values()) {
             if (d.name().equals(input)) {
                 return d;
@@ -182,7 +156,7 @@ public class EmployeeController {
     private static ShiftType readShift(Scanner sc) {
         ShiftType shift = null;
         while (shift == null) {
-            System.out.print("Enter shift type (MORNING or EVENING): ");
+            view.printPromptEnterShiftType();
             String shiftInput = sc.nextLine().trim().toUpperCase();
             for (ShiftType s : ShiftType.values()) {
                 if (s.name().equals(shiftInput)) {
@@ -191,13 +165,13 @@ public class EmployeeController {
                 }
             }
             if (shift == null) {
-                System.out.println("Invalid shift type. Please try again.");
+                view.printInvalidChoice();
             }
         }
         return shift;
     }
 
-    private static boolean shiftExists(Employee employee, DayOfWeek day, ShiftType shift) {
+    public static boolean shiftExists(Employee employee, DayOfWeek day, ShiftType shift) {
         for (AvailableShifts a : employee.getAvailabilityConstraints()) {
             if (a.getDay() == day && a.getShift() == shift) {
                 return true;
@@ -206,9 +180,8 @@ public class EmployeeController {
         return false;
     }
 
-    private static void addNewAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
+    public static void addNewAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
         employee.addAvailability(new AvailableShifts(day, shift));
-        System.out.println("Added availability: Day - " + day + ", Shift - " + shift);
 
         try {
             AvailableShiftDAO dao = new AvailableShiftDAOImpl();
@@ -218,14 +191,13 @@ public class EmployeeController {
                     shift.name()
             );
             dao.save(dto);
-            System.out.println("Saved to DB");
+
         } catch (Exception e) {
-            System.err.println("Failed to save to DB: " + e.getMessage());
+            view.printDBSaveError(e.getMessage());
         }
     }
 
-
-    private static void removeAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
+    public static void removeAvailability(Employee employee, DayOfWeek day, ShiftType shift) {
         AvailableShifts toRemove = null;
         for (AvailableShifts a : employee.getAvailabilityConstraints()) {
             if (a.getDay() == day && a.getShift() == shift) {
@@ -236,20 +208,18 @@ public class EmployeeController {
 
         if (toRemove != null) {
             employee.getAvailabilityConstraints().remove(toRemove);
-            System.out.println("Removed availability: " + day + " " + shift);
+            view.printRemovedAvailability(day, shift);
 
             try {
                 AvailableShiftDAO dao = new AvailableShiftDAOImpl();
                 int employeeId = Integer.parseInt(employee.getId());
                 dao.deleteByCompositeKey(employeeId, day.name(), shift.name());
-                System.out.println("Also removed from DB.");
             } catch (Exception e) {
-                System.err.println("Failed to delete from DB: " + e.getMessage());
+                view.printDBDeleteError(e.getMessage());
             }
 
         } else {
-            System.out.println("No such availability found to remove.");
+            view.printNoSuchAvailability();
         }
     }
-
 }

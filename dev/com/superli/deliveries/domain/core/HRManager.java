@@ -98,7 +98,7 @@ public class HRManager {
         employees.remove(toRemove);
         archivedEmployee.addArchivedEmployee(toRemove);
 
-        System.out.println("Employee with ID " + employee.getId() + " has been removed and archived.");
+        //System.out.println("Employee with ID " + employee.getId() + " has been removed and archived.");
     }
     // ----------------------------------- End Employee Management -----------------------------------
 

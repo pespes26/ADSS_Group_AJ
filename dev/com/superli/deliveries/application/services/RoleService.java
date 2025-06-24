@@ -1,4 +1,5 @@
-package com.superli.deliveries.application.controllers;
+package com.superli.deliveries.application.services;
+import com.superli.deliveries.application.controllers.ManagerController;
 import com.superli.deliveries.dataaccess.dao.HR.RoleDAOImpl;
 import com.superli.deliveries.domain.core.*;
 
@@ -7,14 +8,16 @@ import com.superli.deliveries.dto.HR.RoleDTO;
 import com.superli.deliveries.domain.core.Role;
 import com.superli.deliveries.util.Database;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
-public class RoleController {
+public class RoleService {
 
     private static RoleDAO roleDAO;
 
-    public RoleController(RoleDAO dao) {
-        RoleController.roleDAO = dao;
+    public RoleService(RoleDAO dao) {
+        RoleService.roleDAO = dao;
     }
 
 
@@ -99,14 +102,19 @@ public class RoleController {
         return "Role added to employee successfully.";
     }
 
-    /**
-     * Validates whether a given string is a valid role name.
-     *
-     * @param roleName role name string
-     * @return true if valid, false otherwise
-     */
-    public static boolean isValidRoleName(String roleName) {
-        return roleName != null && roleName.matches("[a-zA-Z 0]+");
+    public static List<String> getAllRoleNames() {
+        try {
+            Connection conn = Database.getConnection();
+            RoleDAO roleDAO = new RoleDAOImpl(conn);
+
+            return roleDAO.findAll().stream()
+                    .map(RoleDTO::getName)
+                    .map(String::toLowerCase)
+                    .toList();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch role names", e);
+        }
     }
 
 

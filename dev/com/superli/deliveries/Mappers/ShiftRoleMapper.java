@@ -8,12 +8,13 @@ import java.util.Map;
 
 public class ShiftRoleMapper {
 
-    public static ShiftRoleDTO toDTO(DayOfWeek day, ShiftType shiftType, int roleId, int requiredCount) {
+    public static ShiftRoleDTO toDTO(DayOfWeek day, ShiftType shiftType, int roleId, int requiredCount,int siteId) {
         return new ShiftRoleDTO(
                 day.name(),
                 shiftType.name(),
                 roleId,
-                requiredCount
+                requiredCount,
+                siteId
         );
     }
 

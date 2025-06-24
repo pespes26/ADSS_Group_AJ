@@ -15,7 +15,7 @@ public class ShiftMapper {
         if (dto == null) return null;
 
         return new Shift(
-                dto.getId(),
+                dto.getSiteId(),
                 dto.getShiftDate(),
                 ShiftType.valueOf(dto.getShiftType()),
                 DayOfWeek.valueOf(dto.getShiftDay()),
@@ -39,7 +39,7 @@ public class ShiftMapper {
         }
 
         return new ShiftDTO(
-                shift.getShiftId(),
+                shift.getSiteId(),
                 shift.getShiftDate(),
                 shift.getShiftType().name(),
                 shift.getShiftDay().name(),

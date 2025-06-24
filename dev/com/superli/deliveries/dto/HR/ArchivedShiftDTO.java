@@ -11,7 +11,8 @@ public class ArchivedShiftDTO {
     private Date date;
     private int roleId;
 
-    public ArchivedShiftDTO() {}
+    public ArchivedShiftDTO() {
+    }
 
     public ArchivedShiftDTO(String employeeId, DayOfWeek dayOfWeek, ShiftType shiftType, Date date, int roleId) {
         this.employeeId = employeeId;

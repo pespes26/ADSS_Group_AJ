@@ -18,6 +18,9 @@ public class ArchivedEmployeeDAOImpl implements ArchivedEmployeeDAO {
             throw new RuntimeException("Failed to connect to database", e);
         }
     }
+    public ArchivedEmployeeDAOImpl(Connection connection) {
+        this.conn = connection;
+    }
 
     @Override
     public List<ArchivedEmployeeDTO> findAll() throws SQLException {
@@ -35,8 +38,7 @@ public class ArchivedEmployeeDAOImpl implements ArchivedEmployeeDAO {
                         rs.getDouble("salary"),
                         rs.getString("employment_terms"),
                         rs.getString("start_date"),
-                        rs.getInt("site_id"),
-                        rs.getString("archived_date")
+                        rs.getInt("site_id")
                 );
                 list.add(dto);
             }
@@ -51,18 +53,17 @@ public class ArchivedEmployeeDAOImpl implements ArchivedEmployeeDAO {
     public void save(ArchivedEmployeeDTO employee) throws SQLException {
         String sql = """
                 INSERT INTO archived_employees 
-                (employee_id, name, bank_account, salary, employment_terms, start_date, site_id, archived_date)
+                (employee_id, name, bank_account, salary, employment_terms, start_date, site_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)""";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, employee.getId());
+            ps.setString(1, employee.getEmployeeId());
             ps.setString(2, employee.getFullName());
             ps.setString(3, employee.getBankAccount());
             ps.setDouble(4, employee.getSalary());
             ps.setString(5, employee.getEmploymentTerms());
             ps.setString(6, employee.getStartDate());
             ps.setInt(7, employee.getSiteId());
-            ps.setString(8, employee.getArchivedDate());
             ps.executeUpdate();
         }
     }

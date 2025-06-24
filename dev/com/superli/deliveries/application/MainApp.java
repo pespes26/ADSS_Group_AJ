@@ -2,12 +2,13 @@ package com.superli.deliveries.application;
 
 import java.util.Scanner; // DELIVERIES
 
+import com.superli.deliveries.presentation.HR.DataSeeder;
 import com.superli.deliveries.presentation.HR.HRDetailsView; // HR
 
 public class MainApp {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-
+        DataSeeder.seedAllData();
         while (true) {
             System.out.println("\n=== Main System Menu ===");
             System.out.println("1. HR Management System");

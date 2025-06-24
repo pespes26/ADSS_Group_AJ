@@ -1,0 +1,215 @@
+package com.superli.deliveries.application.services;
+
+import com.superli.deliveries.dataaccess.dao.del.ProductDAO;
+import com.superli.deliveries.domain.core.Product;
+import com.superli.deliveries.Mappers.ProductMapper;
+import com.superli.deliveries.dto.del.ProductDTO;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * Service for managing products in the context of deliveries.
+ * Provides access to product information.
+ */
+public class ProductService {
+
+    private final ProductDAO productDAO;
+
+    public ProductService(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
+
+    public List<Product> getAllProducts() {
+        try {
+            return productDAO.findAll().stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting all products", e);
+        }
+    }
+
+    public Optional<Product> findByName(String name) {
+        return getAllProducts().stream()
+                .filter(p -> p.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    public Optional<Product> getProductById(String id) {
+        try {
+            return productDAO.findById(id)
+                    .map(ProductMapper::fromDTO);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting product by id: " + id, e);
+        }
+    }
+
+    public void saveProduct(Product product) {
+        try {
+            productDAO.save(ProductMapper.toDTO(product));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving product", e);
+        }
+    }
+
+    public void deleteProduct(String id) {
+        try {
+            productDAO.deleteById(id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting product: " + id, e);
+        }
+    }
+
+    public List<Product> getProductsByCategory(String category) {
+        try {
+            return productDAO.findByCategory(category).stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting products by category: " + category, e);
+        }
+    }
+
+    public List<Product> getProductsByWeightRange(float minWeight, float maxWeight) {
+        try {
+            return productDAO.findByWeightRange(minWeight, maxWeight).stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting products by weight range", e);
+        }
+    }
+
+    public List<Product> getAvailableProducts() {
+        try {
+            return productDAO.findAvailableProducts().stream()
+                    .map(ProductMapper::fromDTO)
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting available products", e);
+        }
+    }
+
+    public List<Product> getAllProductsFilteredByName(String partialName) {
+        return getAllProducts().stream()
+                .filter(product -> product.getName().toLowerCase().contains(partialName.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Generates the next available product ID
+     */
+    public String getNextProductId() {
+        try {
+            List<ProductDTO> products = productDAO.findAll();
+            int maxId = 0;
+            for (ProductDTO product : products) {
+                String id = product.getId();
+                if (id != null && id.startsWith("P")) {
+                    try {
+                        int num = Integer.parseInt(id.substring(1));
+                        maxId = Math.max(maxId, num);
+                    } catch (NumberFormatException e) {
+                        // Skip invalid IDs
+                    }
+                }
+            }
+            return String.format("P%03d", maxId + 1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error generating product ID", e);
+        }
+    }
+}
+
+///**
+// * Service for managing products in the context of deliveries.
+// * Provides access to product information needed for weight calculations.
+// */
+//public class ProductService {
+//
+//    private final IProductRepository productRepository;
+//
+//    // Temporary in-memory storage if repository is not available
+//    private final List<Product> tempProducts;
+//
+//    public ProductService(IProductRepository productRepository) {
+//        this.productRepository = productRepository;
+//        this.tempProducts = new ArrayList<>();
+//
+//        // Initialize with some sample products for testing
+//        initializeSampleProducts();
+//    }
+//
+//    /**
+//     * Gets a product by its ID.
+//     * @param productId The product ID to search for
+//     * @return Optional containing the product if found
+//     */
+//    public Optional<Product> getProductById(String productId) {
+//        // Try to get from repository first
+//        if (productRepository != null) {
+//            return productRepository.findById(productId);
+//        }
+//
+//        // Fall back to in-memory list
+//        return tempProducts.stream()
+//                .filter(p -> p.getProductId().equals(productId))
+//                .findFirst();
+//    }
+//
+//    /**
+//     * Gets all available products.
+//     * @return List of all products
+//     */
+//    public List<Product> getAllProducts() {
+//        // Try to get from repository first
+//        if (productRepository != null) {
+//            return new ArrayList<>(productRepository.findAll());
+//        }
+//
+//        // Fall back to in-memory list
+//        return new ArrayList<>(tempProducts);
+//    }
+//
+//    /**
+//     * Saves a product.
+//     * @param product The product to save
+//     */
+//    public void saveProduct(Product product) {
+//        if (productRepository != null) {
+//            productRepository.save(product);
+//        } else {
+//            // Remove existing product with same ID if exists
+//            tempProducts.removeIf(p -> p.getProductId().equals(product.getProductId()));
+//            tempProducts.add(product);
+//        }
+//    }
+//
+//    /**
+//     * Initializes some sample products for testing.
+//     * This would normally be handled by a proper data initialization process.
+//     */
+//    private void initializeSampleProducts() {
+//        // Create some sample products with realistic weights
+//        tempProducts.add(new Product("P001", "Milk 1L", 1.03f));
+//        tempProducts.add(new Product("P002", "Bread Loaf", 0.75f));
+//        tempProducts.add(new Product("P003", "Rice 5kg Bag", 5.0f));
+//        tempProducts.add(new Product("P004", "Water 6-pack", 6.0f));
+//        tempProducts.add(new Product("P005", "Flour 1kg", 1.0f));
+//        tempProducts.add(new Product("P006", "Sugar 1kg", 1.0f));
+//        tempProducts.add(new Product("P007", "Olive Oil 750ml", 0.75f));
+//        tempProducts.add(new Product("P008", "Pasta 500g", 0.5f));
+//        tempProducts.add(new Product("P009", "Coffee 250g", 0.25f));
+//        tempProducts.add(new Product("P010", "Canned Beans 400g", 0.4f));
+//
+//        // Add some bulkier items
+//        tempProducts.add(new Product("P011", "Washing Machine", 75.0f));
+//        tempProducts.add(new Product("P012", "Refrigerator", 95.0f));
+//        tempProducts.add(new Product("P013", "Microwave Oven", 15.0f));
+//        tempProducts.add(new Product("P014", "Office Chair", 18.0f));
+//        tempProducts.add(new Product("P015", "Desk", 45.0f));
+//    }
+//}

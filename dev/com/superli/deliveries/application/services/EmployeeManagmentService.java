@@ -6,7 +6,7 @@ import com.superli.deliveries.dataaccess.dao.HR.*;
 import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.dto.HR.*;
 import com.superli.deliveries.util.Database;
-import com.superli.deliveries.presentation.EmployeeManagmentView;
+import com.superli.deliveries.presentation.HR.EmployeeManagmentView;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -249,5 +249,35 @@ public class EmployeeManagmentService {
         }
     }
 
+    // Returns employees with Role.DRIVER, available for the shift, and not yet drivers
+    public static List<Employee> getShiftAvailableEmployeesNotYetDrivers(java.time.DayOfWeek day, ShiftType shift, DriverService driverService) {
+        HRManager hr = ManagerController.getHRManager();
+        List<Employee> all = hr.getEmployees();
+        List<Employee> eligible = new ArrayList<>();
+        for (Employee e : all) {
+            boolean hasDriverRole = e.getRoleQualifications().stream().anyMatch(r -> r.getRoleName().equalsIgnoreCase("DRIVER"));
+            boolean isAvailable = e.isAvailable(day, shift);
+            boolean isAlreadyDriver = driverService.getDriverById(e.getId()).isPresent();
+            if (hasDriverRole && isAvailable && !isAlreadyDriver) {
+                eligible.add(e);
+            }
+        }
+        return eligible;
+    }
+
+    // Returns employees with the given role and available for the shift
+    public static List<Employee> findAvailableOn(java.time.DayOfWeek day, Role role, ShiftType shift) {
+        HRManager hr = ManagerController.getHRManager();
+        List<Employee> all = hr.getEmployees();
+        List<Employee> eligible = new ArrayList<>();
+        for (Employee e : all) {
+            boolean hasRole = e.getRoleQualifications().stream().anyMatch(r -> r.getRoleName().equalsIgnoreCase(role.getRoleName()));
+            boolean isAvailable = e.isAvailable(day, shift);
+            if (hasRole && isAvailable) {
+                eligible.add(e);
+            }
+        }
+        return eligible;
+    }
 
 }

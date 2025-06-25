@@ -21,6 +21,8 @@ import com.superli.deliveries.presentation.del.DestinationDetailsView;
 import com.superli.deliveries.presentation.del.SiteDetailsView;
 import com.superli.deliveries.presentation.del.TransportDetailsView;
 import com.superli.deliveries.presentation.del.TransportSummaryView;
+import com.superli.deliveries.domain.core.ShiftType;
+import com.superli.deliveries.domain.core.Employee;
 
 /**
  * Service layer for managing Transport operations and business logic.
@@ -216,25 +218,31 @@ public class TransportService {
      */
     public Optional<Transport> createTransportAuto() {
         List<Truck> availableTrucks = truckService.getAvailableTrucks();
-        List<Driver> availableDrivers = driverService.getAvailableDrivers();
-
-        if (availableTrucks.isEmpty() || availableDrivers.isEmpty()) {
+        if (availableTrucks.isEmpty()) {
             return Optional.empty();
         }
-
+        // For demo, use current day and MORNING shift. In real app, prompt user or use context.
+        java.time.DayOfWeek today = java.time.LocalDate.now().getDayOfWeek();
+        ShiftType shift = ShiftType.MORNING;
+        List<Employee> eligibleEmployees = com.superli.deliveries.application.services.EmployeeManagmentService.findAvailableOn(today, new com.superli.deliveries.domain.core.Role("DRIVER"), shift);
+        List<Driver> eligibleDrivers = eligibleEmployees.stream()
+            .map(e -> driverService.getDriverById(e.getId()).orElse(null))
+            .filter(d -> d != null && d.isAvailable())
+            .collect(java.util.stream.Collectors.toList());
+        if (eligibleDrivers.isEmpty()) {
+            return Optional.empty();
+        }
         for (Truck truck : availableTrucks) {
-            for (Driver driver : availableDrivers) {
+            for (Driver driver : eligibleDrivers) {
                 if (driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
                     Optional<Site> originSiteOpt = getDefaultOriginSite();
                     if (originSiteOpt.isEmpty()) {
                         return Optional.empty();
                     }
-
                     return createTransportWithTruckDriverAndSite(truck, driver, originSiteOpt.get());
                 }
             }
         }
-
         return Optional.empty();
     }
 
@@ -250,7 +258,14 @@ public class TransportService {
         if (originSiteOpt.isEmpty()) {
             return Optional.empty();
         }
-
+        // For demo, use current day and MORNING shift. In real app, prompt user or use context.
+        java.time.DayOfWeek today = java.time.LocalDate.now().getDayOfWeek();
+        ShiftType shift = ShiftType.MORNING;
+        List<Employee> eligibleEmployees = com.superli.deliveries.application.services.EmployeeManagmentService.findAvailableOn(today, new com.superli.deliveries.domain.core.Role("DRIVER"), shift);
+        boolean isEligible = eligibleEmployees.stream().anyMatch(e -> e.getId().equals(driver.getDriverId()));
+        if (!isEligible || driverService.getDriverById(driver.getDriverId()).isEmpty() || !driver.isAvailable()) {
+            return Optional.empty();
+        }
         return createTransportWithTruckDriverAndSite(truck, driver, originSiteOpt.get());
     }
 
@@ -263,12 +278,18 @@ public class TransportService {
      * @param departureDateTime The scheduled departure time
      * @return Optional containing the created transport if successful
      */
-    public Optional<Transport> createTransportManualWithSite(Truck truck, Driver driver, 
-            Site site, LocalDateTime departureDateTime) {
+    public Optional<Transport> createTransportManualWithSite(Truck truck, Driver driver, Site site, java.time.LocalDateTime departureDateTime) {
         if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
             return Optional.empty();
         }
-
+        // For demo, use current day and MORNING shift. In real app, prompt user or use context.
+        java.time.DayOfWeek today = java.time.LocalDate.now().getDayOfWeek();
+        ShiftType shift = ShiftType.MORNING;
+        List<Employee> eligibleEmployees = com.superli.deliveries.application.services.EmployeeManagmentService.findAvailableOn(today, new com.superli.deliveries.domain.core.Role("DRIVER"), shift);
+        boolean isEligible = eligibleEmployees.stream().anyMatch(e -> e.getId().equals(driver.getDriverId()));
+        if (!isEligible || driverService.getDriverById(driver.getDriverId()).isEmpty() || !driver.isAvailable()) {
+            return Optional.empty();
+        }
         String transportId = generateTransportId();
         Transport transport = new Transport(transportId, truck, driver, site, departureDateTime);
         saveTransport(transport);
@@ -287,19 +308,15 @@ public class TransportService {
         if (!driver.getLicenseType().equals(truck.getRequiredLicenseType())) {
             return Optional.empty();
         }
-
-        // Check if driver and truck are available
-        if (!driver.isAvailable() || !truck.isAvailable()) {
+        // Check eligibility: driver must be in drivers table and available
+        if (driverService.getDriverById(driver.getDriverId()).isEmpty() || !driver.isAvailable() || !truck.isAvailable()) {
             return Optional.empty();
         }
-
         String transportId = generateTransportId();
         Transport transport = new Transport(transportId, truck, driver, originSite);
-        
         // Mark driver and truck as unavailable
         driverService.markDriverAsUnavailable(driver.getDriverId());
         truckService.markTruckAsUnavailable(truck.getPlateNum());
-        
         saveTransport(transport);
         return Optional.of(transport);
     }
@@ -430,9 +447,9 @@ public class TransportService {
      */
     private void releaseTransportResources(Transport transport) {
         if (transport != null) {
-            // Release driver
+            // Release driver (set available = true)
             driverService.markDriverAsAvailable(transport.getDriver().getDriverId());
-            // Release truck
+            // Release truck (set available = true)
             truckService.markTruckAsAvailable(transport.getTruck().getPlateNum());
         }
     }

@@ -11,7 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a20e0469-56cc-4ecd-b42d-3b955f199408" name="Changes" comment="HR changes 2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deliveries.db" beforeDir="false" afterPath="$PROJECT_DIR$/deliveries.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/application/services/ShiftService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/HRDetailsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/com/superli/deliveries/presentation/HR/HRDetailsView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

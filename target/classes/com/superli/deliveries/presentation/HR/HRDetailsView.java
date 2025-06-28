@@ -336,18 +336,29 @@ public class HRDetailsView {
             case "3":
                 List<Shift> shifts = hr.getAllShifts();
 
-                if (shifts.isEmpty()) {
-                    System.out.println("No shifts available.");
+                System.out.print("Enter Site ID: ");
+                String input = sc.nextLine().trim();
+                int siteId;
+                try {
+                    siteId = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid Site ID.");
                     break;
                 }
 
-                System.out.print("Enter Site ID: ");
-                String input = sc.nextLine().trim();
-                int siteId = Integer.parseInt(input);
+                List<Shift> siteShifts = hr.getAllShifts().stream()
+                        .filter(s -> s.getSiteId() == siteId)
+                        .sorted(Comparator.comparing(Shift::getShiftDate).thenComparing(Shift::getShiftType))
+                        .toList();
+
+                if (siteShifts.isEmpty()) {
+                    System.out.println("No shifts available for this site.");
+                    break;
+                }
 
                 System.out.println("All shifts for next week:");
-                for (int i = 0; i < Math.min(14, shifts.size()); i++) {
-                    Shift s = shifts.get(i);
+                for (int i = 0; i < Math.min(14, siteShifts.size()); i++) {
+                    Shift s = siteShifts.get(i);
                     System.out.println((i + 1) + ". " + s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
                 }
 
@@ -420,6 +431,7 @@ public class HRDetailsView {
                     System.out.println("No roles were defined.");
                 }
                 break;
+
 
             case "4":
                 hr.printRoles();

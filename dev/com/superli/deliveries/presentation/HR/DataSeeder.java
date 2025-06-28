@@ -76,6 +76,10 @@ public class DataSeeder {
             ManagerController.addNewEmployee("444444444", "Itay Malka", "987-654", 5100, 2,
                     "Full-time", itayRoles, null, false);
 
+            List<Role> shiraRoles = new ArrayList<>(Arrays.asList(shiftManagerRole, driverRole));
+            ManagerController.addNewEmployee("555555555", "Shira Cohen", "123-457", 5000, 2,
+                    "Full-time", shiraRoles, LicenseType.B, true);
+
 
             for (Employee emp : hr.getEmployees()) {
                 for (DayOfWeek day : DayOfWeek.values()) {

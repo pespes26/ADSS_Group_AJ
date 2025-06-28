@@ -84,7 +84,6 @@ public class MainMenuController {
             case "6" -> destinationDocController.runMenu();
             case "0" -> {
                 System.out.println("Exiting the system. Goodbye!");
-                System.exit(0);
             }
             default -> System.out.println("Invalid choice. Please try again.");
         }

@@ -265,14 +265,11 @@ public class ShiftService {
         return output;
     }
 
+    // Entry point for assigning employees to a specific shift in a given site
     public static void assignEmployeeToShift(Scanner sc) {
         HRManager hr = ManagerController.getHRManager();
-        List<Shift> shifts = hr.getAllShifts();
-        if (shifts.isEmpty()) {
-            System.out.println("No shifts available.");
-            return;
-        }
 
+        // Prompt user to enter the site ID
         System.out.print("Enter Site ID for this shift: ");
         int siteId;
         try {
@@ -282,58 +279,91 @@ public class ShiftService {
             return;
         }
 
+        // Filter all shifts that belong to the selected site and sort them
+        List<Shift> shifts = hr.getAllShifts().stream()
+                .filter(s -> s.getSiteId() == siteId)
+                .sorted(Comparator.comparing(Shift::getShiftDate).thenComparing(Shift::getShiftType))
+                .toList();
+
+        // No shifts for the selected site
+        if (shifts.isEmpty()) {
+            System.out.println("No shifts available for this site.");
+            return;
+        }
+
+        // Display available shifts for user to choose from
         System.out.println("All shifts for next week:");
         for (int i = 0; i < Math.min(14, shifts.size()); i++) {
             Shift s = shifts.get(i);
             System.out.println((i + 1) + ". " + s.getShiftDate() + " - " + s.getShiftDay() + " - " + s.getShiftType());
         }
+
+        // Get shift selection from user
         System.out.print("Choose a shift:");
-        int shiftIndex = Integer.parseInt(sc.nextLine());
-        if (shiftIndex < 1 || shiftIndex > shifts.size()) {
+        int shiftIndex;
+        try {
+            shiftIndex = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+            return;
+        }
+
+        // Validate selected index
+        if (shiftIndex < 1 || shiftIndex > Math.min(14, shifts.size())) {
             System.out.println("Invalid shift selection.");
             return;
         }
 
         Shift selectedShift = shifts.get(shiftIndex - 1);
+
+        // Maps to store required and already assigned roles
         Map<Integer, Integer> requiredRoleMap;
         Map<Role, Integer> requiredRoles = new HashMap<>();
         Map<Integer, Integer> alreadyAssignedCount = new HashMap<>();
         Map<String, Set<String>> assignedEmployeesPerRole = new HashMap<>();
+
         try {
+            // === Step 1: Set up database access ===
             Connection conn = Database.getConnection();
             ShiftRoleDAO shiftRoleDAO = new ShiftRoleDAOImpl(conn);
             RoleDAO roleDAO = new RoleDAOImpl(conn);
             ShiftDAOImpl shiftDAO = new ShiftDAOImpl(conn);
 
+            // === Step 2: Load required roles for the selected shift ===
             requiredRoleMap = shiftRoleDAO.getRequiredRolesForShift(
                     selectedShift.getShiftDay().toString(),
                     selectedShift.getShiftType().toString(),
                     siteId
             );
 
+            // If no roles were defined for the shift
             if (requiredRoleMap.isEmpty()) {
                 System.out.println("No required roles defined for this shift. Please define roles before assigning employees.");
                 return;
             }
 
-
-
-            List<ShiftDTO> allShifts = shiftDAO.findAll();
-            for (ShiftDTO dto : allShifts) {
+            // === Step 3: Load existing shift assignments to avoid duplicates ===
+            List<ShiftDTO> siteShifts = shiftDAO.findAll();
+            for (ShiftDTO dto : siteShifts) {
                 if (dto.getShiftDate().equals(selectedShift.getShiftDate()) &&
                         dto.getShiftType().equalsIgnoreCase(selectedShift.getShiftType().toString()) &&
                         dto.getShiftDay().equalsIgnoreCase(selectedShift.getShiftDay().toString())) {
+
                     Map<Integer, Integer> assignments = dto.getAssignedEmployees();
+
                     for (Map.Entry<Integer, Integer> entry : assignments.entrySet()) {
                         String empId = String.valueOf(entry.getKey());
                         int roleId = entry.getValue();
 
+                        // Get role name from DB
                         String roleName = roleDAO.findById(roleId)
                                 .orElseThrow(() -> new RuntimeException("Role not found for ID: " + roleId))
                                 .getName();
 
+                        // Track how many employees already assigned per role
                         alreadyAssignedCount.put(roleId, alreadyAssignedCount.getOrDefault(roleId, 0) + 1);
 
+                        // Track which employees are already assigned to which roles
                         assignedEmployeesPerRole
                                 .computeIfAbsent(roleName.toLowerCase(), k -> new HashSet<>())
                                 .add(empId);
@@ -341,6 +371,7 @@ public class ShiftService {
                 }
             }
 
+            // === Step 4: Compute how many more employees are needed for each role ===
             for (Map.Entry<Integer, Integer> entry : requiredRoleMap.entrySet()) {
                 int roleId = entry.getKey();
                 int required = entry.getValue();
@@ -355,21 +386,25 @@ public class ShiftService {
 
                 requiredRoles.put(role, toAssign);
             }
+
         } catch (Exception e) {
             System.err.println("Failed to load required roles: " + e.getMessage());
             return;
         }
 
+        // If all required roles are already filled
         if (requiredRoles.isEmpty()) {
             System.out.println("All required roles for this shift are already fully assigned.");
             return;
         }
 
+        // Display required roles
         System.out.println("\nRequired roles for this shift:");
         for (Map.Entry<Role, Integer> entry : requiredRoles.entrySet()) {
             System.out.println("- " + entry.getKey().getRoleName() + " (x" + entry.getValue() + ")");
         }
 
+        // Flatten role list for assignment menu
         List<Role> unassignedRoles = new ArrayList<>();
         requiredRoles.forEach((role, count) -> {
             for (int i = 0; i < count; i++) unassignedRoles.add(role);
@@ -382,7 +417,9 @@ public class ShiftService {
             ShiftDAOImpl shiftDAO = new ShiftDAOImpl(conn);
             RoleDAO roleDAO = new RoleDAOImpl(conn);
 
+            // === Step 5: Assignment loop – assign employees to roles ===
             while (!unassignedRoles.isEmpty()) {
+                // Display roles still unassigned
                 System.out.println("\nRoles left to assign:");
                 for (int i = 0; i < unassignedRoles.size(); i++) {
                     System.out.println((i + 1) + ". " + unassignedRoles.get(i).getRoleName());
@@ -402,18 +439,21 @@ public class ShiftService {
                 Role selectedRole = unassignedRoles.get(roleChoice - 1);
                 System.out.println("\nAssigning role: " + selectedRole.getRoleName());
 
+                // === Step 6: Filter eligible employees ===
                 List<Employee> candidates = new ArrayList<>();
                 for (Employee e : hr.getEmployees()) {
+                    // Only employees in this site or global (-1)
                     if ((e.getSiteId() != siteId && e.getSiteId() != -1)) continue;
 
-                    Set<String> alreadyAssignedToThisRole = assignedEmployeesPerRole.getOrDefault(
+                    // Skip if already assigned
+                    Set<String> alreadyAssigned = assignedEmployeesPerRole.getOrDefault(
                             selectedRole.getRoleName().toLowerCase(), Set.of());
-
-                    if (alreadyAssignedToThisRole.contains(e.getId())) {
+                    if (alreadyAssigned.contains(e.getId())) {
                         System.out.println("Skipping " + e.getFullName() + " — already assigned as " + selectedRole.getRoleName());
                         continue;
                     }
 
+                    // Must be qualified and available
                     for (Role r : e.getRoleQualifications()) {
                         if (r.getRoleName().equalsIgnoreCase(selectedRole.getRoleName()) &&
                                 e.isAvailable(selectedShift.getShiftDay(), selectedShift.getShiftType())) {
@@ -423,6 +463,7 @@ public class ShiftService {
                     }
                 }
 
+                // === Step 7: Display candidates and assign ===
                 if (candidates.isEmpty()) {
                     System.out.println("No available employees qualified for role: " + selectedRole.getRoleName());
                     continue;
@@ -447,12 +488,12 @@ public class ShiftService {
 
                 Employee selectedEmployee = candidates.get(empChoice - 1);
                 assignments.computeIfAbsent(selectedRole, k -> new ArrayList<>()).add(selectedEmployee);
-
                 System.out.println("Assigned " + selectedEmployee.getId() + " as " + selectedRole.getRoleName());
 
                 unassignedRoles.remove(roleChoice - 1);
             }
 
+            // === Step 8: Save all assignments to the database ===
             ShiftDTO shiftDTO = new ShiftDTO();
             shiftDTO.setShiftDate(selectedShift.getShiftDate());
             shiftDTO.setShiftDay(selectedShift.getShiftDay().toString());
@@ -468,11 +509,14 @@ public class ShiftService {
 
                 for (Employee emp : entry.getValue()) {
                     int empId = Integer.parseInt(emp.getId());
+
+                    // Avoid duplicate assignments
                     if (assignedMap.containsKey(empId)) {
                         System.out.println("Skipping duplicate assignment for employee " + emp.getId());
                         continue;
                     }
 
+                    // Persist assignment in DB
                     shiftDAO.saveAssignment(
                             emp.getId(),
                             shiftDTO.getShiftDay(),
@@ -485,6 +529,7 @@ public class ShiftService {
                 }
             }
 
+            // Save final mapping into DTO (optional)
             shiftDTO.setAssignedEmployees(assignedMap);
             System.out.println("Shift assignments saved to the database.");
 

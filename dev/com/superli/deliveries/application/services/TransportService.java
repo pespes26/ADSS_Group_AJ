@@ -378,17 +378,34 @@ public class TransportService {
         
         switch (currentStatus) {
             case PLANNED:
+                validStatuses.add(TransportStatus.SELFDELIVERY);
+                validStatuses.add(TransportStatus.COMPLETED);
                 validStatuses.add(TransportStatus.DISPATCHED);
                 validStatuses.add(TransportStatus.CANCELLED);
                 break;
             case DISPATCHED:
+                validStatuses.add(TransportStatus.SELFDELIVERY);
                 validStatuses.add(TransportStatus.COMPLETED);
+                validStatuses.add(TransportStatus.PLANNED);
                 validStatuses.add(TransportStatus.CANCELLED);
                 break;
             case COMPLETED:
+                validStatuses.add(TransportStatus.SELFDELIVERY);
+                validStatuses.add(TransportStatus.DISPATCHED);
+                validStatuses.add(TransportStatus.PLANNED);
+                validStatuses.add(TransportStatus.CANCELLED);
+                break;
             case CANCELLED:
+                validStatuses.add(TransportStatus.SELFDELIVERY);
+                validStatuses.add(TransportStatus.COMPLETED);
+                validStatuses.add(TransportStatus.PLANNED);
+                validStatuses.add(TransportStatus.DISPATCHED);
+                break;
             case SELFDELIVERY:
-                // No valid transitions
+                validStatuses.add(TransportStatus.COMPLETED);
+                validStatuses.add(TransportStatus.PLANNED);
+                validStatuses.add(TransportStatus.DISPATCHED);
+                validStatuses.add(TransportStatus.CANCELLED);
                 break;
         }
         

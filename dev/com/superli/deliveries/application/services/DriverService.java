@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.superli.deliveries.Mappers.DriverMapper;
+import com.superli.deliveries.dataaccess.dao.HR.EmployeeDAOImpl;
 import com.superli.deliveries.dataaccess.dao.del.DriverDAO;
 import com.superli.deliveries.dataaccess.dao.del.DriverDAOImpl;
 import com.superli.deliveries.domain.core.Driver;
@@ -14,6 +15,7 @@ import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Truck;
 import com.superli.deliveries.domain.core.Transport;
 import com.superli.deliveries.domain.core.TransportStatus;
+import com.superli.deliveries.dto.HR.EmployeeDTO;
 
 /**
  * Service layer responsible for business logic related to drivers.
@@ -29,28 +31,24 @@ public class DriverService {
         this.unavailableDriverIds = new ArrayList<>();
         this.transportService = transportService;
     }
-
     // Get all drivers from DB
     public List<Driver> getAllDrivers() {
         try {
-            return driverDAO.findAll().stream()
-                    .map(DriverMapper::fromDTO)
-                    .collect(Collectors.toList());
-        } catch (SQLException e) {
+            List<EmployeeDTO> drivers = new ArrayList<>();
+            EmployeeDAOImpl empService = new EmployeeDAOImpl();
+            return empService.findByRole("driver").stream()
+                    .map(DriverMapper::fromDTO)  // ממפה כל EmployeeDTO ל-Driver
+                    .collect(Collectors.toList());        } catch (SQLException e) {
             throw new RuntimeException("Error getting all drivers", e);
         }
     }
 
     // Get only available drivers (not marked as unavailable)
     public List<Driver> getAvailableDrivers() {
-        try {
-            return driverDAO.findAvailableDrivers().stream()
-                    .map(DriverMapper::fromDTO)
-                    .filter(driver -> !isDriverAssignedToTransport(driver.getDriverId()))
-                    .collect(Collectors.toList());
-        } catch (SQLException e) {
-            throw new RuntimeException("Error getting available drivers", e);
-        }
+        return getAllDrivers().stream()
+                .filter(driver -> !isDriverAssignedToTransport(driver.getDriverId()))
+                .filter(Driver::isAvailable)
+                .collect(Collectors.toList());
     }
 
     public List<Driver> getUnavailableDrivers() {

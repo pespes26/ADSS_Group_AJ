@@ -20,7 +20,7 @@ public class DriverController {
             System.out.println("\n=== Driver Menu ===");
             System.out.println("1. Show all drivers");
             System.out.println("2. Show available drivers");
-            System.out.println("3. Add new driver");
+//            System.out.println("3. Add new driver");
             System.out.println("4. Edit driver details");
             System.out.println("5. Remove driver by ID");
             System.out.println("6. Mark driver as unavailable");
@@ -32,7 +32,7 @@ public class DriverController {
             switch (input) {
                 case "1" -> showAllDrivers();
                 case "2" -> showAvailableDrivers();
-                case "3" -> addDriver();
+//                case "3" -> addDriver();
                 case "4" -> editDriver();
                 case "5" -> removeDriver();
                 case "6" -> markDriverUnavailable();
@@ -80,64 +80,64 @@ public class DriverController {
             driver.isAvailable() ? "Available" : "Unavailable");
     }
 
-    private void addDriver() {
-        // For demo, use current day and MORNING shift. In real app, prompt user or use context.
-        java.time.DayOfWeek today = java.time.LocalDate.now().getDayOfWeek();
-        ShiftType shift = ShiftType.MORNING;
-        List<Employee> candidates = com.superli.deliveries.application.services.EmployeeManagmentService.getShiftAvailableEmployeesNotYetDrivers(today, shift, driverService);
-        if (candidates.isEmpty()) {
-            System.out.println("No eligible employees available to become drivers");
-            return;
-        }
-        System.out.println("Select an employee to promote to driver:");
-        for (int i = 0; i < candidates.size(); i++) {
-            Employee e = candidates.get(i);
-            System.out.printf("%d. %s (ID: %s)\n", i + 1, e.getFullName(), e.getId());
-        }
-        System.out.print("Enter choice (number): ");
-        int choice = -1;
-        try {
-            choice = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
-            return;
-        }
-        if (choice < 1 || choice > candidates.size()) {
-            System.out.println("Invalid choice.");
-            return;
-        }
-        Employee selected = candidates.get(choice - 1);
-        // Prompt for license type
-        System.out.println("Available license types:");
-        for (LicenseType type : LicenseType.values()) {
-            System.out.println("- " + type.getValue());
-        }
-        LicenseType selectedLicenseType = null;
-        while (selectedLicenseType == null) {
-            System.out.print("Enter license type: ");
-            String licenseInput = scanner.nextLine().trim().toUpperCase();
-            try {
-                selectedLicenseType = LicenseType.valueOf(licenseInput);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid license type. Try again.");
-            }
-        }
-        Driver driver = new Driver(
-                selected.getId(),
-                selected.getFullName(),
-                selected.getBankAccount(),
-                selected.getSalary(),
-                selected.getSiteId(),
-                selected.getEmployeeTerms(),
-                selected.getEmployeeStartDate(),
-                selected.getRoleQualifications(),
-                selected.getAvailabilityConstraints(),
-                new Role("Driver"),
-                selectedLicenseType
-        );
-        driverService.saveDriver(driver);
-        System.out.println("Driver added successfully.");
-    }
+//    private void addDriver() {
+//        // For demo, use current day and MORNING shift. In real app, prompt user or use context.
+//        java.time.DayOfWeek today = java.time.LocalDate.now().getDayOfWeek();
+//        ShiftType shift = ShiftType.MORNING;
+//        List<Employee> candidates = com.superli.deliveries.application.services.EmployeeManagmentService.getShiftAvailableEmployeesNotYetDrivers(today, shift, driverService);
+//        if (candidates.isEmpty()) {
+//            System.out.println("No eligible employees available to become drivers");
+//            return;
+//        }
+//        System.out.println("Select an employee to promote to driver:");
+//        for (int i = 0; i < candidates.size(); i++) {
+//            Employee e = candidates.get(i);
+//            System.out.printf("%d. %s (ID: %s)\n", i + 1, e.getFullName(), e.getId());
+//        }
+//        System.out.print("Enter choice (number): ");
+//        int choice = -1;
+//        try {
+//            choice = Integer.parseInt(scanner.nextLine().trim());
+//        } catch (NumberFormatException e) {
+//            System.out.println("Invalid input.");
+//            return;
+//        }
+//        if (choice < 1 || choice > candidates.size()) {
+//            System.out.println("Invalid choice.");
+//            return;
+//        }
+//        Employee selected = candidates.get(choice - 1);
+//        // Prompt for license type
+//        System.out.println("Available license types:");
+//        for (LicenseType type : LicenseType.values()) {
+//            System.out.println("- " + type.getValue());
+//        }
+//        LicenseType selectedLicenseType = null;
+//        while (selectedLicenseType == null) {
+//            System.out.print("Enter license type: ");
+//            String licenseInput = scanner.nextLine().trim().toUpperCase();
+//            try {
+//                selectedLicenseType = LicenseType.valueOf(licenseInput);
+//            } catch (IllegalArgumentException e) {
+//                System.out.println("Invalid license type. Try again.");
+//            }
+//        }
+//        Driver driver = new Driver(
+//                selected.getId(),
+//                selected.getFullName(),
+//                selected.getBankAccount(),
+//                selected.getSalary(),
+//                selected.getSiteId(),
+//                selected.getEmployeeTerms(),
+//                selected.getEmployeeStartDate(),
+//                selected.getRoleQualifications(),
+//                selected.getAvailabilityConstraints(),
+//                new Role("Driver"),
+//                selectedLicenseType
+//        );
+//        driverService.saveDriver(driver);
+//        System.out.println("Driver added successfully.");
+//    }
 
     private void editDriver() {
         System.out.print("Enter driver ID to edit: ");

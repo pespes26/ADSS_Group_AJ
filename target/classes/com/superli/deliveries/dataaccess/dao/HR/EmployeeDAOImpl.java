@@ -143,7 +143,8 @@ public class EmployeeDAOImpl implements EmployeeDAO {
             SELECT e.* 
             FROM employees e
             JOIN employee_roles er ON e.id = er.employee_id
-            WHERE er.role_name = ?
+            JOIN roles r ON er.role_id = r.id
+            WHERE r.name = ?
         """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

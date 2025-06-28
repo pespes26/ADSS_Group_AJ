@@ -1,4 +1,4 @@
-package com.superli.deliveries.presentation;
+package com.superli.deliveries.presentation.HR;
 
 import com.superli.deliveries.domain.core.Employee;
 

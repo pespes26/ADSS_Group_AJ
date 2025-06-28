@@ -44,56 +44,57 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Application.MainApp.executor": "Run",
-    "Application.com.superli.deliveries.application.Main.executor": "Run",
-    "Downloaded.Files.Path.Enabled": "false",
-    "JUnit.All in adss-aj-project.executor": "Run",
-    "JUnit.ControllerManagerTest.executor": "Run",
-    "JUnit.DriverTest (1).executor": "Run",
-    "JUnit.DriverTest.constructor_EmptyName_ThrowsException.executor": "Run",
-    "JUnit.DriverTest.constructor_NullId_ThrowsException.executor": "Run",
-    "JUnit.DriverTest.constructor_ValidData_CreatesDriver.executor": "Run",
-    "JUnit.DriverTest.executor": "Run",
-    "JUnit.DriverTest.setLicenseType_ValidType_UpdatesLicenseType.executor": "Run",
-    "JUnit.ProductTest.executor": "Run",
-    "JUnit.ShiftTest.executor": "Run",
-    "JUnit.ShipmentAreaTest.executor": "Run",
-    "JUnit.SiteTest.executor": "Run",
-    "JUnit.TransportTest.constructor_ValidData_CreatesTransport.executor": "Run",
-    "JUnit.TransportTest.executor": "Run",
-    "JUnit.TruckTest.executor": "Run",
-    "JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor": "Run",
-    "JUnit.ZoneTest.executor": "Run",
-    "Maven.adss-aj-project [clean].executor": "Run",
-    "Maven.adss-aj-project [test].executor": "Run",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "208583781__318861820__318567914__315175554",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/הנדסת מערכות מידע/שנה ג/סמסטר ו/ניתוח ותיכון מערכות תוכנה/HW1_Practical_final",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.45632184",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.com.superli.deliveries.application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JUnit.All in adss-aj-project.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ControllerManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.constructor_EmptyName_ThrowsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.constructor_NullId_ThrowsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.constructor_ValidData_CreatesDriver.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DriverTest.setLicenseType_ValidType_UpdatesLicenseType.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ShiftTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ShipmentAreaTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SiteTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TransportTest.constructor_ValidData_CreatesTransport.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TransportTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TruckTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ZoneTest.constructor_ValidData_CreatesZone.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ZoneTest.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.adss-aj-project [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.adss-aj-project [test].executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;208583781__318861820__318567914__315175554&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/הנדסת מערכות מידע/שנה ג/סמסטר ו/ניתוח ותיכון מערכות תוכנה/HW1_Practical_final&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.45632184&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs" />
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_P2\ADSS_Group_AJ" />
       <recent name="C:\Users\Pesso\Desktop\Projects\ADSS_Group_AJ\release" />
     </key>
@@ -103,8 +104,8 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.Main" />
+    <configuration name="com.superli.deliveries.application.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.superli.deliveries.application.Main" />
       <module name="adss-aj-project" />
       <extension name="coverage">
         <pattern>
@@ -170,7 +171,7 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.com.superli.deliveries.application.Main" />
       <item itemvalue="JUnit.ControllerManagerTest" />
       <item itemvalue="JUnit.All in adss-aj-project" />
       <item itemvalue="JUnit.ShiftTest" />
@@ -178,7 +179,7 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.com.superli.deliveries.application.Main" />
         <item itemvalue="JUnit.All in adss-aj-project" />
         <item itemvalue="JUnit.ShiftTest" />
         <item itemvalue="JUnit.TruckTest" />

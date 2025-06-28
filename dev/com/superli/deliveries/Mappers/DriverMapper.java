@@ -7,6 +7,7 @@ import java.util.Date;
 import com.superli.deliveries.domain.core.Driver;
 import com.superli.deliveries.domain.core.LicenseType;
 import com.superli.deliveries.domain.core.Role;
+import com.superli.deliveries.dto.HR.EmployeeDTO;
 import com.superli.deliveries.dto.del.DriverDTO;
 
 public class DriverMapper {
@@ -29,6 +30,26 @@ public class DriverMapper {
                 LicenseType.valueOf(dto.getLicenseType())   // licenseType
         );
         driver.setAvailable(dto.isAvailable());  // Set the availability status from DTO
+        return driver;
+    }
+
+    public static Driver fromDTO(EmployeeDTO employeeDTO) {
+        Driver driver = new Driver(
+                employeeDTO.getId(),                                 // id
+                employeeDTO.getFullName(),                           // fullName
+                "000-000-000",                              // bankAccount (default)
+                0.0,                                        // salary (default)
+                -1,                                         // siteId (default)
+                "Standard",                                 // employeeTerms (default)
+                new Date(),                                 // employeeStartDate (default)
+                new ArrayList<>(),                          // roleQualifications
+                new ArrayList<>(),                          // availabilityConstraints
+                new Role("DRIVER"),                         // loginRole
+                LicenseType.B   // licenseType
+        );
+        // המרת פרטי ה־DTO לאובייקט Driver
+        driver.setFullName(employeeDTO.getFullName());
+        // הוסיפי שדות נוספים לפי הצורך
         return driver;
     }
 

@@ -2,8 +2,8 @@ package com.superli.deliveries.presentation.HR;
 
 import com.superli.deliveries.application.controllers.EmployeeController;
 import com.superli.deliveries.application.controllers.ManagerController;
-import com.superli.deliveries.application.services.RoleService;
-import com.superli.deliveries.application.services.ShiftService;
+import com.superli.deliveries.application.services.*;
+import com.superli.deliveries.config.DataInitializer;
 import com.superli.deliveries.dataaccess.dao.HR.RoleDAO;
 import com.superli.deliveries.dataaccess.dao.HR.RoleDAOImpl;
 import com.superli.deliveries.dataaccess.dao.HR.ShiftDAOImpl;
@@ -12,10 +12,15 @@ import com.superli.deliveries.dataaccess.dao.del.SiteDAOImpl;
 import com.superli.deliveries.domain.core.*;
 import com.superli.deliveries.dto.del.SiteDTO;
 import com.superli.deliveries.util.Database;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class DataSeeder {
@@ -115,15 +120,14 @@ public class DataSeeder {
                     2
             );
 
-
-
-
             int site1Int = Integer.parseInt(site1.getSiteId());
             int site2Int = Integer.parseInt(site2.getSiteId());
 
             ShiftDAOImpl shiftDAO = new ShiftDAOImpl(conn);
             shiftDAO.saveAssignment("222222222", "SUNDAY", "MORNING", "2025-06-22", 1,site1Int); // shift manager
             shiftDAO.saveAssignment("111111111", "SUNDAY", "MORNING", "2025-06-22", 3,site2Int); // driver
+            shiftDAO.saveAssignment("111111111", "SATURDAY", "MORNING", "2025-06-28", 3,site2Int); // driver
+            shiftDAO.saveAssignment("111111111", "SATURDAY", "EVENING", "2025-06-28", 3,site2Int); // driver
 
             // === Seed Trucks ===
             stmt.executeUpdate("DELETE FROM trucks");

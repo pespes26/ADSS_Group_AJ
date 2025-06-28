@@ -96,7 +96,7 @@ public class DataInitializer {
         this.transportService = transportService;
         this.destinationDocService = destinationDocService;
         this.deliveredItemService = deliveredItemService;
-        
+
         try {
             this.conn = Database.getConnection();
         } catch (SQLException e) {
@@ -119,7 +119,7 @@ public class DataInitializer {
             }
 
             log.info("Starting data initialization...");
-            
+
             List<Zone> zones = initializeZones();
             List<Site> sites = initializeSites(zones);
             List<Driver> drivers = initializeDrivers(sites);
@@ -179,7 +179,7 @@ public class DataInitializer {
         log.info("Initializing zones...");
         List<Zone> zones = new ArrayList<>();
         int numZones = random.nextInt(MAX_ZONES - MIN_ZONES + 1) + MIN_ZONES;
-        
+
         String[] zoneNames = {"North", "South", "East", "West", "Central", "Coastal", "Mountain", "Valley"};
         for (int i = 0; i < numZones; i++) {
             String zoneId = String.format("Z%03d", i + 1);
@@ -187,7 +187,7 @@ public class DataInitializer {
             zones.add(new Zone(zoneId, zoneName));
             zoneService.saveZone(zones.get(i));
         }
-        
+
         log.info("Initialized {} zones", zones.size());
         return zones;
     }
@@ -204,10 +204,10 @@ public class DataInitializer {
             String streetType = STREET_TYPES[random.nextInt(STREET_TYPES.length)];
             String address = streetNum + " " + streetName + " " + streetType;
             String phone = String.format("555-%04d", random.nextInt(10000));
-            String contactName = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)] + " " + 
+            String contactName = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)] + " " +
                                LAST_NAMES[random.nextInt(LAST_NAMES.length)];
             Zone zone = zones.get(random.nextInt(zones.size()));
-            
+
             sites.add(new Site(siteId, address, phone, contactName, zone));
             siteService.saveSite(sites.get(i));
         }
@@ -224,12 +224,12 @@ public class DataInitializer {
 
         for (int i = 0; i < numDrivers; i++) {
             String driverId = String.format("D%03d", i + 1);
-            String name = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)] + " " + 
+            String name = FIRST_NAMES[random.nextInt(FIRST_NAMES.length)] + " " +
                          LAST_NAMES[random.nextInt(LAST_NAMES.length)];
             LicenseType licenseType = LicenseType.values()[random.nextInt(LicenseType.values().length)];
             boolean available = random.nextBoolean();
             Site site = sites.get(random.nextInt(sites.size()));
-            
+
             drivers.add(createDriver(driverId, name, licenseType, available, driverRole, site));
             driverService.saveDriver(drivers.get(i));
         }
@@ -245,7 +245,7 @@ public class DataInitializer {
         List<AvailableShifts> constraints = new ArrayList<>();
         DayOfWeek[] days = DayOfWeek.values();
         ShiftType[] shifts = ShiftType.values();
-        
+
         // Randomly assign 3-5 shifts
         int numShifts = random.nextInt(3) + 3;
         for (int i = 0; i < numShifts; i++) {
@@ -282,7 +282,7 @@ public class DataInitializer {
             float maxWeight = netWeight * (2.0f + random.nextFloat() * 2.0f);
             LicenseType licenseType = LicenseType.values()[random.nextInt(LicenseType.values().length)];
             boolean available = random.nextBoolean();
-            
+
             trucks.add(new Truck(plateNum, model, netWeight, maxWeight, licenseType, available));
             truckService.saveTruck(trucks.get(i));
         }
@@ -312,7 +312,7 @@ public class DataInitializer {
             String productId = String.format("P%03d", i + 1);
             String name = PRODUCT_NAMES[i];
             float weight = 0.1f + random.nextFloat() * 5.0f; // Random weight between 0.1 and 5.0 kg
-            
+
             products.add(new Product(productId, name, weight));
             productService.saveProduct(products.get(i));
         }
@@ -325,7 +325,7 @@ public class DataInitializer {
         log.info("Initializing transports...");
         List<Transport> transports = new ArrayList<>();
         int numTransports = random.nextInt(MAX_TRANSPORTS - MIN_TRANSPORTS + 1) + MIN_TRANSPORTS;
-        
+
         // Filter available drivers and trucks
         List<Driver> availableDrivers = drivers.stream()
             .filter(Driver::isAvailable)
@@ -337,29 +337,29 @@ public class DataInitializer {
         // Create transports using available resources
         for (int i = 0; i < numTransports && !availableDrivers.isEmpty() && !availableTrucks.isEmpty(); i++) {
             String transportId = String.format("T%03d", i + 1);
-            
+
             // Randomly select available driver and truck
             Driver driver = availableDrivers.get(random.nextInt(availableDrivers.size()));
             Truck truck = availableTrucks.stream()
                 .filter(t -> t.getRequiredLicenseType() == driver.getLicenseType())
                 .findFirst()
                 .orElse(null);
-            
+
             if (truck != null) {
                 Site originSite = sites.get(random.nextInt(sites.size()));
                 LocalDateTime departureTime = LocalDateTime.now().plusDays(random.nextInt(7));
-                
+
                 Transport transport = new Transport(transportId, truck, driver, originSite, departureTime);
                 transport.setStatus(TransportStatus.PLANNED);
                 transport.setDepartureWeight(random.nextFloat() * (truck.getMaxWeight() - truck.getNetWeight()));
-                
+
                 transports.add(transport);
                 transportService.saveTransport(transport);
-                
+
                 // Mark driver and truck as unavailable
                 driverService.markDriverAsUnavailable(driver.getDriverId());
                 truckService.markTruckAsUnavailable(truck.getPlateNum());
-                
+
                 // Remove used resources from available lists
                 availableDrivers = availableDrivers.stream()
                     .filter(d -> !d.getDriverId().equals(driver.getDriverId()))
@@ -382,7 +382,7 @@ public class DataInitializer {
             for (int i = 0; i < numDocs; i++) {
                 String docId = String.format("DOC%s-%d", transport.getTransportId(), i + 1);
                 Site destination = sites.get(random.nextInt(sites.size()));
-                
+
                 DestinationDoc doc = new DestinationDoc(
                     docId,
                     transport.getTransportId(),
@@ -390,15 +390,15 @@ public class DataInitializer {
                     "PENDING"
                 );
                 destinationDocService.saveDoc(doc);
-                
+
                 // Add 2-5 items to each document
                 int numItems = random.nextInt(4) + 2;
                 for (int j = 0; j < numItems; j++) {
                     Product product = products.get(random.nextInt(products.size()));
                     String itemId = String.format("I%s-%d", docId, j + 1);
                     int quantity = random.nextInt(10) + 1;
-                    
-                    DeliveredItem item = new DeliveredItem(itemId, doc.getDestinationDocId(), 
+
+                    DeliveredItem item = new DeliveredItem(itemId, doc.getDestinationDocId(),
                         product.getProductId(), quantity);
                     deliveredItemService.addDeliveredItem(doc.getDestinationDocId(), item);
                 }
@@ -410,4 +410,5 @@ public class DataInitializer {
     public static void resetInitializationFlag() {
         initialized = false;
     }
-} 
+
+}

@@ -673,11 +673,11 @@ public class TransportController {
         }
 
         System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║        AVAILABLE NEXT STATUSES      ║");
+        System.out.println("║       AVAILABLE NEXT STATUSES      ║");
         System.out.println("╠════════════════════════════════════╣");
         for (int i = 0; i < validStatuses.size(); i++) {
             System.out.println("║ " + (i + 1) + ". " + validStatuses.get(i) + 
-                " ".repeat(25 - validStatuses.get(i).toString().length()) + "║");
+                " ".repeat(25 - validStatuses.get(i).toString().length()) + "       ║");
         }
         System.out.println("╚════════════════════════════════════╝");
 

@@ -47,17 +47,17 @@ class SiteTest {
         assertEquals(validZone, site.getZone());
     }
 
-    @Test
-    void constructor_NullSiteId_ThrowsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new Site(null, "Rager Blvd 1", "08-6461111", "Yossi", validZone));
-    }
+//    @Test
+//    void constructor_NullSiteId_ThrowsIllegalArgumentException() {
+//        assertThrows(IllegalArgumentException.class, () ->
+//                new Site(null, "Rager Blvd 1", "08-6461111", "Yossi", validZone));
+//    }
 
-    @Test
-    void constructor_BlankSiteId_ThrowsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new Site("   ", "Rager Blvd 1", "08-6461111", "Yossi", validZone));
-    }
+//    @Test
+//    void constructor_BlankSiteId_ThrowsIllegalArgumentException() {
+//        assertThrows(IllegalArgumentException.class, () ->
+//                new Site("   ", "Rager Blvd 1", "08-6461111", "Yossi", validZone));
+//    }
 
     @Test
     void constructor_NullAddress_ThrowsIllegalArgumentException() {

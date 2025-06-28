@@ -3,6 +3,7 @@ package com.superli.deliveries.application.controllers;
 import java.util.Scanner;
 
 import com.superli.deliveries.application.Main;
+import com.superli.deliveries.application.MainApp;
 
 public class MainMenuController {
 
@@ -31,7 +32,7 @@ public class MainMenuController {
         this.scanner = scanner;
     }
 
-    public void run() {
+    public boolean run() {
         while (true) {
             if (Main.isSystemAdmin()) {
                 showAdminMenu();
@@ -39,15 +40,15 @@ public class MainMenuController {
                 showTransportManagerMenu();
             } else {
                 System.out.println("Permission error. Terminating program.");
-                return;
+                return false;
             }
 
             String input = scanner.nextLine().trim();
 
             if (Main.isSystemAdmin()) {
-                handleAdminChoice(input);
+                if (handleAdminChoice(input)) return false;
             } else if (Main.isTransportManager()) {
-                handleTransportManagerChoice(input);
+                if (handleTransportManagerChoice(input)) return false;
             }
         }
     }
@@ -60,7 +61,7 @@ public class MainMenuController {
         System.out.println("4. Manage Sites");
         System.out.println("5. Manage Zones");
         System.out.println("6. Destination Documents");
-        System.out.println("0. Exit");
+        System.out.println("0. Back To Main Menu");
         System.out.print("Your choice: ");
     }
 
@@ -70,11 +71,11 @@ public class MainMenuController {
         System.out.println("2. Manage Drivers");
         System.out.println("3. Manage Trucks");
         System.out.println("4. Destination Documents");
-        System.out.println("0. Exit");
+        System.out.println("0. Back To Main Menu");
         System.out.print("Your choice: ");
     }
 
-    private void handleAdminChoice(String input) {
+    private boolean handleAdminChoice(String input) {
         switch (input) {
             case "1" -> transportController.runMenu();
             case "2" -> driverController.runMenu();
@@ -83,13 +84,15 @@ public class MainMenuController {
             case "5" -> zoneController.runMenu();
             case "6" -> destinationDocController.runMenu();
             case "0" -> {
-                System.out.println("Exiting the system. Goodbye!");
+                System.out.println("Exiting the delivery system. Goodbye!");
+                return true;
             }
             default -> System.out.println("Invalid choice. Please try again.");
         }
+        return false;
     }
 
-    private void handleTransportManagerChoice(String input) {
+    private boolean handleTransportManagerChoice(String input) {
         switch (input) {
             case "1" -> transportController.runMenu();
             case "2" -> driverController.runMenu();
@@ -97,9 +100,10 @@ public class MainMenuController {
             case "4" -> destinationDocController.runMenu();
             case "0" -> {
                 System.out.println("Exiting the system. Goodbye!");
-                System.exit(0);
+                return true;
             }
             default -> System.out.println("Invalid choice. Please try again.");
         }
+        return false;
     }
 }

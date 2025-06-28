@@ -15,7 +15,7 @@ public class DatabaseResetUtil {
 
             System.out.println("Clearing all tables...");
 
-            // כיבוי אילוצי Foreign Keys זמנית כדי לא לקבל שגיאות תלות
+
             stmt.execute("PRAGMA foreign_keys = OFF;");
 
             String[] tables = {
@@ -45,14 +45,13 @@ public class DatabaseResetUtil {
                 }
             }
 
-            // איפוס המונה של AUTOINCREMENT (שולח את הספירה חזרה ל־1)
+
             try {
                 stmt.execute("DELETE FROM sqlite_sequence;");
             } catch (SQLException e) {
                 System.err.println("Could not reset AUTOINCREMENT counters: " + e.getMessage());
             }
 
-            // הפעלת בדיקת Foreign Keys מחדש
             stmt.execute("PRAGMA foreign_keys = ON;");
 
             System.out.println("All existing tables cleared and AUTOINCREMENT reset successfully.");
